@@ -1,0 +1,118 @@
+<dex-project version="0.8">
+   <tasks class="java.util.ArrayList">
+      <task-item name="Read CSV" active="true">
+         <task class="com.dexvis.dex.task.input.ReadCsv">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+            <fileText>C:\dex\data\colleges\Accreditation_2015_09.csv</fileText>
+            <limitRows>false</limitRows>
+            <rowLimitText>0</rowLimitText>
+            <lastDir>C:\dex\data\colleges</lastDir>
+         </task>
+      </task-item>
+      <task-item name="View Data" active="true">
+         <task class="com.dexvis.dex.task.utilities.ViewData">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+         </task>
+      </task-item>
+      <task-item name="Column Filter" active="true">
+         <task class="com.dexvis.dex.task.tablemanipulation.ColumnFilter">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+            <filterTypeCB>&lt;map&gt;
+  &lt;entry&gt;
+    &lt;string&gt;items&lt;/string&gt;
+    &lt;list&gt;
+      &lt;string&gt;Exclude&lt;/string&gt;
+      &lt;string&gt;Include&lt;/string&gt;
+    &lt;/list&gt;
+  &lt;/entry&gt;
+  &lt;entry&gt;
+    &lt;string&gt;selected&lt;/string&gt;
+    &lt;string&gt;Exclude&lt;/string&gt;
+  &lt;/entry&gt;
+&lt;/map&gt;</filterTypeCB>
+            <colCbList class="java.util.ArrayList">
+               <checkBox>false</checkBox>
+               <checkBox>false</checkBox>
+               <checkBox>true</checkBox>
+               <checkBox>false</checkBox>
+               <checkBox>false</checkBox>
+               <checkBox>true</checkBox>
+               <checkBox>true</checkBox>
+               <checkBox>true</checkBox>
+               <checkBox>true</checkBox>
+               <checkBox>true</checkBox>
+               <checkBox>true</checkBox>
+               <checkBox>true</checkBox>
+               <checkBox>true</checkBox>
+               <checkBox>true</checkBox>
+               <checkBox>true</checkBox>
+               <checkBox>true</checkBox>
+               <checkBox>true</checkBox>
+               <checkBox>false</checkBox>
+               <checkBox>true</checkBox>
+               <checkBox>true</checkBox>
+               <checkBox>false</checkBox>
+               <checkBox>false</checkBox>
+               <checkBox>true</checkBox>
+               <checkBox>true</checkBox>
+               <checkBox>true</checkBox>
+            </colCbList>
+            <colLabelList class="java.util.ArrayList">
+               <label>Institution_ID:</label>
+               <label>Institution_Name:</label>
+               <label>Institution_Address:</label>
+               <label>Institution_City:</label>
+               <label>Institution_State:</label>
+               <label>Institution_Zip:</label>
+               <label>Institution_Phone:</label>
+               <label>Institution_OPEID:</label>
+               <label>Institution_IPEDS_UnitID:</label>
+               <label>Institution_Web_Address:</label>
+               <label>Campus_ID:</label>
+               <label>Campus_Name:</label>
+               <label>Campus_Address:</label>
+               <label>Campus_City:</label>
+               <label>Campus_State:</label>
+               <label>Campus_Zip:</label>
+               <label>Campus_IPEDS_UnitID:</label>
+               <label>Accreditation_Type:</label>
+               <label>Agency_Name:</label>
+               <label>Agency_Status:</label>
+               <label>Program_Name:</label>
+               <label>Accreditation_Status:</label>
+               <label>Accreditation_Date_Type:</label>
+               <label>Periods:</label>
+               <label>Last Action:</label>
+            </colLabelList>
+         </task>
+      </task-item>
+      <task-item name="View Data" active="true">
+         <task class="com.dexvis.dex.task.utilities.ViewData">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+         </task>
+      </task-item>
+      <task-item name="Describe Data" active="true">
+         <task class="com.dexvis.dex.task.info.DescribeData">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+         </task>
+      </task-item>
+      <task-item name="Write CSV" active="true">
+         <task class="com.dexvis.dex.task.output.WriteCsv">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+            <outputFileText>C:\dex\data\colleges\accreditation.csv</outputFileText>
+         </task>
+      </task-item>
+   </tasks>
+</dex-project>

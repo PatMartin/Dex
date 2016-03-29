@@ -1,0 +1,135 @@
+<dex-project version="0.8">
+   <tasks class="java.util.ArrayList">
+      <task-item name="Read CSV" active="true">
+         <task class="com.dexvis.dex.task.input.ReadCsv">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+            <fileText>C:\dex2ws\Dex\data\sales.csv</fileText>
+            <limitRows>false</limitRows>
+            <rowLimitText>0</rowLimitText>
+            <lastDir>C:\dex2ws\Dex\data</lastDir>
+         </task>
+      </task-item>
+      <task-item name="View Data" active="true">
+         <task class="com.dexvis.dex.task.utilities.ViewData">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+         </task>
+      </task-item>
+      <task-item name="Radar Chart" active="true">
+         <task class="com.dexvis.dex.task.vis.dexcharts.RadarChart">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper">
+                  <property>
+                     <name>Height</name>
+                     <target>height</target>
+                     <category>Dimensions</category>
+                     <value class="java.lang.Integer">600</value>
+                     <desc></desc>
+                  </property>
+                  <property>
+                     <name>Width</name>
+                     <target>width</target>
+                     <category>Dimensions</category>
+                     <value class="java.lang.Integer">800</value>
+                     <desc></desc>
+                  </property>
+                  <property>
+                     <name>Transform</name>
+                     <target>transform</target>
+                     <category>Dimensions</category>
+                     <value class="java.lang.String"></value>
+                     <desc></desc>
+                  </property>
+                  <property>
+                     <name>Resizable</name>
+                     <target>resizable</target>
+                     <category>Dimensions</category>
+                     <value class="java.lang.Boolean">true</value>
+                     <desc></desc>
+                  </property>
+                  <property>
+                     <name>Circle Radius</name>
+                     <target>radar.circle.r</target>
+                     <category>Radar Circles</category>
+                     <value class="java.lang.String"></value>
+                     <desc></desc>
+                  </property>
+                  <property>
+                     <name>Circle CX</name>
+                     <target>radar.circle.cx</target>
+                     <category>Radar Circles</category>
+                     <value class="java.lang.String"></value>
+                     <desc></desc>
+                  </property>
+                  <property>
+                     <name>Circle CY</name>
+                     <target>radar.circle.cy</target>
+                     <category>Radar Circles</category>
+                     <value class="java.lang.String"></value>
+                     <desc></desc>
+                  </property>
+                  <property>
+                     <name>Circle Transform</name>
+                     <target>radar.circle.transform</target>
+                     <category>Radar Circles</category>
+                     <value class="java.lang.String"></value>
+                     <desc></desc>
+                  </property>
+                  <property>
+                     <name>Fill Color</name>
+                     <target>radar.circle.fill.fillColor</target>
+                     <category>Radar Circles</category>
+                     <value class="java.lang.String"></value>
+                     <desc></desc>
+                  </property>
+                  <property>
+                     <name>Fill Opacity</name>
+                     <target>radar.circle.fill.fillOpacity</target>
+                     <category>Radar Circles</category>
+                     <value class="java.lang.String"></value>
+                     <desc></desc>
+                  </property>
+                  <property>
+                     <name>Stroke Color</name>
+                     <target>radar.circle.stroke.color</target>
+                     <category>Radar Circles</category>
+                     <value class="java.lang.String"></value>
+                     <desc></desc>
+                  </property>
+                  <property>
+                     <name>Stroke Width</name>
+                     <target>radar.circle.stroke.width</target>
+                     <category>Radar Circles</category>
+                     <value class="java.lang.String"></value>
+                     <desc></desc>
+                  </property>
+                  <property>
+                     <name>Stroke Dash Array</name>
+                     <target>radar.circle.stroke.dasharray</target>
+                     <category>Radar Circles</category>
+                     <value class="java.lang.String"></value>
+                     <desc></desc>
+                  </property>
+                  <property>
+                     <name>Stroke Opacity</name>
+                     <target>radar.circle.stroke.opacity</target>
+                     <category>Radar Circles</category>
+                     <value class="java.lang.String"></value>
+                     <desc></desc>
+                  </property>
+                  <property>
+                     <name>Stroke Transform</name>
+                     <target>radar.circle.stroke.transform</target>
+                     <category>Radar Circles</category>
+                     <value class="java.lang.String"></value>
+                     <desc></desc>
+                  </property>
+               </properties>
+            </prop-sheet>
+         </task>
+      </task-item>
+   </tasks>
+</dex-project>

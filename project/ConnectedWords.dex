@@ -1,0 +1,268 @@
+<dex-project version="0.8">
+   <tasks class="java.util.ArrayList">
+      <task-item name="Text Input" active="true">
+         <task class="com.dexvis.dex.task.input.TextInput">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+            <inputText>Honor This is the bedrock of our character. It is the quality that empowers Marines to exemplify the ultimate in ethical and moral behavior: to never lie, cheat, or steal; to abide by an uncompromising code of integrity; to respect human dignity; and to have respect and concern for each other. It represents the maturity, dedication, trust, and dependability that commit Marines to act responsibly, be accountable for their actions, fulfill their obligations, and hold others accountable for their actions.
+Courage The heart of our Core Values, courage is the mental, moral, and physical strength ingrained in Marines that sees them through the challenges of combat and the mastery of fear, and to do what is right, to adhere to a higher standard of personal conduct, to lead by example, and to make tough decisions under stress and pressure. It is the inner strength that enables a Marine to take that extra step.
+Commitment This is the spirit of determination and dedication within members of a force of arms that leads to professionalism and mastery of the art of war. It promotes the highest order of discipline for unit and self and is the ingredient that instills dedication to Corps and country 24 hours a day, pride, concern for others, and an unrelenting determination to achieve a standard of excellence in every endeavor. Commitment is the value that establishes the Marine as the warrior and citizen others strive to emulate.</inputText>
+         </task>
+      </task-item>
+      <task-item name="Twinkle Twinkle" active="false">
+         <task class="com.dexvis.dex.task.input.TextInput">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+            <inputText>Twinkle, twinkle, little star
+How I wonder what you are!
+Up above the world so high
+Like a diamond in the sky
+Twinkle, twinkle, little star
+How I wonder what you are</inputText>
+         </task>
+      </task-item>
+      <task-item name="Trumps Speech" active="false">
+         <task class="com.dexvis.dex.task.input.TextInput">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+            <inputText>Thank you so much.  That&apos;s so nice.  Isn&apos;t he a great guy.  He doesn&apos;t get a fair press; he doesn&apos;t get it.  It&apos;s just not fair. 
+And I have to tell you I&apos;m here, and very strongly here, because I have great respect for Steve King and have great respect likewise for Citizens United, David and everybody, and tremendous resect for the Tea Party.  Also, also the people of Iowa.  They have something in common.  Hard-working people.  They want to work, they want to make the country great.  I love the people of Iowa.  So that&apos;s the way it is.  Very simple.  
+With that said, our country is really headed in the wrong direction with a president who is doing an absolutely terrible job.  The world is collapsing around us, and many of the problems we&apos;ve caused.  Our president is either grossly incompetent, a word that more and more people are using, and I think I was the first to use it, or he has a completely different agenda than you want to know about, which could be possible.  In any event, Washington is broken, and our country is in serious trouble and total disarray.  Very simple.  Politicians are all talk, no action.  They are all talk and no action.  And it&apos;s constant; it never ends.  
+And I&apos;m a conservative, actually very conservative, and I&apos;m a Republican.  And I&apos;m very disappointed by our Republican politicians.  Because they let the president get away with absolute murder.  You see always, oh we&apos;re going to do this, we&apos;re going to--.  Nothing ever happens; nothing ever happens.  
+You look at Obamacare.  A total catastrophe and by the way it really kicks in in &apos;16 and it is going to be a disaster.  People are closing up shops.  Doctors are quitting the business.  I have a friend of mine who&apos;s a doctor, a very good doctor, a very successful guy.  He said, I have more accountants than I have patients.  And he needs because it is so complicated and so terrible and he&apos;s never had that before and he&apos;s going to close up his business.  And he was very successful guy.  But it&apos;s happening more and more.
+Look at Obamacare with a $5 billion website.  I have many websites, many, many websites.  They&apos;re all over the place.  But for $10, okay?
+Now everything about Obamacare was a lie.  It was a filthy lie.  And when you think about it, lies, I mean are they prosecuted?  Does anyone do anything?  And what are the Republican politicians doing about it?  He lied about the doctor, he lied about every aspect.  You can keep your plan.  And you&apos;ve all heard that hundreds of times.  That&apos;s like the real estate location, location.  I don&apos;t even say it anymore because everybody goes location, location.  But you have heard this about Obamacare.  
+And it&apos;s disgraceful.  It&apos;s a big, fat, horrible lie.  Your deductibles are going through the roof.  You&apos;re not going to get--unless you&apos;re hit by an army tank, you&apos;re not going to get coverage.  And people that had plans that they loved, that they really loved, don&apos;t have those plans anymore.  So it&apos;s a real, real disaster.  And somebody has to repeal and replace Obamacare.  And they have to do it fast and not just talk about it.
+Now, we have to build a fence.  And it&apos;s got to be a beauty.  Who can build better than Trump?  I build; it&apos;s what I do.  I build; I build nice fences, but I build great buildings.  Fences are easy, believe me.  I saw the other day on television people just walking across the border.  They&apos;re walking.  The military is standing there holding guns and people are just walking right in front, coming into our country.  It is so terrible.  It is so unfair.  It is so incompetent.  And we don&apos;t have the best coming in.  We have people that are criminals, we have people that are crooks.  You can certainly have terrorists.  You can certainly have Islamic terrorists.  You can have anything coming across the border.  We don&apos;t do anything about it.  So I would say that if I run and if I win, I would certainly start by building a very, very powerful border.
+
+Again, the politicians talk about it and they do nothing about it.  Benghazi.  Oh, Benghazi, Benghazi.  Everything is Benghazi.  What happens?  Nothing.  
+IRS, e-mails.  I get sued all the time, okay.  I run a big business.  You know I&apos;ve always said it&apos;s very, very hard for a person who is very successful.  I have done so many deals.  Almost all of them have been tremendously successful.  You&apos;ll see that when I file my statements.  I mean you will see; you will be very proud of me, okay.  But I&apos;ve always said, and I said it strongly, it&apos;s very hard for somebody that does tremendous numbers of deals to run for politics, run for political office, any office, let alone president.  Because you&apos;ve done so much; you&apos;ve beaten so many people; you&apos;ve created so many--  Look, Obama, what did he do?  No deal.  He never did a deal.  He did one deal.  A house.  And if you did that house you&apos;d be in jail right now, okay.  He got away with murder.  But I can tell you, e-mails.  IRS, the e-mails, thousands of them, they were lost; they were lost.  If you were in my world you would know that e-mails can&apos;t be lost; they can&apos;t be lost.  So why aren&apos;t our politicians finding out where those e-mails are?  
+They talk about executive orders and they talk about immigration and they talk about oh well we have to stop the border; that&apos;s the end of it.  Believe me if I did something you would have a border that would be great.  But they talk about it.  And then you have a president that does an executive order.  Nobody even heard of an executive order.  He does it to let people come in and nobody does anything about executive orders.  Why didn&apos;t they go to court and ask for declaratory judgment--which is something that when you know somebody is going to go after you and when it&apos;s in writing, and he&apos;s been saying it for a long time; he said, I&apos;m going to approve this and that--why didn&apos;t our Republicans go in and get a declaratory judgment from the courts because you could have started the process six months earlier.  Instead they have a weak lawsuit, that probably the time it&apos;s finished, I know so much about this, six, seven, eight years from now everyone&apos;s going to forget about it.  We&apos;ll be into a different mode, and our country will be further destroyed.  So we have to do something. 
+Jobs.  China.  I mean I&apos;ve made so much money fighting against the Chinese.  One of the best deals I ever did was against the Chinese, and they respect me for it.  And I know them.  And they say, we can&apos;t believe what we&apos;re getting away with.  We can&apos;t believe how stupid your leaders are.  They tell me that.  Now they don&apos;t know I&apos;m going to go and make a speech about it, but why not.  But they tell me that.  
+And by the way, especially for the folks here that sell so much--goods, I mean the goods you sell are incredible; I don&apos;t know if you&apos;ve been watching what&apos;s happening with the devaluations of so many countries.  The Euro, China is going crazy with the devaluation.  I never thought that they&apos;d have the guts to do what they&apos;re doing.  They are devaluing down to nothing.  And what it&apos;s going to do is make it impossible for you to sell your product; it&apos;s going make it impossible for you to compete.  And they&apos;re getting away with it.  And they wouldn&apos;t have even done it two years ago, but now they feel we&apos;re so weak and we have so many different problems all over the world that they can do it.  But you watch this devaluation of all of it.  I mean the Euro, China, Mexico; everybody is devaluing.  And when you hear the dollar is getting stronger, it sounds good.  You know it&apos;s one of those things, sounds good.  Be very careful.  Be very careful.  Because we&apos;re just going to lose more and more business to these foreign countries that really know what they are doing.  They have it set.  Don&apos;t forget another thing.  China became the number one economic power a year ago.  That was unthinkable; to think that that was going to happen.  It was absolutely unthinkable.  So it happened and it&apos;s very, very sad.  
+Now we spent $2 trillion in Iraq.  We got nothing.  They don&apos;t even respect us; they don&apos;t even care about us.  Until they started getting their ass kicked, and call, oh please come back and help us.  We want you out; then all of the sudden a new group forms, ISIS.  By the way, you know how they formed.  They took the oil.  And for those of you that know and love Donald Trump--there are some of you--have I been saying for four years, keep the oil.  So now ISIS has the oil.  And the stuff that ISIS doesn&apos;t have, Iran is going to take.  So we get nothing.  We have $2 trillion and we have thousands of lives lost, thousands, and we have, what do we have.  I mean I walk down the streets of New York and I see so many wounded warriors, incredible people.  And we have to help those people, we have to help our vets, we have to help our military, we have to build our military.  But, and we have to do it fast; we have to do it fast.  We have incompetent people.  They put people in charge that have no clue what they&apos;re doing.  It needs money.  
+We have to make our country rich again so we do that, so we can save Social Security.  &apos;Cause I&apos;m not a cutter; I&apos;ll probably be the only Republican that does not want to cut Social Security.  I&apos;m not a cutter of Social Security; I want to make the country rich so that Social Security can be afforded, and Medicare and Medicaid.  Get rid of the waste, get rid of the fraud, but you deserve your Social Security; you&apos;ve been paying your Security.  And like, I like Congressman Ryan, I like a lot of the people that are talking about you know cutting Social Security, and by the way the Democrats are eating your lunch on this issue.  It&apos;s an issue that you&apos;re not going to win; you&apos;ve got to make the country rich again and strong again so that you can afford it, and so you can afford military, and all of the other things.  
+Now, we have a game changer now, and the game changer is nuclear weapons.  We really do have to get strong, and we have to get strong fast.  We can&apos;t let Iran get a nuclear weapon.  We can&apos;t do it.  Can&apos;t do it.  We cannot let that happen.  You know in the old days, I would have said 100 years ago, 50 years ago, 30 years ago, pull out and let them fight each other.  
+Here we are in Syria.  We&apos;re fighting people that want to overturn Syria.  Think of this.  We&apos;re fighting ISIS, but ISIS wants to overturn the government.  Maybe you let them fight for a little while and then you take out the one that remains, okay.  But think of it; think of it.  ISIS is fighting them and we are bombing the hell out of them, but we want Syria to fall.  There are so many things; there are so many things.  
+But the one game changer that we have to be careful with, that we never really had to think about  too much before, other than a cetain number of years ago, is the nuclear.  Nuclear today, it&apos;s not like soldiers in uniforms shooting rifles.  You can take out the East Coast of this country, you can take out large sections of the Midwest, you can take out things that were unthinkable.  The power.  And we have to be in a position where that never, ever, ever, every happens.  We&apos;ve never had this before.  
+We have a situation in Afghanistan; we&apos;re spending tremendous amounts of money there.  We&apos;re trying to do the right thing.  We have leadership, again--no leadership respects us.  You know, leadership of other places never respect stupid people, okay, that&apos;s one thing you&apos;re going to find.  The same thing is happening there.  And I never knew that Afghanistan until a year ago or so, Afghanistan has tremendous wealth in minerals, different, not the oil, but minerals.  And we&apos;re fighting here, and on the other side of the mountain China is taking out all the minerals.  They&apos;re taking it out.  Trillion of dollars and millions of dollars of minerals.  So we&apos;re fighting here and they are taking it out, looking at us and saying thank you very much sucker.  It&apos;s really, really crazy.
+
+So we have to rebuild quickly our infrastructure of this country.  If we don&apos;t--  The other day in Ohio a bridge collapsed.  Bridges are collapsing all over the country.  The reports on bridges and the like are unbelievable, what&apos;s happening with our infrastructure.
+I go to Saudi Arabia, I go to Dubai; I am doing big jobs in Dubai.  I go to various different places.  I go to China.  They are building a bridge on every corner.  They have bridges that make the George Washington Bridge like small time stuff.  They&apos;re building the most incredible things you have ever seen.  They are building airports in Qatar--which they like to say &quot;cutter&quot; but I&apos;ve always said &quot;qatar&quot; so I&apos;ll keep it &quot;qatar&quot; what the hell.  But they&apos;re building, they&apos;re building an airport and have just completed an airport the likes of which you have never seen, in Dubai an airport the likes of which you have never seen.  And then I come back to LaGuardia where the runways have potholes.  The place is falling apart.  You go into the main terminal and they have a terraza floor that&apos;s so old it&apos;s falling apart.  And they have a hole in it, and they replace it with asphalt.  So you have a white terraza floor and they put asphalt all over the place.  This is inside, not outside.  And I just left Dubai where they have the most incredible thing you&apos;ve ever seen.  In fact my pilot said oh Mr. Trump this is such an honor.  I said it&apos;s not an honor; they&apos;re just smart.  But you look at LAX, and you look at Kennedy Airport, and you look at our airports generally, you look at our roadways where they&apos;re crumbling.  
+You look at all of the things that are bad--  I&apos;ll give you an example. And this isn&apos;t part of what I was going to say, but I ride down the highways and somebody makes those guard rails.  You know the guard rails.  The ones that sort of go like this [demonstrates with hand] that are always  bent, rusted and horrible.  Did you ever see more than like 20 feet which isn&apos;t corroded, or bent or the heat, if it gets too hot, it just crushes.  Now they&apos;ve been selling this thing for 25 years.  Why doesn&apos;t someone stop them and get something that works.  Because they don&apos;t know; they don&apos;t know what&apos;s happening.  Somebody made a lot of money on that.  They don&apos;t know what is happening. 
+So we have to make our country great again.  We have to rebuild our country.  And we have a long way to go.  We are just in such serious trouble because we owe so much money.  Now we owe it to the Chinese, a lot of it.  We owe it to other countries.  They&apos;re the ones that hold the debt.  And then we give them money.  We have countries that we owe money to and yet we&apos;re giving them subsidies.  I just ordered thousands of television sets and between LG and Samsung and I mean you know--  No American company comes to see and comes to bid.  It&apos;s South Korea, and whenever they have a problem we send the battleships, we send the destroyers, we send our airplanes, we&apos;re going to protect them.  What are we doing; why aren&apos;t they paying us?  Why aren&apos;t they paying us; what are we doing?  I order thousands and thousands of sets all the time, for some reason it&apos;s South Korea.  You know whether it&apos;s China, South Korea, but in this case televisions, South Korea.  Why aren&apos;t they doing something to justify what is going on?  
+Now, we have a very important election coming up.  We have a presidential election coming up. And we have some good people.  Nobody like Trump of course, but these are minor details.  We have some good people.
+It&apos; can&apos;t be Mitt because Mitt ran and failed.  He failed.  I mean I liked him.  Look--like him, dislike him--the 47% statement that he made, that&apos;s not going away.  The Romneycare from Massachusetts, that&apos;s not going away.  What do you think they&apos;re going to say oh we won&apos;t bring that up this time.  It&apos;s not fair because it was a long t--  That doesn&apos;t work.  But more importantly, he choked.  Something happened to him in the last month.  He had that election won.  And let me tell you something.  That election, sort of like a dealmaker that can&apos;t close the deal.  I know many of those guys; they get it up to the one-yard line, they go ah, ah I can&apos;t close it.  Or a golfer that can&apos;t sink the three-footer to win the tournament.  And there are many of them.  Most people are like that; I mean most people are like that.  You can&apos;t give somebody another chance, &apos;cause actually I think this election is tougher to win than beating a failed president.  I really do.  I think beating Obama would have been a much easier one than the one that&apos;s coming up, which is sad to say but true.  So you can&apos;t have Romney.  He choked.
+You can&apos;t have Bush.  The last thing we need is another Bush.  Now I made that statement very strongly, and now every one says the last thing--  You know they copied it.  I&apos;ll be accused of copying the statement; that&apos;s the bad thing.  But I said it.  I was the one that said it first, and I mean it.  The last thing we need is another Bush.  Now, he&apos;s totally in favor of Common Core; that&apos;s a disaster, that&apos;s bad, it should be local and all of that.  But he&apos;s totally in favor of Common Core.  He&apos;s very, very weak on immigration.  Don&apos;t forget--remember his statement--they come for love.  I say, what?  Come for love?  You&apos;ve got these people coming, half of them are criminals.  They&apos;re coming for love?  They&apos;re coming for a lot of other reasons, and it&apos;s not love.  And when he runs, you got to remember his brother really gave us Obama.  I was never a big fan, but his brother gave us Obama.  &apos;Cause Abraham Lincoln coming home back from the dead could not have won the election because it was going so badly and the economy was just absolutely in shambles that last couple of months.  And then he appointed Justice Roberts.  And Jeb wanted Justice Roberts.  And Justice Roberts basically approved Obamacare in a shocking decision that nobody believes.  So you can&apos;t have Jeb Bush.  And he&apos;s going to lose aside from that; he&apos;s not going to win.  So Mitt and--you just can&apos;t have those two.  That&apos;s it.  That&apos;s it.  It&apos;s so simple.
+So just in summing up and I just wrote a few of these little points down because it&apos;s very important.  And I watch these teleprompters, and by the way I think any president candidate that runs should not be allowed to use a teleprompter, because we got one that uses teleprompters.  And people say, oh he is so quick on his feet.  He is reading it.  I mean give me a break.  Everything is read.  You don&apos;t really test the mettle of a man or a woman unless they can get up on stage and talk.  And that&apos;s what we ended up getting--the king of teleprompters.  But, so when I look at these things here I say you know what, it&apos;s so much easier, it would be so nice, just bah, pa, bah, pa, bah, bing, bing, bing.  No problems, get off stage, everybody falls asleep and that&apos;s the end of that.  But we have to do something about these teleprompters.  
+But in looking at these situations--  I built an incredible company.  And you&apos;ll see that.  An incredible company; a wonderful company.  I employ thousands of people and I love doing what I&apos;m doing.  And in a certain way, I wish I weren&apos;t doing this, but our country is in such trouble and would be so easy to fix.  We have such great potential.
+So if I run for president and if I win, I would totally succeed in: 
+creating jobs; 
+defeating ISIS and stopping the Islamic terrorists--and you have to do that;
+reducing the budget deficit--so important, have to do it;
+securing our Southern border--and I mean seriously securing it;
+stopping nuclear weapons in Iran and elsewhere; 
+saving Social Security, Medicare and Medicaid, without cutting it down to the bone because it&apos;s not fair to people that have been paying for their whole lives and other people and it&apos;s not fair to future people coming up, and we can do it;
+repealing Obamacare and replacing it with something far better for the people, and far less expensive, both for the people and for the country.  And believe me there are plans that are so much better for everybody.  And everybody can be covered.  I&apos;m not saying leave 50-percent of the people out.  Everybody can be c-- This plan is just a basic disaster.  Nobody knows.  As bad as the website was, this is how bad the plan itself is;
+fixing our country&apos;s infrastructure, our bridges, our schools, our highways, our airports.  And that, I can tell you, nobody is close to Trump.  I just got the best hotel in North America.  I&apos;m building, which is sort of interesting, think of this one.  I&apos;m building one of the great hotels of the world on Pennsylvania Avenue, right opposite the White House, between the White House and Congress.  Right on Penn.--  The  Old Post Office site, and I got it from Obama.  Do you believe that?  And everybody wanted it.  So, I can&apos;t believe it myself.  But it&apos;s going to be fantastic;  
+and so many other things. 
+I know what needs to be done to make America great again.  We can make this country great again.  The potential is enormous.  And I am serious thinking of running for president because I can do the job. </inputText>
+         </task>
+      </task-item>
+      <task-item name="Read CSV" active="false">
+         <task class="com.dexvis.dex.task.input.ReadCsv">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+            <fileText>C:\dex2ws\Dex\data\PrimeMinisters.csv</fileText>
+            <limitRows>false</limitRows>
+            <rowLimitText>0</rowLimitText>
+            <lastDir>C:\dex2ws\Dex\data</lastDir>
+         </task>
+      </task-item>
+      <task-item name="Groovy Script" active="true">
+         <task class="com.dexvis.dex.task.prg.GroovyScript">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+            <processbytable>&lt;map&gt;
+  &lt;entry&gt;
+    &lt;string&gt;text&lt;/string&gt;
+    &lt;string&gt;Table&lt;/string&gt;
+  &lt;/entry&gt;
+  &lt;entry&gt;
+    &lt;string&gt;selected&lt;/string&gt;
+    &lt;boolean&gt;true&lt;/boolean&gt;
+  &lt;/entry&gt;
+&lt;/map&gt;</processbytable>
+            <processbyrow>&lt;map&gt;
+  &lt;entry&gt;
+    &lt;string&gt;text&lt;/string&gt;
+    &lt;string&gt;Row&lt;/string&gt;
+  &lt;/entry&gt;
+&lt;/map&gt;</processbyrow>
+            <processbycolumn>&lt;map&gt;
+  &lt;entry&gt;
+    &lt;string&gt;text&lt;/string&gt;
+    &lt;string&gt;Column&lt;/string&gt;
+  &lt;/entry&gt;
+&lt;/map&gt;</processbycolumn>
+            <groovyCode class="javafx.beans.property.SimpleStringProperty">header = [ &quot;WORD1&quot;, &quot;WORD2&quot; ]
+def text = &quot;&quot;
+
+data.eachWithIndex {
+  row, ri -&gt;
+  text += &quot; &quot; + row[1];
+}
+def punctuation = [
+  &quot;!&quot; : true,
+  &quot;.&quot; : true,
+  &quot;?&quot; : true,
+  &quot;-&quot; : true,
+  &quot;;&quot; : true
+];
+
+text = text.trim().toLowerCase();
+
+text = text.replaceAll(/\.\.+/, &quot; &quot;);
+text = text.replaceAll(/[\&quot;]/, &quot; &quot;);
+text = text.replaceAll(/[\.\&quot;]/, &quot; . &quot;);
+text = text.replaceAll(/\?/, &quot; ? &quot;);
+text = text.replaceAll(/\!/, &quot; ! &quot;);
+text = text.replaceAll(&apos;[,;-]&apos;, &quot; &quot;);
+text = text.replaceAll(&apos;\n&apos;, &quot; &quot;);
+text = text.replaceAll(/\s\s+/, &quot; &quot;);
+
+words = text.split(/\s+/)
+
+data = []
+
+words.eachWithIndex{
+  word, i -&gt;
+  if (i&gt;0)
+  {
+    if (!punctuation[words[i-1]])
+    {
+      data &lt;&lt; [ words[i-1], word ]
+    }
+  }
+}</groovyCode>
+         </task>
+      </task-item>
+      <task-item name="Create Data" active="false">
+         <task class="com.dexvis.dex.task.prg.GroovyScript">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+            <processbytable>&lt;map&gt;
+  &lt;entry&gt;
+    &lt;string&gt;text&lt;/string&gt;
+    &lt;string&gt;Table&lt;/string&gt;
+  &lt;/entry&gt;
+  &lt;entry&gt;
+    &lt;string&gt;selected&lt;/string&gt;
+    &lt;boolean&gt;true&lt;/boolean&gt;
+  &lt;/entry&gt;
+&lt;/map&gt;</processbytable>
+            <processbyrow>&lt;map&gt;
+  &lt;entry&gt;
+    &lt;string&gt;text&lt;/string&gt;
+    &lt;string&gt;Row&lt;/string&gt;
+  &lt;/entry&gt;
+&lt;/map&gt;</processbyrow>
+            <processbycolumn>&lt;map&gt;
+  &lt;entry&gt;
+    &lt;string&gt;text&lt;/string&gt;
+    &lt;string&gt;Column&lt;/string&gt;
+  &lt;/entry&gt;
+&lt;/map&gt;</processbycolumn>
+            <groovyCode class="javafx.beans.property.SimpleStringProperty">def COLUMNS=10
+def ROWS = 1000
+header = [ ]
+Random r = new Random()
+
+(1..COLUMNS).each { i -&gt; header &lt;&lt; &quot;C$i&quot; }
+
+data = []
+int node=0;
+
+(1..ROWS).each {
+  ri -&gt;
+  data[ri-1] = []
+  (1..COLUMNS).each {
+    ci -&gt;
+      data[ri-1] &lt;&lt; r.nextInt(100)
+  }
+}
+
+</groovyCode>
+         </task>
+      </task-item>
+      <task-item name="View Data" active="true">
+         <task class="com.dexvis.dex.task.utilities.ViewData">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+         </task>
+      </task-item>
+      <task-item name="Web Driver" active="true">
+         <task class="com.dexvis.dex.task.base.WebDriverTask">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+            <templateText>C:\dex2ws\Dex\web\vivagraph\Network.gtmpl</templateText>
+            <outputFileText>C:\dex2ws\Dex\output\TheRaven.html</outputFileText>
+            <firefoxBrowser>&lt;map&gt;
+  &lt;entry&gt;
+    &lt;string&gt;text&lt;/string&gt;
+    &lt;string&gt;Firefox&lt;/string&gt;
+  &lt;/entry&gt;
+&lt;/map&gt;</firefoxBrowser>
+            <chromeBrowser>&lt;map&gt;
+  &lt;entry&gt;
+    &lt;string&gt;text&lt;/string&gt;
+    &lt;string&gt;Chrome&lt;/string&gt;
+  &lt;/entry&gt;
+  &lt;entry&gt;
+    &lt;string&gt;selected&lt;/string&gt;
+    &lt;boolean&gt;true&lt;/boolean&gt;
+  &lt;/entry&gt;
+&lt;/map&gt;</chromeBrowser>
+         </task>
+      </task-item>
+      <task-item name="Network" active="false">
+         <task class="com.dexvis.dex.task.vis.vis.Network">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper">
+                  <property>
+                     <name>Height</name>
+                     <target>height</target>
+                     <category>Dimensions</category>
+                     <value class="java.lang.Integer">600</value>
+                  </property>
+                  <property>
+                     <name>Width</name>
+                     <target>width</target>
+                     <category>Dimensions</category>
+                     <value class="java.lang.Integer">800</value>
+                  </property>
+                  <property>
+                     <name>Transform</name>
+                     <target>transform</target>
+                     <category>Dimensions</category>
+                  </property>
+                  <property>
+                     <name>Resizable</name>
+                     <target>resizable</target>
+                     <category>Dimensions</category>
+                     <value class="java.lang.Boolean">true</value>
+                  </property>
+               </properties>
+            </prop-sheet>
+         </task>
+      </task-item>
+   </tasks>
+</dex-project>

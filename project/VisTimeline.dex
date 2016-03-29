@@ -1,0 +1,169 @@
+<dex-project version="0.8">
+   <tasks class="java.util.ArrayList">
+      <task-item name="Read CSV" active="true">
+         <task class="com.dexvis.dex.task.input.ReadCsv">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+            <fileText>C:\dex\data\presidents2.csv</fileText>
+            <limitRows>false</limitRows>
+            <rowLimitText>0</rowLimitText>
+            <lastDir>C:\dex\data</lastDir>
+         </task>
+      </task-item>
+      <task-item name="View Data" active="true">
+         <task class="com.dexvis.dex.task.utilities.ViewData">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+         </task>
+      </task-item>
+      <task-item name="Trim Columns" active="true">
+         <task class="com.dexvis.dex.task.tablemanipulation.TrimColumns">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+         </task>
+      </task-item>
+      <task-item name="Groovy Filter" active="true">
+         <task class="com.dexvis.dex.task.utilities.GroovyFilter">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+            <operationCB>&lt;map&gt;
+  &lt;entry&gt;
+    &lt;string&gt;items&lt;/string&gt;
+    &lt;list&gt;
+      &lt;string&gt;INCLUDE&lt;/string&gt;
+      &lt;string&gt;EXCLUDE&lt;/string&gt;
+    &lt;/list&gt;
+  &lt;/entry&gt;
+  &lt;entry&gt;
+    &lt;string&gt;selected&lt;/string&gt;
+    &lt;string&gt;EXCLUDE&lt;/string&gt;
+  &lt;/entry&gt;
+&lt;/map&gt;</operationCB>
+            <conditionCB>&lt;map&gt;
+  &lt;entry&gt;
+    &lt;string&gt;items&lt;/string&gt;
+    &lt;list&gt;
+      &lt;string&gt;IF&lt;/string&gt;
+      &lt;string&gt;UNLESS&lt;/string&gt;
+    &lt;/list&gt;
+  &lt;/entry&gt;
+  &lt;entry&gt;
+    &lt;string&gt;selected&lt;/string&gt;
+    &lt;string&gt;IF&lt;/string&gt;
+  &lt;/entry&gt;
+&lt;/map&gt;</conditionCB>
+            <groovyExpText>(col[&apos;President&apos;] as String).startsWith(&quot;Barack&quot;)</groovyExpText>
+         </task>
+      </task-item>
+      <task-item name="Groovy Script" active="true">
+         <task class="com.dexvis.dex.task.prg.GroovyScript">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+            <processbytable>&lt;map&gt;
+  &lt;entry&gt;
+    &lt;string&gt;text&lt;/string&gt;
+    &lt;string&gt;Table&lt;/string&gt;
+  &lt;/entry&gt;
+  &lt;entry&gt;
+    &lt;string&gt;selected&lt;/string&gt;
+    &lt;boolean&gt;true&lt;/boolean&gt;
+  &lt;/entry&gt;
+&lt;/map&gt;</processbytable>
+            <processbyrow>&lt;map&gt;
+  &lt;entry&gt;
+    &lt;string&gt;text&lt;/string&gt;
+    &lt;string&gt;Row&lt;/string&gt;
+  &lt;/entry&gt;
+&lt;/map&gt;</processbyrow>
+            <processbycolumn>&lt;map&gt;
+  &lt;entry&gt;
+    &lt;string&gt;text&lt;/string&gt;
+    &lt;string&gt;Column&lt;/string&gt;
+  &lt;/entry&gt;
+&lt;/map&gt;</processbycolumn>
+            <groovyCode class="javafx.beans.property.SimpleStringProperty">def toIndex = dex.getColumnNumber(&quot;Took office&quot;)
+def loIndex = dex.getColumnNumber(&quot;Left office&quot;)
+
+if (toIndex &lt; 0 || loIndex &lt; 0)
+{
+  return
+}
+
+data.eachWithIndex {
+  row, ri -&gt;
+  
+  def toMatch = row[toIndex] =~ /\s*(\d+)\s*\/\s*(\d+)\s*\/\s*(\d+)\s*$/
+  if (toMatch.matches())
+  {
+    data[ri][toIndex] = &quot;${toMatch[0][2]}/${toMatch[0][1]}/${toMatch[0][3]}&quot;
+  }
+  
+  def loMatch = row[loIndex] =~ /\s*(\d+)\s*\/\s*(\d+)\s*\/\s*(\d+)\s*$/
+  if (loMatch.matches())
+  {
+    data[ri][loIndex] = &quot;${loMatch[0][2]}/${loMatch[0][1]}/${loMatch[0][3]}&quot;
+  }
+}</groovyCode>
+         </task>
+      </task-item>
+      <task-item name="Select Columns" active="true">
+         <task class="com.dexvis.dex.task.tablemanipulation.SelectColumns">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+            <columnList>&lt;com.dexvis.simple.types.SimpleListSelectionView&gt;
+  &lt;sourceList&gt;
+    &lt;string&gt;Presidency&lt;/string&gt;
+    &lt;string&gt;Wikipedia Entry&lt;/string&gt;
+    &lt;string&gt;Party&lt;/string&gt;
+    &lt;string&gt;Portrait&lt;/string&gt;
+    &lt;string&gt;Thumbnail&lt;/string&gt;
+    &lt;string&gt;Home State&lt;/string&gt;
+  &lt;/sourceList&gt;
+  &lt;targetList&gt;
+    &lt;string&gt;President&lt;/string&gt;
+    &lt;string&gt;Took office&lt;/string&gt;
+    &lt;string&gt;Left office&lt;/string&gt;
+  &lt;/targetList&gt;
+&lt;/com.dexvis.simple.types.SimpleListSelectionView&gt;</columnList>
+         </task>
+      </task-item>
+      <task-item name="View Data" active="true">
+         <task class="com.dexvis.dex.task.utilities.ViewData">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+         </task>
+      </task-item>
+      <task-item name="Web Driver" active="true">
+         <task class="com.dexvis.dex.task.base.WebDriverTask">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+            <templateText>C:\dex2ws\Dex\web\vis\Timeline.gtmpl</templateText>
+            <outputFileText>C:\dex2ws\Dex\output\Vis_Timeline.html</outputFileText>
+            <firefoxBrowser>&lt;map&gt;
+  &lt;entry&gt;
+    &lt;string&gt;text&lt;/string&gt;
+    &lt;string&gt;Firefox&lt;/string&gt;
+  &lt;/entry&gt;
+&lt;/map&gt;</firefoxBrowser>
+            <chromeBrowser>&lt;map&gt;
+  &lt;entry&gt;
+    &lt;string&gt;text&lt;/string&gt;
+    &lt;string&gt;Chrome&lt;/string&gt;
+  &lt;/entry&gt;
+  &lt;entry&gt;
+    &lt;string&gt;selected&lt;/string&gt;
+    &lt;boolean&gt;true&lt;/boolean&gt;
+  &lt;/entry&gt;
+&lt;/map&gt;</chromeBrowser>
+         </task>
+      </task-item>
+   </tasks>
+</dex-project>
