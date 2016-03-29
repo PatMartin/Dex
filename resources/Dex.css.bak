@@ -1,0 +1,627 @@
+/* Dex */
+
+.dex {
+	-fx-color: #EEEEEE;
+	-fx-background: #EEEEEE;
+}
+
+.xychart {
+	-fx-text-fill: #4682b4;
+}
+
+/******
+* Dex Stuff...
+*******/
+
+/*
+.chart {
+    -fx-padding: 10px;
+    -fx-background-image: url("icon.jpg");
+    -fx-font-family: Tahoma;
+    -fx-font-size: 1.2em;
+    -fx-text-fill: #4682b4;    
+}
+.chart-content {
+    -fx-padding: 30px;
+    
+}
+.chart-legend {
+   -fx-background-color:  transparent;
+   -fx-padding: 20px;
+}
+ 
+.chart-legend-item-symbol{
+   -fx-background-radius: 0;
+}
+ 
+.chart-legend-item{
+    -fx-text-fill: #191970;
+}
+ 
+.chart-plot-background {
+    -fx-background-color: #e2ecfe;
+}
+.chart-vertical-grid-lines {
+    -fx-stroke: #3278fa;
+}
+.chart-horizontal-grid-lines {
+    -fx-stroke: #3278fa;
+}
+.chart-alternative-row-fill {
+    -fx-fill: #99bcfd;
+    -fx-stroke: transparent;
+    -fx-stroke-width: 0;
+}
+
+*/
+
+.chart-bar {
+    -fx-background-insets: 0,1,1;
+    -fx-background-radius: 5 5 0 0, 4 4 0 0, 3 3 0 0;
+}
+
+
+.chart {
+    -fx-padding: 1px;
+    -fx-font-family: Tahoma;
+    -fx-font-size: 1.5em;
+    -fx-text-fill: #4682b4;    
+}
+
+
+/*
+.chart {
+    -fx-padding: 2px;
+    -fx-font-family: Tahoma;
+    -fx-text-fill: #4682b4;    
+}
+*/
+
+/* Scatter Plot Chart Symbols */
+
+/* Symbol colors */
+.default-color0.chart-symbol { -fx-background-color: #7770E7; }
+.default-color1.chart-symbol { -fx-background-color: #74E33A; }
+.default-color2.chart-symbol { -fx-background-color: #D9421F; }
+.default-color3.chart-symbol { -fx-background-color: #385F56; }
+.default-color4.chart-symbol { -fx-background-color: #DA7C9D; }
+.default-color5.chart-symbol { -fx-background-color: #5FECC0; }
+.default-color6.chart-symbol { -fx-background-color: #C9B969; }
+.default-color7.chart-symbol { -fx-background-color: #77ADE1; }
+.default-color8.chart-symbol { -fx-background-color: #502215; }
+.default-color9.chart-symbol { -fx-background-color: #3C326D; }
+.default-color10.chart-symbol { -fx-background-color: #DE49D6; }
+.default-color11.chart-symbol { -fx-background-color: #4E9B52; }
+.default-color12.chart-symbol { -fx-background-color: #BDE0DA; }
+.default-color13.chart-symbol { -fx-background-color: #D7E441; }
+.default-color14.chart-symbol { -fx-background-color: #DD4265; }
+.default-color15.chart-symbol { -fx-background-color: #832E58; }
+.default-color16.chart-symbol { -fx-background-color: #9E764F; }
+.default-color17.chart-symbol { -fx-background-color: #DB7E39; }
+.default-color18.chart-symbol { -fx-background-color: #315822; }
+.default-color19.chart-symbol { -fx-background-color: #DEB3D8; }
+.default-color20.chart-symbol { -fx-background-color: #928B89; }
+.default-color21.chart-symbol { -fx-background-color: #E5AD36; }
+.default-color22.chart-symbol { -fx-background-color: #CAE0AB; }
+.default-color23.chart-symbol { -fx-background-color: #D747A5; }
+.default-color24.chart-symbol { -fx-background-color: #CB80E3; }
+.default-color25.chart-symbol { -fx-background-color: #90431E; }
+.default-color26.chart-symbol { -fx-background-color: #B9E079; }
+.default-color27.chart-symbol { -fx-background-color: #D57C71; }
+.default-color28.chart-symbol { -fx-background-color: #58A92C; }
+.default-color29.chart-symbol { -fx-background-color: #455472; }
+.default-color30.chart-symbol { -fx-background-color: #2B331E; }
+.default-color31.chart-symbol { -fx-background-color: #6289E1; }
+.default-color32.chart-symbol { -fx-background-color: #4B8697; }
+.default-color33.chart-symbol { -fx-background-color: #5A4A19; }
+.default-color34.chart-symbol { -fx-background-color: #67DF6B; }
+.default-color35.chart-symbol { -fx-background-color: #529781; }
+.default-color36.chart-symbol { -fx-background-color: #70544D; }
+.default-color37.chart-symbol { -fx-background-color: #916281; }
+.default-color38.chart-symbol { -fx-background-color: #947A28; }
+.default-color39.chart-symbol { -fx-background-color: #708558; }
+.default-color40.chart-symbol { -fx-background-color: #8D2E3A; }
+.default-color41.chart-symbol { -fx-background-color: #9B3FA3; }
+.default-color42.chart-symbol { -fx-background-color: #21313C; }
+.default-color43.chart-symbol { -fx-background-color: #D4BB92; }
+.default-color44.chart-symbol { -fx-background-color: #AEB234; }
+.default-color45.chart-symbol { -fx-background-color: #6BD9CE; }
+.default-color46.chart-symbol { -fx-background-color: #A297D4; }
+.default-color47.chart-symbol { -fx-background-color: #77C68D; }
+.default-color48.chart-symbol { -fx-background-color: #B45DE9; }
+.default-color49.chart-symbol { -fx-background-color: #D34842; }
+.default-color50.chart-symbol { -fx-background-color: #D8A39A; }
+.default-color51.chart-symbol { -fx-background-color: #5F8328; }
+.default-color52.chart-symbol { -fx-background-color: #6553AF; }
+.default-color53.chart-symbol { -fx-background-color: #62CAEA; }
+.default-color54.chart-symbol { -fx-background-color: #47202C; }
+.default-color55.chart-symbol { -fx-background-color: #823579; }
+.default-color56.chart-symbol { -fx-background-color: #5FE291; }
+.default-color57.chart-symbol { -fx-background-color: #D63E82; }
+.default-color58.chart-symbol { -fx-background-color: #CC82C4; }
+.default-color59.chart-symbol { -fx-background-color: #515D9C; }
+.default-color60.chart-symbol { -fx-background-color: #3D2347; }
+.default-color61.chart-symbol { -fx-background-color: #D7CBD3; }
+.default-color62.chart-symbol { -fx-background-color: #7286AE; }
+.default-color63.chart-symbol { -fx-background-color: #7CB4B9; }
+
+/* Line chart line colors */
+.default-color0.chart-series-line { -fx-stroke: #7770E7; }
+.default-color1.chart-series-line { -fx-stroke: #74E33A; }
+.default-color2.chart-series-line { -fx-stroke: #D9421F; }
+.default-color3.chart-series-line { -fx-stroke: #385F56; }
+.default-color4.chart-series-line { -fx-stroke: #DA7C9D; }
+.default-color5.chart-series-line { -fx-stroke: #5FECC0; }
+.default-color6.chart-series-line { -fx-stroke: #C9B969; }
+.default-color7.chart-series-line { -fx-stroke: #77ADE1; }
+.default-color8.chart-series-line { -fx-stroke: #502215; }
+.default-color9.chart-series-line { -fx-stroke: #3C326D; }
+.default-color10.chart-series-line { -fx-stroke: #DE49D6; }
+.default-color11.chart-series-line { -fx-stroke: #4E9B52; }
+.default-color12.chart-series-line { -fx-stroke: #BDE0DA; }
+.default-color13.chart-series-line { -fx-stroke: #D7E441; }
+.default-color14.chart-series-line { -fx-stroke: #DD4265; }
+.default-color15.chart-series-line { -fx-stroke: #832E58; }
+.default-color16.chart-series-line { -fx-stroke: #9E764F; }
+.default-color17.chart-series-line { -fx-stroke: #DB7E39; }
+.default-color18.chart-series-line { -fx-stroke: #315822; }
+.default-color19.chart-series-line { -fx-stroke: #DEB3D8; }
+.default-color20.chart-series-line { -fx-stroke: #928B89; }
+.default-color21.chart-series-line { -fx-stroke: #E5AD36; }
+.default-color22.chart-series-line { -fx-stroke: #CAE0AB; }
+.default-color23.chart-series-line { -fx-stroke: #D747A5; }
+.default-color24.chart-series-line { -fx-stroke: #CB80E3; }
+.default-color25.chart-series-line { -fx-stroke: #90431E; }
+.default-color26.chart-series-line { -fx-stroke: #B9E079; }
+.default-color27.chart-series-line { -fx-stroke: #D57C71; }
+.default-color28.chart-series-line { -fx-stroke: #58A92C; }
+.default-color29.chart-series-line { -fx-stroke: #455472; }
+.default-color30.chart-series-line { -fx-stroke: #2B331E; }
+.default-color31.chart-series-line { -fx-stroke: #6289E1; }
+.default-color32.chart-series-line { -fx-stroke: #4B8697; }
+.default-color33.chart-series-line { -fx-stroke: #5A4A19; }
+.default-color34.chart-series-line { -fx-stroke: #67DF6B; }
+.default-color35.chart-series-line { -fx-stroke: #529781; }
+.default-color36.chart-series-line { -fx-stroke: #70544D; }
+.default-color37.chart-series-line { -fx-stroke: #916281; }
+.default-color38.chart-series-line { -fx-stroke: #947A28; }
+.default-color39.chart-series-line { -fx-stroke: #708558; }
+.default-color40.chart-series-line { -fx-stroke: #8D2E3A; }
+.default-color41.chart-series-line { -fx-stroke: #9B3FA3; }
+.default-color42.chart-series-line { -fx-stroke: #21313C; }
+.default-color43.chart-series-line { -fx-stroke: #D4BB92; }
+.default-color44.chart-series-line { -fx-stroke: #AEB234; }
+.default-color45.chart-series-line { -fx-stroke: #6BD9CE; }
+.default-color46.chart-series-line { -fx-stroke: #A297D4; }
+.default-color47.chart-series-line { -fx-stroke: #77C68D; }
+.default-color48.chart-series-line { -fx-stroke: #B45DE9; }
+.default-color49.chart-series-line { -fx-stroke: #D34842; }
+.default-color50.chart-series-line { -fx-stroke: #D8A39A; }
+.default-color51.chart-series-line { -fx-stroke: #5F8328; }
+.default-color52.chart-series-line { -fx-stroke: #6553AF; }
+.default-color53.chart-series-line { -fx-stroke: #62CAEA; }
+.default-color54.chart-series-line { -fx-stroke: #47202C; }
+.default-color55.chart-series-line { -fx-stroke: #823579; }
+.default-color56.chart-series-line { -fx-stroke: #5FE291; }
+.default-color57.chart-series-line { -fx-stroke: #D63E82; }
+.default-color58.chart-series-line { -fx-stroke: #CC82C4; }
+.default-color59.chart-series-line { -fx-stroke: #515D9C; }
+.default-color60.chart-series-line { -fx-stroke: #3D2347; }
+.default-color61.chart-series-line { -fx-stroke: #D7CBD3; }
+.default-color62.chart-series-line { -fx-stroke: #7286AE; }
+.default-color63.chart-series-line { -fx-stroke: #7CB4B9; }
+
+/* Line Chart Symbols */
+/* Symbol colors */
+.default-color0.chart-line-symbol { -fx-background-color: #7770E7; }
+.default-color1.chart-line-symbol { -fx-background-color: #74E33A; }
+.default-color2.chart-line-symbol { -fx-background-color: #D9421F; }
+.default-color3.chart-line-symbol { -fx-background-color: #385F56; }
+.default-color4.chart-line-symbol { -fx-background-color: #DA7C9D; }
+.default-color5.chart-line-symbol { -fx-background-color: #5FECC0; }
+.default-color6.chart-line-symbol { -fx-background-color: #C9B969; }
+.default-color7.chart-line-symbol { -fx-background-color: #77ADE1; }
+.default-color8.chart-line-symbol { -fx-background-color: #502215; }
+.default-color9.chart-line-symbol { -fx-background-color: #3C326D; }
+.default-color10.chart-line-symbol { -fx-background-color: #DE49D6; }
+.default-color11.chart-line-symbol { -fx-background-color: #4E9B52; }
+.default-color12.chart-line-symbol { -fx-background-color: #BDE0DA; }
+.default-color13.chart-line-symbol { -fx-background-color: #D7E441; }
+.default-color14.chart-line-symbol { -fx-background-color: #DD4265; }
+.default-color15.chart-line-symbol { -fx-background-color: #832E58; }
+.default-color16.chart-line-symbol { -fx-background-color: #9E764F; }
+.default-color17.chart-line-symbol { -fx-background-color: #DB7E39; }
+.default-color18.chart-line-symbol { -fx-background-color: #315822; }
+.default-color19.chart-line-symbol { -fx-background-color: #DEB3D8; }
+.default-color20.chart-line-symbol { -fx-background-color: #928B89; }
+.default-color21.chart-line-symbol { -fx-background-color: #E5AD36; }
+.default-color22.chart-line-symbol { -fx-background-color: #CAE0AB; }
+.default-color23.chart-line-symbol { -fx-background-color: #D747A5; }
+.default-color24.chart-line-symbol { -fx-background-color: #CB80E3; }
+.default-color25.chart-line-symbol { -fx-background-color: #90431E; }
+.default-color26.chart-line-symbol { -fx-background-color: #B9E079; }
+.default-color27.chart-line-symbol { -fx-background-color: #D57C71; }
+.default-color28.chart-line-symbol { -fx-background-color: #58A92C; }
+.default-color29.chart-line-symbol { -fx-background-color: #455472; }
+.default-color30.chart-line-symbol { -fx-background-color: #2B331E; }
+.default-color31.chart-line-symbol { -fx-background-color: #6289E1; }
+.default-color32.chart-line-symbol { -fx-background-color: #4B8697; }
+.default-color33.chart-line-symbol { -fx-background-color: #5A4A19; }
+.default-color34.chart-line-symbol { -fx-background-color: #67DF6B; }
+.default-color35.chart-line-symbol { -fx-background-color: #529781; }
+.default-color36.chart-line-symbol { -fx-background-color: #70544D; }
+.default-color37.chart-line-symbol { -fx-background-color: #916281; }
+.default-color38.chart-line-symbol { -fx-background-color: #947A28; }
+.default-color39.chart-line-symbol { -fx-background-color: #708558; }
+.default-color40.chart-line-symbol { -fx-background-color: #8D2E3A; }
+.default-color41.chart-line-symbol { -fx-background-color: #9B3FA3; }
+.default-color42.chart-line-symbol { -fx-background-color: #21313C; }
+.default-color43.chart-line-symbol { -fx-background-color: #D4BB92; }
+.default-color44.chart-line-symbol { -fx-background-color: #AEB234; }
+.default-color45.chart-line-symbol { -fx-background-color: #6BD9CE; }
+.default-color46.chart-line-symbol { -fx-background-color: #A297D4; }
+.default-color47.chart-line-symbol { -fx-background-color: #77C68D; }
+.default-color48.chart-line-symbol { -fx-background-color: #B45DE9; }
+.default-color49.chart-line-symbol { -fx-background-color: #D34842; }
+.default-color50.chart-line-symbol { -fx-background-color: #D8A39A; }
+.default-color51.chart-line-symbol { -fx-background-color: #5F8328; }
+.default-color52.chart-line-symbol { -fx-background-color: #6553AF; }
+.default-color53.chart-line-symbol { -fx-background-color: #62CAEA; }
+.default-color54.chart-line-symbol { -fx-background-color: #47202C; }
+.default-color55.chart-line-symbol { -fx-background-color: #823579; }
+.default-color56.chart-line-symbol { -fx-background-color: #5FE291; }
+.default-color57.chart-line-symbol { -fx-background-color: #D63E82; }
+.default-color58.chart-line-symbol { -fx-background-color: #CC82C4; }
+.default-color59.chart-line-symbol { -fx-background-color: #515D9C; }
+.default-color60.chart-line-symbol { -fx-background-color: #3D2347; }
+.default-color61.chart-line-symbol { -fx-background-color: #D7CBD3; }
+.default-color62.chart-line-symbol { -fx-background-color: #7286AE; }
+.default-color63.chart-line-symbol { -fx-background-color: #7CB4B9; }
+
+/* Area Chart Line */
+.default-color0.chart-series-area-line { -fx-stroke: #7770E7; }
+.default-color1.chart-series-area-line { -fx-stroke: #74E33A; }
+.default-color2.chart-series-area-line { -fx-stroke: #D9421F; }
+.default-color3.chart-series-area-line { -fx-stroke: #385F56; }
+.default-color4.chart-series-area-line { -fx-stroke: #DA7C9D; }
+.default-color5.chart-series-area-line { -fx-stroke: #5FECC0; }
+.default-color6.chart-series-area-line { -fx-stroke: #C9B969; }
+.default-color7.chart-series-area-line { -fx-stroke: #77ADE1; }
+.default-color8.chart-series-area-line { -fx-stroke: #502215; }
+.default-color9.chart-series-area-line { -fx-stroke: #3C326D; }
+.default-color10.chart-series-area-line { -fx-stroke: #DE49D6; }
+.default-color11.chart-series-area-line { -fx-stroke: #4E9B52; }
+.default-color12.chart-series-area-line { -fx-stroke: #BDE0DA; }
+.default-color13.chart-series-area-line { -fx-stroke: #D7E441; }
+.default-color14.chart-series-area-line { -fx-stroke: #DD4265; }
+.default-color15.chart-series-area-line { -fx-stroke: #832E58; }
+.default-color16.chart-series-area-line { -fx-stroke: #9E764F; }
+.default-color17.chart-series-area-line { -fx-stroke: #DB7E39; }
+.default-color18.chart-series-area-line { -fx-stroke: #315822; }
+.default-color19.chart-series-area-line { -fx-stroke: #DEB3D8; }
+.default-color20.chart-series-area-line { -fx-stroke: #928B89; }
+.default-color21.chart-series-area-line { -fx-stroke: #E5AD36; }
+.default-color22.chart-series-area-line { -fx-stroke: #CAE0AB; }
+.default-color23.chart-series-area-line { -fx-stroke: #D747A5; }
+.default-color24.chart-series-area-line { -fx-stroke: #CB80E3; }
+.default-color25.chart-series-area-line { -fx-stroke: #90431E; }
+.default-color26.chart-series-area-line { -fx-stroke: #B9E079; }
+.default-color27.chart-series-area-line { -fx-stroke: #D57C71; }
+.default-color28.chart-series-area-line { -fx-stroke: #58A92C; }
+.default-color29.chart-series-area-line { -fx-stroke: #455472; }
+.default-color30.chart-series-area-line { -fx-stroke: #2B331E; }
+.default-color31.chart-series-area-line { -fx-stroke: #6289E1; }
+.default-color32.chart-series-area-line { -fx-stroke: #4B8697; }
+.default-color33.chart-series-area-line { -fx-stroke: #5A4A19; }
+.default-color34.chart-series-area-line { -fx-stroke: #67DF6B; }
+.default-color35.chart-series-area-line { -fx-stroke: #529781; }
+.default-color36.chart-series-area-line { -fx-stroke: #70544D; }
+.default-color37.chart-series-area-line { -fx-stroke: #916281; }
+.default-color38.chart-series-area-line { -fx-stroke: #947A28; }
+.default-color39.chart-series-area-line { -fx-stroke: #708558; }
+.default-color40.chart-series-area-line { -fx-stroke: #8D2E3A; }
+.default-color41.chart-series-area-line { -fx-stroke: #9B3FA3; }
+.default-color42.chart-series-area-line { -fx-stroke: #21313C; }
+.default-color43.chart-series-area-line { -fx-stroke: #D4BB92; }
+.default-color44.chart-series-area-line { -fx-stroke: #AEB234; }
+.default-color45.chart-series-area-line { -fx-stroke: #6BD9CE; }
+.default-color46.chart-series-area-line { -fx-stroke: #A297D4; }
+.default-color47.chart-series-area-line { -fx-stroke: #77C68D; }
+.default-color48.chart-series-area-line { -fx-stroke: #B45DE9; }
+.default-color49.chart-series-area-line { -fx-stroke: #D34842; }
+.default-color50.chart-series-area-line { -fx-stroke: #D8A39A; }
+.default-color51.chart-series-area-line { -fx-stroke: #5F8328; }
+.default-color52.chart-series-area-line { -fx-stroke: #6553AF; }
+.default-color53.chart-series-area-line { -fx-stroke: #62CAEA; }
+.default-color54.chart-series-area-line { -fx-stroke: #47202C; }
+.default-color55.chart-series-area-line { -fx-stroke: #823579; }
+.default-color56.chart-series-area-line { -fx-stroke: #5FE291; }
+.default-color57.chart-series-area-line { -fx-stroke: #D63E82; }
+.default-color58.chart-series-area-line { -fx-stroke: #CC82C4; }
+.default-color59.chart-series-area-line { -fx-stroke: #515D9C; }
+.default-color60.chart-series-area-line { -fx-stroke: #3D2347; }
+.default-color61.chart-series-area-line { -fx-stroke: #D7CBD3; }
+.default-color62.chart-series-area-line { -fx-stroke: #7286AE; }
+.default-color63.chart-series-area-line { -fx-stroke: #7CB4B9; }
+
+/* Area Chart Fill */
+.default-color0.chart-series-area-fill { -fx-fill: #7770E7; -fx-opacity: .25; }
+.default-color1.chart-series-area-fill { -fx-fill: #74E33A; -fx-opacity: .25; }
+.default-color2.chart-series-area-fill { -fx-fill: #D9421F; -fx-opacity: .25; }
+.default-color3.chart-series-area-fill { -fx-fill: #385F56; -fx-opacity: .25; }
+.default-color4.chart-series-area-fill { -fx-fill: #DA7C9D; -fx-opacity: .25; }
+.default-color5.chart-series-area-fill { -fx-fill: #5FECC0; -fx-opacity: .25; }
+.default-color6.chart-series-area-fill { -fx-fill: #C9B969; -fx-opacity: .25; }
+.default-color7.chart-series-area-fill { -fx-fill: #77ADE1; -fx-opacity: .25; }
+.default-color8.chart-series-area-fill { -fx-fill: #502215; -fx-opacity: .25; }
+.default-color9.chart-series-area-fill { -fx-fill: #3C326D; -fx-opacity: .25; }
+.default-color10.chart-series-area-fill { -fx-fill: #DE49D6; -fx-opacity: .25; }
+.default-color11.chart-series-area-fill { -fx-fill: #4E9B52; -fx-opacity: .25; }
+.default-color12.chart-series-area-fill { -fx-fill: #BDE0DA; -fx-opacity: .25; }
+.default-color13.chart-series-area-fill { -fx-fill: #D7E441; -fx-opacity: .25; }
+.default-color14.chart-series-area-fill { -fx-fill: #DD4265; -fx-opacity: .25; }
+.default-color15.chart-series-area-fill { -fx-fill: #832E58; -fx-opacity: .25; }
+.default-color16.chart-series-area-fill { -fx-fill: #9E764F; -fx-opacity: .25; }
+.default-color17.chart-series-area-fill { -fx-fill: #DB7E39; -fx-opacity: .25; }
+.default-color18.chart-series-area-fill { -fx-fill: #315822; -fx-opacity: .25; }
+.default-color19.chart-series-area-fill { -fx-fill: #DEB3D8; -fx-opacity: .25; }
+.default-color20.chart-series-area-fill { -fx-fill: #928B89; -fx-opacity: .25; }
+.default-color21.chart-series-area-fill { -fx-fill: #E5AD36; -fx-opacity: .25; }
+.default-color22.chart-series-area-fill { -fx-fill: #CAE0AB; -fx-opacity: .25; }
+.default-color23.chart-series-area-fill { -fx-fill: #D747A5; -fx-opacity: .25; }
+.default-color24.chart-series-area-fill { -fx-fill: #CB80E3; -fx-opacity: .25; }
+.default-color25.chart-series-area-fill { -fx-fill: #90431E; -fx-opacity: .25; }
+.default-color26.chart-series-area-fill { -fx-fill: #B9E079; -fx-opacity: .25; }
+.default-color27.chart-series-area-fill { -fx-fill: #D57C71; -fx-opacity: .25; }
+.default-color28.chart-series-area-fill { -fx-fill: #58A92C; -fx-opacity: .25; }
+.default-color29.chart-series-area-fill { -fx-fill: #455472; -fx-opacity: .25; }
+.default-color30.chart-series-area-fill { -fx-fill: #2B331E; -fx-opacity: .25; }
+.default-color31.chart-series-area-fill { -fx-fill: #6289E1; -fx-opacity: .25; }
+.default-color32.chart-series-area-fill { -fx-fill: #4B8697; -fx-opacity: .25; }
+.default-color33.chart-series-area-fill { -fx-fill: #5A4A19; -fx-opacity: .25; }
+.default-color34.chart-series-area-fill { -fx-fill: #67DF6B; -fx-opacity: .25; }
+.default-color35.chart-series-area-fill { -fx-fill: #529781; -fx-opacity: .25; }
+.default-color36.chart-series-area-fill { -fx-fill: #70544D; -fx-opacity: .25; }
+.default-color37.chart-series-area-fill { -fx-fill: #916281; -fx-opacity: .25; }
+.default-color38.chart-series-area-fill { -fx-fill: #947A28; -fx-opacity: .25; }
+.default-color39.chart-series-area-fill { -fx-fill: #708558; -fx-opacity: .25; }
+.default-color40.chart-series-area-fill { -fx-fill: #8D2E3A; -fx-opacity: .25; }
+.default-color41.chart-series-area-fill { -fx-fill: #9B3FA3; -fx-opacity: .25; }
+.default-color42.chart-series-area-fill { -fx-fill: #21313C; -fx-opacity: .25; }
+.default-color43.chart-series-area-fill { -fx-fill: #D4BB92; -fx-opacity: .25; }
+.default-color44.chart-series-area-fill { -fx-fill: #AEB234; -fx-opacity: .25; }
+.default-color45.chart-series-area-fill { -fx-fill: #6BD9CE; -fx-opacity: .25; }
+.default-color46.chart-series-area-fill { -fx-fill: #A297D4; -fx-opacity: .25; }
+.default-color47.chart-series-area-fill { -fx-fill: #77C68D; -fx-opacity: .25; }
+.default-color48.chart-series-area-fill { -fx-fill: #B45DE9; -fx-opacity: .25; }
+.default-color49.chart-series-area-fill { -fx-fill: #D34842; -fx-opacity: .25; }
+.default-color50.chart-series-area-fill { -fx-fill: #D8A39A; -fx-opacity: .25; }
+.default-color51.chart-series-area-fill { -fx-fill: #5F8328; -fx-opacity: .25; }
+.default-color52.chart-series-area-fill { -fx-fill: #6553AF; -fx-opacity: .25; }
+.default-color53.chart-series-area-fill { -fx-fill: #62CAEA; -fx-opacity: .25; }
+.default-color54.chart-series-area-fill { -fx-fill: #47202C; -fx-opacity: .25; }
+.default-color55.chart-series-area-fill { -fx-fill: #823579; -fx-opacity: .25; }
+.default-color56.chart-series-area-fill { -fx-fill: #5FE291; -fx-opacity: .25; }
+.default-color57.chart-series-area-fill { -fx-fill: #D63E82; -fx-opacity: .25; }
+.default-color58.chart-series-area-fill { -fx-fill: #CC82C4; -fx-opacity: .25; }
+.default-color59.chart-series-area-fill { -fx-fill: #515D9C; -fx-opacity: .25; }
+.default-color60.chart-series-area-fill { -fx-fill: #3D2347; -fx-opacity: .25; }
+.default-color61.chart-series-area-fill { -fx-fill: #D7CBD3; -fx-opacity: .25; }
+.default-color62.chart-series-area-fill { -fx-fill: #7286AE; -fx-opacity: .25; }
+.default-color63.chart-series-area-fill { -fx-fill: #7CB4B9; -fx-opacity: .25; }
+
+/* Area Chart Symbols */
+.default-color0.chart-area-symbol { -fx-background-color: #7770E7; }
+.default-color1.chart-area-symbol { -fx-background-color: #74E33A; }
+.default-color2.chart-area-symbol { -fx-background-color: #D9421F; }
+.default-color3.chart-area-symbol { -fx-background-color: #385F56; }
+.default-color4.chart-area-symbol { -fx-background-color: #DA7C9D; }
+.default-color5.chart-area-symbol { -fx-background-color: #5FECC0; }
+.default-color6.chart-area-symbol { -fx-background-color: #C9B969; }
+.default-color7.chart-area-symbol { -fx-background-color: #77ADE1; }
+.default-color8.chart-area-symbol { -fx-background-color: #502215; }
+.default-color9.chart-area-symbol { -fx-background-color: #3C326D; }
+.default-color10.chart-area-symbol { -fx-background-color: #DE49D6; }
+.default-color11.chart-area-symbol { -fx-background-color: #4E9B52; }
+.default-color12.chart-area-symbol { -fx-background-color: #BDE0DA; }
+.default-color13.chart-area-symbol { -fx-background-color: #D7E441; }
+.default-color14.chart-area-symbol { -fx-background-color: #DD4265; }
+.default-color15.chart-area-symbol { -fx-background-color: #832E58; }
+.default-color16.chart-area-symbol { -fx-background-color: #9E764F; }
+.default-color17.chart-area-symbol { -fx-background-color: #DB7E39; }
+.default-color18.chart-area-symbol { -fx-background-color: #315822; }
+.default-color19.chart-area-symbol { -fx-background-color: #DEB3D8; }
+.default-color20.chart-area-symbol { -fx-background-color: #928B89; }
+.default-color21.chart-area-symbol { -fx-background-color: #E5AD36; }
+.default-color22.chart-area-symbol { -fx-background-color: #CAE0AB; }
+.default-color23.chart-area-symbol { -fx-background-color: #D747A5; }
+.default-color24.chart-area-symbol { -fx-background-color: #CB80E3; }
+.default-color25.chart-area-symbol { -fx-background-color: #90431E; }
+.default-color26.chart-area-symbol { -fx-background-color: #B9E079; }
+.default-color27.chart-area-symbol { -fx-background-color: #D57C71; }
+.default-color28.chart-area-symbol { -fx-background-color: #58A92C; }
+.default-color29.chart-area-symbol { -fx-background-color: #455472; }
+.default-color30.chart-area-symbol { -fx-background-color: #2B331E; }
+.default-color31.chart-area-symbol { -fx-background-color: #6289E1; }
+.default-color32.chart-area-symbol { -fx-background-color: #4B8697; }
+.default-color33.chart-area-symbol { -fx-background-color: #5A4A19; }
+.default-color34.chart-area-symbol { -fx-background-color: #67DF6B; }
+.default-color35.chart-area-symbol { -fx-background-color: #529781; }
+.default-color36.chart-area-symbol { -fx-background-color: #70544D; }
+.default-color37.chart-area-symbol { -fx-background-color: #916281; }
+.default-color38.chart-area-symbol { -fx-background-color: #947A28; }
+.default-color39.chart-area-symbol { -fx-background-color: #708558; }
+.default-color40.chart-area-symbol { -fx-background-color: #8D2E3A; }
+.default-color41.chart-area-symbol { -fx-background-color: #9B3FA3; }
+.default-color42.chart-area-symbol { -fx-background-color: #21313C; }
+.default-color43.chart-area-symbol { -fx-background-color: #D4BB92; }
+.default-color44.chart-area-symbol { -fx-background-color: #AEB234; }
+.default-color45.chart-area-symbol { -fx-background-color: #6BD9CE; }
+.default-color46.chart-area-symbol { -fx-background-color: #A297D4; }
+.default-color47.chart-area-symbol { -fx-background-color: #77C68D; }
+.default-color48.chart-area-symbol { -fx-background-color: #B45DE9; }
+.default-color49.chart-area-symbol { -fx-background-color: #D34842; }
+.default-color50.chart-area-symbol { -fx-background-color: #D8A39A; }
+.default-color51.chart-area-symbol { -fx-background-color: #5F8328; }
+.default-color52.chart-area-symbol { -fx-background-color: #6553AF; }
+.default-color53.chart-area-symbol { -fx-background-color: #62CAEA; }
+.default-color54.chart-area-symbol { -fx-background-color: #47202C; }
+.default-color55.chart-area-symbol { -fx-background-color: #823579; }
+.default-color56.chart-area-symbol { -fx-background-color: #5FE291; }
+.default-color57.chart-area-symbol { -fx-background-color: #D63E82; }
+.default-color58.chart-area-symbol { -fx-background-color: #CC82C4; }
+.default-color59.chart-area-symbol { -fx-background-color: #515D9C; }
+.default-color60.chart-area-symbol { -fx-background-color: #3D2347; }
+.default-color61.chart-area-symbol { -fx-background-color: #D7CBD3; }
+.default-color62.chart-area-symbol { -fx-background-color: #7286AE; }
+.default-color63.chart-area-symbol { -fx-background-color: #7CB4B9; }
+
+/* Pie chart colors */
+.default-color0.chart-pie { -fx-pie-color: #7770E7; }
+.default-color1.chart-pie { -fx-pie-color: #74E33A; }
+.default-color2.chart-pie { -fx-pie-color: #D9421F; }
+.default-color3.chart-pie { -fx-pie-color: #385F56; }
+.default-color4.chart-pie { -fx-pie-color: #DA7C9D; }
+.default-color5.chart-pie { -fx-pie-color: #5FECC0; }
+.default-color6.chart-pie { -fx-pie-color: #C9B969; }
+.default-color7.chart-pie { -fx-pie-color: #77ADE1; }
+.default-color8.chart-pie { -fx-pie-color: #502215; }
+.default-color9.chart-pie { -fx-pie-color: #3C326D; }
+.default-color10.chart-pie { -fx-pie-color: #DE49D6; }
+.default-color11.chart-pie { -fx-pie-color: #4E9B52; }
+.default-color12.chart-pie { -fx-pie-color: #BDE0DA; }
+.default-color13.chart-pie { -fx-pie-color: #D7E441; }
+.default-color14.chart-pie { -fx-pie-color: #DD4265; }
+.default-color15.chart-pie { -fx-pie-color: #832E58; }
+.default-color16.chart-pie { -fx-pie-color: #9E764F; }
+.default-color17.chart-pie { -fx-pie-color: #DB7E39; }
+.default-color18.chart-pie { -fx-pie-color: #315822; }
+.default-color19.chart-pie { -fx-pie-color: #DEB3D8; }
+.default-color20.chart-pie { -fx-pie-color: #928B89; }
+.default-color21.chart-pie { -fx-pie-color: #E5AD36; }
+.default-color22.chart-pie { -fx-pie-color: #CAE0AB; }
+.default-color23.chart-pie { -fx-pie-color: #D747A5; }
+.default-color24.chart-pie { -fx-pie-color: #CB80E3; }
+.default-color25.chart-pie { -fx-pie-color: #90431E; }
+.default-color26.chart-pie { -fx-pie-color: #B9E079; }
+.default-color27.chart-pie { -fx-pie-color: #D57C71; }
+.default-color28.chart-pie { -fx-pie-color: #58A92C; }
+.default-color29.chart-pie { -fx-pie-color: #455472; }
+.default-color30.chart-pie { -fx-pie-color: #2B331E; }
+.default-color31.chart-pie { -fx-pie-color: #6289E1; }
+.default-color32.chart-pie { -fx-pie-color: #4B8697; }
+.default-color33.chart-pie { -fx-pie-color: #5A4A19; }
+.default-color34.chart-pie { -fx-pie-color: #67DF6B; }
+.default-color35.chart-pie { -fx-pie-color: #529781; }
+.default-color36.chart-pie { -fx-pie-color: #70544D; }
+.default-color37.chart-pie { -fx-pie-color: #916281; }
+.default-color38.chart-pie { -fx-pie-color: #947A28; }
+.default-color39.chart-pie { -fx-pie-color: #708558; }
+.default-color40.chart-pie { -fx-pie-color: #8D2E3A; }
+.default-color41.chart-pie { -fx-pie-color: #9B3FA3; }
+.default-color42.chart-pie { -fx-pie-color: #21313C; }
+.default-color43.chart-pie { -fx-pie-color: #D4BB92; }
+.default-color44.chart-pie { -fx-pie-color: #AEB234; }
+.default-color45.chart-pie { -fx-pie-color: #6BD9CE; }
+.default-color46.chart-pie { -fx-pie-color: #A297D4; }
+.default-color47.chart-pie { -fx-pie-color: #77C68D; }
+.default-color48.chart-pie { -fx-pie-color: #B45DE9; }
+.default-color49.chart-pie { -fx-pie-color: #D34842; }
+.default-color50.chart-pie { -fx-pie-color: #D8A39A; }
+.default-color51.chart-pie { -fx-pie-color: #5F8328; }
+.default-color52.chart-pie { -fx-pie-color: #6553AF; }
+.default-color53.chart-pie { -fx-pie-color: #62CAEA; }
+.default-color54.chart-pie { -fx-pie-color: #47202C; }
+.default-color55.chart-pie { -fx-pie-color: #823579; }
+.default-color56.chart-pie { -fx-pie-color: #5FE291; }
+.default-color57.chart-pie { -fx-pie-color: #D63E82; }
+.default-color58.chart-pie { -fx-pie-color: #CC82C4; }
+.default-color59.chart-pie { -fx-pie-color: #515D9C; }
+.default-color60.chart-pie { -fx-pie-color: #3D2347; }
+.default-color61.chart-pie { -fx-pie-color: #D7CBD3; }
+.default-color62.chart-pie { -fx-pie-color: #7286AE; }
+.default-color63.chart-pie { -fx-pie-color: #7CB4B9; }
+
+
+
+/* Bar chart colors */
+.default-color0.chart-bar { -fx-bar-fill: #7770E7; }
+.default-color1.chart-bar { -fx-bar-fill: #74E33A; }
+.default-color2.chart-bar { -fx-bar-fill: #D9421F; }
+.default-color3.chart-bar { -fx-bar-fill: #385F56; }
+.default-color4.chart-bar { -fx-bar-fill: #DA7C9D; }
+.default-color5.chart-bar { -fx-bar-fill: #5FECC0; }
+.default-color6.chart-bar { -fx-bar-fill: #C9B969; }
+.default-color7.chart-bar { -fx-bar-fill: #77ADE1; }
+.default-color8.chart-bar { -fx-bar-fill: #502215; }
+.default-color9.chart-bar { -fx-bar-fill: #3C326D; }
+.default-color10.chart-bar { -fx-bar-fill: #DE49D6; }
+.default-color11.chart-bar { -fx-bar-fill: #4E9B52; }
+.default-color12.chart-bar { -fx-bar-fill: #BDE0DA; }
+.default-color13.chart-bar { -fx-bar-fill: #D7E441; }
+.default-color14.chart-bar { -fx-bar-fill: #DD4265; }
+.default-color15.chart-bar { -fx-bar-fill: #832E58; }
+.default-color16.chart-bar { -fx-bar-fill: #9E764F; }
+.default-color17.chart-bar { -fx-bar-fill: #DB7E39; }
+.default-color18.chart-bar { -fx-bar-fill: #315822; }
+.default-color19.chart-bar { -fx-bar-fill: #DEB3D8; }
+.default-color20.chart-bar { -fx-bar-fill: #928B89; }
+.default-color21.chart-bar { -fx-bar-fill: #E5AD36; }
+.default-color22.chart-bar { -fx-bar-fill: #CAE0AB; }
+.default-color23.chart-bar { -fx-bar-fill: #D747A5; }
+.default-color24.chart-bar { -fx-bar-fill: #CB80E3; }
+.default-color25.chart-bar { -fx-bar-fill: #90431E; }
+.default-color26.chart-bar { -fx-bar-fill: #B9E079; }
+.default-color27.chart-bar { -fx-bar-fill: #D57C71; }
+.default-color28.chart-bar { -fx-bar-fill: #58A92C; }
+.default-color29.chart-bar { -fx-bar-fill: #455472; }
+.default-color30.chart-bar { -fx-bar-fill: #2B331E; }
+.default-color31.chart-bar { -fx-bar-fill: #6289E1; }
+.default-color32.chart-bar { -fx-bar-fill: #4B8697; }
+.default-color33.chart-bar { -fx-bar-fill: #5A4A19; }
+.default-color34.chart-bar { -fx-bar-fill: #67DF6B; }
+.default-color35.chart-bar { -fx-bar-fill: #529781; }
+.default-color36.chart-bar { -fx-bar-fill: #70544D; }
+.default-color37.chart-bar { -fx-bar-fill: #916281; }
+.default-color38.chart-bar { -fx-bar-fill: #947A28; }
+.default-color39.chart-bar { -fx-bar-fill: #708558; }
+.default-color40.chart-bar { -fx-bar-fill: #8D2E3A; }
+.default-color41.chart-bar { -fx-bar-fill: #9B3FA3; }
+.default-color42.chart-bar { -fx-bar-fill: #21313C; }
+.default-color43.chart-bar { -fx-bar-fill: #D4BB92; }
+.default-color44.chart-bar { -fx-bar-fill: #AEB234; }
+.default-color45.chart-bar { -fx-bar-fill: #6BD9CE; }
+.default-color46.chart-bar { -fx-bar-fill: #A297D4; }
+.default-color47.chart-bar { -fx-bar-fill: #77C68D; }
+.default-color48.chart-bar { -fx-bar-fill: #B45DE9; }
+.default-color49.chart-bar { -fx-bar-fill: #D34842; }
+.default-color50.chart-bar { -fx-bar-fill: #D8A39A; }
+.default-color51.chart-bar { -fx-bar-fill: #5F8328; }
+.default-color52.chart-bar { -fx-bar-fill: #6553AF; }
+.default-color53.chart-bar { -fx-bar-fill: #62CAEA; }
+.default-color54.chart-bar { -fx-bar-fill: #47202C; }
+.default-color55.chart-bar { -fx-bar-fill: #823579; }
+.default-color56.chart-bar { -fx-bar-fill: #5FE291; }
+.default-color57.chart-bar { -fx-bar-fill: #D63E82; }
+.default-color58.chart-bar { -fx-bar-fill: #CC82C4; }
+.default-color59.chart-bar { -fx-bar-fill: #515D9C; }
+.default-color60.chart-bar { -fx-bar-fill: #3D2347; }
+.default-color61.chart-bar { -fx-bar-fill: #D7CBD3; }
+.default-color62.chart-bar { -fx-bar-fill: #7286AE; }
+.default-color63.chart-bar { -fx-bar-fill: #7CB4B9; }
+
+/*
+.chart-pie-label-line {
+    -fx-stroke: #8b4513;
+    -fx-fill: #8b4513;
+}
+ 
+.chart-pie-label {
+    -fx-fill: #8b4513;
+    -fx-font-size: 1em;
+} 
+.chart-legend {
+   -fx-background-color:  #fafad2;
+   -fx-stroke: #daa520;
+}
+*

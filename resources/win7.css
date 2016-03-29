@@ -1,0 +1,665 @@
+/*
+ * Copyright (c) 2014, Matthias Meidinger
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice, this
+ *    list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
+ *    and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
+ * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * The views and conclusions contained in the software and documentation are those
+ * of the authors and should not be interpreted as representing official policies,
+ * either expressed or implied, of the FreeBSD Project.
+ */
+
+.root{
+    -fx-text-base-color: black;
+    -fx-text-fill: -fx-text-base-color;
+
+    /* This is the default Windows-font */
+    -fx-font-family: "Segoe UI Semibold";
+    -fx-font-size: 10.5;
+
+    /* For debugging purposes*/
+    -fx-background-color: rgb(240,240,240);
+
+    -fx-disabled-opacity: 0.6;
+}
+
+.text{
+    -fx-font-smoothing-type: lcd;
+}
+
+/* disabled controls */
+.button:disabled,
+.toggle-button:disabled,
+.radio-button:disabled,
+.check-box:disabled,
+.hyperlink:disabled,
+.menu-button:disabled,
+.split-menu-button:disabled,
+.slider:disabled,
+.scroll-pane:disabled,
+.progress-bar:disabled,
+.progress-indicator:disabled,
+.text-input:disabled,
+.choice-box:disabled,
+.combo-box-base:disabled,
+.list-view:disabled,
+.tree-view:disabled,
+.table-view:disabled,
+.tree-table-view:disabled,
+.tab-pane:disabled,
+.tab-pane > .tab-header-area > .headers-region > .tab:disabled {
+    -fx-opacity: -fx-disabled-opacity;
+}
+
+/* mnemonics */
+.button:show-mnemonics > .mnemonic-underline,
+.toggle-button:show-mnemonics > .mnemonic-underline,
+.radio-button:show-mnemonics > .mnemonic-underline,
+.check-box:show-mnemonics > .mnemonic-underline,
+.hyperlink:show-mnemonics > .mnemonic-underline,
+.split-menu-button:show-mnemonics > .mnemonic-underline,
+.menu-button:show-mnemonics > .mnemonic-underline {
+    -fx-stroke: -fx-text-base-color;
+}
+
+.mnemonic-underline{
+    -fx-stroke: transparent;
+}
+
+
+
+
+/********************************************
+*                                           *
+*       Button & Default-Button             *
+*                                           *
+*********************************************/
+.button-focus-border{
+    -fx-stroke: black;
+    -fx-stroke-dash-array: 1;
+    -fx-stroke-width: 1px;
+    -fx-stroke-line-cap: butt;
+    -fx-stroke-type: inside;
+}
+
+.button{
+    -fx-skin:"org.aerofx.controls.skin.AeroButtonSkin";
+}
+
+.button, .toggle-button{
+    -fx-alignment: center;
+    -fx-background-color:
+        rgb(112,112,112),
+        linear-gradient(rgb(252,252,252), rgb(252,252,252)),
+        linear-gradient(rgb(242,242,242) 0%, rgb(235,235,235) 49%, rgb(221,221,221) 50%, rgb(207,207,207) 100%);
+    -fx-background-insets: 0,1,2;
+    -fx-background-radius: 3,2,1;
+    -fx-padding: 4 4 3 3;
+    -fx-text-fill: -fx-text-base-color;
+}
+
+.button:hover{
+    -fx-background-color:
+        rgb(60,127,177),
+        linear-gradient(rgb(250,253,254),rgb(250,253,254)),
+        linear-gradient(rgb(234, 246, 253) 0%, rgb(217, 240, 252) 49%, rgb(190, 230, 253) 50%, rgb(167, 217, 245) 100%);
+}
+
+.button:default{
+    -fx-background-color:
+        rgb(60,127,177),
+        linear-gradient(rgb(47,212,255), rgb(47,212,255)),
+        linear-gradient(rgb(234,246,252) 0%, rgb(228,243,252) 49%, rgb(202,233,250) 50%, rgb(182,222,245) 100%);
+}
+
+.button:armed, .toggle-button:armed{
+    -fx-background-color:
+        rgb(44,98,139),
+        linear-gradient(rgb(158,176,186), rgb(158,176,186)),
+        linear-gradient(rgb(229,244,252) 0%, rgb(196,229,246) 49%, rgb(152,209,239) 50%, rgb(104,179,219) 100%);
+}
+
+
+/********************************************
+*                                           *
+*       TextField                           *
+*                                           *
+*********************************************/
+.text-field{
+   /* If four values are used, the sides are top, right, bottom, left. */
+   -fx-border-color: rgb(170,170,178) rgb(218,220,230) rgb(226,231.0,239) rgb(226,224,234);
+   -fx-background-color: rgb(255,255,255);
+   -fx-padding: 0.0em;
+   -fx-cursor: text;
+   -fx-effect: null;
+   -fx-pref-height: 20px;
+}
+.text-field:focused{
+    -fx-border-color: rgb(61,123,173) rgb(164,201,227) rgb(183,217,237) rgb(181,207,231);
+    /* Remove the blue glow on focus */
+    -fx-background-insets: 0, 0, 0, 0;
+    -fx-effect: null;
+}
+
+
+/********************************************
+*                                           *
+*       CheckBox                            *
+*                                           *
+*********************************************/
+.check-box-focus-border{
+    -fx-stroke: black;
+    -fx-stroke-dash-array: 1;
+    -fx-stroke-width: 1px;
+    -fx-stroke-line-cap: butt;
+    -fx-stroke-type: inside;
+}
+/* TODO: Style the mark by using a fx-shape */
+.check-box{
+    -fx-skin:"org.aerofx.controls.skin.AeroCheckBoxSkin";
+    -fx-label-padding: 0.0em 0.0em 0.0em 0.05em;
+}
+
+.check-box > .box{
+    -fx-padding: 0.7em;
+    -fx-background-insets: 0, 2, 4;
+    -fx-border-color: rgb(140.0, 141.0, 141.0);
+    -fx-background-color:
+        rgb(244,244,244),
+        linear-gradient(to bottom right, rgb(174,179,185), rgb(233,233,234)),
+        linear-gradient(to bottom right, rgb(203,207,213), rgb(246,246,246));
+    -fx-scale-x: 0.75;
+    -fx-scale-y: 0.75;
+}
+
+.check-box:hover > .box {
+    -fx-border-color: rgb(85,134,163);
+    -fx-background-color:
+        rgb(222,249,250),
+        linear-gradient(to bottom right, rgb(121,198,249), rgb(207,236,253)),
+        linear-gradient(to bottom right, rgb(177,223,253), rgb(231,247,254));
+}
+
+.check-box:pressed > .box{
+    -fx-border-color: rgb(44,98,139);
+        -fx-background-color:
+            rgb(194,228,246),
+            linear-gradient(to bottom right, rgb(94,182,247), rgb(194,228,246)),
+            linear-gradient(to bottom right, rgb(157,213,252), rgb(224,244,254));
+}
+
+.check-box:disabled > .box{
+    -fx-background-color:
+        linear-gradient(rgb(239.0, 239.0, 239.0), rgb(250.0, 250.0, 250.0));
+}
+
+.check-box:selected > .box{
+    -fx-padding: 0.166667em 0.166667em 0.25em 0.25em;
+}
+
+.check-box:selected > .box > .mark{
+    -fx-padding: 0.416667em 0.416667em 0.5em 0.5em;
+    -fx-shape: "M 5.1806931,9.0173267 7.5232674,12.170792 11.307426,4.4673266 10.091089,3.9717821 7.2980199,9.6029703 6.1267328,7.9361386 z";
+    -fx-background-color: rgb(76,97,152);
+}
+
+.check-box:selected:hover > .box > .mark{
+    -fx-background-color: rgb(4,34,113);
+}
+
+.check-box:selected:pressed > .box > .mark{
+    -fx-background-color: rgb(44,83,148);
+}
+
+
+/********************************************
+*                                           *
+*       RadioButton                         *
+*                                           *
+*********************************************/
+.radio-button-focus-border{
+    -fx-stroke: black;
+    -fx-stroke-dash-array: 1;
+    -fx-stroke-width: 1px;
+    -fx-stroke-line-cap: butt;
+    -fx-stroke-type: inside;
+}
+
+.radio-button{
+    -fx-skin:"org.aerofx.controls.skin.AeroRadioButtonSkin";
+    -fx-label-padding: 0.0em 0.0em 0.0em 0.35em;
+}
+
+.radio-button > .text{
+    -fx-translate-y: 1px;
+}
+
+.radio-button > .radio{
+    -fx-pref-height: 12px;
+    -fx-pref-width: 12px;
+    -fx-background-color:
+        rgb(147,148,148),
+        rgb(239,239,239),
+        linear-gradient(to bottom right, rgb(179,184,189), rgb(235,235,235)),
+        linear-gradient(to bottom right, rgb(203,207,213), rgb(241,241,241));
+    -fx-background-insets: 0,1,2,3;
+    -fx-background-radius: 1em;
+    -fx-padding: 0.333333em;
+}
+
+.radio-button:hover > .radio{
+    -fx-background-color:
+        rgb(93,140,167),
+        rgb(216,244,246),
+        linear-gradient(to bottom right, rgb(128,202,249), rgb(210,238,253)),
+        linear-gradient(to bottom right, rgb(177,223,253), rgb(223,243,254));
+    -fx-background-insets: 0,1,2,3;
+}
+
+.radio-button:pressed > .radio{
+    -fx-background-color:
+        rgb(58,103,135),
+        rgb(198,239,241),
+        linear-gradient(to bottom right, rgb(90,179,246), rgb(190,230,252)),
+        linear-gradient(to bottom right, rgb(147,208,252), rgb(208,237,253));
+    -fx-background-insets: 0,1,2,3;
+    -fx-background-radius: 1.0em;
+    -fx-padding: 0.333333em;
+}
+
+.radio-button:selected > .radio > .dot{
+    -fx-padding: 0.333333em;
+    -fx-pref-height: 4px;
+    -fx-pref-width: 4px;
+    -fx-background-color:
+        rgb(20,47,68),
+        rgb(11,130,199),
+        linear-gradient(to bottom right, rgb(255,255,255) 20%, rgb(11,130,199) 60%);
+    -fx-background-insets: 0,1,2;
+    -fx-background-radius: 1.0em;
+}
+
+.radio-button:selected:hover > .radio > .dot{
+   -fx-background-color:
+        rgb(20,47,68),
+        rgb(11,130,199),
+        linear-gradient(to bottom right, rgb(255,255,255) 20%, rgb(13,160,243) 60%);
+}
+
+.radio-button:selected:pressed > .radio > .dot{
+   -fx-background-color:
+        rgb(20,47,68),
+        rgb(11,130,199),
+    linear-gradient(to bottom right, rgb(255,255,255) 20%, rgb(7,84,131) 60%);
+}
+
+.radio-button:show-mnemonics > .mnemonic-underline{
+    -fx-stroke: -fx-text-base-color;
+}
+
+/********************************************
+*                                           *
+*       TabPane                             *
+*                                           *
+*********************************************/
+.tab-pane{
+    -fx-tab-min-height: 1.8333em; /* 22 */
+    -fx-tab-max-height: 1.8333em; /* 22 */
+}
+
+.tab-pane:top > .tab-content-area {
+    -fx-background-color: rgb(255,255,255);
+    -fx-border-color: transparent rgb(137,140,149) rgb(137,140,149) rgb(137,140,149);
+}
+
+.tab-pane:top > .tab-header-area {
+    -fx-padding: 0.416667em 5 0.0em 0.416667em; /* 5 2 0 5 */
+}
+
+.tab-pane > *.tab-header-area > .headers-region {
+    -fx-translate-x: -5px;
+}
+
+.tab-pane > *.tab-header-area > *.tab-header-background{
+    -fx-background-color: rgb(240,240,240);
+    -fx-border-color: transparent transparent rgb(137,140,149) transparent ;
+}
+
+.tab-pane > .tab-header-area > .headers-region > .tab{
+    -fx-padding: 0.083333em 0.5em 0.083333em 0.5em;
+    -fx-border-color: rgb(137,140,149);
+    -fx-background-color:
+        rgb(255,255,255),
+        linear-gradient(to bottom, rgb(242,242,242) 0%, rgb(235,235,235) 49%, rgb(221,221,221) 50%, rgb(207,207,207) 100%);
+    -fx-background-insets: 0,2 2 0 2;
+}
+
+.tab-pane > .tab-header-area > .headers-region > .tab:top{
+    -fx-border-color: rgb(244,0,0), rgb(137,140,149), rgb(137,140,149), rgb(137,140,149);
+    -fx-border-width: 1 1 1 1;
+    -fx-pref-height: 1.8em;
+}
+
+.tab-pane > .tab-header-area > .headers-region > .tab:hover{
+    -fx-border-color: rgb(60,127,177);
+    -fx-background-color:
+        rgb(255,255,255),
+        linear-gradient(to bottom, rgb(234,246,253) 0%, rgb(217,240,252) 49%, rgb(190,230,253) 50%, rgb(167,217,245) 100%);
+    -fx-background-insets: 0,2 2 0 2;
+}
+
+.tab-pane > .tab-header-area > .headers-region > .tab:selected{
+    -fx-border-color: rgb(137,140,149);
+    -fx-border-width: 1 1 0 1;
+    -fx-background-color: rgb(255,255,255);
+    -fx-pref-height: 2em;
+}
+
+.tab-pane > .tab-header-area > .headers-region > .tab:selected .focus-indicator{
+    -fx-border-width: 0;
+    -fx-border-color: transparent;
+}
+
+.tab-pane > .tab-header-area > .headers-region > .tab > .tab-container > .tab-label {
+    -fx-alignment: CENTER;
+    -fx-text-fill: -fx-text-base-color;
+}
+
+.tab-pane.floating > .tab-content-area {
+    -fx-background-color: -fx-outer-border, -fx-background;
+    -fx-background-insets: 0, 1;
+    -fx-background-radius: 3, 2;
+    -fx-padding: 2;
+}
+
+/********************************************
+*                                           *
+*       Hyperlink                           *
+*                                           *
+*********************************************/
+.hyperlink{
+    -fx-text-fill: rgb(0,102,204);
+}
+
+.hyperlink:focused{
+    -fx-border-color: black;
+    -fx-border-style: dotted;
+}
+
+
+/********************************************
+*                                           *
+*       GroupBox                            *
+*                                           *
+*********************************************/
+.group-box{
+    -fx-skin: "org.aerofx.controls.skin.AeroGroupBoxSkin";
+}
+
+.group-box-border{
+    -fx-stroke: rgb(213,223,229);
+    -fx-stroke-dash-array: 1 0;
+    -fx-stroke-width: 1px;
+    -fx-stroke-line-cap: butt;
+    -fx-stroke-type: inside;
+    -fx-arc-height: 6px;
+    -fx-arc-width: 6px;
+}
+
+
+/********************************************
+*                                           *
+*       TableView                           *
+*                                           *
+*********************************************/
+.table-view{
+    -fx-border-color: rgb(130,135,144);
+    -fx-background-color: white;
+}
+
+.table-view > column-header-background > nested-column-header > .arrow{
+    -fx-shape:null;
+}
+
+.table-view > .column-header-background > .nested-column-header > .column-header{
+    -fx-pref-height: 23px;
+    -fx-border-color: rgb(213,213,213);
+    -fx-border-width: 0 1 1 0;
+    -fx-background-color:
+        linear-gradient(to bottom, rgb(255,255,255) 0%, rgb(255,255,255) 40%, rgb(247,248,250) 41%, rgb(241,242,244) 100%);
+}
+
+.table-view > .column-header-background > .nested-column-header > .column-header:hover{
+    -fx-border-color: transparent rgb(136,203,235) rgb(147,201,227) rgb(105,187,227);
+    -fx-border-width: 0 1 1 1;
+    -fx-background-color:
+        linear-gradient(to bottom, rgb(227,247,255) 0%, rgb(227,247,255) 40%, rgb(189,237,255) 41%, rgb(183,231,251) 100%);
+}
+
+.table-view > .column-header-background > .nested-column-header > .column-header:pressed{
+    -fx-translate-x: 1px;
+    -fx-translate-y: 1px;
+    -fx-border-color: rgb(134,163,178) rgb(79,144,174) rgb(147,201,227) rgb(80,145,175);
+    -fx-border-width: 1;
+    -fx-background-color:
+        linear-gradient(to bottom, rgb(188,228,249) 0%, rgb(188,228,249) 40%, rgb(141,214,247) 41%, rgb(138,209,245) 100%);
+}
+
+.table-view > .column-header-background > .nested-column-header > .column-header > .label{
+    -fx-translate-x: 4px;
+    -fx-alignment: center-left;
+}
+
+
+/********************************************
+*                                           *
+*       Separator                           *
+*                                           *
+*********************************************/
+.separator:horizontal{
+    -fx-border-color:rgb(160,160,160);
+    -fx-border-width: 0.5;
+}
+
+
+/********************************************
+*                                           *
+*       Tooltip                             *
+*                                           *
+*********************************************/
+.tooltip{
+    -fx-border-color: rgb(117,117,117);
+    -fx-border-width: 1;
+    -fx-border-radius: 2;
+    -fx-background-insets: 0;
+    -fx-background-radius: 2;
+    -fx-background-color:
+        linear-gradient(to bottom, rgb(255,255,255) 0%, rgb(228,225,241) 100%);
+    -fx-padding: 2 4 2 4;
+    -fx-effect: dropshadow( one-pass-box , rgba(0,0,0,0.5) , 10, 0.0 , 2 , 2 );
+
+}
+
+
+/********************************************
+*                                           *
+*       Menu                                *
+*                                           *
+*********************************************/
+.menu-bar{
+    /*-fx-border-color:
+        rgb(169,191,214) rgb(233,237,246) rgb(182,188,204) rgb(233,237,246);*/
+    -fx-background-color:
+        linear-gradient(to bottom, rgb(252,253,254) 0%, rgb(229,234,245) 35%, rgb(212,219,237) 36%, rgb(225,230,246)100%);
+    -fx-padding: 0 4 0 4;
+    -fx-use-system-menu-bar: true;
+}
+
+.menu{
+    -fx-padding: 3 4 3 4;
+}
+
+.menu:show-mnemonics > .mnemonic-underline{
+    -fx-stroke: -fx-text-base-color;
+}
+
+.menu:hover{
+    -fx-background-color: rgb(42,144,255);
+}
+
+.menu-item{
+    -fx-background-color: /*red;*/rgb(241,241,241);
+    -fx-background-insets: 0;
+    -fx-padding: 0;/* 2 4 2 4;*/
+}
+
+.menu-item > .label{
+    -fx-padding: 4 10 4 4;
+}
+
+.menu-item > .left-container {
+    -fx-padding: 0.458em 0.791em 0.458em 0.458em;
+    -fx-border-width: 0 1 0 1;
+}
+
+.menu-item:hover{
+    -fx-background-insets: 1 2 1 2,2 3 2 3 ,3 4 3 4;
+    -fx-background-color:
+        rgb(174,207,247),rgb(245,245,245), linear-gradient(to bottom, rgb(239,240,240)0%, rgb(239,240,240)70%, rgb(231,237,245)71%);
+    -fx-background-radius: 1,2,3;
+}
+
+.menu-item:disabled{
+    -fx-background-insets: 0;
+    -fx-padding: 0;/* 2 4 2 4;*/
+}
+
+.menu-item:disabled > .label {
+    -fx-text-fill: rgb(114,112,125);
+}
+
+.menu-item:disabled:hover{
+    -fx-background-insets: 1 2 1 2,2 3 2 3,3 4 3 4;
+    -fx-background-color: rgb(150,150,150), rgb(200,200,200);
+    -fx-background-radius: 1,2,3;
+}
+
+.separator{
+    -fx-background-color: linear-gradient(to bottom,rgb(224,224,244)0%,rgb(254,254,254)100%);
+    -fx-background-insets: 1;
+    -fx-padding: 0;
+}
+
+.radio-menu-item:checked > .left-container > .radio {
+    -fx-padding: 0.333333em;
+    -fx-pref-height: 4px;
+    -fx-pref-width: 4px;
+    -fx-background-color:
+        rgb(20,47,68),
+        rgb(11,130,199),
+        linear-gradient(to bottom right, rgb(255,255,255) 20%, rgb(11,130,199) 60%);
+    -fx-background-insets: 0,1,2;
+    -fx-background-radius: 1.0em;
+}
+
+
+/* Needed, as JavaFX menus are, in fact, custom context menus*/
+/********************************************
+*                                           *
+*       Context-Menu                        *
+*                                           *
+*********************************************/
+.context-menu {
+    -fx-background-color: rgb(240,240,240);
+    -fx-background-insets: 0;
+    -fx-border-color: rgb(151,151,151);
+    -fx-padding: 0;
+}
+
+
+/********************************************
+*                                           *
+*       Combobox                            *
+*                                           *
+*********************************************/
+.combo-box {
+    -fx-padding: 0;
+    -fx-background-color:
+        rgb(112,112,112),
+        linear-gradient(rgb(252,252,252), rgb(252,252,252)),
+        linear-gradient(rgb(242,242,242) 0%, rgb(235,235,235) 49%, rgb(221,221,221) 50%, rgb(207,207,207) 100%);
+    -fx-background-insets: 0, 1,2;
+    -fx-background-radius: 3,2,1;
+    -fx-text-fill: -fx-text-base-color;
+}
+
+.combo-box > .arrow-button {
+    -fx-border-width: 0px;
+    -fx-background-color: transparent;
+    -fx-padding: 4 4 3 3;
+    -fx-text-fill: -fx-text-base-color;
+}
+
+.combo-box > .arrow-button > .arrow{
+    -fx-background-color: rgb(80,80,80);
+    -fx-background-insets: 0 0 -1 0, 0;
+    -fx-padding: 0.166667em 0.333333em 0.166667em 0.333333em; /* 2 4 2 4 */
+    -fx-shape: "M 0 0 h 7 l -3.5 4 z";
+}
+
+.combo-box > .list-cell {
+    -fx-background: transparent;
+    -fx-background-color: transparent;
+    -fx-text-fill: -fx-text-base-color;
+    -fx-padding: 0.333333em 0.666667em 0.416667em 0.666667em; /* 4 8 5 8 */
+    -fx-border-width: 0;
+}
+
+.combo-box > .arrow-button  {
+    -fx-background-radius: 0 5 5 0, 0 4 4 0, 0 3 3 0;
+    -fx-padding: 0.5em 0.833333em 0.5em 0.833333em; /* 6 10 6 10 */
+    -fx-background-insets: 1 1 1 0, 1, 2;
+}
+
+.combo-box:hover {
+    -fx-background-color:
+    rgb(60,127,177),
+    linear-gradient(rgb(250,253,254),rgb(250,253,254)),
+    linear-gradient(rgb(234, 246, 253) 0%, rgb(217, 240, 252) 49%, rgb(190, 230, 253) 50%, rgb(167, 217, 245) 100%);
+}
+
+.combo-box:focused {
+    -fx-background-color:
+    rgb(44,98,139),
+    linear-gradient(rgb(158,176,186), rgb(158,176,186)),
+    linear-gradient(rgb(229,244,252) 0%, rgb(196,229,246) 49%, rgb(152,209,239) 50%, rgb(104,179,219) 100%);
+}
+
+.combo-box-popup > .list-view {
+    -fx-background-color: rgb(100,100,100), rgb(255,255,255);
+    -fx-background-insets: 0, 1;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.6), 8, 0.0, 0, 0);
+}
+
+.combo-box-popup  > .list-view > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:hover {
+    -fx-background-color: rgb(30,144,255);
+    -fx-text-fill: white;
+}

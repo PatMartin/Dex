@@ -1,0 +1,1272 @@
+/*
+Document : win 7 glass css styles for JavaFX 2+ controls.
+Created on : May 22, 2012, 3:31:03 PM
+Description:
+Attempt to recreate Win 7 glass theme. If a -fx- variable isnt defined
+in this CSS stylesheet, I am referecing it in the default style sheet
+"caspian.css".
+
+1. Added splitMenu, ChoiceBox. Toggle Buttons are work in progress.
+2. Currently, im not happy with spacing in menus when a single
+menu item is being hovered.
+
+*/
+
+/***************************************************************************
+* *
+* The main color palette from which the rest of the colors are derived. *
+* *
+**************************************************************************/
+.root {
+    -fx-text-base-color: #000000;
+}
+
+/*******************************************************************************
+* *
+* Toolbar *
+* *
+******************************************************************************/
+
+.tool-bar {
+    
+}
+
+
+.tool-bar:vertical {
+    -fx-background-color:
+        rgb(160,175,195),
+        rgb(205,218,234),
+        rgb(228,239,251),
+        linear-gradient(
+            to right,
+            rgb(255,255,255) 0%,
+            rgb(243,248,253) 30%,
+            rgb(238,243,250) 70%,
+            rgb(238,244,251) 100%
+        ),
+        linear-gradient(
+            to right,
+            rgb(250,252,253) 0%,
+            rgb(230,240,250) 60%,
+            rgb(220,230,244) 70%,
+            rgb(221,233,247) 100%
+        );
+    
+    -fx-background-insets: 0, 0 1 0 0, 0 2 0 0, 1 3 1 0;
+    -fx-background-radius: 0 ;
+    -fx-padding: 0.833em 0.416667em 0.833em 0.416667em;
+    -fx-spacing: 0.333em;
+    -fx-alignment: TOP_LEFT;
+        
+}
+
+.tool-bar .separator:vertical .line {
+    -fx-border-color:
+        linear-gradient(
+            to bottom,
+            rgb(246,249,254) 0%,
+            rgb(235,240,249) 100%
+        );
+    
+    -fx-background-color:
+        linear-gradient(
+            to bottom,
+            rgb(148,169,190) 0%,
+            rgb(177,194,213) 25%,
+            rgb(164,183,207) 100%
+        );
+    -fx-border-style: solid;
+}
+
+.tool-bar .separator:horizontal .line {
+    -fx-border-color:
+        linear-gradient(
+            to right,
+            rgb(246,249,254) 0%,
+            rgb(235,240,249) 100%
+        );
+    
+    -fx-background-color:
+        linear-gradient(
+            to right,
+            rgb(148,169,190) 0%,
+            rgb(177,194,213) 25%,
+            rgb(164,183,207) 100%
+        );
+    -fx-border-style: solid;
+}
+
+.tool-bar:vertical .separator {
+    -fx-orientation: horizontal;
+    -fx-padding: 0.0em 0.0835em 0.0em 0.0835em; /* 0 1 0 1 */
+}
+
+.tool-bar:horizontal {
+    -fx-background-color:
+        rgb(160,175,195),
+        rgb(205,218,234),
+        rgb(228,239,251),
+        linear-gradient(
+            to bottom,
+            rgb(255,255,255) 0%,
+            rgb(243,248,253) 54%,
+            rgb(238,243,250) 54%,
+            rgb(238,244,251) 100%
+        ),
+        linear-gradient(
+            to bottom,
+            rgb(250,252,253) 0%,
+            rgb(230,240,250) 54%,
+            rgb(220,230,244) 54%,
+            rgb(221,233,247) 100%
+        );
+    
+    -fx-background-insets: 0, 0 0 1 0, 0 0 2 0, 0 1 3 1;
+    -fx-background-radius: 0,0,0,0;
+    -fx-padding: 0.416667em 0.833em 0.416667em 0.833em; /* 5 10 5 10 */
+    -fx-spacing: 0.333em; /* 4 */
+    -fx-alignment: CENTER_LEFT;
+}
+
+.tool-bar:horizontal .separator {
+    -fx-orientation: vertical;
+    -fx-padding: 0.0835em 0.0em 0.0835em 0.0em; /* 1 0 1 0 */
+}
+
+.tool-bar-overflow-button {
+    -fx-background-color: transparent;
+    -fx-padding: 0.666667em 0.916667em 0em 0em; /* 8 11 0 0 */
+}
+
+.tool-bar-overflow-button .arrow {
+    -fx-background-color: -fx-mark-highlight-color, -fx-mark-color;
+    -fx-background-insets: 1 0 -1 0, 0;
+    -fx-padding: 0.666667em 0.916667em 0em 0em; /* 8 11 0 0 */
+    -fx-shape: "M337.273,297.622l-0.016,1.069l2.724,2.639l-2.723,2.628l0.015,1.048h0.881l3.81-3.685l-3.788-3.699H337.273z M343.783,297.622h-0.902l-0.015,1.069l2.724,2.639l-2.724,2.628l0.015,1.048h0.882l3.809-3.685L343.783,297.622z" ;
+}
+
+.tool-bar-overflow-button:focused .arrow {
+   -fx-background-color: -fx-mark-highlight-color, derive(-fx-accent, -15%);
+   -fx-background-insets: 1 0 -1 0, 0;
+}
+
+.tool-bar-overflow-button:hover .arrow {
+   -fx-background-color: -fx-mark-highlight-color, derive(-fx-hover-base, -35%);
+   -fx-background-insets: 1 0 -1 0, 0;
+}
+
+/* This style clears button bg when used in toolbar. */
+.tool-bar .button {
+    -fx-background-color: transparent;
+}
+
+.tool-bar:hover .button:pressed {
+    -fx-background-color:
+        linear-gradient(
+            to bottom,
+            rgb(187,202,219) 0%,
+            rgb(177,195,216) 48%,
+            rgb(170,188,211) 48%,
+            rgb(170,188,213) 100%),
+        linear-gradient(
+            to bottom,
+            rgb(249,251,253) 0%,
+            rgb(250,252,254) 46%,
+            rgb(245,248,252) 46%,
+            rgb(239,244,249) 100%),
+        linear-gradient(
+            to bottom,
+            rgb(248,251,254) 0%,
+            rgb(237,242,250) 46%,
+            rgb(215,228,244) 46%,
+            rgb(193,210,232) 100%);
+            
+    -fx-background-insets: 0, 1, 2;
+    -fx-background-radius: 3, 2, 2;
+        
+}
+
+.tool-bar .button:hover {
+    -fx-background-color:
+        linear-gradient(
+            to bottom,
+            rgb(187,202,219) 0%,
+            rgb(177,195,216) 48%,
+            rgb(170,188,211) 48%,
+            rgb(170,188,213) 100%),
+        linear-gradient(
+            to bottom,
+            rgb(249,251,253) 0%,
+            rgb(250,252,254) 46%,
+            rgb(245,248,252) 46%,
+            rgb(239,244,249) 100%),
+        linear-gradient(
+            to bottom,
+            rgb(243,248,254) 0%,
+            rgb(230,240,250) 46%,
+            rgb(220,230,244) 46%,
+            rgb(220,231,245) 100%);
+            
+    -fx-background-insets: 0, 1, 2;
+    -fx-background-radius: 3, 2, 2;
+        
+}
+/*******************************************************************************
+* *
+* Tooltip *
+* *
+******************************************************************************/
+
+.tooltip {
+    
+    -fx-background-color: rgba(112,112,112,0.95),
+        linear-gradient(
+            to bottom,
+            rgb(255,255,255),
+            rgb(229,229,237));
+    
+    -fx-background-insets: 1,2;
+    -fx-background-radius: 3,2;
+    -fx-padding: 5 7 5 7;
+    -fx-effect: dropshadow(one-pass-box, rgba(0,0,0,0.3),3,0,2,2);
+}
+
+/* Page Corner. */
+.page-corner {
+    
+    -fx-shape: "";
+}
+
+/*******************************************************************************
+* *
+* Button *
+* *
+******************************************************************************/
+
+.button, .menu-button, .toggle-button {
+
+    -fx-background-color:
+        rgb(112,112,112),
+        linear-gradient(
+            to bottom,
+            rgb(252,252,252) 0%,
+            rgb(250,250,250) 50%,
+            rgb(246,246,246) 50%,
+            rgb(243,243,243) 100%),
+        linear-gradient(
+            to bottom,
+            rgb(242,242,242) 0%,
+            rgb(235,235,235) 50%,
+            rgb(221,221,221) 50%,
+            rgb(207,207,207) 100%);
+            
+        
+    -fx-background-insets: 0, 1, 2;
+    -fx-background-radius: 3, 2, 2;
+    -fx-padding: 0.40em 0.833333em 0.40em 0.833333em;
+    -fx-text-fill: -fx-text-base-color;
+    -fx-alignment: CENTER;
+    -fx-content-display: LEFT;
+}
+
+.button:focused, .menu-button:focused, .toggle-button:focused {
+    
+    -fx-background-color: rgb(60,127,177),
+    linear-gradient(
+        to bottom,
+        rgb(55,213,254) 0%,
+        rgb(54,212,253) 50%,
+        rgb(49,210,251) 50%,
+        rgb(44,206,248) 100%),
+    linear-gradient(
+        to bottom,
+        rgb(178,234,250) 0%,
+        rgb(173,231,247) 50%,
+        rgb(158,222,241) 50%,
+        rgb(144,212,234) 100%),
+    linear-gradient(
+        to bottom,
+        rgb(237,245,249) 0%,
+        rgb(231,241,246) 50%,
+        rgb(208,229,240) 50%,
+        rgb(191,218,233) 100%);
+    
+    -fx-background-insets: 0, 1, 2, 3;
+    -fx-background-radius: 3, 2, 2, 1;
+}
+
+.button:hover, .menu-button:hover, .toggle-button:hover {
+    
+    -fx-background-color: rgb(60, 127, 177),
+    linear-gradient(
+        to bottom,
+        rgb(250, 253, 254) 0%,
+        rgb(245, 251, 254) 50%,
+        rgb(239, 249, 254) 50%,
+        rgb(232, 245, 252) 100%),
+    linear-gradient(
+        to bottom,
+        rgb(234, 246, 253) 0%,
+        rgb(217, 240, 252) 50%,
+        rgb(190, 230, 253) 50%,
+        rgb(167, 217, 245) 100%);
+}
+
+.button:armed, .menu-button:armed, .toggle-button:armed {
+    
+    -fx-background-color: rgb(44, 98, 139),
+    linear-gradient(
+        to bottom,
+        rgb(157, 175, 185) 0%,
+        rgb(154, 186, 203) 50%,
+        rgb(120, 170, 197) 50%,
+        rgb(85, 146, 181) 100%),
+    linear-gradient(
+        to bottom,
+        rgb(228, 243, 251) 0%,
+        rgb(196, 229, 246) 50%,
+        rgb(152, 209, 239) 50%,
+        rgb(104, 178, 218) 100%);
+    
+    -fx-color: -fx-pressed-base;
+    -fx-background-insets: 0, 1, 2 2 1 2;
+    -fx-background-radius: 3, 2, 2;
+}
+ 
+.button:default {
+    -fx-base: -fx-accent;
+}
+
+.button:cancel {
+}
+
+.button:disabled {
+    -fx-opacity: -fx-disabled-opacity;
+}
+
+.button:show-mnemonics .mnemonic-underline {
+    -fx-stroke: -fx-text-fill;
+}
+
+
+/*******************************************************************************
+* *
+* MenuButton *
+* *
+******************************************************************************/
+
+/* MenuButton styles can be found with .button; adjusted padding to make the
+menu button the same height as button control. Does this break on other
+Operating Systems?
+
+Should left and right padding be the same as a button? */
+.menu-button {
+    -fx-padding: 0.244444em 0.633333em 0.211111em 0.633333em;
+}
+
+/*******************************************************************************
+* *
+* ToggleButton *
+* *
+******************************************************************************/
+/* Get toggle button colors */
+.toggle-button:selected {
+    -fx-background-color:
+        -fx-shadow-highlight-color,
+        linear-gradient(to bottom, derive(-fx-color,-90%) 0%, derive(-fx-color,-60%) 100%),
+        linear-gradient(to bottom, derive(-fx-color,-60%) 0%, derive(-fx-color,-35%) 50%, derive(-fx-color,-30%) 98%, derive(-fx-color,-50%) 100%),
+        linear-gradient(to right, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0) 10%, rgba(0,0,0,0) 90%, rgba(0,0,0,0.3) 100%);
+    -fx-background-insets: 0 0 -1 0, 0, 1, 1;
+    /* TODO: -fx-text-fill should be derived */
+    -fx-text-fill: -fx-light-text-color;
+}
+
+/* Get toggle button colors */
+.toggle-button:selected:focused {
+    -fx-color: -fx-focused-base;
+    -fx-background-color:
+        -fx-focus-color,
+        linear-gradient(to bottom, derive(-fx-color,-90%) 0%, derive(-fx-color,-60%) 100%),
+        linear-gradient(to bottom, derive(-fx-color,-60%) 0%, derive(-fx-color,-35%) 50%, derive(-fx-color,-30%) 98%, derive(-fx-color,-50%) 100%),
+        linear-gradient(to right, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0) 10%, rgba(0,0,0,0) 90%, rgba(0,0,0,0.3) 100%);
+    -fx-background-insets: -1.4, 0, 1, 1;
+}
+
+
+/*******************************************************************************
+* *
+* CheckBox *
+* *
+******************************************************************************/
+
+.check-box {
+    -fx-label-padding: 0.0em 0.0em 0.0em 0.416667em;
+    -fx-text-fill: #000;
+}
+
+.check-box .box {
+   
+    -fx-background-color:
+        rgb(142,143,143),
+        rgb(244,244,244),
+        linear-gradient(
+            to bottom right,
+            rgb(174,179,185) 0%,
+            rgb(233,233,234) 75%,
+            rgb(233,233,234) 100%
+        ),
+        linear-gradient(
+            to bottom right,
+            rgb(203,207,213) 0%,
+            rgb(246,246,246) 84%,
+            rgb(246,246,246) 100%
+        );
+
+    -fx-background-insets: 0, 1, 2, 3;
+    -fx-background-radius: 0,0,0,0;
+    -fx-padding: 0.25em;
+}
+
+.check-box:focused .box {
+    
+    -fx-background-color:
+        rgb(85,134,163),
+        rgb(222,249,250),
+        linear-gradient(
+            to bottom right,
+            rgb(121,198,245) 35%,
+            rgb(207,236,253) 100%),
+        linear-gradient(
+            to bottom right,
+            rgb(177,223,253) 0%,
+            rgb(231,247,254) 85%);
+}
+
+.check-box:hover .box {
+    
+    -fx-background-color:
+        rgb(85,134,163),
+        rgb(222,249,250),
+        linear-gradient(
+            to bottom right,
+            rgb(121,198,249) 0%,
+            rgb(121,198,249) 54%,
+            rgb(207,236,253) 85%,
+            rgb(207,236,253) 100%),
+        linear-gradient(
+            to bottom right,
+            rgb(177,223,253) 0%,
+            rgb(231,247,254) 75%,
+            rgb(231,247,254) 100%);
+}
+
+.check-box:armed .box {
+    
+    -fx-background-color:
+        rgb(44,98,139),
+        rgb(194,228,246),
+        linear-gradient(
+            to bottom right,
+            rgb(94,182,247) 0%,
+            rgb(94,182,247) 54%,
+            rgb(193,230,252) 85%,
+            rgb(193,230,252) 100%),
+        linear-gradient(
+            to bottom right,
+            rgb(157,213,252) 0%,
+            rgb(224,244,254) 75%,
+            rgb(224,244,254) 100%);
+    
+    -fx-color: -fx-pressed-base;
+}
+
+.check-box .mark {
+    -fx-background-color: transparent;
+    -fx-background-insets: 1 0 -1 0;
+    -fx-padding: 0.333333em;
+    -fx-shape: "M0,4H2L3,6L6,0H8L4,8H2Z";
+}
+
+.check-box:indeterminate .mark {
+    -fx-background-color: rgb(74,95,151);
+    -fx-shape: "M0,0H8V2H0Z";
+    -fx-scale-shape: false;
+}
+
+.check-box:selected .mark {
+    -fx-background-color: rgb(74,95,151);
+}
+
+.check-box:disabled {
+    -fx-opacity: -fx-disabled-opacity;
+}
+
+.check-box:show-mnemonics .mnemonic-underline {
+    -fx-stroke: -fx-text-fill;
+}
+
+/*******************************************************************************
+* *
+* RadioButton *
+* *
+******************************************************************************/
+
+.radio-button {
+    -fx-label-padding: 0.0em 0.0em 0.0em 0.416667em;
+    -fx-text-fill: -fx-text-background-color;
+}
+
+.radio-button:focused {
+    -fx-color: -fx-focused-base;
+}
+
+.radio-button .radio {
+   
+    -fx-background-color:
+        rgb(145,146,146),
+        rgb(242,242,242),
+        rgb(181,186,196),
+        radial-gradient(
+            center 65% 65%,
+            radius 100%,
+            rgba(255,255,255,0.85),
+        rgba(255,255,255,0));
+ 
+   -fx-background-insets: 0, 1, 2, 3 2 2 3;
+   -fx-background-radius: 1.0em;
+   -fx-padding: 0.25em;
+}
+
+.radio-button:focused .radio {
+    
+    -fx-background-color:
+       rgb(85,134,163),
+        rgb(222,249,250),
+        rgb(121,198,249),
+        radial-gradient(
+            center 65% 65%,
+            radius 100%,
+            rgba(255,255,255,0.85),
+        rgba(255,255,255,0))
+}
+
+.radio-button:hover .radio {
+        
+    -fx-background-color:
+       rgb(85,134,163),
+        rgb(222,249,250),
+        rgb(121,198,249),
+        radial-gradient(
+            center 65% 65%,
+            radius 100%,
+            rgba(255,255,255,0.85),
+        rgba(255,255,255,0))
+}
+
+.radio-button:armed .radio {
+    
+    -fx-background-color:
+        rgb(44,98,139),
+        rgb(194,228,246),
+        rgb(75,154,215),
+        radial-gradient(
+            center 65% 65%,
+            radius 100%,
+            rgba(255,255,255,0.85),
+            rgba(255,255,255,0));
+    
+    -fx-color: -fx-pressed-base;
+}
+
+.radio-button .dot {
+   -fx-background-color: transparent;
+   -fx-background-insets: 0;
+   -fx-background-radius: 1.0em;
+   -fx-padding: 0.25em;
+}
+
+.radio-button:selected .dot {
+    
+    -fx-background-color:
+        rgb(25,52,74),
+        linear-gradient(
+            to bottom right,
+            rgb(255,255,255) 0%,
+            rgb(11,130,199) 40%),
+        radial-gradient(
+            center 10% 10%,
+            radius 70%,
+            rgb(255,255,255),
+            rgba(255,255,255,0.2));
+    
+   -fx-background-insets: 0, 1, 1;
+}
+
+.radio-button:disabled {
+    -fx-opacity: -fx-disabled-opacity;
+}
+
+.radio-button:show-mnemonics .mnemonic-underline {
+    -fx-stroke: -fx-text-fill;
+}
+
+/*******************************************************************************
+* *
+* PopupMenu *
+* *
+******************************************************************************/
+
+.context-menu {
+    -fx-background-color:
+        rgb(151,151,151),
+        rgb(245,245,245),
+        rgb(240,240,240);
+
+    -fx-background-insets: 0, 1, 2;
+    -fx-background-radius: 0,0,0,0,0,0;
+    -fx-padding: 0.333333em 0.083333em 0.666667em 0.083333em; /* 4 1 8 1 */
+    -fx-effect: dropshadow(one-pass-box, rgba(0,0,0,0.3),3,0,2,2);
+}
+
+.context-menu .separator {
+    -fx-padding: 0.0em 0.333333em 0.0em 0.333333em; /* 0 4 0 4 */
+}
+
+.context-menu .scroll-arrow {
+    -fx-padding: 0.416667em 0.416667em 0.416667em 0.416667em; /* 5 */
+    -fx-background-color: transparent;
+}
+
+.context-menu .scroll-arrow:hover {
+    -fx-background: -fx-accent;
+    -fx-background-color: -fx-selection-bar;
+    -fx-text-fill: -fx-selection-bar-text;
+}
+
+.context-menu:show-mnemonics .mnemonic-underline {
+    -fx-stroke: -fx-text-fill;
+}
+
+/*******************************************************************************
+* *
+* Menu *
+* *
+******************************************************************************/
+
+/* Each Top Level Menu Item: File, Edit, About, Etc...*/
+.menu {
+    -fx-background-color: transparent;
+    -fx-padding: 0.42em 0.4em 0.3em 0.4em; /* 4 8 4 8 */
+    -fx-text-fill: rgb(0,0,0);
+}
+
+.menu:disabled {
+    -fx-opacity: -fx-disabled-opacity;
+}
+
+.menu:show-mnemonics .mnemonic-underline {
+    -fx-stroke: -fx-text-fill;
+}
+
+/* This hides the down arrow that would show on a menu placed in a menubar */
+.menu-bar .menu .arrow {
+    -fx-padding: 0;
+    -fx-background-color: transparent;
+    -fx-shape: null;
+}
+
+.menu-bar .menu .arrow-button {
+    -fx-padding: 0;
+}
+
+.menu .arrow {
+    -fx-background-color: rgb(40,40,40);
+    -fx-shape: "M0,-4L4,0L0,4Z";
+    -fx-scale-shape: false;
+}
+
+.menu:focused:showing .arrow, .menu:hover:showing .arrow, .menu:focused .arrow, .menu:showing .arrow {
+    -fx-background-color: black;
+}
+
+.menu-up-arrow {
+    -fx-padding: 0.666667em 0.416667em 0.0em 0.416667em; /* 8 5 0 5 */
+    -fx-background-color: derive(-fx-color,-2%);
+    -fx-shape: "M0 1 L1 1 L.5 0 Z";
+    -fx-effect: innershadow( two-pass-box , rgba(0,0,0,0.6) , 4, 0.0 , 0 , 1 );
+}
+
+.menu-down-arrow {
+    -fx-background-color: derive(-fx-color,-2%);
+    -fx-padding: 0.666667em 0.416667em 0.0em 0.416667em; /* 8 5 0 5 */
+    -fx-shape: "M0 0 L1 0 L.5 1 Z";
+    -fx-effect: innershadow( two-pass-box , rgba(0,0,0,0.6) , 4, 0.0 , 0 , 1 );
+}
+
+/*******************************************************************************
+* *
+* MenuBar *
+* *
+******************************************************************************/
+
+.menu-bar {
+    
+    /*-fx-padding: 0.0em 0.666667em 0.0em 0.666667em;*/
+    -fx-padding: 0 0 0 0;
+    -fx-spacing: 0.166667em;
+  
+    -fx-background-color:
+        rgb(182,188,204),
+        linear-gradient(
+            to bottom,
+            rgb(254,254,255) 0%,
+            rgb(242,244,250) 35%,
+            rgb(233,236,246) 35%,
+            rgb(240,242,250) 100%),
+        linear-gradient(
+            to bottom,
+            rgb(254,254,255) 0%,
+            rgb(229,234,245) 35%,
+            rgb(212,219,237) 35%,
+            rgb(225,230,246) 100%);
+            
+    -fx-background-insets: 0, 0 0 1 0, 0 1 1 1;
+    -fx-background-radius: 0, 0, 0;
+}
+
+/* Show nothing for background of normal menu button in a menu bar */
+.menu-bar .menu-button {
+    -fx-background-radius: 0;
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+}
+
+/* Change padding of menu buttons when in menu bar */
+.menu-bar .menu-button .label {
+    -fx-padding: 0.1em 0.5em 0.2em 0.5em;
+}
+
+.menu-bar .menu-button:hover {
+    -fx-text-fill: rgb(0,0,0);
+    -fx-background-color:
+        linear-gradient(
+            to bottom,
+            rgb(176,177,177) 0%,
+            rgb(160,163,171) 40%,
+            rgb(148,153,165) 40%,
+            rgb(127,131,142) 100%),
+        linear-gradient(
+            to bottom,
+            rgb(253,253,254) 0%,
+            rgb(244,246,251) 30%,
+            rgb(236,239,247) 30%,
+            rgb(213,216,224) 60%,
+            rgb(239,241,249) 100%),
+        linear-gradient(
+            to bottom,
+            rgba(246,248,250,0.2),
+            rgba(229,233,240,0.2),
+            rgba(215,220,233,0.2));
+    
+    -fx-background-insets: 3,4,5,5;
+    -fx-background-radius: 3,2,2,2;
+}
+
+.menu-bar .menu-button:focused, .menu-bar .menu-button:showing {
+    -fx-text-fill: rgb(0,0,0);
+    -fx-background-color:
+        linear-gradient(
+            rgb(88,88,89) 0%,
+            rgb(64,66,71) 100%),
+        linear-gradient(
+            rgb(159,160,162) 0%,
+            rgb(173,176,187) 100%),
+        linear-gradient(
+            rgb(182,184,187) 0%,
+            rgb(200,205,218) 100%),
+        linear-gradient(
+            rgb(200,202,208) 0%,
+            rgb(205,209,219) 35%,
+            rgb(194,200,217) 35%,
+            rgb(213,218,233) 100%);
+    
+    -fx-background-insets: 3,4,5,5;
+    -fx-background-radius: 3,2,2,2;
+}
+
+.menu-bar:show-mnemonics .mnemonic-underline {
+    -fx-stroke: -fx-text-fill;
+}
+
+/*******************************************************************************
+* *
+* MenuItem *
+* *
+******************************************************************************/
+
+.menu-item {
+    
+    /*-fx-padding: 0.333333em 0.41777em 0.333333em 0.41777em;*/ /* 4 5 4 5 */
+    -fx-padding: 0.6em 0.41777em 0.6em 0.41777em;
+}
+
+.menu-item .left-container {
+    -fx-padding: 0.458em 0.791em 0.458em 0.458em;
+    -fx-background-color: #ffffff;
+}
+
+.menu-item .graphic-container {
+    -fx-padding: 0em 0.333em 0em 0em;
+}
+
+/* Adds padding to the label text. For ex, adds .05em spacing b/n label text
+and Shortcut accelerator text. */
+.menu-item .label {
+    -fx-padding: 0em 0.5em 0em 0em;
+    -fx-text-fill: rgb(0,0,0); /* Menu Item Text Color */
+    
+}
+
+.menu-item:disabled .label {
+    -fx-opacity: -fx-disabled-opacity;
+}
+
+/* Menu Item Hover */
+.menu-item:focused {
+     -fx-background: -fx-accent;
+     -fx-background-color:
+         rgb(174,207,247),
+         linear-gradient(
+            to bottom,
+            rgb(248,248,250) 0%,
+            rgb(239,244,250) 100%),
+         linear-gradient(
+            to bottom,
+            rgb(243,248,247) 0%,
+            rgb(231,238,247) 100%);
+
+     -fx-background-insets: 3, 4, 5;
+     -fx-background-radius: 3, 2, 1 ;
+     -fx-text-fill: rgb(0,0,0);
+     
+}
+
+.menu-item:focused .label {
+    -fx-text-fill: rgb(0,0,0);
+}
+.menu-item .right-container {
+    -fx-padding: 0em 0em 0em 0.5em;
+}
+
+.menu-item:show-mnemonics .mnemonic-underline {
+    -fx-stroke: -fx-text-fill;
+}
+
+
+.radio-menu-item:checked .radio {
+    -fx-background-color: -fx-mark-color;
+    -fx-shape: "M0,5H2L4,8L8,0H10L5,10H3Z";
+    -fx-scale-shape: false;
+}
+
+.radio-menu-item:focused:checked .radio {
+    -fx-background-color: rgb(30,57,91);
+}
+
+.check-menu-item:checked .check {
+    -fx-background-color: -fx-mark-color;
+    -fx-shape: "M0,5H2L4,8L8,0H10L5,10H3Z";
+    -fx-scale-shape: false;
+}
+
+.check-menu-item:focused:checked .check {
+    -fx-background-color: white;
+}
+
+.menu .arrow {
+    -fx-padding: 0.458em 0.167em 0.458em 0.167em; /* 4.5 2 4.5 2 */
+    -fx-background-color: -fx-mark-color;
+    -fx-shape: "M0,-4L4,0L0,4Z";
+    -fx-scale-shape: false;
+}
+
+.menu:selected .arrow {
+    -fx-background-color: rgb(40,40,40);
+}
+
+.menu-item:disabled {
+    -fx-opacity: -fx-disabled-opacity;
+}
+
+/*******************************************************************************
+* *
+* ChoiceBox *
+* *
+******************************************************************************/
+
+.choice-box {
+    
+    -fx-background-color:
+        rgb(112,112,112),
+        linear-gradient(
+            to bottom,
+            rgb(252,252,252) 0%,
+            rgb(250,250,250) 50%,
+            rgb(246,246,246) 50%,
+            rgb(243,243,243) 100%),
+        linear-gradient(
+            to bottom,
+            rgb(252,252,252) 0%,
+            rgb(235,235,235) 50%,
+            rgb(221,221,221) 50%,
+            rgb(207,207,207) 100%
+        );
+    -fx-background-insets: 0, 1, 2;
+    -fx-background-radius: 3, 2, 1;
+}
+
+.choice-box:focused {
+    -fx-color: -fx-focused-base;
+    -fx-background-color:
+        rgb(44,97,139),
+        linear-gradient(
+            to bottom,
+            rgb(151,170,180) 0%,
+            rgb(154,186,203) 50%,
+            rgb(120,170,197) 50%,
+            rgb(85,146,181) 100%),
+        linear-gradient(
+            to bottom,
+            rgb(222,237,246) 0%,
+            rgb(196,229,246) 50%,
+            rgb(152,209,239) 50%,
+            rgb(102,175,215) 100%
+        );
+    
+    -fx-background-insets: 0, 1 1 1 1, 2 2 1 2;
+    -fx-background-radius: 3, 2, 1;
+}
+
+.choice-box:hover {
+    -fx-color: -fx-hover-base;
+    
+    -fx-background-color:
+        rgb(60, 127, 177),
+        linear-gradient(
+            to bottom,
+            rgb(250, 253, 254) 0%,
+            rgb(245, 251, 254) 50%,
+            rgb(239, 249, 254) 50%,
+            rgb(232, 245, 252) 100%),
+        linear-gradient(
+            to bottom,
+            rgb(234, 246, 253) 0%,
+            rgb(217, 240, 252) 50%,
+            rgb(190, 230, 253) 50%,
+            rgb(167, 217, 245) 100%
+        );
+}
+
+
+/*******************************************************************************
+* *
+* SplitMenuButton *
+* *
+******************************************************************************/
+
+/* inset/radius hides background color behind the arrow and label segments. */
+
+/* TO DO: Determine which CSS Style is responsible for the selected menu item in
+the menu. Currently, the hover state isnt working for the currently selected
+item contained in menu of a split menu button. */
+.split-menu-button {
+    -fx-background-insets: 2;
+    -fx-background-radius: 3;
+    -fx-padding: 0.0em; /* 0 */
+}
+
+.split-menu-button:focused {
+    -fx-color: -fx-focused-base;
+    -fx-background-color:
+        rgb(44,97,139),
+        linear-gradient(
+            to bottom,
+            rgb(151,170,180) 0%,
+            rgb(154,186,203) 50%,
+            rgb(120,170,197) 50%,
+            rgb(85,146,181) 100%),
+        linear-gradient(
+            to bottom,
+            rgb(222,237,246) 0%,
+            rgb(196,229,246) 50%,
+            rgb(152,209,239) 50%,
+            rgb(102,175,215) 100%
+        );
+}
+
+.split-menu-button .label:hover {
+    -fx-color: -fx-hover-base;
+    -fx-background-color:
+        rgb(60, 127, 177),
+        linear-gradient(
+            to bottom,
+            rgb(250, 253, 254) 0%,
+            rgb(245, 251, 254) 50%,
+            rgb(239, 249, 254) 50%,
+            rgb(232, 245, 252) 100%),
+        linear-gradient(
+            to bottom,
+            rgb(234, 246, 253) 0%,
+            rgb(217, 240, 252) 50%,
+            rgb(190, 230, 253) 50%,
+            rgb(167, 217, 245) 100%
+        );
+}
+
+.split-menu-button:armed .label {
+    -fx-color: -fx-pressed-base;
+    -fx-background-color:
+        rgb(44,97,139),
+        linear-gradient(
+            to bottom,
+            rgb(151,170,180) 0%,
+            rgb(154,186,203) 50%,
+            rgb(120,170,197) 50%,
+            rgb(85,146,181) 100%),
+        linear-gradient(
+            to bottom,
+            rgb(222,237,246) 0%,
+            rgb(196,229,246) 50%,
+            rgb(152,209,239) 50%,
+            rgb(102,175,215) 100%
+        );
+}
+
+/* The SplitMenuButton skin uses an inner Label part */
+.split-menu-button .label {
+    -fx-background-color:
+        rgb(112,112,112),
+        linear-gradient(
+            to bottom,
+            rgb(252,252,252) 0%,
+            rgb(250,250,250) 50%,
+            rgb(246,246,246) 50%,
+            rgb(243,243,243) 100%),
+        linear-gradient(
+            to bottom,
+            rgb(242,242,242) 0%,
+            rgb(235,235,235) 50%,
+            rgb(221,221,221) 50%,
+            rgb(207,207,207) 100%);
+            
+        
+    -fx-background-insets: 0, 1, 2;
+    -fx-background-radius: 3 0 0 3, 2 0 0 2, 1 0 0 1;
+    -fx-padding: 0.166667em 1.5em 0.25em 0.833333em; /* 2 18 3 10 */
+}
+
+.split-menu-button .arrow-button {
+    -fx-background-color:
+        rgb(112,112,112),
+        linear-gradient(
+            to bottom,
+            rgb(252,252,252) 0%,
+            rgb(250,250,250) 50%,
+            rgb(246,246,246) 50%,
+            rgb(243,243,243) 100%),
+        linear-gradient(
+            to bottom,
+            rgb(242,242,242) 0%,
+            rgb(235,235,235) 50%,
+            rgb(221,221,221) 50%,
+            rgb(207,207,207) 100%);
+    -fx-background-insets: 0, 1, 2;
+    -fx-background-radius: 0 3 3 0, 0 2 2 0, 0 1 1 0;
+    -fx-padding: 0.5em 0.416667em 0.5em 0.416667em; /* 6 5 6 5 */
+}
+
+.split-menu-button .arrow-button:hover {
+    -fx-color: -fx-hover-base;
+    -fx-background-color:
+        rgb(60, 127, 177),
+        linear-gradient(
+            to bottom,
+            rgb(250, 253, 254) 0%,
+            rgb(245, 251, 254) 50%,
+            rgb(239, 249, 254) 50%,
+            rgb(232, 245, 252) 100%),
+        linear-gradient(
+            to bottom,
+            rgb(234, 246, 253) 0%,
+            rgb(217, 240, 252) 50%,
+            rgb(190, 230, 253) 50%,
+            rgb(167, 217, 245) 100%
+        );
+}
+
+.split-menu-button .arrow-button:armed {
+    -fx-color: -fx-pressed-base;
+    -fx-background-color:
+        rgb(44,97,139),
+        linear-gradient(
+            to bottom,
+            rgb(151,170,180) 0%,
+            rgb(154,186,203) 50%,
+            rgb(120,170,197) 50%,
+            rgb(85,146,181) 100%),
+        linear-gradient(
+            to bottom,
+            rgb(222,237,246) 0%,
+            rgb(196,229,246) 50%,
+            rgb(152,209,239) 50%,
+            rgb(102,175,215) 100%
+        );
+}
+
+.split-menu-button .arrow {
+    -fx-background-color: -fx-mark-highlight-color, -fx-mark-color;
+    -fx-background-insets: 1 0 -1 0, 0;
+    -fx-padding: 0.25em; /* 3 */
+    -fx-shape: "M 0 -3.5 v 7 l 4 -3.5 z";
+}
+
+.split-menu-button:openvertically .arrow {
+    -fx-padding: 0.166667em 0.333333em 0.166667em 0.333333em; /* 2 4 2 4 */
+    -fx-shape: "M 0 0 h 7 l -3.5 4 z";
+}
+
+.split-menu-button:disabled {
+    -fx-opacity: -fx-disabled-opacity;
+}
+
+.split-menu-button:show-mnemonics .mnemonic-underline {
+    -fx-stroke: -fx-text-fill;
+}
+
+/******
+* Dex Stuff...
+*******/
+
+/*
+.chart {
+    -fx-padding: 10px;
+    -fx-background-image: url("icon.jpg");
+    -fx-font-family: Tahoma;
+    -fx-font-size: 1.2em;
+    -fx-text-fill: #4682b4;    
+}
+.chart-content {
+    -fx-padding: 30px;
+    
+}
+.chart-legend {
+   -fx-background-color:  transparent;
+   -fx-padding: 20px;
+}
+ 
+.chart-legend-item-symbol{
+   -fx-background-radius: 0;
+}
+ 
+.chart-legend-item{
+    -fx-text-fill: #191970;
+}
+ 
+.chart-plot-background {
+    -fx-background-color: #e2ecfe;
+}
+.chart-vertical-grid-lines {
+    -fx-stroke: #3278fa;
+}
+.chart-horizontal-grid-lines {
+    -fx-stroke: #3278fa;
+}
+.chart-alternative-row-fill {
+    -fx-fill: #99bcfd;
+    -fx-stroke: transparent;
+    -fx-stroke-width: 0;
+}
+
+.chart-bar {
+    -fx-bar-fill: #22bad9;
+    -fx-background-color: linear (0%,0%) to (0%,100%) 
+        stops (0%, derive(-fx-bar-fill,-30%)) 
+        (100%, derive(-fx-bar-fill,-40%)),
+        linear (0%,0%) to (0%,100%) 
+        stops (0%, derive(-fx-bar-fill,80%)) 
+        (100%, derive(-fx-bar-fill, 0%)),
+        linear (0%,0%) to (0%,100%) 
+        stops (0%, derive(-fx-bar-fill,30%)) 
+        (100%, derive(-fx-bar-fill,-10%));
+    -fx-background-insets: 0,1,2;
+    -fx-background-radius: 5 5 0 0, 4 4 0 0, 3 3 0 0;
+}
+*/
+
+
+.default-color0.chart-line-symbol { -fx-background-color: #336699, white; }
+.default-color1.chart-line-symbol { -fx-background-color: #a9e200, white; }
+.default-color2.chart-line-symbol { -fx-background-color: #22bad9, white; }
+.default-color3.chart-line-symbol { -fx-background-color: #0181e2, white; }
+.default-color4.chart-line-symbol { -fx-background-color: #2f357f, white; }
+.default-color5.chart-line-symbol { -fx-background-color: #860061, white; }
+.default-color6.chart-line-symbol { -fx-background-color: #c62b00, white; }
+.default-color7.chart-line-symbol { -fx-background-color: #f9d900, white; }
+
+.default-color0.chart-series-line { -fx-stroke: #336699; }
+.default-color1.chart-series-line { -fx-stroke: #a9e200; }
+.default-color2.chart-series-line { -fx-stroke: #22bad9; }
+.default-color3.chart-series-line { -fx-stroke: #0181e2; }
+.default-color4.chart-series-line { -fx-stroke: #2f357f; }
+.default-color5.chart-series-line { -fx-stroke: #860061; }
+.default-color6.chart-series-line { -fx-stroke: #c62b00; }
+.default-color7.chart-series-line { -fx-stroke: #f9d900; }
+
+.default-color0.chart-pie { -fx-pie-color: #f9d900; }
+.default-color1.chart-pie { -fx-pie-color: #a9e200; }
+.default-color2.chart-pie { -fx-pie-color: #22bad9; }
+.default-color3.chart-pie { -fx-pie-color: #0181e2; }
+.default-color4.chart-pie { -fx-pie-color: #2f357f; }
+.default-color5.chart-pie { -fx-pie-color: #860061; }
+.default-color6.chart-pie { -fx-pie-color: #c62b00; }
+.default-color7.chart-pie { -fx-pie-color: #336699; }
+
+
+/*
+
+.default-color0.chart-pie { -fx-pie-color: #f9d900; }
+.default-color1.chart-pie { -fx-pie-color: #a9e200; }
+.default-color2.chart-pie { -fx-pie-color: #22bad9; }
+.default-color3.chart-pie { -fx-pie-color: #0181e2; }
+.default-color4.chart-pie { -fx-pie-color: #2f357f; }
+.default-color5.chart-pie { -fx-pie-color: #860061; }
+.default-color6.chart-pie { -fx-pie-color: #c62b00; }
+.default-color7.chart-pie { -fx-pie-color: #ff5700; }
+
+.default-color0.chart-pie { -fx-pie-color: #0000FF; }
+.default-color1.chart-pie { -fx-pie-color: #FF0000; }
+.default-color2.chart-pie { -fx-pie-color: #00FF00; }
+.default-color3.chart-pie { -fx-pie-color: #336699; }
+.default-color4.chart-pie { -fx-pie-color: #ff5700; }
+.default-color5.chart-pie { -fx-pie-color: #CCCCCC; }
+.default-color6.chart-pie { -fx-pie-color: #ffa500; }
+.default-color7.chart-pie { -fx-pie-color: #860061; }
+.default-color8.chart-pie { -fx-pie-color: #adff2f; }
+.default-color9.chart-pie { -fx-pie-color: #FFFFFF; }
+*/
+
+/*
+.chart-pie-label-line {
+    -fx-stroke: #8b4513;
+    -fx-fill: #8b4513;
+}
+ 
+.chart-pie-label {
+    -fx-fill: #8b4513;
+    -fx-font-size: 1em;
+} 
+.chart-legend {
+   -fx-background-color:  #fafad2;
+   -fx-stroke: #daa520;
+}
+*/
