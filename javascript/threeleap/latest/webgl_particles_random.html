@@ -1,0 +1,232 @@
+
+
+<!--
+	
+    webgl_particles_random example by @alteredq
+    
+	Slightly modified to add leap controls
+
+-->
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - particles</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				background-color: #000000;
+				margin: 0px;
+				overflow: hidden;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+				font-weight: bold;
+				text-align:center;
+			}
+
+			a {
+				color:#0078ff;
+			}
+
+			#info {
+				color: #fff;
+				position: absolute;
+				top: 0px; width: 100%;
+				padding: 5px;
+				z-index: 100;
+			}
+
+		</style>
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="http://threejs.org" target="_blank">three.js</a> - webgl particles example using <a href="http://cabbibo.com">Cabbibo</a> Leap Controls
+		</div>
+
+		<!-- THREE SCRIPTS -->
+		<script src="lib/three.min.js"></script>
+		<script src="lib/Detector.js"></script>
+		<script src="lib/stats.min.js"></script>
+        
+        <!-- LEAP SCRIPT -->
+        <script src="lib/leap.js"></script>
+        
+        <!-- LEAP CONTROL -->
+        <script src="LeapControls.js"></script>
+
+		<script>
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			var container, stats;
+			var camera, scene, renderer, particles, geometry, materials = [], parameters, i, h, color;
+			var mouseX = 0, mouseY = 0;
+			
+			var clock = new THREE.Clock();
+	
+
+			var windowHalfX = window.innerWidth / 2;
+			var windowHalfY = window.innerHeight / 2;
+
+			init();
+			
+
+			function init() {
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				//camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 3000 );
+				camera = new THREE.PerspectiveCamera(70,window.innerWidth/window.innerHeight,1,3000)
+				camera.position.z = 1000;
+				
+				
+				
+				/*
+				
+					ADDED LEAP CONTROLS
+				
+				*/
+				controls = new THREE.LeapControls(camera)
+				
+				
+				//TO CHANGE SPEED / ROTATION / ETC
+				//Alter the variables below
+				//right now they are being assigned the default values
+				//so if you don't want to change them, please delete!
+				
+				//makes rotation slower
+				controls.leapConstants.rotationConstant = 200
+		
+				//when the hand leaves the field
+				//this is the amount the rotation will be
+				//divided by ever render
+				controls.leapConstants.rotationDampening = 1.01,
+		
+				//Changes the 0 of the Y field
+				controls.leapConstants.yAlignment = 250,
+				
+				//Changes the 0 of the Z field
+				controls.leapConstants.zAlignment = -50
+				
+				//Makes movement faster
+				controls.leapConstants.movementConstant=.01
+				
+				//deceleration for when hand leaves field
+				controls.leapConstants.movementDampening=1.05
+				
+				
+				
+				
+
+				scene = new THREE.Scene();
+				scene.fog = new THREE.FogExp2( 0x000000, 0.0007 );
+
+				geometry = new THREE.Geometry();
+
+				for ( i = 0; i < 20000; i ++ ) {
+
+					var vertex = new THREE.Vector3();
+					vertex.x = Math.random() * 2000 - 1000;
+					vertex.y = Math.random() * 2000 - 1000;
+					vertex.z = Math.random() * 2000 - 1000;
+
+					geometry.vertices.push( vertex );
+
+				}
+
+				parameters = [ [ [1.0, 1.0, 1.0], 5 ], [ [0.95, 1, 1], 4 ], [ [0.90, 1, 1], 3 ], [ [0.85, 1, 1], 2 ], [ [0.80, 1, 1], 1 ] ];
+				//parameters = [ [ 0xff0000, 5 ], [ 0xff3300, 4 ], [ 0xff6600, 3 ], [ 0xff9900, 2 ], [ 0xffaa00, 1 ] ];
+				//parameters = [ [ 0xffffff, 5 ], [ 0xdddddd, 4 ], [ 0xaaaaaa, 3 ], [ 0x999999, 2 ], [ 0x777777, 1 ] ];
+
+				for ( i = 0; i < parameters.length; i ++ ) {
+
+					size  = parameters[i][1];
+					color = parameters[i][0];
+
+					//materials[i] = new THREE.ParticleBasicMaterial( { color: color, size: size } );
+
+					materials[i] = new THREE.ParticleBasicMaterial( { size: size } );
+					materials[i].color.setHSV( color[0], color[1], color[2] );
+
+					particles = new THREE.ParticleSystem( geometry, materials[i] );
+
+					particles.rotation.x = Math.random() * 6;
+					particles.rotation.y = Math.random() * 6;
+					particles.rotation.z = Math.random() * 6;
+
+					scene.add( particles );
+
+				}
+
+				renderer = new THREE.WebGLRenderer();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				container.appendChild( renderer.domElement );
+
+				stats = new Stats();
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.top = '0px';
+				container.appendChild( stats.domElement );
+
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				windowHalfX = window.innerWidth / 2;
+				windowHalfY = window.innerHeight / 2;
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			
+			function animate() {
+				
+				/*
+				
+					ADDED LEAP CONTROLS UPDATE
+				
+				*/
+				
+				controls.update(clock.getDelta() );
+				render();
+				stats.update();
+
+			}
+
+			function render() {
+
+				var time = Date.now() * 0.00005;
+
+
+				for ( i = 0; i < materials.length; i ++ ) {
+
+					color = parameters[i][0];
+
+					h = ( 360 * ( color[0] + time ) % 360 ) / 360;
+					materials[i].color.setHSV( h, color[1], color[2] );
+
+				}
+
+				renderer.render( scene, camera );
+
+			}
+			
+			
+			//Calling the Leap Init function as defined in Leap Controls
+			leapInit();
+
+
+		</script>
+	</body>
+</html>
