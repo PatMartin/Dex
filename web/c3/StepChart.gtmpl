@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+  html,body{
+    height:100%;
+    min-height: 100%;
+    width="100%";
+    min-width="100%"
+  }
+
+#ChartArea {
+  height : 100%;
+  width : 100%;
+}
+
+<% println new File("javascript/c3/latest/c3.min.css").text %>
+
+</style>
+<html>
+  <head>
+    <title>DexCharts : C3JS Bar Chart</title>
+  </head>
+  <body>
+  <div id="ChartArea"></div>
+
+<script>
+<%
+  println new File("javascript/d3/latest/d3.min.js").text
+  println new File("javascript/c3/latest/c3.min.js").text
+  println new File("javascript/underscore/latest/underscore-min.js").text
+  println new File("javascript/dexjs/latest/dex.js").text
+%>
+
+</script>
+
+<script>
+<%
+  def header = "[" + dexData.header.collect { return "\"$it\"" }.join(',') + "]"
+  def data = []
+  dexData.data.eachWithIndex
+  {
+    row, ri ->
+    data << "[" + row.collect { return "\"$it\"" }.join(',') + "]"
+  }
+  println "var csv = { 'header' : $header,\n 'data' : [" + data.join(',\n') + "] }";
+%>
+
+  var ncsv = dex.csv.numericSubset(dex.csv.columnSlice(csv, dex.range(1, csv.header.length-1)));
+  var columns = dex.csv.transpose(ncsv);
+
+  for (var ci=0; ci<columns.header.length; ci++)
+  {
+    columns.data[ci].unshift(columns.header[ci]);
+  }
+
+  var types = {};
+  dex.range(1, ncsv.header.length)
+    .map(function(hi) { types[ncsv.header[hi]] = 'step'; });
+
+  dex.console.log("TYPES", types);
+
+dex.console.log("ChartArea", document.getElementById("ChartArea"));
+
+var chart = c3.generate({
+    'bindto' : "#ChartArea",
+    data: {
+        columns: columns.data,
+        types: types
+    },
+    'axis': {
+      'x': {
+        'type': 'category',
+        'categories': dex.csv.transpose(dex.csv.columnSlice(csv, [0])).data[0]
+      }
+    },
+    subchart: {
+        show: true
+    },
+    zoom: {
+        enabled: true
+    },
+    legend: {
+      position : 'right'
+    }
+});
+</script>
+</body>
+</html>

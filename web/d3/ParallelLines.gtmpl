@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<% import com.dexvis.util.DexUtil %>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+    <title>Parallel Lines</title>
+<style>
+<%
+   println new File("javascript/jqueryui/latest/jquery-ui.css").text
+   println new File("javascript/jqueryui/latest/jquery-ui.theme.css").text
+   println new File("web/d3/d3.css").text
+%>
+</style>
+
+<script type="text/javascript">
+<%
+   println new File("javascript/d3/latest/d3.min.js").text
+   println new File("javascript/d3/latest/lib/colorbrewer/colorbrewer.js").text
+   println new File("javascript/jquery/latest/jquery-2.1.3.min.js").text
+   println new File("javascript/jqueryui/latest/jquery-ui.min.js").text
+   
+   println new File("javascript/touchpunch/latest/touchpunch.js").text
+println ""
+println "<!-- INCLUDING: sql.js -->"
+println ""
+println new File("javascript/sql/latest/js/sql.js").text
+println new File("javascript/dex/dexutils.js").text
+%>
+</script>
+
+<style type="text/css">
+
+textarea
+{
+    width:100%;
+}
+.textwrapper
+{
+    border:1px solid #999999;
+    margin:5px 0;
+    padding:5px;
+}
+
+.background path
+{
+  fill: none;
+  stroke: #ccc;
+  stroke-opacity: .9;
+  shape-rendering: crispEdges;
+}
+
+.foreground path
+{
+  fill: none;
+  stroke: steelblue;
+  stroke-opacity: .9;
+}
+
+.brush .extent
+{
+  fill-opacity: .3;
+  stroke: #fff;
+  shape-rendering: crispEdges;
+}
+
+.axis line, .axis path
+{
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.axis text
+{
+  text-shadow: 0 1px 0 #fff;
+}
+</style>
+
+</head>
+<body>
+
+<div id="chartTitle" class="ui-widget-content">
+  <h1 id="titletext"></h1>
+</div>
+
+<div id="settings" style="visibility: hidden">
+  <div id="chartHeight" value="600"></div>
+  <div id="chartWidth" value="1000"></div>
+  <div id="topMargin" value="40"></div>
+  <div id="rightMargin" value="40"></div>
+  <div id="bottomMargin" value="40"></div>
+  <div id="leftMargin" value="80"></div>
+  <div id="opacity" value="50"></div>
+  <div id="strokeWidth" value="4"></div>
+  <div id="axisFontSize" value="16"></div>
+  <div id="fontSize" value="12"></div>
+  <div id="colorScheme" value="1"></div>
+  
+  <div id="titleTop" value="0"></div>
+  <div id="titleLeft" value="0"></div>
+  <div id="chartTop" value="0"></div>
+  <div id="chartLeft" value="0"></div>
+  <div id="chartConfigTop" value="200"></div>
+  <div id="chartConfigLeft" value="600"></div>
+  <div id="dbQuery" value="select * from dex"></div>
+</div>
+
+<div id="chart" class="ui-widget-content"></div>
+
+<script type="text/javascript">
+
+d3.selection.prototype.size = function()
+{
+  var n = 0;
+  this.each(function() { ++n; });
+  return n;
+}
+
+readJson = function(text, callback)
+{
+  callback(text ? JSON.parse(text) : null);
+}
+
+var width        = parseInt(d3.select("#chartWidth").attr("value"));
+var height       = parseInt(d3.select("#chartHeight").attr("value"));
+var topMargin    = parseInt(d3.select("#topMargin").attr("value"));
+var rightMargin  = parseInt(d3.select("#rightMargin").attr("value"));
+var bottomMargin = parseInt(d3.select("#bottomMargin").attr("value"));
+var leftMargin   = parseInt(d3.select("#leftMargin").attr("value"));
+var axisFontSize = parseInt(d3.select("#axisFontSize").attr("value"));
+var fontSize     = parseInt(d3.select("#fontSize").attr("value"));
+var opacity      = parseInt(d3.select("#opacity").attr("value"));
+var colorScheme  = d3.select("#colorScheme").attr("value");
+var strokeWidth  = parseInt(d3.select("#strokeWidth").attr("value"));
+
+var titleTop = parseInt(d3.select("#titleTop").attr("value"));
+var titleTop = parseInt(d3.select("#titleLeft").attr("value"));
+var chartTop = parseInt(d3.select("#chartTop").attr("value"));
+var chartLeft = parseInt(d3.select("#chartLeft").attr("value"));
+var chartConfigTop = parseInt(d3.select("#chartConfigTop").attr("value"));
+var chartConfigLeft = parseInt(d3.select("#chartConfigLeft").attr("value"));
+
+var fill = getFill(colorScheme);
+
+var dbQuery = d3.select("#dbQuery").attr("value");
+//\$("#queryText").value(dbQuery);
+
+\$("#chartTitle").position({ top : titleTop, left : titleLeft });
+\$("#chart").position({ top : chartTop, left : chartLeft });
+\$("#chartConfig").position({ top : chartConfigTop, left : chartConfigLeft });
+
+function draw()
+{
+  d3.select("#chart").html("");
+  drawParallelLines(width, height, topMargin, rightMargin, bottomMargin, leftMargin,
+                    fontSize, axisFontSize, strokeWidth);
+}
+
+var sql = window.SQL;
+var db = new sql.Database();
+
+<%
+  def headerStr = "[" + header.collect { return "\"$it\"" }.join(',') + "]"
+  def dataRows = []
+  data.eachWithIndex
+  {
+    row, ri ->
+    dataRows << "[" + row.collect { return "\"$it\"" }.join(',') + "]"
+  }
+  println "var csv = { 'header' : $headerStr,\n 'data' : [" + dataRows.join(',\n') + "] };";
+%>
+
+var numericHeaders = dex.csv.getNumericColumnNames(csv);
+var numHeaders = csv.header.length;
+
+var createStr = "create table dex(" + csv.header.map(function(h, i) {
+    return "'" + h + "' " + ((dex.csv.isColumnNumeric(csv, i)) ? "float" : "text");
+  }).join(",") + ")";
+
+console.log("CREATESTR: " + createStr);
+db.exec("drop table if exists dex;");
+db.exec(createStr);
+
+//var populateDataSql = "BEGIN;" + csv.data.map(function(row) {
+//  return "insert into dex values(" + row.map(function(col) { return "'" + col + "'"; }).join(",") + ")";
+//  console.log(insertStr);
+//db.exec(insertStr);
+//  }).join(";") + ";COMMIT;";
+
+csv.data.map(function(row) {
+  var insertStr =
+    "insert into dex values(" + row.map(function(col) {
+      return "'" + col.replace("'", "") + "'"; }).join(",") + ");";
+  console.log(insertStr);
+  db.exec(insertStr);
+});
+
+//console.log(populateDataSql);
+//db.exec(populateDataSql);
+
+function drawParallelLines(width, height, topMargin, rightMargin, bottomMargin, leftMargin,
+                           fontSize, axisFontSize, strokeWidth)
+{
+  var jsonData = [];
+
+  var rs = db.exec(dbQuery);
+
+  console.log("RESULT SET");
+  console.dir(rs);
+
+  //db(JSON.parse(queryStr)).each(function(d)
+  //{
+	//  d["___id"] = undefined;
+	//  d["___s"] = undefined;
+	//  jsonData.push(d);
+  //});
+
+  for (var i=0; i<rs.length; i++)
+  {
+    var row = {};
+    for (var j=0; j<rs[i].length; j++)
+    {
+      row[rs[i][j]["column"]] = rs[i][j]["value"];
+    }
+
+    jsonData.push(row);
+  }
+
+  console.log("NEW-JSON-DATA");
+  console.dir(jsonData);
+
+  var x = d3.scale.ordinal()
+      .rangePoints([0, width], 1);
+
+  var y = {};
+
+  var line = d3.svg.line();
+  var axis = d3.svg.axis().orient("left");
+  var raxis = d3.svg.axis().orient("right");
+  var background;
+  var foreground;
+
+  var svg = d3.select("#chart").append("svg")
+    .attr("width", (width + leftMargin + rightMargin))
+    .attr("height", height + topMargin + bottomMargin)
+    .append("g")
+    .attr("transform", "translate(" + leftMargin + "," + topMargin + ")");
+
+  readJson(JSON.stringify(jsonData), function(cars)
+  {
+    // Extract the list of dimensions and create a scale for each.
+    //x.domain(dimensions = d3.keys(cars[0]).filter(function(d)
+    //{
+    //  return d != "name" && (y[d] = d3.scale.linear()
+    //    .domain(d3.extent(cars, function(p) { return +p[d]; }))
+    //    .range([height, 0]));
+    //}));
+    var normalize = false;
+    var allExtents = []
+
+    numericHeaders.forEach(function(d)
+    {
+      //console.log("CARS: " + cars);
+      //console.log("EXT: " + d3.extent(cars, function(p) { return +p[d]; }));
+      allExtents = allExtents.concat(d3.extent(cars, function(p) { return +p[d]; }));
+      //console.log("AE: " + allExtents);
+    });
+    
+    var normalizedExtent = d3.extent(allExtents);
+
+    //console.log("NE: " + normalizedExtent);
+
+    // REM: Figure out how to switch over to consistent extends.  Snapping.
+    x.domain(dimensions = d3.keys(cars[0]).filter(function(d)
+    {
+      if(d === "name") return false;
+
+      if(contains(numericHeaders, d))
+      {
+        var extent = d3.extent(cars, function(p) { return +p[d]; });
+        if (normalize)
+        {
+          extent = normalizedExtent;
+        }
+        
+        y[d] = d3.scale.linear()
+          .domain(extent)
+          .range([height, 0]);
+        allExtents.concat(extent);
+      }
+      else
+      {
+        y[d] = d3.scale.ordinal()
+          .domain(cars.map(function(p) { return p[d]; }))
+          .rangePoints([height, 0]);
+      }
+
+      return true;
+    }));
+
+    // Add grey background lines for context.
+    background = svg.append("g")
+      .attr("class", "background")
+      .selectAll("path")
+      .data(cars)
+      .enter().append("path")
+      .attr("d", path)
+      .attr("id", "fillpath");
+
+    foreground = svg.append("g")
+      .attr("fill", "none")
+      .attr("stroke-opacity", opacity/100.0)
+      .selectAll("path")
+      .data(cars)
+      .enter().append("path")
+      .attr("d", path)
+      .attr("stroke", function(d, i) { return fill(i); })
+      .attr("stroke-width", strokeWidth)
+      .attr("title", function(d, i)
+      {
+        var info = "<table border=\"1\">";
+        for (var key in cars[i])
+        {
+          info += "<tr><td><b><i>" + key + "</i></b></td><td>" + cars[i][key] + "</td></tr>"
+        }
+        return info + "</table>";
+      })
+      .on("mouseover", function()
+      {
+        d3.select(this)
+          .style("stroke-width", strokeWidth + (strokeWidth/3))
+          .style("stroke-opacity", opacity/100.0);
+      })
+      .on("mouseout", function()
+      {
+        d3.select(this)
+          .style("stroke-width", strokeWidth)
+          .style("stroke-opacity", opacity/100);
+      });
+
+// Original random colors:
+//      .attr("stroke", function(d) { return '#'+Math.floor(Math.random()*16777215).toString(16); });
+
+    // Add a group element for each dimension.
+    var g = svg.selectAll(".dimension")
+      .data(dimensions)
+      .enter().append("g")
+      .attr("font-size", fontSize)
+      .attr("class", "dimension")
+      .attr("transform", function(d) { return "translate(" + x(d) + ")"; });
+
+    // Add an axis and title.
+    g.append("g")
+      .attr("class", "axis")
+      .each(function(d, i)
+      {
+       d3.select(this).call((i==(numHeaders-1)) ? raxis.scale(y[d]) : axis.scale(y[d]));
+      })
+      .append("text")
+      .attr("text-anchor", "middle")
+      .attr("y", -9)
+      .attr("font-size", axisFontSize)
+      .text(String);
+
+    // Add and store a brush for each axis.
+    g.append("g")
+      .attr("class", "brush")
+      .each(function(d) { d3.select(this).call(y[d].brush = d3.svg.brush().y(y[d]).on("brush", brush)); })
+      .selectAll("rect")
+      .attr("x", -8)
+      .attr("width", 16);
+  });
+
+function contains(a, obj)
+{
+  var i = a.length;
+  while (i--)
+  {
+    if (a[i] === obj)
+    {
+      return true;
+    }
+  }
+  return false;
+}
+
+// Returns the path for a given data point.
+function path(d)
+{
+  return line(dimensions.map(function(p) { return [x(p), y[p](d[p])]; }));
+}
+
+// Handles a brush event, toggling the display of foreground lines.
+function brush()
+{
+  var actives = dimensions.filter(function(p) { return !y[p].brush.empty(); }),
+      extents = actives.map(function(p) { return y[p].brush.extent(); });
+
+  foreground.style("display", function(d)
+  {
+    return actives.every(
+      function(p, i)
+      {
+        // Categorical
+        if (!contains(numericHeaders, p))
+        {
+          return extents[i][0] <= y[p](d[p]) && y[p](d[p]) <= extents[i][1];
+        }
+        // Numeric
+        else
+        {
+          return extents[i][0] <= d[p] && d[p] <= extents[i][1];
+        }
+      }) ? null : "none";
+    });
+  }
+}
+
+draw();
+
+<%
+
+   println """
+   
+function toggleConfig()
+{
+  if (\$("#chartConfig").css('visibility') == 'hidden')
+  {
+    show("#chartConfig");
+  }
+  else
+  {
+    hide("#chartConfig");
+  }
+}
+
+function hide(elt)
+{
+  \$(elt).css("visibility", "hidden");
+}
+
+function show(elt)
+{
+  \$(elt).css("visibility", "visible");
+}
+
+\$(function() {
+ 	\$( "#chartTitle" ).draggable().zIndex(3);
+  \$( "#chartConfig" ).draggable().zIndex(2);
+  \$( "#chart" ).draggable().zIndex(1);
+  \$("#chartConfig").resizable();
+});
+
+\$(function()
+{
+  \$(document).tooltip(
+  {
+    track : true
+  });
+});
+
+  \$(document).keypress(function(e)
+  {
+    if (e.altKey)
+    {
+      toggleConfig();
+    }
+  });
+
+   \$("#chartConfig").draggable(
+   {
+    zIndex: 2,
+    stop: function(event, ui) {
+    	var pos = \$(this).position();
+    	d3.select("#chartConfigTop").attr("value", pos.top);
+    	d3.select("#chartConfigLeft").attr("value", pos.left);
+    }
+   });
+
+   \$("#chartTitle").draggable(
+   {
+    zIndex: 3,
+    stop: function(event, ui) {
+    	var pos = \$(this).position();
+    	d3.select("#titleTop").attr("value", pos.top);
+    	d3.select("#titleLeft").attr("value", pos.left);
+    }
+   });
+
+   \$("#chart").draggable(
+   {
+    zIndex: 1,
+    stop: function(event, ui) {
+
+    	// Show dropped position.
+    	var pos = \$(this).position();
+    	d3.select("#chartTop").attr("value", pos.top);
+    	d3.select("#chartLeft").attr("value", pos.left);
+    }
+   });
+ 
+	\$(function() {
+		\$( "#height-slider" ).slider(
+		{
+	      min: 100,
+		  max: 2000,
+		  value: height,
+		  slide : function(event, ui)
+		  {
+		    height = ui.value;
+		    draw();
+	        \$("#height-input").val(height);
+	        d3.select("#chartHeight").attr("value", height);
+		  }
+		});
+		\$("#height-input").val(height);
+		d3.select("#chartHeight").attr("value", height);
+	});
+
+    \$(function()
+    {
+      \$("#height-input").change(function ()
+      {
+          height = parseInt(this.value);
+          draw();
+          d3.select("#chartHeight").attr("value", height);
+          \$("#height-slider").slider("value", height);
+      });
+    });
+
+	\$(function() {
+		\$( "#width-slider" ).slider(
+		{
+	      min: 100,
+		  max: 2000,
+		  value: width,
+		  slide : function(event, ui)
+		  {
+		    width = ui.value;
+		    draw();
+	        \$("#width-input").val(width);
+	        d3.select("#chartWidth").attr("value", width);
+		  }
+		});
+		\$("#width-input").val(width);
+		d3.select("#chartWidth").attr(width);
+	});
+
+    \$(function()
+    {
+      \$("#width-input").change(function ()
+      {
+          width = parseInt(this.value);
+          draw();
+          d3.select("#chartWidth").attr("value", width);
+          \$("#width-slider").slider("value", width);
+      });
+    });
+
+	\$(function() {
+		\$( "#leftmargin-slider" ).slider(
+		{
+	      min: 0,
+		  max: 500,
+		  value: leftMargin,
+		  slide : function(event, ui)
+		  {
+		    leftMargin = ui.value;
+	        draw();
+	        \$("#leftmargin-input").val(leftMargin);
+	        d3.select("#leftMargin").attr("value", leftMargin);
+		  }
+		});
+		\$("#leftmargin-input").val(leftMargin);
+		d3.select("#leftMargin").attr("value", leftMargin);
+	});
+
+    \$(function()
+    {
+      \$("#leftmargin-input").change(function ()
+      {
+          leftMargin = parseInt(this.value);
+          draw();
+          d3.select("#leftMargin").attr("value", leftMargin);
+          \$("#leftmargin-slider").slider("value", leftMargin);
+      });
+    });
+
+	\$(function() {
+		\$( "#rightmargin-slider" ).slider(
+		{
+	      min: 0,
+		  max: 500,
+		  value: rightMargin,
+		  slide : function(event, ui)
+		  {
+		    rightMargin = ui.value;
+	        draw();
+	        \$("#rightmargin-input").val(rightMargin);
+	        d3.select("#rightMargin").attr("value", rightMargin);
+		  }
+		});
+		\$("#rightmargin-input").val(rightMargin);
+		d3.select("#rightMargin").attr("value", rightMargin);
+	});
+
+    \$(function()
+    {
+      \$("#rightmargin-input").change(function ()
+      {
+          rightMargin = parseInt(this.value);
+          draw();
+          d3.select("#rightMargin").attr("value", rightMargin);
+          \$("#rightmargin-slider").slider("value", rightMargin);
+      });
+    });
+
+	\$(function() {
+		\$( "#topmargin-slider" ).slider(
+		{
+	      min: 0,
+		  max: 500,
+		  value: topMargin,
+		  slide : function(event, ui)
+		  {
+		    topMargin = ui.value;
+	        draw();
+	        \$("#topmargin-input").val(topMargin);
+	        d3.select("#topMargin").attr("value", topMargin);
+		  }
+		});
+		\$("#topmargin-input").val(topMargin);
+		d3.select("#topMargin").attr("value", topMargin);
+	});
+
+    \$(function()
+    {
+      \$("#topmargin-input").change(function ()
+      {
+          topMargin = parseInt(this.value);
+          draw();
+          d3.select("#topMargin").attr("value", topMargin);
+          \$("#topmargin-slider").slider("value", topMargin);
+      });
+    });
+
+	\$(function() {
+		\$( "#bottommargin-slider" ).slider(
+		{
+	      min: 0,
+		  max: 500,
+		  value: bottomMargin,
+		  slide : function(event, ui)
+		  {
+		    bottomMargin = ui.value;
+	        draw();
+	        \$("#bottommargin-input").val(bottomMargin);
+	        d3.select("#bottomMargin").attr("value", bottomMargin);
+		  }
+		});
+		\$("#bottommargin-input").val(bottomMargin);
+		d3.select("#bottomMargin").attr("value", bottomMargin);
+	});
+
+    \$(function()
+    {
+      \$("#bottommargin-input").change(function ()
+      {
+          bottomMargin = parseInt(this.value);
+          draw();
+          d3.select("#bottomMargin").attr("value", bottomMargin);
+          \$("#bottommargin-slider").slider("value", bottomMargin);
+      });
+    });
+
+	\$(function() {
+		\$( "#axisfontsize-slider" ).slider(
+		{
+	      min: 0,
+		  max: 100,
+		  value: axisFontSize,
+		  slide : function(event, ui)
+		  {
+		    axisFontSize = ui.value;
+	        draw();
+	        \$("#axisfontsize-input").val(axisFontSize);
+	        d3.select("#axisFontSize").attr("value", axisFontSize);
+		  }
+		});
+		\$("#axisfontsize-input").val(axisFontSize);
+		d3.select("#axisFontSize").attr("value", axisFontSize);
+	});
+
+    \$(function()
+    {
+      \$("#axisfontsize-input").change(function ()
+      {
+          axisFontSize = parseInt(this.value);
+          draw();
+          d3.select("#axisFontSize").attr("value", axisFontSize);
+          \$("#axisfontsize-slider").slider("value", axisFontSize);
+      });
+    });
+
+	\$(function() {
+		\$( "#fontsize-slider" ).slider(
+		{
+	      min: 0,
+		  max: 100,
+		  value: fontSize,
+		  slide : function(event, ui)
+		  {
+		    fontSize = ui.value;
+	        draw();
+	        \$("#fontsize-input").val(fontSize);
+	        d3.select("#fontSize").attr("value", fontSize);
+		  }
+		});
+		\$("#fontsize-input").val(fontSize);
+		d3.select("#fontSize").attr("value", fontSize);
+	});
+
+    \$(function()
+    {
+      \$("#fontsize-input").change(function ()
+      {
+          fontSize = parseInt(this.value);
+          draw();
+          d3.select("#fontSize").attr("value", fontSize);
+          \$("#fontsize-slider").slider("value", fontSize);
+      });
+    });
+    
+	\$(function() {
+		\$( "#opacity-slider" ).slider(
+		{
+	      min: 0,
+		  max: 100,
+		  value: opacity,
+		  slide : function(event, ui)
+		  {
+		    opacity = ui.value;
+	        draw();
+	        \$("#opacity-input").val(opacity);
+	        d3.select("#opacity").attr("value", opacity);
+		  }
+		});
+		\$("#opacity-input").val(opacity);
+		d3.select("#opacity").attr("value", opacity);
+	});
+
+    \$(function()
+    {
+      \$("#opacity-input").change(function ()
+      {
+          opacity = parseInt(this.value);
+          draw();
+          d3.select("#opacity").attr("value", opacity);
+          \$("#opacity-slider").slider("value", opacity);
+      });
+    });
+    
+	\$(function() {
+		\$( "#strokewidth-slider" ).slider(
+		{
+	      min: 0,
+		  max: 50,
+		  value: strokeWidth,
+		  slide : function(event, ui)
+		  {
+		    strokeWidth = ui.value;
+	        draw();
+	        \$("#strokewidth-input").val(strokeWidth);
+	        d3.select("#strokeWidth").attr("value", strokeWidth);
+		  }
+		});
+		\$("#strokewidth-input").val(strokeWidth);
+		d3.select("#strokeWidth").attr("value", strokeWidth);
+	});
+
+    \$(function()
+    {
+      \$("#strokewidth-input").change(function ()
+      {
+          strokeWidth = parseInt(this.value);
+          draw();
+          d3.select("#strokeWidth").attr("value", strokeWidth);
+          \$("#strokewidth-slider").slider("value", strokeWidth);
+      });
+    });
+
+    \$(function()
+    {
+      \$("#colorschemeSelection").change(function ()
+      {
+          colorScheme = this.value;
+          fill = getFill(colorScheme, d3.selectAll("#fillpath").size());
+          draw();
+          d3.select("#colorScheme").attr("value", colorScheme);
+      });
+    });
+
+  function titleChange(newTitle)
+  {
+    d3.select("title").text(newTitle);
+    d3.select("#titletext").text(newTitle);
+  }
+
+  function queryChange(newQuery)
+  {
+    dbQuery = newQuery;
+    d3.select("#dbQuery").attr("value", dbQuery);
+    draw();
+  }
+"""
+%>
+</script>
+
+<div id="chartConfig" class="ui-widget-content">
+  <h1>Options</h1>
+  <div>
+	<label for="height">Height:</label>
+	<input type="text" id="height-input" size="5" />
+	<div id="height-slider"/>
+  </div>
+  <div>
+	<label for="width">Width:</label>
+	<input type="text" id="width-input" size="5" />
+	<div id="width-slider"/>
+  </div>
+  <div>
+	<label for="leftmargin">Left Margin:</label>
+	<input type="text" id="leftmargin-input" size="5"  />
+	<div id="leftmargin-slider"/>
+  </div>
+  <div>
+	<label for="rightmargin">Right Margin:</label>
+	<input type="text" id="rightmargin-input" size="5"  />
+	<div id="rightmargin-slider"/>
+  </div>
+  <div>
+	<label for="topmargin">Top Margin:</label>
+	<input type="text" id="topmargin-input" size="5"  />
+	<div id="topmargin-slider"/>
+  </div>
+  <div>
+	<label for="bottommargin">Bottom Margin:</label>
+	<input type="text" id="bottommargin-input" size="5"  />
+	<div id="bottommargin-slider"/>
+  </div>
+  <div>
+	<label for="opacity">Opacity:</label>
+	<input type="text" id="opacity-input" size="5"  />
+	<div id="opacity-slider"/>
+  </div>
+  <div>
+	<label for="strokewidth">Stroke Width:</label>
+	<input type="text" id="strokewidth-input" size="5"  />
+	<div id="strokewidth-slider"/>
+  </div>
+  <div>
+	<label for="axisfontsize">Axis Font Size:</label>
+	<input type="text" id="axisfontsize-input" size="5"  />
+	<div id="axisfontsize-slider"/>
+  </div>
+  <div>
+	<label for="fontsize">Font Size:</label>
+	<input type="text" id="fontsize-input" size="5"  />
+	<div id="fontsize-slider"/>
+  </div>
+	<div>
+	  <label for="colorschemeSelection">Scheme:</label>
+	  <select id="colorschemeSelection" class="combobox">
+	    <option value="1">Category10</option>
+    	<option value="2">Category20</option>
+    	<option value="3">Category20b</option>
+    	<option value="4">Category20c</option>
+    	<option value="YlGn">YlGn</option>
+    	<option value="YlGnBu">YlGnBu</option>
+    	<option value="GnBu">GnBu</option>
+    	<option value="BuGn">BuGn</option>
+	    <option value="PuBuGn">PuBuGn</option>
+	    <option value="PuBu">PuBu</option>
+	    <option value="BuPu">BuPu</option>
+	    <option value="RdPu">RdPu</option>
+	    <option value="PuRd">PuRd</option>
+	    <option value="OrRd">OrRd</option>
+	    <option value="YlOrRd">YlOrRd</option>
+    	<option value="YlOrBr">YlOrBr</option>
+    	<option value="Purples">Purples</option>
+    	<option value="Blues">Blues</option>
+	    <option value="Greens">Greens</option>
+	    <option value="Oranges">Oranges</option>
+	    <option value="Reds">Reds</option>
+	    <option value="Greys">Greys</option>
+	    <option value="PuOr">PuOr</option>
+	    <option value="BrBG">BrBG</option>
+	    <option value="PRGn">PRGn</option>
+	    <option value="PiYG">PiYG</option>
+	    <option value="RdBu">RdBu</option>
+	    <option value="RdGy">RdGy</option>
+	    <option value="RdYlBu">RdYlBu</option>
+	    <option value="Spectral">Spectral</option>
+	    <option value="RdYlGn">RdYlGn</option>
+	    <option value="HiContrast">HiContrast</option>
+	    <option value="SoftSep4WhiteBG">SoftSep4WhiteBG</option>
+	    <option value="HardSep4WhiteBG">HardSep4WhiteBG</option>
+	  </select>
+	</div>
+  <div>
+	<label for="charttitle">Title:</label>
+	<input type="text" id="charttitle" size="20" onchange="titleChange(this.value)" />
+  </div>
+  <div>
+	  <center><label>Query:</label></center>
+	  <div class="textwrapper">
+	    <textarea id="queryText" onchange="queryChange(this.value)"></textarea>
+	  </div>
+  </div>
+</div>
+
+  </body>
+</html>

@@ -1,0 +1,227 @@
+<html>    
+<head>    
+<title>experiment Front end</title>    
+<style>
+  body * {
+    font-family: sans-serif;
+    font-size: 14px;
+  }
+  body.white {
+    background-color: white;
+    color: black;
+  }
+  body.black {
+    background-color: black;
+    color: white;
+  }
+  span.spaceyspan { margin-right: 20px; }
+  div.centeredDiv { text-align: center; }
+  li { list-style: none; }
+  td { padding-right: 10px; }
+</style>
+
+<script>
+<%
+println new File("javascript/pre3d/pre3d.js").text
+println new File("javascript/pre3d/pre3d_shape_utils.js").text
+println new File("javascript/pre3d/pre3d_path_utils.js").text
+println new File("javascript/pre3d/demo_utils.js").text
+%>
+</script>
+
+<body>
+
+<div class="centeredDiv">
+<canvas id="canvas" width="1000" height="800">
+  Sorry, this demo requires a web browser which supports HTML5 canvas!
+</canvas>
+</div>
+<script>
+
+var lines = [
+<%
+  //def dexData = [ [0, 0, 0], [100, 102, 32], [2, 3, 54] ]
+  xLines = [:]
+  yLines = [:]
+
+  def lines = []
+
+  double xMin = data[0][0] as double
+  double xMax = data[0][0] as double
+  double yMin = data[0][1] as double
+  double yMax = data[0][1] as double
+  double zMin = data[0][2] as double
+  double zMax = data[0][2] as double
+
+  data.each
+  {
+    row ->
+    x = row[0] as double
+    y = row[1] as double
+    z = row[2] as double
+
+    xMin = (xMin < x) ? xMin : x
+    yMin = (yMin < y) ? yMin : y
+    zMin = (zMin < z) ? zMin : z
+    
+    xMax = (xMax > x) ? xMax : x
+    yMax = (yMax > y) ? yMax : y
+    zMax = (zMax > z) ? zMax : z
+    
+    if (!xLines.containsKey(x))
+    {
+      xLines[x] = [:]
+    }
+    xLines[x][y] = z
+    
+    if (!yLines.containsKey(y))
+    {
+      yLines[y] = [:]
+    }
+    yLines[y][x] = z
+  }
+
+  xLines?.keySet()?.sort().each
+  {
+    x ->
+    points = []
+    xLines[x]?.keySet()?.sort().each
+    {
+      y ->
+      points << "{ x:$x, y:$y, z:${xLines[x][y]} }"
+    }
+
+    lines << "[" +  points.join(",") + "]"
+  }
+  
+  yLines?.keySet()?.sort().each
+  {
+    y ->
+    points = []
+    yLines[x]?.keySet()?.sort().each
+    {
+      x ->
+      points << "{ x:$x, y:$y, z:${xLines[x][y]} }"
+    }
+    lines << "[" +  points.join(",") + "]"
+  }
+  
+  println lines.join(",\n")
+%>
+];
+
+<%
+  println "var xMin = $xMin;"
+  println "var yMin = $yMin;"
+  println "var zMin = $zMin;"
+  println "var xMax = $xMax;"
+  println "var yMax = $yMax;"
+  println "var zMax = $zMax;"
+%>
+
+var numLines = lines.length;
+var numPoints;
+
+window.addEventListener('load', function() {
+	var screen_canvas = document.getElementById('canvas');
+	var renderer = new Pre3d.Renderer(screen_canvas);
+
+	renderer.ctx.setStrokeColor(0.0, 0.0, 0.0, 1);
+
+	function draw() {
+		renderer.ctx.setFillColor(1, 1, 1, 1);
+		renderer.drawBackground();
+		renderer.transform.reset();
+		renderer.transform.translate(0, 0, 0);
+
+        var line;
+
+        // X Axis
+        renderer.ctx.setStrokeColor(0.9, 0.4, 0.4, 3);
+        line = Pre3d.PathUtils.makeLine({x:0,y:0,z:0}, {x:xMax,y:0,z:0});
+        renderer.drawPath(line);
+	    renderer.pushTransform();
+        renderer.popTransform();
+    	line = Pre3d.PathUtils.makeLine({x:0,y:0,z:0}, {x:xMin,y:0,z:0});
+        renderer.drawPath(line);
+	    renderer.pushTransform();
+        renderer.popTransform();
+        
+    	// Y axis
+    	renderer.ctx.setStrokeColor(0.1, 0.1, 0.1, 3);
+    	line = Pre3d.PathUtils.makeLine({x:0,y:0,z:0}, {x:0,y:yMax,z:0});
+        renderer.drawPath(line);
+	    renderer.pushTransform();
+        renderer.popTransform();
+        line = Pre3d.PathUtils.makeLine({x:0,y:0,z:0}, {x:0,y:yMin,z:0});
+        renderer.drawPath(line);
+	    renderer.pushTransform();
+        renderer.popTransform();
+        
+        // Z Axis.
+        renderer.ctx.setStrokeColor(0.4, 0.9, 0.4, 3);
+    	line = Pre3d.PathUtils.makeLine({x:0,y:0,z:0}, {x:0,y:0,z:zMax});
+        renderer.drawPath(line);
+	    renderer.pushTransform();
+        renderer.popTransform();
+        line = Pre3d.PathUtils.makeLine({x:0,y:0,z:0}, {x:0,y:0,z:zMin});
+        renderer.drawPath(line);
+	    renderer.pushTransform();
+        renderer.popTransform();
+        
+        renderer.ctx.setStrokeColor(0.2, 0.5, 0.9, 1);
+        for (var lineNum=0; lineNum<numLines; lineNum++)
+        {
+          if (lines[lineNum].length == 1)
+          {
+            line = Pre3d.PathUtils.makeLine(lines[lineNum][0], lines[lineNum][0]);
+		    renderer.drawPath(line);
+		    renderer.pushTransform();
+    	    renderer.popTransform();
+          }
+		  for (var pointNum = 1; pointNum < lines[lineNum].length; pointNum++) 
+		  {
+            line = Pre3d.PathUtils.makeLine(lines[lineNum][pointNum-1], lines[lineNum][pointNum]);
+		    renderer.drawPath(line);
+		    renderer.pushTransform();
+    	    renderer.popTransform();
+		  }
+		}
+
+		var fill = true;
+		//renderer.ctx.setFillColor(0.5, 0.8, 1.0, 0.2); // ECAL color
+		renderer.ctx.setFillColor(0.7, 0.7, 0.0, 0.2);
+
+	}
+
+
+	renderer.camera.focal_length = 2.5;
+	// Have the engine handle mouse / camera movement for us. 
+	
+	//DemoUtils.autoCamera(renderer, 0, 0, -8, 0, 0, 0, draw);
+
+	DemoUtils.autoCamera(renderer, 0, 0, -10, 0, 0, -0, draw, {
+		panZOnMouseWheel : true,
+		panZOnMouseWheelScale : 100,
+		zAxisLimit : zMax*2,
+		touchDrawCallback : draw
+	});
+
+	document.addEventListener('keydown', function(e) {
+		if(e.keyCode != 84)// t
+			return;
+
+		if(cur_white) {
+			document.body.className = "black";
+		} else {
+			document.body.className = "white";
+		}
+		cur_white = !cur_white;
+		draw();
+	}, false);
+	draw();
+}, false);
+</script>
+
+</body>
+</html>

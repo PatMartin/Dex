@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js canvas - lines - sphere</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				background-color: #000000;
+				margin: 0px;
+				overflow: hidden;
+			}
+
+			a {
+				color:#0078ff;
+			}
+		</style>
+	</head>
+	<body>
+
+<script>
+<%
+  println new File("javascript/three/latest/three.min.js").text
+  println new File("javascript/three/latest/detector.js").text
+%>
+</script>
+<script>
+<%
+  def numericData = dexData.getNumericData()
+  def maxX = 0
+  def maxY = 0
+  def maxZ = 0
+  def minX = 0
+  def minY = 0
+  def minZ = 0
+
+  numericData.getData().eachWithIndex
+  {
+    row, ri ->
+    def x = row[0] as Double
+    def y = row[1] as Double
+    def z = row[2] as Double
+    maxX = (x > maxX) ? x : maxX
+    minX = (x < minX) ? x : minX
+    maxY = (y > maxY) ? y : maxY
+    minY = (y < minY) ? y : minY
+    maxZ = (z > maxZ) ? z : maxZ
+    minZ = (z < minZ) ? z : minZ
+  }
+
+  println "var bounds = { minx : $minX, maxx : $maxX, miny : $minY, maxy : $maxY, minz : $minZ, maxz : $maxZ };"
+  println "var dexHeader = " + numericData.getHeader().collect { return "\"$it\"" } + ";"
+  println "var dexData = ${numericData.getData()};"
+%>
+
+function mousewheel(event)
+{
+  var fovMAX = 160;
+  var fovMIN = 1;
+
+  camera.fov -= event.wheelDeltaY * 0.05;
+  camera.fov = Math.max( Math.min( camera.fov, fovMAX ), fovMIN );
+  camera.projectionMatrix = new THREE.Matrix4().makePerspective(camera.fov, window.innerWidth / window.innerHeight, camera.near, camera.far);
+}
+
+var sphereRadius = 300;
+var SCREEN_WIDTH = window.innerWidth,
+	SCREEN_HEIGHT = window.innerHeight,
+	mouseX = 0, mouseY = 0,
+	windowHalfX = window.innerWidth / 2,
+	windowHalfY = window.innerHeight / 2,
+	SEPARATION = 200,
+	AMOUNTX = 10,
+	AMOUNTY = 10,
+	camera, scene, renderer;
+
+init();
+animate();
+
+function init()
+{
+  var container, separation = 100, amountX = 50, amountY = 50,
+	  particles, particle;
+
+  container = document.createElement('div');
+  document.body.appendChild(container);
+
+  camera = new THREE.PerspectiveCamera( 75, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 10000 );
+  camera.position.z = 1000;
+
+  scene = new THREE.Scene();
+  renderer = new THREE.CanvasRenderer();
+  renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+  container.appendChild( renderer.domElement );
+
+  var PI2 = Math.PI * 2;
+  var material = new THREE.ParticleCanvasMaterial( {
+	color: 0xffffff,
+	program: function ( context )
+	{
+	  context.beginPath();
+	  context.arc( 0, 0, 1, 0, PI2, true );
+	  context.closePath();
+	  context.fill();
+	}
+  } );
+
+  // lines
+  for (var j=2; j<dexHeader.length; j++)
+  {
+    for (var i = 0; i < dexData.length; i++)
+	{
+      particle = new THREE.Particle( material );
+					particle.position.x = dexData[0];
+					particle.position.y = dexData[1];
+					particle.position.z = dexData[j];
+					particle.position.normalize();
+					//particle.position.multiplyScalar( Math.random() * 10000 + sphereRadius );
+					scene.add( particle );
+    }
+  }
+
+  var sx = 0, sy = 0;
+  var down = false;
+
+  window.onmouseup = function()
+  {
+    console.log("MOUSE: UP");
+    down = false;
+  };
+  window.onmousedown = function (ev)
+  {
+    console.log("MOUSE: DOWN");
+    down = true; sx = ev.clientX; sy = ev.clientY;
+  };
+
+  window.onmousemove = function(ev)
+  {
+    if (down)
+    {
+      var dx = ev.clientX - sx;
+      var dy = ev.clientY - sy;
+      //scene.rotation.y += dy * 0.05;
+      //scene.rotation.x += dx * 0.05;
+      camera.position.y += dy * 2;
+      camera.position.x += dx * 2;
+      sx += dx;
+      sy += dy;
+    }
+  }
+
+  //document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+  //document.addEventListener( 'touchstart', onDocumentTouchStart, false );
+  //document.addEventListener( 'touchmove', onDocumentTouchMove, false );
+
+  window.addEventListener('DOMMouseScroll', mousewheel, false);
+  window.addEventListener('mousewheel', mousewheel, false);
+  window.addEventListener( 'resize', onWindowResize, false );
+};
+
+function onWindowResize()
+{
+  windowHalfX = window.innerWidth / 2;
+  windowHalfY = window.innerHeight / 2;
+
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+
+  renderer.setSize( window.innerWidth, window.innerHeight );
+}
+
+function animate()
+{
+  requestAnimationFrame( animate );
+  render();
+}
+
+function render()
+{
+  camera.lookAt( scene.position );
+  renderer.render( scene, camera );
+}
+    </script>
+  </body>
+</html>

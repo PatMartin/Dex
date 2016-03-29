@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<% import com.dexvis.util.DexUtil %>
+<style>
+<%
+   println new File("javascript/jqueryui/latest/jquery-ui.css").text
+   println new File("javascript/jqueryui/latest/jquery-ui.theme.css").text
+   println new File("javascript/d3-ext/circular-heat/css/svg.css").text
+%>
+div.ui-tooltip {
+    max-width: 600px;
+}
+</style>
+
+<script type="text/javascript">
+<%
+println new File("javascript/d3/latest/d3.min.js").text
+println new File("javascript/d3/latest/lib/colorbrewer/colorbrewer.js").text
+println new File("javascript/jquery/latest/jquery-2.1.3.min.js").text
+println new File("javascript/jqueryui/latest/jquery-ui.min.js").text
+println new File("javascript/touchpunch/latest/touchpunch.js").text
+println new File("javascript/d3-ext/circular-heat/js/circularHeatChart.js").text
+%>
+</script>
+<html>
+  <head>
+    <title>Chord Diagram</title>
+
+<style type="text/css">
+
+<% println new File("web/d3/d3.css").text %>
+</style>
+
+<style type="text/css">
+#chart {
+  font: 10px sans-serif;
+}
+
+.chord path {
+  fill-opacity: .67;
+  stroke: #000;
+  stroke-width: .5px;
+}
+</style>
+  </head>
+<body>
+
+<div id="chartTitle" class="ui-widget-content">
+  <h1 id="titletext"></h1>
+</div>
+<div id="settings" style="visibility: hidden">
+  <div id="chartHeight" value="800"></div>
+  <div id="chartWidth" value="800"></div>
+  <div id="innerRadius" value="100"></div>
+  <div id="segmentHeight" value="20"></div>
+  <div id="fontSize" value="12"></div>
+  <div id="topMargin" value="50"></div>
+  <div id="bottomMargin" value="50"></div>
+  <div id="strokeWidth" value="0.1"></div>
+  <div id="titleTop" value="0"></div>
+  <div id="titleLeft" value="0"></div>
+  <div id="chartTop" value="0"></div>
+  <div id="chartLeft" value="0"></div>
+  <div id="chartConfigTop" value="200"></div>
+  <div id="chartConfigLeft" value="600"></div>
+  <div id="colorRange" value="white,red"></div>
+  <div id="coloringMethod" value="linear"></div>
+</div>
+<div id="chart" class="ui-widget-content"></div>
+
+<script type="text/javascript">
+
+var fill = d3.scale.category10();
+
+var width       = parseInt(d3.select("#chartWidth").attr("value"));
+var height      = parseInt(d3.select("#chartHeight").attr("value"));
+var innerRadius = parseInt(d3.select("#innerRadius").attr("value"));
+var segmentHeight = parseInt(d3.select("#segmentHeight").attr("value"));
+var fontSize    = parseInt(d3.select("#fontSize").attr("value"));
+var topMargin  = parseInt(d3.select("#topMargin").attr("value"));
+var bottomMargin = parseInt(d3.select("#bottomMargin").attr("value"));
+var strokeWidth = parseInt(d3.select("#strokeWidth").attr("value"));
+var titleTop = d3.select("#titleTop").attr("value");
+var titleTop = d3.select("#titleLeft").attr("value");
+var chartTop = parseInt(d3.select("#chartTop").attr("value"));
+var chartLeft = parseInt(d3.select("#chartLeft").attr("value"));
+var chartConfigTop = parseInt(d3.select("#chartConfigTop").attr("value"));
+var chartConfigLeft = parseInt(d3.select("#chartConfigLeft").attr("value"));
+var colorRange  = d3.select("#colorRange").attr("value");
+var coloringMethod = d3.select("#coloringMethod").attr("value");
+
+\$("#chartTitle").position({ top : titleTop, left : titleLeft });
+\$("#chart").position({ top : chartTop, left : chartLeft });
+\$("#chartConfig").position({ top : chartConfigTop, left : chartConfigLeft });
+
+<% println "var header = " + DexUtil.getHeaderString(dexData) %>
+<% println "var data = " + DexUtil.getFlatDataString(dexData) %>
+
+function getColumnNumber(header, columnName)
+{
+  for (var i=0; i<header.length; i++)
+  {
+    if (header[i] == columnName)
+    {
+      return i;
+    }
+  }
+  return -1;
+}
+
+function getColumnData(header, columnName, data)
+{
+  var columnNum = getColumnNumber(header, columnName);
+  var columnData = []
+  if (columnNum >= 0)
+  {
+    for (var i=0; i < data.length; i++)
+    {
+      //console.log("Adding: " + data[i][columnNum]);
+      columnData.push(data[i][columnNum]);
+    }
+  }
+  return columnData;
+}
+
+function getKeys(obj)
+{
+  var keys = []
+  for (var key in obj)
+  {
+    keys.push(key);
+  }
+  return keys;
+}
+
+function getUniqueColumnData(header, columnName, data)
+{
+  var columnNum = getColumnNumber(header, columnName);
+  var columnData = {}
+  if (columnNum >= 0)
+  {
+    for (var i=0; i < data.length; i++)
+    {
+      //console.log("Adding: " + data[i][columnNum]);
+      columnData[data[i][columnNum]] = 1;
+    }
+  }
+  return getKeys(columnData);
+}
+
+//console.dir(getColumnData(header, "MONTH", data));
+//console.dir(getUniqueColumnData(header, "SALESMAN", data));
+
+var segments = getUniqueColumnData(header, header[0], data);
+var radialLabels = getUniqueColumnData(header, header[1], data);
+var heatData = getColumnData(header, header[2], data);
+
+console.dir(heatData);
+
+function draw()
+{
+  \$("#chart").html("");
+  drawCircularHeat(width, height, segmentHeight, innerRadius, strokeWidth)
+}
+
+function drawCircularHeat(width, height, segmentHeight, innerRadius, strokeWidth)
+{
+  // Column #1 across the perimeter.
+  // Column #2 across the radius.
+  // Column #3 for the values.
+  //var accessor = function(d) {return d;},
+
+  var colorArray = colorRange.split(",");
+
+  var chart = circularHeatChart()
+    .range(colorArray)
+    .outerFontSize(fontSize)
+    .segmentHeight(segmentHeight)
+    .innerRadius(innerRadius)
+    .numSegments(segments.length)
+    .radialLabels(radialLabels)
+    .segmentLabels(segments)
+    .coloringMethod(coloringMethod)
+    .margin({top: topMargin, right: 0, bottom: bottomMargin, left: 280});
+
+  d3.select('#chart')
+    .selectAll('svg')
+    .data([heatData])
+    .enter()
+    .append('svg')
+    .attr("width", width)
+    .attr("height", height)
+    .call(chart);
+    
+    d3.selectAll("path")
+      .style("stroke-width", strokeWidth);
+
+
+  /** Returns an event handler for fading a given chord group. */
+  function fade(opacity)
+  {
+    return function(g, i)
+    {
+      svg.selectAll("g.chord path")
+        .filter(function(d)
+        {
+          return d.source.index != i && d.target.index != i;
+        })
+        .transition()
+        .style("opacity", opacity);
+    };
+  }
+}
+
+draw();
+
+<%
+   println """
+
+\$(document).ready(
+  function()
+  {
+  });
+
+\$(function()
+{
+  \$(document).tooltip(
+  {
+    track : true,
+    content: function () {
+        return this.getAttribute("title");
+    },
+  });
+});
+
+function toggleConfig()
+{
+  if (\$("#chartConfig").css('visibility') == 'hidden')
+  {
+    show("#chartConfig");
+  }
+  else
+  {
+    hide("#chartConfig");
+  }
+}
+
+function hide(elt)
+{
+  \$(elt).css("visibility", "hidden");
+}
+
+function show(elt)
+{
+  \$(elt).css("visibility", "visible");
+}
+
+  \$(function() {
+  	\$( "#chartTitle" ).draggable().zIndex(3);
+    \$( "#chartConfig" ).draggable().zIndex(2);
+    \$( "#chart" ).draggable().zIndex(1);
+  });
+
+  \$(document).keypress(function(e)
+  {
+    if (e.altKey) {
+      console.log("Alt Pressed");
+      toggleConfig();
+    }
+  });
+
+   \$("#chartTitle").draggable(
+   {
+    stop: function(event, ui) {
+    	var pos = \$(this).position();
+    	d3.select("#titleTop").attr("value", pos.top);
+    	d3.select("#titleLeft").attr("value", pos.left);
+    }
+   });
+
+   \$("#chart").draggable(
+   {
+    stop: function(event, ui) {
+
+    	// Show dropped position.
+    	var pos = \$(this).position();
+    	d3.select("#chartTop").attr("value", pos.top);
+    	d3.select("#chartLeft").attr("value", pos.left);
+    }
+   });
+
+   \$("#chartConfig").draggable(
+   {
+    stop: function(event, ui) {
+    	var pos = \$(this).position();
+    	d3.select("#chartConfigTop").attr("value", pos.top);
+    	d3.select("#chartConfigLeft").attr("value", pos.left);
+    }
+   });
+
+   
+   \$(function() {
+     \$("#chartConfig").resizable();
+     });
+   
+	\$(function() {
+		\$( "#height-slider" ).slider(
+		{
+	      min: 100,
+		  max: 2000,
+		  value: height,
+		  slide : function(event, ui)
+		  {
+		    height = ui.value;
+		    draw();
+	        \$("#height-input").val(height);
+	        d3.select("#chartHeight").attr("value", height);
+		  }
+		});
+		\$("#height-input").val(height);
+		d3.select("#chartHeight").attr("value", height);
+	});
+
+    \$(function()
+    {
+      \$("#height-input").change(function ()
+      {
+          height = parseInt(this.value);
+          draw();
+          d3.select("#chartHeight").attr("value", height);
+          \$("#height-slider").slider("value", height);
+      });
+    });
+
+	\$(function() {
+		\$( "#width-slider" ).slider(
+		{
+	      min: 100,
+		  max: 2000,
+		  value: width,
+		  slide : function(event, ui)
+		  {
+		    width = ui.value;
+		    draw();
+	        \$("#width-input").val(width);
+	        d3.select("#chartWidth").attr("value", width);
+		  }
+		});
+		\$("#width-input").val(width);
+		d3.select("#chartWidth").attr(width);
+	});
+
+    \$(function()
+    {
+      \$("#width-input").change(function ()
+      {
+          width = parseInt(this.value);
+          draw();
+          d3.select("#chartWidth").attr("value", width);
+          \$("#width-slider").slider("value", width);
+      });
+    });
+
+	\$(function() {
+		\$( "#innerradius-slider" ).slider(
+		{
+	      min: 0,
+		  max: 500,
+		  value: innerRadius,
+		  slide : function(event, ui)
+		  {
+		    innerRadius = ui.value;
+	        draw();
+	        \$("#innerradius-input").val(innerRadius);
+	        d3.select("#innerRadius").attr("value", innerRadius);
+		  }
+		});
+		\$("#innerradius-input").val(innerRadius);
+		d3.select("#innerRadius").attr("value", innerRadius);
+	});
+
+    \$(function()
+    {
+      \$("#innerradius-input").change(function ()
+      {
+          innerRadius = parseInt(this.value);
+          draw();
+          d3.select("#innerRadius").attr("value", innerRadius);
+          \$("#innerradius-slider").slider("value", innerRadius);
+      });
+    });
+
+	\$(function() {
+		\$( "#segmentheight-slider" ).slider(
+		{
+	      min: 1,
+		  max: 200,
+		  value: segmentHeight,
+		  slide : function(event, ui)
+		  {
+		    segmentHeight = ui.value;
+	        \$(draw());
+	        \$("#segmentheight-input").val(segmentHeight);
+	        d3.select("#segmentHeight").attr("value", segmentHeight);
+		  }
+		});
+		\$("#segmentheight-input").val(segmentHeight);
+		d3.select("#segmentHeight").attr("value", segmentHeight);
+	});
+
+  \$(function()
+  {
+    \$("#segmentheight-input").change(function ()
+    {
+      segmentHeight = parseInt(this.value);
+      draw();
+      d3.select("#segmentHeight").attr("value", segmentHeight);
+      \$("#segmentheight-slider").slider("value", segmentHeight);
+    });
+  });
+
+	\$(function() {
+		\$( "#fontsize-slider" ).slider(
+		{
+	      min: 0,
+		  max: 128,
+		  value: fontSize,
+		  slide : function(event, ui)
+		  {
+		    fontSize = ui.value;
+		    draw();
+		    d3.select("#fontSize").attr("value", fontSize);
+	      \$("#fontsize-input").val(fontSize);
+		  }
+		});
+		\$("#fontsize-input").val(fontSize);
+		d3.select("#fontSize").attr("value", fontSize);
+	});
+
+    \$(function()
+    {
+      \$("#fontsize-input").change(function ()
+      {
+          fontSize = parseInt(this.value);
+          draw();
+          d3.select("#fontSize").attr("value", fontSize);
+          \$("#fontsize-slider").slider("value", fontSize);
+      });
+    });
+
+	\$(function() {
+		\$( "#topmargin-slider" ).slider(
+		{
+	    min: 0,
+		  max: 100,
+		  value: topMargin,
+		  slide : function(event, ui)
+		  {
+		    topMargin = ui.value;
+		    draw();
+		    d3.select("#topMargin").attr("value", topMargin);
+	        \$("#topmargin-input").val(topMargin);
+		  }
+		});
+		\$("#topmargin-input").val(topMargin);
+		d3.select("#topMargin").attr("value", topMargin);
+	});
+
+    \$(function()
+    {
+      \$("#topmargin-input").change(function ()
+      {
+          topMargin = parseInt(this.value);
+          draw();
+          d3.select("#topMargin").attr("value", topMargin);
+          \$("#topmargin-slider").slider("value", topMargin);
+      });
+    });
+
+	\$(function() {
+		\$( "#bottommargin-slider" ).slider(
+		{
+	      min: 0,
+		  max: 100,
+		  value: bottomMargin,
+		  slide : function(event, ui)
+		  {
+		    bottomMargin = ui.value;
+	        draw();
+	        \$("#bottommargin-input").val(bottomMargin);
+	        d3.select("#bottomMargin").attr("value", bottomMargin);
+		  }
+		});
+		\$("#bottommargin-input").val(bottomMargin);
+		d3.select("#bottomMargin").attr("value", bottomMargin);
+	});
+
+    \$(function()
+    {
+      \$("#bottommargin-input").change(function ()
+      {
+          bottomMargin = parseInt(this.value);
+          draw();
+          d3.select("#bottomMargin").attr("value", bottomMargin);
+          \$("#bottommargin-slider").slider("value", bottomMargin);
+      });
+    });
+
+	\$(function() {
+		\$( "#strokewidth-slider" ).slider(
+		{
+	      min: 0,
+		  max: 50,
+		  value: strokeWidth,
+		  slide : function(event, ui)
+		  {
+		    strokeWidth = ui.value;
+	        draw();
+	        \$("#strokewidth-input").val(strokeWidth);
+	        d3.select("#strokeWidth").attr("value", strokeWidth);
+		  }
+		});
+		\$("#strokewidth-input").val(strokeWidth);
+		d3.select("#strokeWidth").attr("value", strokeWidth);
+	});
+
+    \$(function()
+    {
+      \$("#strokewidth-input").change(function ()
+      {
+          strokeWidth = parseInt(this.value);
+          draw();
+          d3.select("#strokeWidth").attr("value", strokeWidth);
+          \$("#strokewidth-slider").slider("value", strokeWidth);
+      });
+    });
+
+function titleChange(newTitle)
+{
+  document.title = newTitle;
+  document.getElementById("titletext").innerHTML = newTitle;
+}
+
+function colorRangeChange(newColor)
+{
+  colorRange = newColor;
+  d3.select("#colorRange").attr("value", colorRange);
+  draw();
+}
+
+\$(function()
+{
+  \$("#coloringMethodSelection").change(function ()
+  {
+    coloringMethod = this.value;
+    draw();
+    d3.select("#coloringMethod").attr("value", coloringMethod);
+  });
+});
+"""
+
+%>
+
+</script>
+
+  <div id="chartConfig" class="ui-widget-content">
+    <table>
+    <h1 title="<b>Options:</b><br><br>This menu can be disabled or enabled via ALT-c.">Options</h1>
+	<div>
+		<label for="height" title="<b>Height:</b><br><br>This will control the overall height of the SVG in pixels.">Height:</label>
+		<input type="text" id="height-input" size="5" />
+		<div id="height-slider"/>
+	</div>
+	<div>
+		<label for="width" title="<b>Width:</b><br><br>This will control overall width of the SVG in pixels.">Width:</label>
+		<input type="text" id="width-input" size="5" />
+		<div id="width-slider"/>
+	</div>
+	<div>
+		<label for="innerradius"
+		title="<b>Inner Radius:</b><br><br>This will control the size of the inner radius in pixels.">Inner Radius:</label>
+		<input type="text" id="innerradius-input" size="5" />
+		<div id="innerradius-slider"/>
+	</div>
+	<div>
+		<label for="segmentheight" title="<div><b>Segment Height:</b><br><br></div><div>This controls the height of each segment.</div>">Segment Height:</label>
+		<input type="text" id="segmentheight-input" size="5" />
+		<div id="segmentheight-slider"/>
+	</div>
+	<div>
+		<label for="fontsize" title="<div><b>Font Size:</b><br><br></div><div>This controls the size of the segment fonts.  The size is specified in pixels.</div>">Font Size:</label>
+		<input type="text" id="fontsize-input" size="5"/>
+		<div id="fontsize-slider"/>
+	</div>
+	<div>
+		<label for="topmargin"
+		title="<div><b>Top Margin:</b><br><br></div><div>If the image is cut off at the top, you might need more top margin.  Either that, or more SVG height.</div>">Top Margin:</label>
+		<input type="text" id="topmargin-input" size="5" />
+		<div id="topmargin-slider"/>
+	</div>
+    <div>
+	  <label for="bottommargin" 	  title="<div><b>Bottom Margin:</b><br><br></div><div>If the image is cut off at the bottom, you might need more bottom margin.  Or maybe more height on the SVG.</div>">Bottom Margin:</label>
+	  <input type="text" id="bottommargin-input" size="5"/>
+	  <div id="bottommargin-slider"/>
+    </div>
+    <div>
+	  <label for="strokewidth" title="<div><b>Stroke Width:</b><br><br></div><div>Enter the width of the stroke lines for each segment.</div>">Stroke Width:</label>
+	  <input type="text" id="strokewidth-input" size="5" />
+	  <div id="strokewidth-slider"/>
+    </div>
+	<div>
+	  <label title="<b>Color Range:</b><br><br>Here you may optionally specify a list of colors which will be used.<br><br>Each color should be separated by a comma.<br><br>For example, to span from white to blue, enter:<br><br>white,blue<br><br>Some coloring methods will accept multiple colors for the range such as:<br><br>red,orange,white,lightgreen,green.<br><br>Also, #ff0000 type values may also be used here.</div>">Color Range:</label>
+    <input type="text" id="colorrange" onchange="colorRangeChange(this.value)" />
+	</div>
+	<div>
+  <div>
+    <label for="coloringMethodSelection"
+     title="<b>Coloring Method:</b><br><br>This will specify how the numerical values are colored.<br><br><table><tr><td>Linear</td><td>Use a straight linear coloring model.</td></tr><tr><td>Logarithmic</td><td>Use a logarithmic function to assign colors.</td></tr><tr><td>Square Root</td><td>Use the square root of the numbers when assigning color values.</td></tr><tr><td>Exponential</td><td>Uses d3.pow() for scaling.</td></tr><tr><td>Quantize</td><td>This scale accepts more than 2 colors.  Colors are assigned based on the quantized deciles of the range.</td></tr><tr><td>Quantile</td><td>This one also accepts multiple colors and also maps the input domain into a discrete range.</td></tr><tr><td>Threshold</td><td>Similar to quantize scales, except it allows mapping of domain subsets to discrete values.</td></tr><tr><td>Identity</td><td>A special case of linear scale where the domain and range are identical.</td></tr></table>"
+     >Coloring Method:</label>
+	  <select id="coloringMethodSelection" class="combobox">
+	    <option value="linear">Linear</option>
+	    <option value="log">Logarithmic</option>
+	    <option value="sqrt">Exponential</option>
+	    <option value="pow">Exponential</option>
+	    <option value="quantize">Quantize</option>
+	    <option value="quantile">Quantile</option>
+	    <option value="identity">Identity</option>
+	    <option value="threshold">Threshold</option>
+	  </select>
+	</div>
+	<div>
+		<label for="charttitle">Title:</label>
+		<input type="text" id="charttitle" onchange="titleChange(this.value)" />
+	</div>
+  </div>
+</body>
+</html>

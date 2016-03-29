@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <title>VivaGraphs test page</title>
+<script>
+<%
+  println new File("javascript/vivagraph/latest/vivagraph.min.js").text
+%>
+</script>
+        <script type='text/javascript'>
+<%
+  def header = "[" + dexData.header.collect { return "\"$it\"" }.join(',') + "]"
+  def data = []
+  dexData.data.eachWithIndex
+  {
+    row, ri ->
+    data << "[" + row.collect { return "\"$it\"" }.join(',') + "]"
+  }
+  println "var csv = { 'header' : $header,\n 'data' : [" + data.join(',\n') + "] };";
+%>
+
+    var nodes = null;
+    var edges = null;
+    var network = null;
+
+    var nodeMap = {};
+    var linkMap = {};
+    var colors = [ '#a6cee3','#1f78b4','#b2df8a','#33a02c','#fb9a99','#e31a1c','#fdbf6f','#ff7f00'];
+ 
+    var id = 1;
+    // Create node map.    
+    csv.header.map ( function(h, ci) {
+      csv.data.map ( function(row) {
+        if (!nodeMap[row[ci]])
+        {
+          nodeMap[row[ci]] = {
+            'id' : id,
+            'label' : row[ci],
+            'size' : 8,
+            'color' : colors[ci%colors.length],
+            'group' : ci+1
+          };
+          id++;
+        }
+      });
+    });
+
+    // Count links from C1 -> C2 -> ... -> Cx
+    for (var ci=1; ci<csv.header.length; ci++)
+    {
+        for (var ri=0; ri<csv.data.length; ri++)
+        {
+          var src  = csv.data[ri][ci-1];
+          var dest = csv.data[ri][ci];
+          var linkKey = src + "->" + dest;
+
+          nodeMap[src]['size']++;
+          nodeMap[dest]['size']++;
+          
+          if (!linkMap[linkKey])
+          {
+            linkMap[linkKey] = {
+              'from' : nodeMap[src].id,
+              'to'   : nodeMap[dest].id,
+              'linkCount' : 1,
+              'label' : nodeMap[src].label + "->" + nodeMap[dest].label +
+                ": 1 link"
+            };
+          }
+          else
+          {
+            linkMap[linkKey]['linkCount']++;
+            linkMap[linkKey]['label'] =
+              nodeMap[src].label + "->" + nodeMap[dest].label +
+                ": " + linkMap[linkKey]['linkCount'];
+          }
+        }
+      }
+
+    nodes = [];
+    edges = [];
+
+      // Populate nodes
+      for (var key in nodeMap) {
+        var node = nodeMap[key];
+        nodes.push({
+          'id'    : node.id,
+          'size'  : node.size,
+          'label' : node.label,
+          'color' : node.color,
+          'group' : node.group
+        });
+      }
+      
+      // Populate edges
+      for (var key in linkMap) {
+        var edge = linkMap[key];
+        edges.push({
+          'from'  : edge.from,
+          'to'    : edge.to,
+          'value' : edge.weight,
+          'title' : edge.label,
+          'font'  : {'align': 'middle'} });
+      }
+
+  /*global Viva*/
+  function onLoad() {
+  var graphGenerator = Viva.Graph.generator();
+
+  var graph = Viva.Graph.graph();
+
+for (var i in nodes) {
+  console.dir(nodes[i]);
+  graph.addNode(nodes[i].id, {
+    group:nodes[i].group,
+    size:nodes[i].size,
+    color:nodes[i].color,
+    label:nodes[i].label
+  });
+}
+
+for (var i in edges)
+{
+  graph.addLink(edges[i].from, edges[i].to);
+}
+
+var graphics = Viva.Graph.View.svgGraphics();
+graphics.node(function(node) {
+  //console.dir(node);
+  var g = Viva.Graph.svg('g');
+  
+  var rect = Viva.Graph.svg('rect')
+    .attr('height', Math.min(node.data.size, 50))
+    .attr('width', Math.min(node.data.size, 50))
+    .attr('fill', node.data.color);
+  
+  var text = Viva.Graph.svg('text')
+    .attr('text-anchor', 'middle')
+    //.attr('stroke', node.data.color)
+    .attr('fill', node.data.color)
+    .attr('font-size', Math.min(node.data.size, 64))
+    .text(node.data.label);
+  g.append(rect);
+  g.append(text);
+  return text;
+});
+
+ //var graph = graphGenerator.randomNoLinks(500);
+ //var graph = graphGenerator.completeBipartite(10, 10);
+ //var graph = graphGenerator.complete(100);
+ //var graph = graphGenerator.balancedBinTree(10);
+
+  var layout = Viva.Graph.Layout.forceDirected(graph, {
+    springLength : 100,
+    springCoeff : 0.00008,
+    dragCoeff : 0.05,
+    gravity : -1
+  });
+
+  var renderer = Viva.Graph.View.renderer(graph, {
+    layout     : layout,
+    graphics   : graphics
+  });
+  renderer.run();
+}
+        </script>
+        <style type='text/css'>
+            body, svg {
+                height: 100%;
+                width: 100%;
+                position: absolute;
+                margin: 0;
+            }
+        </style>
+    </head>
+    <body onload="onLoad()" style="background-color: black;">
+
+    </body>
+</html>

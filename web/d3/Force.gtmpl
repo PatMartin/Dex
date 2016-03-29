@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+    <title>Force Diagram</title>
+  </head>
+
+<style type="text/css">
+	#demo-frame > div.demo {
+		padding: 10px !important;
+	}
+	#page {
+      margin: 0 auto;
+      /*width: 1000px;*/
+      background: #fff;
+    }
+
+    h1
+    {
+      font-family: "Arial";
+      font-size: 24px;
+      margin: 5px 0px 5px 0px;
+      color: steelblue;
+    }
+	#config h1
+    {
+      font-family: "Arial";
+      font-size: 16px;
+      margin: 5px 0px 5px 0px;
+      color: steelblue;
+    }
+	path.link {
+		fill: none;
+		stroke: #666;
+		stroke-width: 1px;
+	}
+	marker#greenline {
+		fill: green;
+	}
+	path.link.greenline {
+		stroke: green;
+	}
+	path.link.dottedline {
+		stroke-dasharray: 0, 2 1;
+	}
+	circle {
+		fill: #ccc;
+		stroke: #444;
+		stroke-width: 1.5px;
+	}
+	text {
+		font: 12px sans-serif;
+		pointer-events: none;
+	}
+	text.shadow {
+		stroke: #fff;
+		stroke-width: 3px;
+		stroke-opacity: .5;
+	}
+</style>
+
+<script type="text/javascript">
+<%
+println "/* D3 MIN */"
+println new File("javascript/d3/latest/d3.min.js").text
+//def d3str = new File("javascript/d3/latest/d3.js").text
+//new File("D3OUT").withWriter
+//{
+//  out ->
+//  out.writeLine(d3str)
+//}
+
+println "/* COLOR BREWER */"
+println new File("javascript/d3/latest/lib/colorbrewer/colorbrewer.js").text
+%>
+</script>
+
+<style>
+<%
+  println new File("javascript/jqueryui/latest/jquery-ui.min.css").text
+  println new File("javascript/jqueryui/latest/jquery-ui.theme.min.css").text
+  println new File("web/d3/d3.css").text
+%>
+</style>
+
+<script>
+
+<%
+  println new File("javascript/jquery/latest/jquery-2.1.3.min.js").text
+  println new File("javascript/jqueryui/latest/jquery-ui.min.js").text
+%>
+</script>
+
+<body>
+<div id="chartTitle" class="ui-widget-content">
+  <h1 id="titletext">Force Diagram</h1>
+</div>
+
+<div id="chart"></div>
+<script type="text/javascript">
+
+var dexLinks =
+[
+<%
+  def linkList = []
+  data.each
+  {
+    row ->
+    (2..row.size()).each
+    {
+      linkList << "{source: \"${row[it-2]}\", target: \"${row[it-1]}\", sname: \"${header[it-2]}\", tname: \"${header[it-1]}\", type: \"blackline\" }"
+    }
+  }
+  println linkList.join(",")
+%>
+];
+
+var width = 900;
+var height = 850;
+var title = "Force Diagram";
+var nodeSize = 5;
+var linkDistance = 50;
+var linkStrength = 50;
+var charge = -500;
+var friction = 90;
+var gravity = 30;
+var force;
+var drawLinks = [];
+drawLinks = drawLinks.concat(dexLinks);
+var circle;
+
+function draw()
+{
+  \$("#chart").html("");
+  force = drawForce(width, height, title, nodeSize, linkDistance, linkStrength, charge, friction, gravity, drawLinks);
+  return force;
+}
+
+function drawForce(width, height, title, nodeSize, linkDistance, linkStrength, charge, friction, gravity, links)
+{
+  var nodes = {};
+  var color = d3.scale.category20();
+ 
+  //Compute the distinct nodes from the links.
+  links.forEach(function(link)
+  {
+    link.source = nodes[link.source] || (nodes[link.source] = {name: link.source});
+    link.target = nodes[link.target] || (nodes[link.target] = {name: link.target});
+  });
+
+  var force = d3.layout.force()
+   .nodes(d3.values(nodes))
+   .links(links)
+   .size([width, height])
+   .linkStrength(linkStrength / 100.0)
+   .linkDistance(linkDistance)
+   .friction(friction/100.0)
+   .gravity(gravity/100.0)
+   .charge(charge)
+   .on("tick", tick)
+   .start();
+
+  d3.select("#chart").selectAll("svg").remove();
+  var svg = d3.select("#chart").append("svg:svg")
+   .attr("width", width)
+   .attr("height", height);
+
+  //Per-type markers, as they don't inherit styles.
+  svg.append("svg:defs").selectAll("marker")
+   .data(["blackline", "greenline", "dottedline"])
+   .enter().append("svg:marker")
+   .attr("id", String)
+   .attr("viewBox", "0 -5 10 10")
+   .attr("refX", 15)
+   .attr("refY", -1.5)
+   .attr("markerWidth", 6)
+   .attr("markerHeight", 6)
+   .attr("orient", "auto")
+   .append("svg:path")
+   .attr("d", "M0,-5L10,0L0,5");
+
+  var path = svg.append("svg:g")
+   .selectAll("path")
+   .data(force.links())
+   .enter().append("svg:path")
+   .attr("class", function(d) { return "link " + d.type; })
+   .attr("marker-end", function(d) { return "url(#" + d.type + ")"; });
+
+  //svg.select("svg:g").selectAll("circle").remove();
+
+  circle = svg.append("svg:g").selectAll("circle")
+   .data(force.nodes())
+   .enter().append("svg:circle")
+   .attr("r", nodeSize)
+   .call(force.drag)
+   .on("mousedown", function() { d3.event.stopPropagation(); });
+
+  var text = svg.append("svg:g").selectAll("g")
+   .data(force.nodes())
+   .enter().append("svg:g");
+
+  //A copy of the text with a thick white stroke for legibility.
+  text.append("svg:text")
+   .attr("x", 8)
+   .attr("y", ".31em")
+   .attr("text-anchor", "start")
+   .attr("transform", "rotate(0)")
+   .attr("class", "shadow")
+   .text(function(d) { return d.name; });
+
+  text.append("svg:text")
+   .attr("x", 8)
+   .attr("y", ".31em")
+   .attr("text-anchor", "start")
+   .attr("transform", "rotate(0)")
+   .text(function(d) { return d.name; });
+
+  function lineConnector(d, i)
+  {
+     var dx = d.target.x - d.source.x,
+          dy = d.target.y - d.source.y,
+          dr = Math.sqrt(dx * dx + dy * dy);
+      return "M" + d.source.x + "," + d.source.y + "A" + dr + "," + dr + " 0 0,1 " + d.target.x + "," + d.target.y;
+  }
+
+  function elbowConnector(d, i)
+  {
+    //console.log(d);
+    return "M" + d.source.x + "," + d.source.y
+      + "V" + d.target.y + "H" + d.target.x;
+  }
+  
+  //Use elliptical arc path segments to doubly-encode directionality.
+  function tick()
+  {
+    path.attr("d", elbowConnector);
+
+    circle.attr("transform", function(d)
+    {
+      return "translate(" + d.x + "," + d.y + ")";
+    });
+
+    text.attr("transform", function(d)
+    {
+      return "translate(" + d.x + "," + d.y + ")";
+    });
+  }
+  return force;
+}
+
+draw();
+
+<%
+   println """
+	\$(function() {
+		\$( "#height-slider" ).slider(
+		{
+	      min: 100,
+		  max: 2000,
+		  value: height,
+		  slide : function(event, ui)
+		  {
+		    height = ui.value;
+		    \$(force.size([width, height]));
+		    \$(d3.select("svg").attr("width", width));
+		    \$(d3.select("svg").attr("height", height));
+		    \$(force.start());
+	        \$("#height").val(\$("#height-slider").slider("value"));
+		  }
+		});
+		\$("#height").val(\$("#height-slider").slider("value"));
+	});
+"""
+
+   println """
+	\$(function() {
+		\$( "#width-slider" ).slider(
+		{
+	      min: 100,
+		  max: 2000,
+		  value: width,
+		  slide : function(event, ui)
+		  {
+		    width = ui.value;
+		    \$(force.size([width, height]));
+		    \$(d3.select("svg").attr("width", width));
+		    \$(d3.select("svg").attr("height", height));
+		    \$(force.start());
+	        \$("#width").val(\$("#width-slider").slider("value"));
+		  }
+		});
+		\$("#width").val(\$("#width-slider").slider("value"));
+	});
+"""
+
+   println """
+	\$(function() {
+		\$( "#nodesize-slider" ).slider(
+		{
+	      min: 1,
+		  max: 100,
+		  value: nodeSize,
+		  slide : function(event, ui)
+		  {
+		    nodeSize = ui.value;
+		    \$(circle.attr("r", nodeSize));
+		    \$("#nodesize").val(\$("#nodesize-slider").slider("value"));
+		  }
+		});
+
+		\$("#nodesize").val(\$("#nodesize-slider").slider("value"));
+	});
+"""
+
+   println """
+	\$(function() {
+		\$( "#linkdistance-slider" ).slider(
+		{
+	      min: 0,
+		  max: 1000,
+		  value: linkDistance,
+		  slide : function(event, ui)
+		  {
+		    linkDistance = ui.value;
+		    \$(force.linkDistance(linkDistance));
+		    \$(force.start());
+		    \$("#linkdistance").val(\$("#linkdistance-slider").slider("value"));
+		  }
+		});
+
+		\$("#linkdistance").val(\$("#linkdistance-slider").slider("value"));
+	});
+"""
+
+   println """
+	\$(function() {
+		\$( "#linkstrength-slider" ).slider(
+		{
+	      min: 0,
+		  max: 100,
+		  value: linkStrength,
+		  slide : function(event, ui)
+		  {
+		    linkStrength = ui.value;
+		    \$(force.linkStrength(linkStrength / 100.0));
+		    \$(force.start());
+		    \$("#linkstrength").val(\$("#linkstrength-slider").slider("value"));
+		  }
+		});
+
+		\$("#linkstrength").val(\$("#linkstrength-slider").slider("value"));
+	});
+"""
+
+   println """
+	\$(function() {
+		\$( "#charge-slider" ).slider(
+		{
+	      min: -1000,
+		  max: 1000,
+		  value: charge,
+		  slide : function(event, ui)
+		  {
+		    charge = ui.value;
+		    \$(force.charge(charge));
+		    \$(force.start());
+		    \$("#charge").val(\$("#charge-slider").slider("value"));
+		  }
+		});
+
+		\$("#charge").val(\$("#charge-slider").slider("value"));
+	});
+"""
+
+   println """
+	\$(function() {
+		\$( "#friction-slider" ).slider(
+		{
+	      min: 0,
+		  max: 100,
+		  value: friction,
+		  slide : function(event, ui)
+		  {
+		    friction = ui.value;
+		    \$(force.friction(friction/100.0));
+		    \$(force.start());
+		    \$("#friction").val(\$("#friction-slider").slider("value"));
+		  }
+		});
+
+		\$("#friction").val(\$("#friction-slider").slider("value"));
+	});
+"""
+
+   println """
+	\$(function() {
+		\$( "#gravity-slider" ).slider(
+		{
+	      min: 0,
+		  max: 100,
+		  value: gravity,
+		  slide : function(event, ui)
+		  {
+		    gravity = ui.value;
+		    \$(force.gravity(gravity/100.0));
+		    \$(force.start());
+		    \$("#gravity").val(\$("#gravity-slider").slider("value"));
+		  }
+		});
+
+		\$("#gravity").val(\$("#gravity-slider").slider("value"));
+	});
+"""
+
+   println """
+    \$(function() {
+    	\$( "#chartTitle" ).draggable();
+        \$( "#chartConfig" ).draggable();
+        \$( "#chart" ).draggable();
+    });
+    
+function titleChange(newTitle)
+{
+  d3.select("title").text(newTitle);
+  d3.select("#titletext").text(newTitle);
+}
+"""
+%>
+</script>
+
+<div id="chartConfig" class="demo">
+    <h1>Configuration</h1>
+	<div>
+		<label for="height">Height:</label>
+		<input type="text" id="height" size="5" style="border:0; color:#f6931f; font-weight:bold;" />
+		<div id="height-slider"/>
+	</div>
+	<div>
+		<label for="width">Width:</label>
+		<input type="text" id="width" size="5" style="border:0; color:#f6931f; font-weight:bold;" />
+		<div id="width-slider"/>
+	</div>
+	<div>
+		<label for="nodesize">Node Size:</label>
+		<input type="text" id="nodesize" size="5" style="border:0; color:#f6931f; font-weight:bold;" />
+		<div id="nodesize-slider"/>
+	</div>
+	<div>
+		<label for="linkdistance">Link Distance:</label>
+		<input type="text" id="linkdistance" size="5" style="border:0; color:#f6931f; font-weight:bold;" />
+		<div id="linkdistance-slider"/>
+	</div>
+	<div>
+		<label for="linkstrength">Link Strength:</label>
+		<input type="text" id="linkstrength" size="5" style="border:0; color:#f6931f; font-weight:bold;" />
+		<div id="linkstrength-slider"/>
+	</div>
+	<div>
+		<label for="charge">Charge:</label>
+		<input type="text" id="charge" size="5" style="border:0; color:#f6931f; font-weight:bold;" />
+		<div id="charge-slider"/>
+	</div>
+    <div>
+	    <label for="friction">Friction:</label>
+		<input type="text" id="friction" size="5" style="border:0; color:#f6931f; font-weight:bold;" />
+	    <div id="friction-slider"/>
+	</div>
+	<div>
+	    <label for="gravity">Gravity:</label>
+		<input type="text" id="gravity" size="5" style="border:0; color:#f6931f; font-weight:bold;" />
+	    <div id="gravity-slider"/>
+	</div>
+	<div>
+		<label for="charttitle">Title:</label>
+		<input type="text" id="charttitle" size="20" style="border:2; color:#f6931f; font-weight:10;" onchange="titleChange(this.value)" />
+	</div>
+</div>
+
+</body>
+</html>

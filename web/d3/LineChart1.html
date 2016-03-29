@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+body {
+  font: 10px sans-serif;
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.x.axis path {
+  //display: none;
+}
+
+.line {
+  fill: none;
+  stroke: steelblue;
+  stroke-width: 1.5px;
+}
+
+</style>
+<body>
+<script src="http://d3js.org/d3.v3.js"></script>
+<script src="../../javascript/dex/dexutils.js"></script>
+<script src="../../javascript/dex/dexcharts.js"></script>
+<script>
+
+// Create an SVG for our chart.
+var svg = d3.select("body").append("svg")
+  .attr("width", 1000)
+  .attr("height", 800)
+  .append("g")
+  .attr("transform", "translate(40,20)");
+
+var legend = VerticalLegend(
+	{
+    'parent'  : svg,
+    'labels'  : ["Y"],
+	  'xoffset' : -10,
+	}
+)
+legend();
+
+// Configure a chart.
+var chart = LineChart(
+  {
+	  'parent' : svg,
+	  'labels' : [ "X", "Y" ],
+	  'data'   : [[-3,9], [-2,4], [-1,1], [0,0], [1,1], [2,4], [3,9]],
+	  'xoffset': 70
+  }
+);
+
+// Render the chart.
+chart();
+
+</script>

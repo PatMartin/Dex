@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+<% println new File("javascript/nvd3/latest/src/nv.d3.css").text %>
+
+body {
+  overflow-y:scroll;
+}
+
+text {
+  font: 12px sans-serif;
+}
+
+#chart {
+  height: 100%;
+  width: 100%;
+}
+
+#chart svg {
+  height: 95%;
+  width: 95%;
+  margin: 0px;
+/*
+  margin: 50px;
+  Minimum height and width is a good idea to prevent negative SVG dimensions...
+  For example width should be =< margin.left + margin.right + 1,
+  of course 1 pixel for the entire chart would not be very useful, BUT should not have errors
+*/
+</style>
+<body>
+
+<div id="chart">
+<svg></svg>
+</div>
+<script>
+<% println new File("javascript/nvd3/latest/lib/d3.v2.js").text %>
+<% println new File("javascript/nvd3/latest/nv.d3.js").text %>
+<% println new File("javascript/nvd3/latest/src/models/legend.js").text %>
+<% println new File("javascript/nvd3/latest/src/models/pie.js").text %>
+<% println new File("javascript/nvd3/latest/src/models/pieChart.js").text %>
+<% println new File("javascript/nvd3/latest/src/utils.js").text %>
+</script>
+
+<script>
+  
+  var testdata = [
+<%
+  def dataMap = [:]
+
+  data.eachWithIndex
+  {
+    row, ri ->
+    try
+    {
+      if (dataMap.containsKey(row[0]))
+      {
+        dataMap[row[0]] = (Double.parseDouble(dataMap[row[0]]) + Double.parseDouble(row[1])).toString()
+      }
+      else
+      {
+        dataMap[row[0]] = Double.parseDouble(row[1]).toString()
+      }
+    }
+    catch (Exception ex)
+    {
+      if (dataMap.containsKey(row[0]))
+      {
+        dataMap[row[0]] = (Double.parseDouble(dataMap[row[0]]) + 1).toString()
+      }
+      else
+      {
+        dataMap[row[0]] = "1"
+      }
+    }
+  }
+  
+  def output = []
+  
+  dataMap.each
+  {
+    it ->
+    output << "{\"key\": \"${it.key}\", \"y\": ${it.value} }"
+  }
+  
+  println output.join(",\n")
+%>
+  ];
+
+nv.addGraph(function() {
+
+    var chart = nv.models.pieChart()
+        .x(function(d) { return d.key })
+        //.y(function(d) { return d.value })
+        .values(function(d) { return d })
+        //.labelThreshold(.08)
+        //.showLabels(false)
+        .color(d3.scale.category20().range())
+        .donut(true);
+
+      d3.select("#chart svg")
+          .datum([testdata])
+        .transition().duration(1200)
+          .call(chart);
+
+    nv.utils.windowResize(chart.update);
+    return chart;
+});
+
+</script>
+</body>
+</html>

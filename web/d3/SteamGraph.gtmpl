@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<% import com.dexvis.util.DexUtil %>
+<meta charset="utf-8">
+<style>
+<%
+   def theme = "flick"
+   println new File("javascript/jqueryui/latest/jquery-ui.min.css").text
+   println new File("javascript/jqueryui/latest/jquery-ui.theme.css").text
+%>
+
+</style>
+<body>
+<script type="text/javascript">
+<%
+println new File("javascript/d3/latest/d3.min.js").text
+println new File("javascript/d3/latest/lib/colorbrewer/colorbrewer.js").text
+println new File("javascript/jquery/latest/jquery-2.1.3.min.js").text
+println new File("javascript/jqueryui/latest/jquery-ui.min.js").text
+println new File("javascript/touchpunch/latest/touchpunch.js").text
+println new File("javascript/dex/dexutils.js").text
+%>
+</script>
+<html>
+  <head>
+    <title>Clustered Force</title>
+<style type="text/css">
+<% println new File("web/d3/d3.css").text %>
+</style>
+
+<body>
+
+<div id="chartTitle" class="ui-widget-content">
+  <h1 id="titletext"></h1>
+</div>
+<div id="settings" style="visibility: hidden">
+  <div id="chartHeight" value="500"></div>
+  <div id="chartWidth" value="800"></div>
+  <div id="opacity" value="100"></div>
+  <div id="stroke" value="black"></div>
+  <div id="strokeWidth" value="0"></div>
+  <div id="titleTop" value="0"></div>
+  <div id="titleLeft" value="0"></div>
+  <div id="chartTop" value="0"></div>
+  <div id="chartLeft" value="0"></div>
+  <div id="chartConfigTop" value="200"></div>
+  <div id="chartConfigLeft" value="600"></div>
+  <div id="sizingMethod" value="linear"></div>
+  <div id="colorScheme" value="1"></div>
+  <div id="offset" value="wiggle"></div>
+</div>
+<div id="chart" class="ui-widget-content"></div>
+
+<script>
+
+var width           = parseInt(d3.select("#chartWidth").attr("value"));
+var height          = parseInt(d3.select("#chartHeight").attr("value"));
+var opacity         = parseInt(d3.select("#opacity").attr("value"));
+var stroke          = d3.select("#stroke").attr("value");
+var strokeWidth     = parseInt(d3.select("#strokeWidth").attr("value"));
+var titleTop        = d3.select("#titleTop").attr("value");
+var titleTop        = d3.select("#titleLeft").attr("value");
+var chartTop        = parseInt(d3.select("#chartTop").attr("value"));
+var chartLeft       = parseInt(d3.select("#chartLeft").attr("value"));
+var chartConfigTop  = parseInt(d3.select("#chartConfigTop").attr("value"));
+var chartConfigLeft = parseInt(d3.select("#chartConfigLeft").attr("value"));
+var sizingMethod    = d3.select("#sizingMethod").attr("value");
+var colorScheme     = d3.select("#colorScheme").attr("value");
+var offset          = d3.select("#offset").attr("value");
+
+\$("#chartTitle").position({ top : titleTop, left : titleLeft });
+\$("#chart").position({ top : chartTop, left : chartLeft });
+\$("#chartConfig").position({ top : chartConfigTop, left : chartConfigLeft });
+
+<% println "var dex = " + DexUtil.getCsvString(dexData) %>
+
+var numericHeaders = getNumericHeaders(dex);
+var numericIndices = getNumericIndices(dex);
+
+var chart;
+
+function draw()
+{
+  chart = new SteamGraph(width, height, opacity, stroke, strokeWidth, colorScheme, sizingMethod, offset);
+}
+
+function update()
+{
+  chart.update(width, height);
+}
+
+function SteamGraph(width, height, opacity, stroke, strokeWidth, colorScheme, sizingMethod, offset)
+{
+  var n = 4, // number of layers
+    m = 40, // number of samples per layer
+    stack = d3.layout.stack().offset(offset);
+    //layers0 = stack(d3.range(n).map(function() { return bumpLayer(m); }));
+ 
+    // [ [{x11,y11}, {x12, y12}, ...], [{x21, y21}, {x22, y22}...], ... ]
+
+    var layer = [];
+    for (var i=1; i<numericIndices.length; i++)
+    {
+      var stream = [];
+
+      for (var ri=1; ri<dex.length; ri++)
+      {
+        stream.push({ x : parseFloat(dex[ri][numericIndices[0]]), y : parseFloat(dex[ri][numericIndices[i]]) });
+      }
+      layer.push(stream);
+    }
+    //console.dir(d3.range(n).map(function() { return bumpLayer(m); }));
+    m = dex.length - 1;
+    n = numericIndices.length - 1;
+    var layers0 = stack(layer);
+    //console.dir(layers0);
+
+    var xdomain = [ getMin(dex, numericIndices[0]), getMax(dex, numericIndices[0])];
+
+    var x = d3.scale.linear()
+      .domain(xdomain)
+      .range([0, width]);
+
+    var reverseX = d3.scale.linear()
+      .domain([0, width])
+      .range(xdomain);
+
+    var y;
+   
+    if (sizingMethod == "log")
+    {
+      y = d3.scale.log()
+            .domain([0, d3.max(layers0, function(layer) { return d3.max(layer, function(d) { return d.y0 + d.y; }); })])
+            .range([height, 0]);
+    } 
+    else if (sizingMethod == "pow")
+    {
+      y = d3.scale.pow()
+            .domain([0, d3.max(layers0, function(layer) { return d3.max(layer, function(d) { return d.y0 + d.y; }); })])
+            .range([height, 0]);
+    }
+    else if (sizingMethod == "sqrt")
+    {
+      y = d3.scale.sqrt()
+            .domain([0, d3.max(layers0, function(layer) { return d3.max(layer, function(d) { return d.y0 + d.y; }); })])
+            .range([height, 0]);
+    }
+    else if (sizingMethod == "quantize")
+    {
+      y = d3.scale.quantize()
+            .domain([0, d3.max(layers0, function(layer) { return d3.max(layer, function(d) { return d.y0 + d.y; }); })])
+            .range([height, 0]);
+    }
+    else if (sizingMethod == "quantile")
+    {
+      y = d3.scale.quantile()
+            .domain([0, d3.max(layers0, function(layer) { return d3.max(layer, function(d) { return d.y0 + d.y; }); })])
+            .range([height, 0]);
+    }
+    else if (sizingMethod == "identity")
+    {
+      y = d3.scale.identity()
+            .domain([0, d3.max(layers0, function(layer) { return d3.max(layer, function(d) { return d.y0 + d.y; }); })])
+            .range([height, 0]);
+    }
+     else if (sizingMethod == "threshold")
+    {
+      y = d3.scale.threshold()
+            .domain([0, d3.max(layers0, function(layer) { return d3.max(layer, function(d) { return d.y0 + d.y; }); })])
+            .range([height, 0]);
+    }
+    else
+    {
+      y = d3.scale.linear()
+            .domain([0, d3.max(layers0, function(layer) { return d3.max(layer, function(d) { return d.y0 + d.y; }); })])
+            .range([height, 0]);
+    }
+
+  // Figure out the pixel width of a single tick.
+  var tickWidth = Math.max(1, x(layers0[0][1].x));
+  //console.log("TICK WIDTH: " + tickWidth);
+  
+  // Keep this in case I decide to go with gradients.
+  //var colorArray = colorRange.split(",");
+
+  var color = getFill(colorScheme, n);
+
+  var area = d3.svg.area()
+    .x(function(d) { return x(d.x); })
+    .y0(function(d) { return y(d.y0); })
+    .y1(function(d) { return y(d.y0 + d.y); });
+
+  // There can only be one.
+  d3.select("#chart").selectAll("svg").remove();
+
+  var svg = d3.select("#chart").append("svg")
+    .attr("width", width)
+    .attr("height", height);
+
+  var pathG = svg.append("g");
+
+  pathG.selectAll("path")
+    .data(layers0)
+    .enter().append("path")
+      .attr("opacity", opacity/100.0)
+      //.attr("title", function(d, i) { return dex[0][numericIndices[i+1]]; } )
+      .attr("d", area)
+      .attr("stroke", stroke)
+      .attr("stroke-width", strokeWidth)
+      .style("fill", function(d, i) { return color(i); });
+
+  var focus = svg.selectAll("g")
+    .data(layers0)
+    .enter().append("g")
+    .attr("class", "focus")
+    .attr("opacity", 0.0);
+//      .style("display", "none");
+
+  var rectalData = new Array(layers0.length * layers0[0].length);
+  for (var l=0; l<layers0.length; l++)
+  {
+    for (var r=0; r<layers0[l].length; r++)
+    {
+      rectalData[l*layers0[l].length + r] = layers0[l][r];
+      rectalData[l*layers0[l].length + r].label = dex[0][numericIndices[l+1]]
+    }
+  }
+
+  //console.log("RECTAL-DATA");
+  //console.dir(rectalData);
+
+  focus.selectAll("rect")
+    .data(rectalData)
+    .enter().append("rect")
+      .attr("class", "overlay")
+      //.attr("fill", "none")
+      .attr("width", function() { return tickWidth; })
+      .attr("transform", function(d, i) { return "translate(" + x(d.x) + ", " + y(d.y+d.y0) + ")"; })
+      .attr("height", function(d, i) { return height - y(d.y); })
+      .attr("title", function(d) { return d.label + " = " + d.y; });
+
+  // Not working yet, dummy replacement
+  this.update = function (width, height, minRadius, maxRadius)
+  {
+    draw();
+  };
+}
+
+draw();
+
+<%
+   println """
+
+\$(document).ready(
+  function()
+  {
+  });
+
+\$(function()
+{
+  \$(document).tooltip(
+  {
+    track : true
+  });
+});
+
+function toggleConfig()
+{
+  if (\$("#chartConfig").css('visibility') == 'hidden')
+  {
+    show("#chartConfig");
+  }
+  else
+  {
+    hide("#chartConfig");
+  }
+}
+
+function hide(elt)
+{
+  \$(elt).css("visibility", "hidden");
+}
+
+function show(elt)
+{
+  \$(elt).css("visibility", "visible");
+}
+
+  \$(function() {
+  	\$( "#chartTitle" ).draggable().zIndex(3);
+    \$( "#chartConfig" ).draggable().zIndex(2);
+    \$( "#chart" ).draggable().zIndex(1);
+  });
+
+  \$(document).keypress(function(e)
+  {
+    if (e.altKey) {
+      console.log("Alt Pressed");
+      toggleConfig();
+    }
+  });
+
+   \$("#chartTitle").draggable(
+   {
+    stop: function(event, ui) {
+    	var pos = \$(this).position();
+    	d3.select("#titleTop").attr("value", pos.top);
+    	d3.select("#titleLeft").attr("value", pos.left);
+    }
+   });
+
+   \$("#chart").draggable(
+   {
+    stop: function(event, ui) {
+
+    	// Show dropped position.
+    	var pos = \$(this).position();
+    	d3.select("#chartTop").attr("value", pos.top);
+    	d3.select("#chartLeft").attr("value", pos.left);
+    }
+   });
+
+   \$("#chartConfig").draggable(
+   {
+    stop: function(event, ui) {
+    	var pos = \$(this).position();
+    	d3.select("#chartConfigTop").attr("value", pos.top);
+    	d3.select("#chartConfigLeft").attr("value", pos.left);
+    }
+   });
+
+   
+  \$(function() {
+     \$("#chartConfig").resizable();
+  });
+   
+	\$(function() {
+		\$( "#height-slider" ).slider(
+		{
+	      min: 100,
+		  max: 2000,
+		  value: height,
+		  slide : function(event, ui)
+		  {
+		    height = ui.value;
+		    update();
+	      \$("#height-input").val(height);
+	      d3.select("#chartHeight").attr("value", height);
+		  }
+		});
+		\$("#height-input").val(height);
+		d3.select("#chartHeight").attr("value", height);
+	});
+
+    \$(function()
+    {
+      \$("#height-input").change(function ()
+      {
+          height = parseInt(this.value);
+          update();
+          d3.select("#chartHeight").attr("value", height);
+          \$("#height-slider").slider("value", height);
+      });
+    });
+
+	\$(function() {
+		\$( "#width-slider" ).slider(
+		{
+	    min: 100,
+		  max: 2000,
+		  value: width,
+		  slide : function(event, ui)
+		  {
+		    width = ui.value;
+		    update();
+	      \$("#width-input").val(width);
+	      d3.select("#chartWidth").attr("value", width);
+		  }
+		});
+		\$("#width-input").val(width);
+		d3.select("#chartWidth").attr(width);
+	});
+
+  \$(function()
+  {
+    \$("#width-input").change(function ()
+    {
+      width = parseInt(this.value);
+      update();
+      d3.select("#chartWidth").attr("value", width);
+      \$("#width-slider").slider("value", width);
+    });
+  });
+
+	\$(function() {
+		\$( "#opacity-slider" ).slider(
+		{
+	    min: 0,
+		  max: 100,
+		  value: opacity,
+		  slide : function(event, ui)
+		  {
+		    opacity = ui.value;
+		    update();
+	      \$("#opacity-input").val(opacity);
+	      d3.select("#opacity").attr("value", opacity);
+		  }
+		});
+		\$("#opacity-input").val(opacity);
+		d3.select("#opacity").attr(opacity);
+	});
+
+  \$(function()
+  {
+    \$("#opacity-input").change(function ()
+    {
+      opacity = parseInt(this.value);
+      update();
+      d3.select("#opacity").attr("value", opacity);
+      \$("#opacity-slider").slider("value", opacity);
+    });
+  });
+
+	\$(function() {
+		\$( "#strokewidth-slider" ).slider(
+		{
+	    min: 0,
+		  max: 50,
+		  value: strokeWidth,
+		  slide : function(event, ui)
+		  {
+		    strokeWidth = ui.value;
+	      update();
+	      \$("#strokewidth-input").val(strokeWidth);
+	      d3.select("#strokeWidth").attr("value", strokeWidth);
+		  }
+		});
+		\$("#strokewidth-input").val(strokeWidth);
+		d3.select("#strokeWidth").attr("value", strokeWidth);
+	});
+
+  \$(function()
+  {
+    \$("#strokewidth-input").change(function ()
+    {
+      strokeWidth = parseInt(this.value);
+      update();
+      d3.select("#strokeWidth").attr("value", strokeWidth);
+      \$("#strokewidth-slider").slider("value", strokeWidth);
+    });
+  });
+
+  \$(function()
+  {
+    \$("#colorschemeSelection").change(function ()
+    {
+      colorScheme = this.value;
+      fill = getFill(colorScheme, numericHeaders.length);
+      draw();
+      d3.select("#colorScheme").attr("value", colorScheme);
+    });
+  });
+
+function titleChange(newTitle)
+{
+  document.title = newTitle;
+  document.getElementById("titletext").innerHTML = newTitle;
+}
+
+function strokeChange(newColor)
+{
+  stroke = newColor;
+  update();
+}
+
+\$(function()
+{
+  \$("#offsetSelection").change(function ()
+  {
+    offset = this.value;
+    draw();
+    d3.select("#offset").attr("value", offset);
+  });
+});
+
+\$(function()
+{
+  \$("#sizingMethodSelection").change(function ()
+  {
+    sizingMethod = this.value;
+    draw();
+    d3.select("#sizingMethod").attr("value", sizingMethod);
+  });
+});
+"""
+%>
+</script>
+
+  <div id="chartConfig" class="ui-widget-content">
+    <table>
+    <h1 title="<b>Options:</b><br><br>This menu can be disabled or enabled via ALT-c.">Options</h1>
+	<div>
+		<label for="height" title="<b>Height:</b><br><br>This will control the overall height of the SVG in pixels.">Height:</label>
+		<input type="text" id="height-input" size="5" />
+		<div id="height-slider"/>
+	</div>
+	<div>
+		<label for="width" title="<b>Width:</b><br><br>This will control overall width of the SVG in pixels.">Width:</label>
+		<input type="text" id="width-input" size="5" />
+		<div id="width-slider"/>
+	</div>
+	<div>
+		<label for="opacity" title="<b>Opacity:</b><br><br>This will control steamgraph's opacity.">Opacity:</label>
+		<input type="text" id="opacity-input" size="5" />
+		<div id="opacity-slider"/>
+	</div>
+	<div>
+		<label for="strokeWidth" title="<b>Stroke Width:</b><br><br>This will control stroke width.">Stroke Width:</label>
+		<input type="text" id="strokewidth-input" size="5" />
+		<div id="strokewidth-slider"/>
+	</div>
+  <div>
+		<label for="stroke">Stroke:</label>
+		<input type="text" id="stroke" size="15" onchange="strokeChange(this.value)" />
+	</div>
+	<div>
+  <div>
+    <label for="sizingMethodSelection"
+     title="<b>Sizing:</b><br><br>This will specify how the numerical values are sized.<br><br><table><tr><td>Linear</td><td>Use a straight linear coloring model.</td></tr><tr><td>Logarithmic</td><td>Use a logarithmic function to assign colors.</td></tr><tr><td>Square Root</td><td>Use the square root of the numbers when assigning color values.</td></tr><tr><td>Exponential</td><td>Uses d3.pow() for scaling.</td></tr><tr><td>Quantize</td><td>This scale accepts more than 2 colors.  Colors are assigned based on the quantized deciles of the range.</td></tr><tr><td>Quantile</td><td>This one also accepts multiple colors and also maps the input domain into a discrete range.</td></tr><tr><td>Threshold</td><td>Similar to quantize scales, except it allows mapping of domain subsets to discrete values.</td></tr><tr><td>Identity</td><td>A special case of linear scale where the domain and range are identical.</td></tr></table>">Sizing:</label>
+	  <select id="sizingMethodSelection" class="combobox">
+	    <option value="linear">Linear</option>
+	    <!--option value="log">Logarithmic</option-->
+	    <option value="sqrt">Square Root</option>
+	    <option value="pow">Power</option>
+	    <option value="quantize">Quantize</option>
+	    <option value="quantile">Quantile</option>
+	    <option value="identity">Identity</option>
+	    <option value="threshold">Threshold</option>
+	  </select>
+	</div>
+  <div>
+    <label for="offset"
+     title="<b>Offset:</b><br><br>This will specify stack offset algorithm.<br><br><table><tr><td>Silhouette</td><td>Center the stream.</td></tr><tr><td>Wiggle</td><td>Minimize weighted change in slope.</td></tr><tr><td>Expand</td><td>Normalize layers to fill the range [0, 1].</td></tr><tr><td>Zero</td><td>Use a zero baseline.</td></tr></table>">Offset:</label>
+	  <select id="offsetSelection" class="combobox">
+	    <option value="wiggle">Wiggle</option>
+	    <option value="silhouette">Silhouette</option>
+	    <option value="expand">Expand</option>
+	    <option value="zero">Zero</option>
+	  </select>
+	</div>
+		<div>
+	  <label for="colorschemeSelection">Scheme:</label>
+	  <select id="colorschemeSelection" class="combobox">
+	    <option value="1">Category10</option>
+    	<option value="2">Category20</option>
+    	<option value="3">Category20b</option>
+    	<option value="4">Category20c</option>
+    	<option value="YlGn">YlGn</option>
+    	<option value="YlGnBu">YlGnBu</option>
+    	<option value="GnBu">GnBu</option>
+    	<option value="BuGn">BuGn</option>
+	    <option value="PuBuGn">PuBuGn</option>
+	    <option value="PuBu">PuBu</option>
+	    <option value="BuPu">BuPu</option>
+	    <option value="RdPu">RdPu</option>
+	    <option value="PuRd">PuRd</option>
+	    <option value="OrRd">OrRd</option>
+	    <option value="YlOrRd">YlOrRd</option>
+    	<option value="YlOrBr">YlOrBr</option>
+    	<option value="Purples">Purples</option>
+    	<option value="Blues">Blues</option>
+	    <option value="Greens">Greens</option>
+	    <option value="Oranges">Oranges</option>
+	    <option value="Reds">Reds</option>
+	    <option value="Greys">Greys</option>
+	    <option value="PuOr">PuOr</option>
+	    <option value="BrBG">BrBG</option>
+	    <option value="PRGn">PRGn</option>
+	    <option value="PiYG">PiYG</option>
+	    <option value="RdBu">RdBu</option>
+	    <option value="RdGy">RdGy</option>
+	    <option value="RdYlBu">RdYlBu</option>
+	    <option value="Spectral">Spectral</option>
+	    <option value="RdYlGn">RdYlGn</option>
+	    <option value="HiContrast">HiContrast</option>
+	    <option value="SoftSep4WhiteBG">SoftSep4WhiteBG</option>
+	    <option value="HardSep4WhiteBG">HardSep4WhiteBG</option>
+	  </select>
+	</div>
+	<div>
+		<label for="charttitle">Title:</label>
+		<input type="text" id="charttitle" onchange="titleChange(this.value)" />
+	</div>
+  </div>
+</body>
+</html>

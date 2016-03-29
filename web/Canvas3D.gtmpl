@@ -1,0 +1,106 @@
+<%
+import org.apache.commons.io.FileUtils
+%>
+<script type="text/javascript">
+<% println FileUtils.readFileToString(new File("javascript/canvas3d/canvas3d.js")) %>
+</script>
+<style type="text/css">
+    #g-holder {  
+        height:620px;  
+        position:relative;  
+    }  
+      
+    #canvasDiv{  
+        border:solid 1px #e1e1e1;  
+        width:600px;  
+        height:600px;  
+        position:absolute;  
+        top:0px; left:0px;  
+        z-index:10;  
+    }  
+    #x-label{  
+        position:absolute;  
+        z-index:2;  
+        top:340px;  
+        left:580px;  
+    }  
+      
+    #y-label{  
+        position:absolute;  
+        z-index:2;  
+        top:10px;  
+        left:220px;  
+    }  
+      
+    #z-label{  
+        position:absolute;  
+        z-index:2;  
+        top:540px;  
+        left:10px;  
+    }  
+      
+    #gInfo div.gText{  
+        position:absolute;  
+        z-index:-1;  
+        font:normal 10px Arial;  
+    }  
+</style>
+
+<script type="text/javascript">  
+  
+    window.onload=function(){
+
+<%
+   def xMin, xMax, yMin, yMax, zMin, zMax
+
+   data.eachWithIndex
+   {
+     row, i ->
+     xMin = (i==0 || row[0] < xMin) ? row[0] : xMin
+     xMax = (i==0 || row[0] > xMax) ? row[0] : xMax
+     yMin = (i==0 || row[1] < yMin) ? row[1] : yMin
+     yMax = (i==0 || row[1] > yMax) ? row[1] : yMax
+     zMin = (i==0 || row[2] < zMin) ? row[2] : zMin
+     zMax = (i==0 || row[2] > zMax) ? row[2] : zMax
+   }
+
+   xMin = yMin = zMin = 0;
+
+   println """var xMin = $xMin,
+       xMax = $xMax,
+       yMin = $yMin,
+       yMax = $yMax,
+       zMin = $zMin,
+       zMax = $zMax;"""
+%>
+var g = new canvasGraph('graph', xMin, xMax, yMin, yMax, zMin, zMax);  
+         
+        //define some data  
+        gData=new Array();  
+
+<%
+   data.eachWithIndex
+   {
+     row, i ->
+     println "gData[$i]={x:${row[0]},y:${row[1]},z:${row[2]}};"
+   }
+%>
+
+        // sort data - draw farest elements first         
+        gData.sort(sortNumByZ);  
+                  
+        //draw graph   
+        g.drawGraph(gData);   
+  
+    }  
+</script>
+
+<div id="g-holder">  
+    <div id="canvasDiv">  
+        <canvas id="graph" width="600" height="600" ></canvas>  
+        <div id="gInfo"></div>   
+    </div>  
+    <div id="controls">  
+    <!-- (put your controls here, if you need any) -->  
+    </div>  
+</div>   

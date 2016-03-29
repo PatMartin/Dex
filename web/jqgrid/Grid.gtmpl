@@ -1,0 +1,107 @@
+<html>
+  <head>
+    <title>Grid</title>
+<style>
+
+<%
+   def theme = "flick"
+   println new File("javascript/jqueryui/latest/themes/$theme/jquery-ui.css").text
+   println new File("javascript/jqueryui/latest/themes/$theme/jquery.ui.theme.css").text
+   println new File("javascript/jqGrid/latest/css/ui.jqgrid.css").text
+   println new File("javascript/jqGrid/latest/plugins/searchFilter.css").text
+   println new File("javascript/jqGrid/latest/src/css/ui.multiselect.css").text
+%>
+</style>
+<script>
+<%
+  println new File("javascript/jqueryui/latest/jquery-1.9.1.min.js").text
+  println new File("javascript/jqueryui/latest/ui/minified/jquery-ui.min.js").text
+  println new File("javascript/jqGrid/latest/plugins/ui.multiselect.js").text
+  println new File("javascript/jqGrid/latest/js/i18n/grid.locale-en.js").text
+  //println new File("javascript/jqGrid/latest/plugins/jquery.contextmenu.js").text
+  println new File("javascript/jqGrid/latest/js/jquery.jqGrid.min.js").text
+
+  def colModel = []
+  def colData = []
+
+  dexData.header.each
+  {
+    //colModel << "{name:\"$it\", 'hidden':false, 'viewable':true, 'editrules':{ edithidden: true}}"
+    colModel << "{name:\"$it\", index:\"$it\", 'hidden':false, 'viewable':true }"
+  }
+
+  dexData.data.each
+  {
+    row ->
+    def colRow = []
+    row.eachWithIndex
+    {
+      col, ci ->
+      colRow << "\"${dexData.header[ci]}\":\"${col}\""
+    }
+    colData << "{" + colRow.join(",") + "}";
+  }
+
+println """
+  jQuery(document).ready(function()
+  {
+"""
+
+  println "var colNames = [" + dexData.header.collect { "\"$it\"" }.join(",") + "];"
+  println "var colModel = [" + colModel.join(",") + "];"
+  println "var colData  = [" + colData.join(",") + "];"
+
+println """
+  var grid = jQuery("#grid");
+
+  grid.jqGrid({
+      datatype: "local",
+      //height: '100%',
+      //width: 'auto',
+      autowidth: true,
+      autoheight: true,
+      //shrinkToFit: true,
+      colName: colNames,
+      colModel : colModel,
+      data : colData,
+      multiselect: false,
+      multipleSearch: true,
+      rownumbers: true,
+      rowNum: 40,
+      loadonce:true,
+      //hidegrid: true,
+      viewrecords:true,
+      gridview: true,
+      pager: '#gridPager',
+      caption: "${dexData.data.size()} rows of ${dexData.header.size()} columns."
+    });
+    
+    grid.jqGrid ('navGrid', '#gridPager', { edit: false, add: false, del: false, refresh: true, view: false },
+      {},{},{},{multipleSearch:true});
+    
+    grid.jqGrid('navButtonAdd', '#gridPager',
+      { caption: "",
+        buttonicon: "ui-icon-calculator",
+        title: "Choose Columns",
+        onClickButton: function() {
+          grid.jqGrid('columnChooser');
+        }
+      });
+      
+    \$(window).bind('resize', function() {
+      \$("#grid").setGridWidth(\$(window).width() - 40);
+      \$("#grid").setGridHeight(\$(window).height() - 120);
+    }).trigger('resize');
+});    
+"""
+%>
+ </script>
+
+</head>
+<body>
+  <div style="height: 100%; width: 100%; overflow: scroll;">
+    <table id="grid"></table>
+    <div id="gridPager"></div>
+  </div>
+</body>
+</html>

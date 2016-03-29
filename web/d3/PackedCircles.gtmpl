@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<% import com.dexvis.util.DexUtil %>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+    <title>Packed Circles</title>
+<script type="text/javascript">
+<%
+   println new File("javascript/d3/latest/d3.min.js").text
+   println new File("javascript/d3/latest/lib/colorbrewer/colorbrewer.js").text
+%>
+</script>
+
+<style>
+<%
+   println new File("javascript/jqueryui/latest/jquery-ui.css").text
+   println new File("javascript/jqueryui/latest/jquery-ui.theme.css").text
+   println new File("web/d3/d3.css").text
+ %>
+</style>
+
+<script>
+<%
+   println new File("javascript/jquery/latest/jquery-2.1.3.min.js").text
+   println new File("javascript/jqueryui/latest/jquery-ui.min.js").text
+%>
+</script>
+
+<style type="text/css">
+
+text {
+  font-size: 11px;
+  pointer-events: none;
+}
+
+text.parent {
+  //fill: #1f77b4;
+}
+
+circle {
+  //fill: #ccc;
+  stroke: #999;
+  pointer-events: all;
+}
+
+circle.parent {
+  //fill: #1f77b4;
+  //fill-opacity: .3;
+  //stroke: steelblue;
+}
+
+circle.parent:hover {
+  stroke: #ff7f0e;
+  stroke-width: .5px;
+}
+
+circle.child {
+  pointer-events: none;
+}
+</style>
+  </head>
+  <body>
+  
+    <div id="chartTitle" class="ui-widget-content">
+      <h1 id="titletext">Packed Circles</h1>
+    </div>
+    
+<div id="settings" style="visibility: hidden">
+  <div id="chartHeight" value="800"></div>
+  <div id="chartWidth" value="800"></div>
+  <div id="diameter" value="800"></div>
+  <div id="duration" value="400"></div>
+  <div id="fontSize" value="12"></div>
+  <div id="padding" value="15"></div>
+  <div id="opacity" value="30"></div>
+  <div id="colorScheme" value="1"></div>
+  
+  <div id="titleTop" value="0"></div>
+  <div id="titleLeft" value="0"></div>
+  <div id="chartTop" value="0"></div>
+  <div id="chartLeft" value="0"></div>
+  <div id="chartConfigTop" value="200"></div>
+  <div id="chartConfigLeft" value="600"></div>
+</div>
+
+<div id="chart"></div>
+
+<script type="text/javascript">
+<%
+  def numericColumns = dexData.getNumericColumns()
+  def header = dexData.getHeader()
+  def lastHeader = header[header.size() - 1]
+
+  println DexUtil.getSizedJSONString(dexData, 100)
+%>
+
+var fill = d3.scale.category10();
+
+function setColorScheme()
+{
+  if (colorScheme == 1)
+  {
+   fill = d3.scale.category10();
+  }
+  else if (colorScheme == 2)
+  {
+    fill = d3.scale.category20();
+  }
+  else if (colorScheme == 3)
+  {
+    fill = d3.scale.category20b();
+  }
+  else if (colorScheme == 4)
+  {
+    fill = d3.scale.category20c();
+  }
+  else if (colorScheme in colorbrewer)
+  {
+    console.log(colorScheme)
+    fill = d3.scale.ordinal().range(colorbrewer[colorScheme][9]);
+  }
+  else
+  {
+    fill = d3.scale.category20();
+  }
+}
+
+readJson = function(text, callback)
+{
+  callback(text ? JSON.parse(text) : null);
+}
+
+var width    = d3.select("#chartWidth").attr("value");
+var height   = d3.select("#chartHeight").attr("value");
+var diameter   = d3.select("#diameter").attr("value");
+var duration = d3.select("#duration").attr("value");
+var fontSize = d3.select("#fontSize").attr("value");
+var padding  = d3.select("#padding").attr("value");
+var opacity = d3.select("#opacity").attr("value");
+var colorScheme = d3.select("#colorScheme").attr("value");
+var titleTop = d3.select("#titleTop").attr("value");
+var titleTop = d3.select("#titleLeft").attr("value");
+var chartTop = d3.select("#chartTop").attr("value");
+var chartLeft = d3.select("#chartLeft").attr("value");
+var chartConfigTop = d3.select("#chartConfigTop").attr("value");
+var chartConfigLeft = d3.select("#chartConfigLeft").attr("value");
+\$("#chartTitle").position({ top : titleTop, left : titleLeft });
+\$("#chart").position({ top : chartTop, left : chartLeft });
+\$("#chartConfig").position({ top : chartConfigTop, left : chartConfigLeft });
+
+function draw()
+{
+  d3.select("#chart").html("");
+  drawPackedCircles(width, height, diameter, fontSize, padding, opacity);
+}
+
+function drawPackedCircles(width, height, diameter, fontSize, padding, opacity)
+{
+  var w = width,
+    h = height,
+    r = diameter,
+    x = d3.scale.linear().range([0, r]),
+    y = d3.scale.linear().range([0, r]),
+    node,
+    root;
+
+  var pack = d3.layout.pack()
+    .size([r, r])
+    .value(function(d) { return d.size; })
+    .padding(padding);
+
+  d3.select("#chart").selectAll("svg").remove();
+
+  var vis = d3.select("#chart").append("svg:svg")
+    .attr("width", w)
+    .attr("height", h)
+    .append("svg:g")
+    .attr("transform", "translate(" + (w - r) / 2 + "," + (h - r) / 2 + ")");
+
+  readJson(JSON.stringify(jsonData), function(data)
+  {
+    node = root = data;
+
+    var nodes = pack.nodes(root);
+
+    vis.selectAll("circle")
+      .data(nodes)
+      .enter().append("svg:circle")
+      .attr("class", function(d) { return d.children ? "parent" : "child"; })
+      .style("fill", function(d, i)
+      {
+       return fill(i);
+      })
+      .attr("cx", function(d) { return d.x; })
+      .attr("cy", function(d) { return d.y; })
+      .attr("r", function(d) { return d.r; })
+      .style("opacity", opacity / 100.0)
+      .on("click", function(d) { return zoom(node == d ? root : d); });
+
+    vis.selectAll("text")
+      .data(nodes)
+      .enter().append("svg:text")
+      .attr("class", function(d) { return d.children ? "parent" : "child"; })
+      .attr("x", function(d) { return d.x; })
+      .attr("y", function(d) { return d.y; })
+      .attr("dy", ".35em")
+      .style("font-size", function(d)
+      {
+        var dynamicSize = Math.round(d.r * 2 / d.name.length);
+        if (dynamicSize < 8)
+        {
+          dynamicSize = 8;
+        }
+
+        return dynamicSize + "px";
+      })
+      .attr("text-anchor", "middle")
+      .style("opacity", function(d)
+      {
+        return 1; 
+      })
+      .text(function(d) { return d.name; });
+
+    d3.select(window).on("click", function() { zoom(root); });
+  });
+
+  function zoom(d, i)
+  {
+    var k = r / d.r / 2;
+    x.domain([d.x - d.r, d.x + d.r]);
+    y.domain([d.y - d.r, d.y + d.r]);
+
+    var t = vis.transition()
+      .duration(d3.event.altKey ? 7500 : 750);
+
+    t.selectAll("circle")
+      .attr("cx", function(d) { return x(d.x); })
+      .attr("cy", function(d) { return y(d.y); })
+      .attr("r", function(d) { return k * d.r; })
+      .style("fill", function(d, i)
+      {
+       return fill(i);
+       //console.log("COLORING");
+       //return "#ff0000";
+      });
+
+    t.selectAll("text")
+      .attr("x", function(d) { return x(d.x); })
+      .attr("y", function(d) { return y(d.y); })
+//      .style("opacity", function(d) { return k * d.r > 20 ? 1 : 0; });
+      .style("font-size", function(d)
+      {
+        var dynamicSize = Math.round(d.r * k/ d.name.length);
+        if (dynamicSize < 8)
+        {
+          dynamicSize = 8;
+        }
+        return dynamicSize + "px";
+      })
+      .style("opacity", function(d)
+      {
+        return 1;
+        //var dynamicSize = Math.round(d.r * 2 / d.name.length);
+        //return ((dynamicSize < 6) ? 0 : 1); 
+      });
+
+    node = d;
+    d3.event.stopPropagation();
+  }
+}
+
+draw();
+
+<%
+println """
+function toggleConfig()
+{
+  if (\$("#chartConfig").css('visibility') == 'hidden')
+  {
+    show("#chartConfig");
+  }
+  else
+  {
+    hide("#chartConfig");
+  }
+}
+
+function hide(elt)
+{
+  \$(elt).css("visibility", "hidden");
+}
+
+function show(elt)
+{
+  \$(elt).css("visibility", "visible");
+}
+
+\$(function()
+{
+  \$( "#chartTitle" ).draggable().zIndex(3);
+  \$( "#chartConfig" ).draggable().zIndex(2);
+  \$( "#chart" ).draggable().zIndex(1);
+});
+
+  \$(document).keypress(function(e)
+  {
+    if (e.altKey) {
+      console.log("Alt Pressed");
+      toggleConfig();
+    }
+  });
+
+   \$("#chartTitle").draggable(
+   {
+    stop: function(event, ui) {
+    	var pos = \$(this).position();
+    	d3.select("#titleTop").attr("value", pos.top);
+    	d3.select("#titleLeft").attr("value", pos.left);
+    }
+   });
+
+   \$("#chart").draggable(
+   {
+    stop: function(event, ui) {
+
+    	// Show dropped position.
+    	var pos = \$(this).position();
+    	d3.select("#chartTop").attr("value", pos.top);
+    	d3.select("#chartLeft").attr("value", pos.left);
+    }
+   });
+
+   \$("#chartConfig").draggable(
+   {
+    stop: function(event, ui) {
+    	var pos = \$(this).position();
+    	d3.select("#chartConfigTop").attr("value", pos.top);
+    	d3.select("#chartConfigLeft").attr("value", pos.left);
+    }
+   });
+ 
+	\$(function() {
+		\$( "#height-slider" ).slider(
+		{
+	      min: 100,
+		  max: 2000,
+		  value: height,
+		  slide : function(event, ui)
+		  {
+		    height = ui.value;
+		    draw();
+	        \$("#height-input").val(height);
+	        d3.select("#chartHeight").attr("value", height);
+		  }
+		});
+		\$("#height-input").val(height);
+		d3.select("#chartHeight").attr("value", height);
+	});
+
+    \$(function()
+    {
+      \$("#height-input").change(function ()
+      {
+          height = parseInt(this.value);
+          draw();
+          d3.select("#chartHeight").attr("value", height);
+          \$("#height-slider").slider("value", height);
+      });
+    });
+
+	\$(function() {
+		\$( "#width-slider" ).slider(
+		{
+	      min: 100,
+		  max: 2000,
+		  value: width,
+		  slide : function(event, ui)
+		  {
+		    width = ui.value;
+		    draw();
+	        \$("#width-input").val(width);
+	        d3.select("#chartWidth").attr("value", width);
+		  }
+		});
+		\$("#width-input").val(width);
+		d3.select("#chartWidth").attr(width);
+	});
+
+    \$(function()
+    {
+      \$("#width-input").change(function ()
+      {
+          width = parseInt(this.value);
+          draw();
+          d3.select("#chartWidth").attr("value", width);
+          \$("#width-slider").slider("value", width);
+      });
+    });
+
+	\$(function() {
+		\$( "#diameter-slider" ).slider(
+		{
+	      min: 100,
+		  max: 2000,
+		  value: diameter,
+		  slide : function(event, ui)
+		  {
+		    diameter = ui.value;
+	        draw();
+	        \$("#diameter-input").val(diameter);
+	        d3.select("#diameter").attr("value", diameter);
+		  }
+		});
+		\$("#diameter-input").val(diameter);
+		d3.select("#diameter").attr("value", diameter);
+	});
+
+    \$(function()
+    {
+      \$("#diameter-input").change(function ()
+      {
+          diameter = parseInt(this.value);
+          draw();
+          d3.select("#diameter").attr("value", diameter);
+          \$("#diameter-slider").slider("value", diameter);
+      });
+    });
+
+	\$(function() {
+		\$( "#padding-slider" ).slider(
+		{
+	      min: 0,
+		  max: 200,
+		  value: padding,
+		  slide : function(event, ui)
+		  {
+		    padding = ui.value;
+	        draw();
+	        \$("#padding-input").val(padding);
+	        d3.select("#padding").attr("value", padding);
+		  }
+		});
+		\$("#padding-input").val(padding);
+		d3.select("#padding").attr("value", padding);
+	});
+
+    \$(function()
+    {
+      \$("#padding-input").change(function ()
+      {
+          padding = parseInt(this.value);
+          draw();
+          d3.select("#padding").attr("value", padding);
+          \$("#padding-slider").slider("value", padding);
+      });
+    });
+
+	\$(function() {
+		\$( "#opacity-slider" ).slider(
+		{
+	      min: 0,
+		  max: 100,
+		  value: opacity,
+		  slide : function(event, ui)
+		  {
+		    opacity = ui.value;
+	        draw();
+	        \$("#opacity-input").val(opacity);
+	        d3.select("#opacity").attr("value", opacity);
+		  }
+		});
+		\$("#opacity-input").val(opacity);
+		d3.select("#opacity").attr("value", opacity);
+	});
+
+    \$(function()
+    {
+      \$("#opacity-input").change(function ()
+      {
+          opacity = parseInt(this.value);
+          draw();
+          d3.select("#opacity").attr("value", opacity);
+          \$("#opacity-slider").slider("value", opacity);
+      });
+    });
+
+	\$(function() {
+		\$( "#fontsize-slider" ).slider(
+		{
+	      min: 0,
+		  max: 100,
+		  value: fontSize,
+		  slide : function(event, ui)
+		  {
+		    fontSize = ui.value;
+	        draw();
+	        \$("#fontsize-input").val(fontSize);
+	        d3.select("#fontsize").attr("value", fontSize);
+		  }
+		});
+		\$("#fontsize-input").val(fontSize);
+		d3.select("#fontsize").attr("value", fontSize);
+	});
+
+    \$(function()
+    {
+      \$("#fontsize-input").change(function ()
+      {
+          fontSize = parseInt(this.value);
+          draw();
+          d3.select("#fontsize").attr("value", fontSize);
+          \$("#fontsize-slider").slider("value", fontSize);
+      });
+    });
+
+    \$(function()
+    {
+      \$("#colorschemeSelection").change(function ()
+      {
+          colorScheme = this.value;
+          setColorScheme();
+          draw();
+          d3.select("#colorScheme").attr("value", colorScheme);
+      });
+    });
+    
+function titleChange(newTitle)
+{
+  d3.select("title").text(newTitle);
+  d3.select("#titletext").text(newTitle);
+}
+
+"""
+%>
+</script>
+    
+<div id="chartConfig" class="demo">
+    <h1>Configuration</h1>
+	<div>
+		<label for="height">Height:</label>
+		<input type="text" id="height-input" size="5" style="border:0; color:#f6931f; font-weight:bold;" />
+		<div id="height-slider"/>
+	</div>
+	<div>
+		<label for="width">Width:</label>
+		<input type="text" id="width-input" size="5" style="border:0; color:#f6931f; font-weight:bold;" />
+		<div id="width-slider"/>
+	</div>
+	<div>
+		<label for="diameter">Diameter:</label>
+		<input type="text" id="diameter-input" size="5" style="border:0; color:#f6931f; font-weight:bold;" />
+		<div id="diameter-slider"/>
+	</div>
+	<div>
+		<label for="padding">Padding:</label>
+		<input type="text" id="padding-input" size="5" style="border:0; color:#f6931f; font-weight:bold;" />
+		<div id="padding-slider"/>
+	</div>
+	<div>
+		<label for="opacity">Opacity:</label>
+		<input type="text" id="opacity-input" size="5" style="border:0; color:#f6931f; font-weight:bold;" />
+		<div id="opacity-slider"/>
+	</div>
+	<div>
+		<label for="fontsize">Font Size:</label>
+		<input type="text" id="fontsize" size="5" style="border:0; color:#f6931f; font-weight:bold;" />
+		<div id="fontsize-slider"/>
+	</div>
+	<div>
+	  <label for="colorschemeSelection">Scheme:</label>
+	  <select id="colorschemeSelection" class="combobox">
+		<option value="1">Category10</option>
+		<option value="2">Category20</option>
+		<option value="3">Category20b</option>
+		<option value="4">Category20c</option>
+		<option value="YlGn">YlGn</option>
+		<option value="YlGnBu">YlGnBu</option>
+		<option value="GnBu">GnBu</option>
+		<option value="BuGn">BuGn</option>
+		<option value="PuBuGn">PuBuGn</option>
+		<option value="PuBu">PuBu</option>
+		<option value="BuPu">BuPu</option>
+		<option value="RdPu">RdPu</option>
+		<option value="PuRd">PuRd</option>
+		<option value="OrRd">OrRd</option>
+		<option value="YlOrRd">YlOrRd</option>
+		<option value="YlOrBr">YlOrBr</option>
+		<option value="Purples">Purples</option>
+		<option value="Blues">Blues</option>
+		<option value="Greens">Greens</option>
+		<option value="Oranges">Oranges</option>
+		<option value="Reds">Reds</option>
+		<option value="Greys">Greys</option>
+		<option value="PuOr">PuOr</option>
+		<option value="BrBG">BrBG</option>
+		<option value="PRGn">PRGn</option>
+		<option value="PiYG">PiYG</option>
+		<option value="RdBu">RdBu</option>
+		<option value="RdGy">RdGy</option>
+		<option value="RdYlBu">RdYlBu</option>
+		<option value="Spectral">Spectral</option>
+		<option value="RdYlGn">RdYlGn</option>
+	  </select>
+	</div>
+	<div>
+		<label for="charttitle">Title:</label>
+		<input type="text" id="charttitle" size="20" style="border:2; color:#f6931f; font-weight:10;" onchange="titleChange(this.value)" />
+	</div>
+</div>
+  </body>
+</html>

@@ -1,0 +1,180 @@
+#container {
+	margin: 0 auto;
+	width: 1024px;
+	background: #fff;
+}
+#header {
+	background: white;
+	padding: 10px;
+}
+#header h1 {
+	margin: 0;
+	color: #323030;
+}
+#navigation {
+	float: left;
+	width: 900px;
+	background: #000000;
+}
+#navigation ul {
+	margin: 0;
+	padding: 0;
+}
+#navigation ul li {
+	list-style-type: none;
+	display: inline;
+}
+#navigation li a {
+	display: block;
+	float: left;
+	padding: 5px 18px;
+	color: white;
+	text-decoration: none;
+	border-right: 1px solid #fff;
+}
+#navigation li a:hover {
+	background: #333;
+}
+#content-container {
+	float: left;
+	width: 900px;
+	background: #eeeeee;
+}
+#content {
+	clear: left;
+	float: left;
+	width: 600px;
+	padding: 10px 0;
+	margin: 0 0 0 5px;
+	display: inline;
+}
+#content h1 {
+	font-family: "Arial";
+	font-size: 24px;
+	margin: 5px 0px 5px 0px;
+	color: steelblue;
+}
+#content h2 {
+	font-family: "Arial";
+	font-size: 20px;
+	margin: 5px 0px 5px 0px;
+	color: steelblue;
+}
+#content h3 {
+	font-family: "Arial";
+	font-size: 16px;
+	margin: 5px 0px 5px 0px;
+	color: steelblue;
+}
+#content h4 {
+	font-family: "Arial";
+	font-size: 12px;
+	margin: 5px 0px 5px 0px;
+	color: steelblue;
+}
+#content h5 {
+	font-family: "Arial";
+	font-size: 10px;
+	margin: 5px 0px 5px 0px;
+	color: steelblue;
+}
+#indent1 {
+	margin-left: 10px;
+}
+#indent2 {
+	margin-left: 20px;
+}
+#indent3 {
+	margin-left: 25px;
+}
+#indent4 {
+	margin-left: 30px;
+}
+#indent5 {
+	margin-left: 35px;
+}
+#aside {
+	float: right;
+	width: 240px;
+	padding: 10px 0;
+	margin: 0 20px 0 0;
+	display: inline;
+	font-size: 12px;
+}
+
+#aside h1 {
+   font-family: "Arial";
+   font-size: 16px;
+   margin: 5px 0px 5px 0px;
+   color: steelblue;
+}
+#aside h2 {
+   font-family: "Arial";
+   font-size: 14px;
+   margin: 5px 0px 5px 0px;
+   color: steelblue;
+}
+#aside h3 {
+   font-family: "Arial";
+   font-size: 12px;
+   margin: 5px 0px 5px 0px;
+   color: steelblue;
+}
+#aside h4 {
+   font-family: "Arial";
+   font-size: 10px;
+   margin: 5px 0px 5px 0px;
+   color: steelblue;
+}
+#aside h5 {
+   font-family: "Arial";
+   font-size: 8px;
+   margin: 5px 0px 5px 0px;
+   color: steelblue;
+}
+
+#footer {
+	clear: both;
+	background: white;
+	text-align: right;
+	padding: 20px;
+	height: 1%;
+}
+body {
+	margin: 0;
+	padding: 0;
+	background: #FFFFFF;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 16px;
+	color: #444444;
+}
+#aside ul li {
+	list-style-type: none;
+}
+
+
+#horizontal-list ul {
+	margin: 0;
+	padding: 0;
+	list-style-type: none;
+}
+#horizontal-list ul li {
+	list-style-type: none;
+	display: inline;
+}
+
+#horizontal-list li a {
+	display: inline-block;
+	padding: 2px 2px;
+	color: white;
+	text-decoration: none;
+	border-right: 1px solid #fff;
+}
+#horizontal-list li a:hover {
+	background: steelblue;
+
+}
+.thumbnail {
+	height: 100px;
+	width: 150px;
+}

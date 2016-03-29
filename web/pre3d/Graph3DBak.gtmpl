@@ -1,0 +1,174 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head>
+<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+<meta name="description" content="GraphyCalc is a 3d graphing calculator, allowing you to interactively explore graphs of 3-dimensional functions/formulas.">
+<title>GraphyCalc - 3d Graphing Calculator</title>
+<style>
+  body {
+    background-color: #f8f8f8;
+    margin: 0px 0px 0px 0px;
+  }
+  body * {
+    font-family: sans-serif;
+    font-size: 14px;
+    color: #444;  /* Soften the text a bit. */
+  }
+  input#equationinput {
+    margin-bottom: 5px;
+    padding: 1px 1px 1px 1px;
+    width: 344px;
+    border: solid 1px #e0e0e0;
+    color: black; /* Make the input most prominent. */
+  }
+  div#sidebar {
+    float: left;
+    width: 348px; /* 348 / 2 = 174  348 / 4 = 87  348 / 3 = 116 */
+    margin-right: 20px;
+  }
+  div#sidebar img {
+    display: block; /* Grr, descender space under it normally when inline. */
+    margin-left: 1px;  /* The logo is 346, center it within 348. */
+    border: 0px;
+  }
+  span.xyRadios {
+    display: inline-block;
+    width: 58px;  /* 174 / 3 */
+    margin: 0px;
+    padding: 0px;
+    margin-bottom: 5px; /* kinda dirty, should put it on the div. */
+  }
+  span.xyRadios label {
+    margin-left: 3px;
+  }
+  span.sidebarHalfCell {
+    display: inline-block;
+    margin-left: 3px; /* Match the radios margin. */
+    width: 171px;
+  }
+  span.sidebarLinkbar {
+    display: inline-block;
+    margin-right: 3px; /* Match sidebarHalfCell. */
+    width: 345px;
+    text-align: right;
+  }
+  span.sidebarLinkbar a {
+    font-size: 10pt;
+  }
+  div#help {
+    display: none;
+    padding: 0 5px;
+    border: dashed 1px #e0e0e0;
+    margin-bottom: 10px;
+  }
+  div#help * {
+    font-size: 10pt;
+  }
+  canvas#canvas, div#nocanvas {
+    border: solid 1px #e0e0e0;
+  }
+  div#nocanvas {
+    width: 800px;
+    height: 600px;
+    display: inline-block;
+  }
+  div#nocanvas a {
+    margin-left: 10px;
+  }
+  div.centeredText {
+    text-align: center;
+  }
+  p.centeredBlock {
+    margin-left: auto;
+    margin-right: auto;
+    width: 34em;
+  }
+  div.footer, div.footer a {
+    clear: both;
+    text-align: center;
+    margin-top: 20px;
+    font-size: 12px;
+  }
+  div#mainContent {
+    margin: 8px 8px 8px 8px;
+  }
+</style>
+
+</head>
+
+<body>
+
+<div id="mainContent">
+<div id="sidebar">
+<div><a href="http://www.graphycalc.com/"><img src="GraphyCalc_files/graphycalc.png" alt="GraphyCalc" height="75" width="346"></a></div>
+<div><span class="sidebarLinkbar"><a href="#" id="helplink">Help</a></span></div>
+<div><input id="equationinput" value="sinc(x * 10) * sinc(y * 10)"></div>
+<div><span class="sidebarHalfCell"><input checked="checked" id="smoothcheck" type="checkbox"><label for="smoothcheck">smooth curves</label></span><span class="xyRadios"><input checked="checked" id="radio_xy" name="xyradios" type="radio"><label for="radio_xy">xy</label></span><span class="xyRadios"><input id="radio_x" name="xyradios" type="radio"><label for="radio_x">x</label></span><span class="xyRadios"><input id="radio_y" name="xyradios" type="radio"><label for="radio_y">y</label></span></div>
+<div id="help"><p>GraphyCalc is a 3d graphing calculator, allowing you to
+interactively explore 3d functions.</p>
+<p><b>Examples</b>:
+<a href="#" id="ex_sinc">sinc</a>
+<a href="#" id="ex_exp">exp</a>
+<a href="#" id="ex_dome">dome</a>
+</p>
+<p>Nerdy Details: The formula you supply calculates the height <i>z</i> from the variables <i>x</i> and <i>y</i> between <i>-1</i> and <i>1</i>.  Formulas are composed of arithmetic operators (<i style="white-space: nowrap">+ - * / ^</i>), built-in functions (<i>abs acos asin atan ceil cos exp floor log round sin sinc sqrt tan</i>), and constants (<i>E PI</i>).</p>
+</div>
+
+</div>
+
+<div class="canvasDiv">
+<canvas id="canvas" width="800" height="600">
+  <div id="nocanvas">
+    <p class="centeredBlock" style="margin-top: 10em">
+    GraphyCalc is a 3d graphing calculator, allowing you to interactively
+    explore graphs of 3d functions.  This experience is built using some modern
+    web technology that your browser unfortunately does not support.  But don't
+    give up yet, you have several great ways to join the cutting edge.
+    <br><br>
+    <a href="http://www.google.com/chrome">Google Chrome</a><br>
+    <a href="http://www.apple.com/safari/">Apple Safari</a><br>
+    <a href="http://www.mozilla.com/firefox/">Mozilla Firefox</a><br>
+    <a href="http://www.opera.com/">Opera</a><br>
+    </p>
+  </div>
+</canvas>
+</div>
+
+
+<div class="footer">Brought to you by <a href="http://www.deanmcnamee.com/">Dean McNamee</a>, © 2010.  Powered by <a href="http://deanm.github.com/pre3d/">Pre3d</a>.</div>
+
+</div>
+
+<script src="GraphyCalc_files/ga.js" async="" type="text/javascript"></script><script src="GraphyCalc_files/pre3d.js"></script>
+<script src="GraphyCalc_files/demo_utils.js"></script>
+<script src="GraphyCalc_files/graphycalccalculator.js"></script>
+<script src="GraphyCalc_files/graphycalc.js"></script>
+
+<script>
+<%
+println new File("javascript/pre3d/ga.js").text
+println new File("javascript/pre3d/pre3d.js").text
+println new File("javascript/pre3d/demo_utils.js").text
+println new File("javascript/pre3d/graphycalccalculator.js").text
+println new File("javascript/pre3d/graphycalc.js").text
+%>
+</script>
+
+<script>
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-16922429-1']);
+_gaq.push(['_trackPageview']);
+
+window.addEventListener('load', function() {
+  var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+  ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+  var s = document.getElementsByTagName('script')[0];
+  s.parentNode.insertBefore(ga, s);
+
+  start3d();
+}, false);
+</script>
+
+
+
+
+</body></html>

@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<%
+import com.dexvis.util.DexUtil
+%>
+<html>
+ <head>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+   <title>Force Tree</title>
+   <script type="text/javascript">
+<%
+   println new File("javascript/d3/latest/d3.min.js").text
+   println new File("javascript/d3/latest/lib/colorbrewer/colorbrewer.js").text
+   
+%>
+   </script>
+
+   <style>
+<%
+   println new File("javascript/jqueryui/latest/jquery-ui.css").text
+   println new File("javascript/jqueryui/latest/jquery-ui.theme.css").text
+ println new File("web/d3/d3.css").text
+%>
+   </style>
+   <script>
+   <%
+   println new File("javascript/jquery/latest/jquery-2.1.3.min.js").text
+   println new File("javascript/jqueryui/latest/jquery-ui.min.js").text
+   println new File("javascript/touchpunch/latest/touchpunch.js").text
+   %>
+</script>
+
+<style type="text/css">
+
+circle.node
+{
+  cursor: pointer;
+  stroke: #000;
+  stroke-width: 1.5px;
+}
+
+line.link
+{
+  fill: none;
+  stroke: #9ecae1;
+  stroke-width: 1.5px;
+}
+    </style>
+  </head>
+  <body>
+
+    <div id="chartTitle" class="ui-widget-content">
+      <h1 id="titletext">Force Tree</h1>
+    </div>
+
+<div id="settings" style="visibility: hidden">
+  <div id="chartHeight" value="1000"></div>
+  <div id="chartWidth" value="900"></div>
+  <div id="nodeSize" value="10"></div>
+  <div id="linkDistance" value="25"></div>
+  <div id="linkStrength" value="25"></div>
+  <div id="charge" value="-1"></div>
+  <div id="friction" value="100"></div>
+  <div id="gravity" value="100"></div>
+  <div id="opacity" value="30"></div>
+  <div id="colorScheme" value="1"></div>
+  
+  <div id="titleTop" value="0"></div>
+  <div id="titleLeft" value="0"></div>
+  <div id="chartTop" value="0"></div>
+  <div id="chartLeft" value="0"></div>
+  <div id="chartConfigTop" value="200"></div>
+  <div id="chartConfigLeft" value="600"></div>
+</div>
+
+    <div id="chart"></div>
+
+<script type="text/javascript">
+  var jsonData;
+<%
+  def numericColumns = dexData.getNumericColumns()
+  def header = dexData.getHeader()
+  def lastHeader = header[header.size() - 1]
+
+  println DexUtil.getSizedJSONString(dexData)
+%>
+
+var force;
+
+var width = d3.select("#chartWidth").attr("value");
+var height = d3.select("#chartHeight").attr("value");
+var nodeSize = d3.select("#nodeSize").attr("value");
+var linkDistance = d3.select("#linkDistance").attr("value");
+var linkStrength = d3.select("#linkStrength").attr("value");
+var charge = d3.select("#charge").attr("value");
+var friction = d3.select("#friction").attr("value");
+var gravity = d3.select("#gravity").attr("value");
+var opacity = d3.select("#opacity").attr("value");
+var colorScheme = d3.select("#colorScheme").attr("value");
+var titleTop = d3.select("#titleTop").attr("value");
+var titleTop = d3.select("#titleLeft").attr("value");
+var chartTop = d3.select("#chartTop").attr("value");
+var chartLeft = d3.select("#chartLeft").attr("value");
+var chartConfigTop = d3.select("#chartConfigTop").attr("value");
+var chartConfigLeft = d3.select("#chartConfigLeft").attr("value");
+\$("#draggable-title").position({ top : titleTop, left : titleLeft });
+\$("#chart").position({ top : chartTop, left : chartLeft });
+\$("#chartConfig").position({ top : chartConfigTop, left : chartConfigLeft });
+
+function draw()
+{
+  \$("#chart").html("");
+  drawForceTree(width, height, nodeSize, linkDistance,
+                linkStrength, charge, friction, gravity);
+}
+
+var node,
+    link,
+    text,
+    root,
+    svg,
+    fill;
+
+readJson = function(text, callback)
+{
+  callback(text ? JSON.parse(text) : null);
+}
+
+function setColorScheme()
+{
+  if (colorScheme == 1)
+  {
+   fill = d3.scale.category10();
+  }
+  else if (colorScheme == 2)
+  {
+    fill = d3.scale.category20();
+  }
+  else if (colorScheme == 3)
+  {
+    fill = d3.scale.category20b();
+  }
+  else if (colorScheme == 4)
+  {
+    fill = d3.scale.category20c();
+  }
+  else if (colorScheme in colorbrewer)
+  {
+    console.log(colorScheme)
+    fill = d3.scale.ordinal().range(colorbrewer[colorScheme][9]);
+  }
+  else
+  {
+    fill = d3.scale.category20();
+  }
+}
+
+function drawForceTree(width, height, nodeSize, linkDistance,
+                       linkStrength, charge, friction, gravity)
+{
+  d3.select("#chart").selectAll("svg").remove();
+  svg = d3.select("#chart").append("svg:svg")
+    .attr("width", width).attr("height", height);
+    //.style("background-color", "#bbbbbb");
+
+  setColorScheme();
+  //fill = d3.scale.category20();
+
+  force = d3.layout.force()
+    .size([width, height])
+    .on("tick", tick)
+    .charge(function(d) { return getCharge(d); })
+    .linkDistance(linkDistance);
+
+  readJson(JSON.stringify(jsonData), function(json)
+  {
+    root = json;
+    root.fixed = true;
+    root.x = width / 2;
+    root.y = height / 2;
+    update();
+  });
+}
+
+// Toggle children on click.
+function click(d)
+{
+  d3.selectAll("text").remove();
+  if (d.children)
+  {
+    d._children = d.children;
+    d.children = null;
+  }
+  else
+  {
+    d.children = d._children;
+    d._children = null;
+  }
+  update();
+}
+
+function tick()
+{
+  link.attr("x1", function(d) { return d.source.x; })
+      .attr("y1", function(d) { return d.source.y; })
+      .attr("x2", function(d) { return d.target.x; })
+      .attr("y2", function(d) { return d.target.y; });
+
+  svg.selectAll("circle")
+    .attr("cx", function(d) { return d.x; })
+    .attr("cy", function(d) { return d.y; })
+    .attr("r", function(d) { return getNodeSize(d); })
+    .style("fill", function(d) { return fill(d.index);})
+    .style("opacity", opacity / 100.0);
+        
+  svg.selectAll("text")
+    .attr("x", function(d) { return d.x; })
+    .attr("y", function(d) { return d.y; });
+}
+
+function flatten(root)
+{
+  var nodes = [], i = 0;
+
+  function recurse(node)
+  {
+    if (node.children) node.size = node.children.reduce(function(p, v) { return p + recurse(v); }, 0);
+    if (!node.id) node.id = ++i;
+    nodes.push(node);
+    return node.size;
+  }
+
+  root.size = recurse(root);
+  return nodes;
+}
+
+function update()
+{
+  var nodes = flatten(root);
+  var links = d3.layout.tree().links(nodes);
+
+  // Restart the force layout.
+  force
+    .nodes(nodes)
+    .links(links)
+    .friction(friction / 100.0)
+    .gravity(gravity / 100.0)
+    .linkStrength(linkStrength / 100.0)
+    .linkDistance(linkDistance)
+    .size([width, height])
+    .start();
+
+  svg.attr("width", width)
+     .attr("height", height);
+
+  // Update the links…
+  link = svg.selectAll("line")
+    .data(links, function(d) { return d.target.id; })
+
+  // Enter any new links.
+  link.enter().insert("line")
+      .attr("class", "link")
+      .attr("x1", function(d) { return d.source.x; })
+      .attr("y1", function(d) { return d.source.y; })
+      .attr("x2", function(d) { return d.target.x; })
+      .attr("y2", function(d) { return d.target.y; });
+
+  // Update the nodes…
+  node = svg.selectAll("circle")
+      .data(nodes, function(d) { return d.id; })
+      .style("fill", function(d) { return fill(d.index); });
+
+  node.transition()
+      .attr("r", function(d) { return nodeSize; });
+
+  // Enter any new nodes.
+  var circle = svg.append("svg:g")
+    .selectAll("circle")
+    .data(nodes)
+    .enter()
+    .append("circle")
+    .attr("class", "node")
+    .attr("cx", function(d) { return d.x; })
+    .attr("cy", function(d) { return d.y; })
+    .attr("r", function(d) { return getNodeSize(d); })
+    .style("fill", function(d) { return fill(d.index); })
+    .style("opacity", opacity / 100.0)
+    .on("click", click)
+    .call(force.drag);
+
+  text = svg.selectAll("text")
+   .data(nodes)
+   .enter().append("text")
+   .attr("x", 8)
+   .attr("y", ".31em")
+   .attr("text-anchor", "start")
+   .attr("transform", "rotate(0)")
+   .attr("class", "shadow")
+   .attr("fill", "#555555")
+   .text(function(d) { return d.name; });
+
+  // Exit any old nodes.
+  node.exit().remove();
+  link.exit().remove();
+  //text.exit().remove();
+}
+
+function getCharge(d)
+{
+  var nodeSize = getNodeSize(d);
+  var mass = Math.PI * nodeSize * nodeSize;
+  return mass * charge;
+}
+
+function getNodeSize(d)
+{
+  if (d && d.children)
+  {
+    return nodeSize;
+  }
+  else if (d && d._children)
+  {
+    var area = Math.PI * nodeSize * nodeSize;
+    var newArea = d._children.length * area;
+    var newSize = Math.sqrt(newArea / Math.PI);
+    //console.log(newSize);
+    return newSize;
+  }
+
+  return nodeSize;
+}
+
+// Color leaf nodes orange, and packages white or blue.
+function color(d)
+{
+  ////return d._children ? "#3182bd" : d.children ? "#c6dbef" : "#fd8d3c";
+  //return d._children ? "#3182bd" : d.children ? "#c6dbef" : "#ffffff";
+  return fill(d.index);
+}
+
+function collapse(node)
+{
+  if (node.children)
+  {
+    node.children.forEach(collapse);
+    node._children = node.children;
+    node.children = null;
+  }
+  d3.selectAll("text").remove();
+}
+
+function expand(node)
+{
+  if (node.children)
+  {
+    node.children.forEach(expand);
+  }
+  else if (node._children)
+  {
+    node.children = node._children;
+    node._children = null;
+    node.children.forEach(expand);
+  }
+  d3.selectAll("text").remove();
+}
+
+draw();
+
+<%
+   println """
+   
+function toggleConfig()
+{
+  if (\$("#chartConfig").css('visibility') == 'hidden')
+  {
+    show("#chartConfig");
+  }
+  else
+  {
+    hide("#chartConfig");
+  }
+}
+
+function hide(elt)
+{
+  \$(elt).css("visibility", "hidden");
+}
+
+function show(elt)
+{
+  \$(elt).css("visibility", "visible");
+}
+
+\$(function()
+{
+  \$( "#chartTitle" ).draggable().zIndex(3);
+  \$( "#chartConfig" ).draggable().zIndex(2);
+  \$( "#chart" ).draggable().zIndex(1);
+});
+
+  \$(document).keypress(function(e)
+  {
+    if (e.altKey) {
+      console.log("Alt Pressed");
+      toggleConfig();
+    }
+  });
+
+   \$("#chartTitle").draggable(
+   {
+    stop: function(event, ui) {
+    	var pos = \$(this).position();
+    	d3.select("#titleTop").attr("value", pos.top);
+    	d3.select("#titleLeft").attr("value", pos.left);
+    }
+   });
+
+   \$("#chart").draggable(
+   {
+    stop: function(event, ui) {
+
+    	// Show dropped position.
+    	var pos = \$(this).position();
+    	d3.select("#chartTop").attr("value", pos.top);
+    	d3.select("#chartLeft").attr("value", pos.left);
+    }
+   });
+
+   \$("#chartConfig").draggable(
+   {
+    stop: function(event, ui) {
+    	var pos = \$(this).position();
+    	d3.select("#chartConfigTop").attr("value", pos.top);
+    	d3.select("#chartConfigLeft").attr("value", pos.left);
+    }
+   });
+   
+	\$(function() {
+		\$( "#height-slider" ).slider(
+		{
+	    min: 100,
+		  max: 2000,
+		  value: height,
+		  slide : function(event, ui)
+		  {
+		    height = ui.value;
+   		    //draw();
+   		    root.x = width / 2;
+          root.y = height / 2;
+   		    update();
+	        \$("#height-input").val(height);
+	        d3.select("#chartHeight").attr("value", height);
+		  }
+		});
+		\$("#height-input").val(height);
+		d3.select("#chartHeight").attr("value", height);
+	});
+
+    \$(function()
+    {
+      \$("#height-input").change(function ()
+      {
+          height = parseInt(this.value);
+		  //draw();
+  		  root.x = width / 2;
+          root.y = height / 2;
+		  update();
+          d3.select("#chartHeight").attr("value", height);
+          \$("#height-slider").slider("value", height);
+      });
+    });
+
+	\$(function() {
+		\$( "#width-slider" ).slider(
+		{
+	      min: 100,
+		  max: 2000,
+		  value: width,
+		  slide : function(event, ui)
+		  {
+		    width = ui.value;
+		    //draw();
+		    root.x = width / 2;
+        root.y = height / 2;
+		    update();
+	        \$("#width-input").val(width);
+	        d3.select("#chartWidth").attr("value", width);
+		  }
+		});
+		\$("#width-input").val(width);
+		d3.select("#chartWidth").attr("value", width);
+	});
+
+    \$(function()
+    {
+      \$("#width-input").change(function ()
+      {
+          width = parseInt(this.value);
+          //draw();
+             		    root.x = width / 2;
+            root.y = height / 2;
+          update();
+          d3.select("#chartWidth").attr("value", width);
+          \$("#width-slider").slider("value", width);
+      });
+    });
+
+	\$(function() {
+		\$( "#nodesize-slider" ).slider(
+		{
+	      min: 1,
+		  max: 100,
+		  value: nodeSize,
+		  slide : function(event, ui)
+		  {
+		    nodeSize = ui.value;
+		    //draw();
+		    update();
+		    \$("#nodesize-input").val(nodeSize);
+		    d3.select("#nodeSize").attr("value", nodeSize);
+		  }
+		});
+
+		\$("#nodesize-input").val(nodeSize);
+		d3.select("#nodeSize").attr("value", nodeSize);
+	});
+
+    \$(function()
+    {
+      \$("#nodesize-input").change(function ()
+      {
+          nodesize = parseInt(this.value);
+          //draw();
+          update();
+          d3.select("#nodeSize").attr("value", nodesize);
+          \$("#nodesize-slider").slider("value", nodesize);
+      });
+    });
+    
+	\$(function() {
+		\$( "#linkdistance-slider" ).slider(
+		{
+	      min: 0,
+		  max: 1000,
+		  value: linkDistance,
+		  slide : function(event, ui)
+		  {
+		    linkDistance = ui.value;
+		    //draw();
+		    \$(force.linkDistance(linkDistance));
+		    \$(force.start());
+		    d3.select("#linkDistance").attr("value", linkDistance);
+		    \$("#linkdistance-input").val(linkDistance);
+		  }
+		});
+		d3.select("#linkDistance").attr("value", linkDistance);
+		\$("#linkdistance-input").val(linkDistance);
+	});
+
+    \$(function()
+    {
+      \$("#linkdistance-input").change(function ()
+      {
+          linkDistance = parseInt(this.value);
+		  \$(force.linkDistance(linkDistance));
+		  \$(force.start());
+          //draw();
+          d3.select("#linkDistance").attr("value", linkDistance);
+          \$("#linkdistance-slider").slider("value", linkDistance);
+      });
+    });
+    
+	\$(function() {
+		\$( "#linkstrength-slider" ).slider(
+		{
+	      min: 0,
+		  max: 100,
+		  value: linkStrength,
+		  slide : function(event, ui)
+		  {
+		    linkStrength = ui.value;
+		    //draw();
+		    \$(force.linkStrength(linkStrength / 100.0));
+		    \$(force.start());
+		    d3.select("#linkStrength").attr("value", linkStrength);
+		    \$("#linkstrength-input").val(linkStrength);
+		  }
+		});
+		d3.select("#linkStrength").attr("value", linkStrength);
+		\$("#linkstrength-input").val(linkStrength);
+	});
+
+    \$(function()
+    {
+      \$("#linkstrength-input").change(function ()
+      {
+          linkStrength = parseInt(this.value);
+          //draw();
+          \$(force.linkStrength(linkStrength / 100.0));
+		  \$(force.start());
+          d3.select("#linkStrength").attr("value", linkStrength);
+          \$("#linkstrength-slider").slider("value", linkStrength);
+      });
+    });
+
+	\$(function() {
+		\$( "#opacity-slider" ).slider(
+		{
+	      min: 0,
+		  max: 100,
+		  value: opacity,
+		  slide : function(event, ui)
+		  {
+		    opacity = ui.value;
+		    update();
+		    d3.select("#opacity").attr("value", opacity);
+		    \$("#opacity-input").val(opacity);
+		  }
+		});
+		d3.select("#opacity").attr("value", opacity);
+		\$("#opacity-input").val(opacity);
+	});
+
+    \$(function()
+    {
+      \$("#opacity-input").change(function ()
+      {
+          opacity = parseInt(this.value);
+          update();
+          d3.select("#opacity").attr("value", opacity);
+          \$("#opacity-slider").slider("value", opacity);
+      });
+    });
+
+	\$(function() {
+		\$( "#charge-slider" ).slider(
+		{
+	      min: -1000,
+		  max: 1000,
+		  value: charge,
+		  slide : function(event, ui)
+		  {
+		    charge = ui.value;
+		    \$(force.charge(charge));
+		    \$(force.start());
+		    //draw();
+		    d3.select("#charge").attr("value", charge);
+		    \$("#charge-input").val(charge);
+		  }
+		});
+		d3.select("#charge").attr("value", charge);
+		\$("#charge-input").val(charge);
+	});
+
+    \$(function()
+    {
+      \$("#charge-input").change(function ()
+      {
+          charge = parseInt(this.value);
+          //draw();
+          \$(force.charge(charge));
+		  \$(force.start());
+          d3.select("#charge").attr("value", charge);
+          \$("#charge-slider").slider("value", charge);
+      });
+    });
+
+	\$(function() {
+		\$( "#friction-slider" ).slider(
+		{
+	      min: 0,
+		  max: 100,
+		  value: friction,
+		  slide : function(event, ui)
+		  {
+		    friction = ui.value;
+		    \$(force.friction(friction/100.0));
+		    \$(force.start());
+		    //draw();
+		    d3.select("#friction").attr("value", friction);
+		    \$("#friction-input").val(friction);
+		  }
+		});
+
+		d3.select("#friction").attr("value", friction);
+		\$("#friction-input").val(friction);
+	});
+
+    \$(function()
+    {
+      \$("#friction-input").change(function ()
+      {
+          friction = parseInt(this.value);
+          \$(force.friction(friction/100.0));
+		  \$(force.start());
+		  //draw();
+          d3.select("#friction").attr("value", friction);
+          \$("#friction-slider").slider("value", friction);
+      });
+    });
+    
+	\$(function() {
+		\$( "#gravity-slider" ).slider(
+		{
+	      min: 0,
+		  max: 100,
+		  value: gravity,
+		  slide : function(event, ui)
+		  {
+		    gravity = ui.value;
+		    //draw();
+		    \$(force.gravity(gravity/100.0));
+		    \$(force.start());
+		    d3.select("#gravity").attr("value", gravity);
+		    \$("#gravity-input").val(gravity);
+		  }
+		});
+		d3.select("#gravity").attr("value", gravity);
+		\$("#gravity-input").val(\$("#gravity-slider").slider("value"));
+	});
+
+    \$(function()
+    {
+      \$("#gravity-input").change(function ()
+      {
+          gravity = parseInt(this.value);
+          //draw();
+          \$(force.gravity(gravity/100.0));
+		  \$(force.start());
+          d3.select("#gravity").attr("value", gravity);
+          \$("#gravity-slider").slider("value", gravity);
+      });
+    });
+
+    \$(function()
+    {
+      \$("#collapseall-button").click(function ()
+      {
+		  //d3.selectAll("text").remove();
+		  //d3.selectAll("circle").remove();
+		  //d3.selectAll("link").remove();
+		  collapse(root);
+		  update();
+      });
+    });
+
+    \$(function()
+    {
+      \$("#expandall-button").click(function ()
+      {
+		  //d3.selectAll("text").remove();
+		  //d3.selectAll("circle").remove();
+		  //d3.selectAll("link").remove();
+		  expand(root);
+		  update();
+      });
+    });
+    
+    \$(function() {
+    	\$( "#chartTitle" ).draggable();
+        \$( "#chartConfig" ).draggable();
+        \$( "#chart" ).draggable();
+    });
+
+    \$(function()
+    {
+      \$("#colorschemeSelection").change(function ()
+      {
+          colorScheme = this.value;
+          setColorScheme();
+          update();
+          d3.select("#colorScheme").attr("value", colorScheme);
+      });
+    });
+
+function titleChange(newTitle)
+{
+  d3.select("title").text(newTitle);
+  d3.select("#titletext").text(newTitle);
+}
+
+function cbChange(cb)
+{
+  drawLinks = []
+
+  var console = d3.select("#console");
+  console.text("");
+  
+  //Compute the distinct nodes from the links.
+  dexLinks.forEach(function(link) {
+    var scb = d3.select("#" + link.sname + "_cb");
+    var tcb = d3.select("#" + link.tname + "_cb");
+
+    if (scb.property("checked") && tcb.property("checked"))
+    {
+      console.html(console.html() + "Adding Link: " + link.sname + " -> " + link.tname + "<br>");
+      drawLinks.push(link)
+    }
+  });
+
+  d3.select("#chart").html("");
+  //d3.select("svg:svg").html("");
+  draw();
+  //d3.select("#titletext").text("DONE");
+}
+"""
+%>
+    </script>
+    
+<div id="chartConfig" class="demo">
+    <h1>Configuration</h1>
+	<div>
+		<label for="height">Height:</label>
+		<input type="text" id="height-input" size="5" style="border:0; color:#f6931f; font-weight:bold;" />
+		<div id="height-slider"/>
+	</div>
+	<div>
+		<label for="width" size="20">Width:</label>
+		<input type="text" id="width-input" size="5" style="border:0; color:#f6931f; font-weight:bold;" />
+		<div id="width-slider"/>
+	</div>
+	<div>
+		<label for="nodesize">Node Size:</label>
+		<input type="text" id="nodesize-input" size="5" style="border:0; color:#f6931f; font-weight:bold;" />
+		<div id="nodesize-slider"/>
+	</div>
+	<div>
+		<label for="linkdistance">Link Distance:</label>
+		<input type="text" id="linkdistance-input" size="5" style="size:5; border:1; color:#f6931f; font-weight:bold;" />
+		<div id="linkdistance-slider"/>
+	</div>
+	<div>
+		<label for="linkstrength">Link Strength:</label>
+		<input type="text" size="5" id="linkstrength-input" style="border:0; color:#f6931f; font-weight:bold;" />
+		<div id="linkstrength-slider"/>
+	</div>
+	<div>
+		<label for="charge">Charge:</label>
+		<input type="text" id="charge-input" size="5" style="border:0; color:#f6931f; font-weight:bold;" />
+		<div id="charge-slider"/>
+	</div>
+    <div>
+	    <label for="friction">Friction:</label>
+		<input type="text" id="friction-input" size="5" style="border:0; color:#f6931f; font-weight:bold;" />
+	    <div id="friction-slider"/>
+	</div>
+	<div>
+	    <label for="gravity">Gravity:</label>
+		<input type="text" id="gravity-input" size="5" style="border:0; color:#f6931f; font-weight:bold;" />
+	    <div id="gravity-slider"/>
+	</div>
+	<div>
+	    <label for="opacity">Opacity:</label>
+		<input type="text" id="opacity-input" size="5" style="border:0; color:#f6931f; font-weight:bold;" />
+	    <div id="opacity-slider"/>
+	</div>
+	<div>
+	  <label for="colorschemeSelection">Scheme:</label>
+	  <select id="colorschemeSelection" class="combobox">
+		<option value="1">Category10</option>
+		<option value="2">Category20</option>
+		<option value="3">Category20b</option>
+		<option value="4">Category20c</option>
+		<option value="YlGn">YlGn</option>
+		<option value="YlGnBu">YlGnBu</option>
+		<option value="GnBu">GnBu</option>
+		<option value="BuGn">BuGn</option>
+		<option value="PuBuGn">PuBuGn</option>
+		<option value="PuBu">PuBu</option>
+		<option value="BuPu">BuPu</option>
+		<option value="RdPu">RdPu</option>
+		<option value="PuRd">PuRd</option>
+		<option value="OrRd">OrRd</option>
+		<option value="YlOrRd">YlOrRd</option>
+		<option value="YlOrBr">YlOrBr</option>
+		<option value="Purples">Purples</option>
+		<option value="Blues">Blues</option>
+		<option value="Greens">Greens</option>
+		<option value="Oranges">Oranges</option>
+		<option value="Reds">Reds</option>
+		<option value="Greys">Greys</option>
+		<option value="PuOr">PuOr</option>
+		<option value="BrBG">BrBG</option>
+		<option value="PRGn">PRGn</option>
+		<option value="PiYG">PiYG</option>
+		<option value="RdBu">RdBu</option>
+		<option value="RdGy">RdGy</option>
+		<option value="RdYlBu">RdYlBu</option>
+		<option value="Spectral">Spectral</option>
+		<option value="RdYlGn">RdYlGn</option>
+	  </select>
+	</div>
+    <div>
+		<button type="submit" id="collapseall-button">Collapse</button>
+		<button type="submit" id="expandall-button">Expand</button>
+	</div>
+	<div>
+		<label for="charttitle">Title:</label>
+		<input type="text" id="charttitle" size="20" style="border:2; color:#f6931f; font-weight:10;" onchange="titleChange(this.value)" />
+	</div>
+<%
+    header.eachWithIndex
+    {
+      h, i ->
+      println """
+    <div>
+		<label  for="${h}_cb">$h</label>
+		<input type="checkbox" id="${h}_cb" checked="true" onchange='cbChange(this);'/>
+	</div>
+	"""
+	}
+%>
+</div>
+  </body>
+</html>

@@ -1,0 +1,68 @@
+#demo-frame>div.demo {
+	padding: 10px !important;
+}
+
+#page {
+	display: inline;
+	margin: 0 auto;
+	width: 1000px;
+	background: #fff;
+}
+
+#chart.ui-widget-content {
+    background-color: transparent;
+    background-image:none !important;
+    border:none !important;
+}
+
+#chartTitle.ui-widget-content {
+    background-color: transparent !important;
+    background-image:none !important;
+    border:none !important;
+}
+
+#chartConfig.ui-widget-content {
+	margin: 0;
+    background-image:none !important;
+    border-width:5 !important;
+    border-style:dotted solid;
+    outline-width:5;
+}
+
+#chart {
+	float: left;
+	width: 700px;
+}
+
+#chartConfig {
+	float: right;
+	width: 200px;
+}
+
+h1 {
+	font-family: "Arial";
+	font-size: 28px;
+	margin: 5px 0px 5px 0px;
+	color: steelblue;
+}
+
+#chartConfig h1 {
+	font-family: "Arial";
+	font-size: 22px;
+	margin: 5px 0px 5px 0px;
+	text-align: center;
+	color: white;
+	background-color: steelblue;
+}
+
+#chartConfig label
+{
+  font-family: "Arial,Bold";
+  font-size: 16px;
+}
+
+.input
+{
+  font-family: "Arial,Bold";
+  font-size: 16px;
+}

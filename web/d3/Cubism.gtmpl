@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<% import com.dexvis.util.DexUtil %>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+    <title>Starburst</title>
+<script type="text/javascript">
+<%
+println new File("javascript/d3/latest/d3.min.js").text
+println new File("javascript/d3/latest/lib/colorbrewer/colorbrewer.js").text
+println new File("javascript/cubism/latest/cubism.v1.min.js").text
+%>
+</script>
+
+<style>
+<% println new File("javascript/jquery/1.9.1/css/ui-lightness/jquery-ui-1.9.1.custom.css").text %>
+<% println new File("web/d3/d3.css").text %>
+body {
+  font-family: "Helvetica Neue", Helvetica, sans-serif;
+  margin: 30px auto;
+  width: 1280px;
+  position: relative;
+}
+
+header {
+  padding: 6px 0;
+}
+
+.group {
+  margin-bottom: 1em;
+}
+
+.axis {
+  font: 10px sans-serif;
+  position: fixed;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.axis text {
+  -webkit-transition: fill-opacity 250ms linear;
+}
+
+.axis path {
+  display: none;
+}
+
+.axis line {
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.axis.top {
+  background-image: linear-gradient(top, #fff 0%, rgba(255,255,255,0) 100%);
+  background-image: -o-linear-gradient(top, #fff 0%, rgba(255,255,255,0) 100%);
+  background-image: -moz-linear-gradient(top, #fff 0%, rgba(255,255,255,0) 100%);
+  background-image: -webkit-linear-gradient(top, #fff 0%, rgba(255,255,255,0) 100%);
+  background-image: -ms-linear-gradient(top, #fff 0%, rgba(255,255,255,0) 100%);
+  top: 0px;
+  padding: 0 0 24px 0;
+}
+
+.axis.bottom {
+  background-image: linear-gradient(bottom, #fff 0%, rgba(255,255,255,0) 100%);
+  background-image: -o-linear-gradient(bottom, #fff 0%, rgba(255,255,255,0) 100%);
+  background-image: -moz-linear-gradient(bottom, #fff 0%, rgba(255,255,255,0) 100%);
+  background-image: -webkit-linear-gradient(bottom, #fff 0%, rgba(255,255,255,0) 100%);
+  background-image: -ms-linear-gradient(bottom, #fff 0%, rgba(255,255,255,0) 100%);
+  bottom: 0px;
+  padding: 24px 0 0 0;
+}
+
+.horizon {
+  border-bottom: solid 1px #000;
+  overflow: hidden;
+  position: relative;
+}
+
+.horizon {
+  border-top: solid 1px #000;
+  border-bottom: solid 1px #000;
+}
+
+.horizon + .horizon {
+  border-top: none;
+}
+
+.horizon canvas {
+  display: block;
+}
+
+.horizon .title,
+.horizon .value {
+  bottom: 0;
+  line-height: 30px;
+  margin: 0 6px;
+  position: absolute;
+  text-shadow: 0 1px 0 rgba(255,255,255,.5);
+  white-space: nowrap;
+}
+
+.horizon .title {
+  left: 0;
+}
+
+.horizon .value {
+  right: 0;
+}
+
+.line {
+  background: #000;
+  z-index: 2;
+}
+</style>
+
+<script>
+<%
+println new File("javascript/jquery/1.9.1/js/jquery-1.8.2.js").text
+println new File("javascript/jquery/1.9.1/js/jquery-ui-1.9.1.custom.min.js").text
+%>
+</script>
+
+<style type="text/css">
+
+path {
+  stroke: #000;
+  stroke-width: 1.5;
+  cursor: pointer;
+}
+
+text {
+  font: 11px sans-serif;
+  cursor: pointer;
+}
+
+body {
+/*  width: 880px;*/
+  margin: 0 auto;
+}
+
+#breadcrumbs { display: none; }
+</style>
+  </head>
+  <body>
+  <div id="chartTitle" class="ui-widget-content">
+    <h1 id="titletext">Starburst</h1>
+  </div>
+
+<div id="chart"></div>
+
+<script type="text/javascript">
+var jsonData;
+
+<%
+   def numericColumns = dexData?.getNumericColumns()
+   def data = dexData?.getData()
+   def header = dexData?.getHeader()
+
+   def sdata = dexData?.select(numericColumns)
+   def sheaders = sdata?.getHeader()
+   def lines = []
+   
+   sdata.getData().sort() { a, b -> (a[0] as Double) <=> (b[0] as Double)}.eachWithIndex
+   {
+     row, ri ->
+     row.eachWithIndex
+     {
+       col, ci ->
+       if (ci > 0)
+       {
+         lines << "{ \"time\": \"${row[0]}\", \"key\": \"${sheaders[ci]}\", \"value\": \"$col\" }"
+       }
+     }
+   }
+   println "var columnNames = [" +
+     sheaders.collect { "\"$it\"" }.join(",") + "];"
+   println "var jsonData = [" + lines.join(",\n") + "];"
+%>
+
+jsonData = [ jsonData ];
+
+readJson = function(text, callback)
+{
+  callback(text ? JSON.parse(text) : null);
+}
+
+var width = 600,
+    height = width,
+    radius = width/2,
+    duration = 1000,
+    fontSize = 8;
+
+function draw()
+{
+  d3.select("#chart").html("");
+  drawCubism(width, height, radius, duration, fontSize);
+}
+
+function drawCubism(width, height, radius, duration, fontSize)
+{
+var context = cubism.context()
+    .serverDelay(new Date(2012, 4, 2) - Date.now())
+    .step(864e5)
+    .size(1280)
+    .stop();
+
+d3.select("#demo").selectAll(".axis")
+    .data(["top", "bottom"])
+  .enter().append("div")
+    .attr("class", function(d) { return d + " axis"; })
+    .each(function(d) { d3.select(this).call(context.axis().ticks(12).orient(d)); });
+
+d3.select("body").append("div")
+    .attr("class", "rule")
+    .call(context.rule());
+
+d3.select("body").selectAll(".horizon")
+    .data(columnNames.map(stock))
+  .enter().insert("div", ".bottom")
+    .attr("class", "horizon")
+  .call(context.horizon()
+    .format(d3.format("+,.2p")));
+
+context.on("focus", function(i) {
+  d3.selectAll(".value").style("right", i == null ? null : context.size() - i + "px");
+});
+
+// Replace this with context.graphite and graphite.metric!
+function stock(name)
+{
+  var format = d3.time.format("%d-%b-%y");
+  return context.metric(function(start, stop, step, callback)
+  {
+    readJson(JSON.stringify(jsonData), function(rows)
+    {
+      rows = rows.map(function(d)
+      { return [format.parse(d.time), +d.value]; })
+        .filter(function(d) { return d[1]; }).reverse();
+
+      var date = rows[0][0], compare = rows[rows.length-1][1], value = rows[0][1], values = [value];
+      rows.forEach(function(d) {
+        while ((date = d3.time.day.offset(date, 1)) < d[0]) values.push(value);
+        values.push(value = (d[1] - compare) / compare);
+      });
+      callback(null, values.slice(-context.size()));
+    });
+  }, name);
+}
+}
+
+draw();
+
+<%
+   println """
+	\$(function() {
+		\$( "#height-slider" ).slider(
+		{
+	      min: 100,
+		  max: 2000,
+		  value: height,
+		  slide : function(event, ui)
+		  {
+		    height = ui.value;
+		    draw();
+	        \$("#height").val(\$("#height-slider").slider("value"));
+		  }
+		});
+		\$("#height").val(\$("#height-slider").slider("value"));
+	});
+"""
+
+   println """
+	\$(function() {
+		\$( "#width-slider" ).slider(
+		{
+	      min: 100,
+		  max: 2000,
+		  value: width,
+		  slide : function(event, ui)
+		  {
+		    width = ui.value;
+		    draw();
+	        \$("#width").val(\$("#width-slider").slider("value"));
+		  }
+		});
+		\$("#width").val(\$("#width-slider").slider("value"));
+	});
+"""
+
+   println """
+	\$(function() {
+		\$( "#radius-slider" ).slider(
+		{
+	      min: 1,
+		  max: 500,
+		  value: radius,
+		  slide : function(event, ui)
+		  {
+		    radius = ui.value;
+		    draw();
+	        \$("#width").val(\$("#radius-slider").slider("value"));
+		  }
+		});
+		\$("#radius").val(\$("#radius-slider").slider("value"));
+	});
+"""
+   println """
+	\$(function() {
+		\$( "#fontsize-slider" ).slider(
+		{
+	      min: 1,
+		  max: 48,
+		  value: fontSize,
+		  slide : function(event, ui)
+		  {
+		    fontSize = ui.value;
+		    draw();
+	        \$("#fontsize").val(\$("#fontsize-slider").slider("value"));
+		  }
+		});
+		\$("#fontsize").val(\$("#fontsize-slider").slider("value"));
+	});
+"""
+   println """
+    \$(function() {
+    	\$( "#chartTitle" ).draggable();
+        \$( "#chartConfig" ).draggable();
+        \$( "#chart" ).draggable();
+    });
+    
+function titleChange(newTitle)
+{
+  d3.select("title").text(newTitle);
+  d3.select("#titletext").text(newTitle);
+}
+
+"""
+%>
+</script>
+    
+<div id="chartConfig" class="demo">
+    <h1>Configuration</h1>
+	<div>
+		<label for="height">Height:</label>
+		<input type="text" id="height" size="5" style="border:0; color:#f6931f; font-weight:bold;" />
+		<div id="height-slider"/>
+	</div>
+	<div>
+		<label for="width">Width:</label>
+		<input type="text" id="width" size="5" style="border:0; color:#f6931f; font-weight:bold;" />
+		<div id="width-slider"/>
+	</div>
+	<div>
+		<label for="radius">Radius:</label>
+		<input type="text" id="radius" size="5" style="border:0; color:#f6931f; font-weight:bold;" />
+		<div id="radius-slider"/>
+	</div>
+	<div>
+		<label for="fontsize">Font Size:</label>
+		<input type="text" id="fontsize" size="5" style="border:0; color:#f6931f; font-weight:bold;" />
+		<div id="fontsize-slider"/>
+	</div>
+	<div>
+		<label for="charttitle">Title:</label>
+		<input type="text" id="charttitle" size="20" style="border:2; color:#f6931f; font-weight:10;" onchange="titleChange(this.value)" />
+	</div>
+</div>
+  </body>
+</html>

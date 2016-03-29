@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<% import com.dexvis.util.DexUtil %>
+
+<script type="text/javascript">
+<%
+   println new File("javascript/d3/latest/d3.min.js").text
+   println new File("javascript/d3/latest/lib/colorbrewer/colorbrewer.js").text
+%>
+</script>
+
+<style>
+<%
+   println new File("javascript/jqueryui/latest/jquery-ui.css").text
+   println new File("javascript/jqueryui/latest/jquery-ui.theme.css").text
+   println new File("web/d3/d3.css").text
+%>
+</style>
+
+<script>
+<%
+   println new File("javascript/jquery/latest/jquery-2.1.3.min.js").text
+   println new File("javascript/jqueryui/latest/jquery-ui.min.js").text
+%>
+</script>
+
+<html>
+  <head>
+    <title>Tension Map</title>
+
+<style type="text/css">
+
+path.arc {
+  cursor: move;
+  fill: #fff;
+}
+
+.node {
+  font-size: 10px;
+}
+
+.node:hover {
+  fill: #1f77b4;
+}
+
+.link {
+  fill: none;
+  stroke: #1f77b4;
+  stroke-opacity: .4;
+  pointer-events: none;
+}
+
+.link.source, .link.target {
+  stroke-opacity: 1;
+  stroke-width: 2px;
+}
+
+.node.target {
+  fill: #d62728 !important;
+}
+
+.link.source {
+  stroke: #d62728;
+}
+
+.node.source {
+  fill: #2ca02c;
+}
+
+.link.target {
+  stroke: #2ca02c;
+}
+</style>
+  </head>
+<body>
+<div id="chartTitle" class="ui-widget-content">
+  <h1 id="titletext">Tension Map</h1>
+</div>
+
+<div id="chart"></div>
+<script type="text/javascript">
+
+var margin = 100;
+var size = 700;
+var radialRange = 360;
+var fontSize = 8;
+var tension = 85;
+
+function draw()
+{
+  d3.select("#chart").html("");
+  drawTensionMap(size, radialRange, margin, fontSize, tension);
+}
+
+function drawTensionMap(size, radialRange, margin, fontSize)
+{
+  var jsonData = [
+<%
+   def links = [:]
+   def entries = []
+   
+   // Get unique node list.
+   data.each
+   {
+     row ->
+     row.each
+     {
+       col ->
+       links[col] = []
+     }
+   }
+   
+   // Create connection map.
+   data.each
+   {
+     row ->
+     (1..(row.size()-1)).each
+     {
+       i ->
+       links[row[i-1]] << row[i]
+     }
+   }
+   
+   links.each
+   {
+     key, value ->
+     def entry = "{\"name\":\"$key\",\"connections\":[" + value.unique().collect { "\"$it\"" }.join(",") + "]}\n"
+     entries << entry
+   }
+
+   println entries.join(",")
+%>
+];
+  (function() {
+    network = {
+
+      // Lazily construct the network hierarchy from connection names.
+      root: function(connections) {
+        var map = {};
+
+        function find(name, data) {
+          var node = map[name], i;
+          if (!node) {
+            node = map[name] = data || {name: name, children: []};
+            if (name.length) {
+              node.parent = find(name.substring(0, i = name.lastIndexOf(".")));
+              node.parent.children.push(node);
+              node.key = name.substring(i + 1);
+            }
+          }
+          return node;
+        }
+
+        connections.forEach(function(d) {
+          find(d.name, d);
+        });
+
+        return map[""];
+      },
+
+      // Return a list of connections for the given array of nodes.
+      connections: function(nodes) {
+        var map = {},
+            connections = [];
+
+        // Compute a map from name to node.
+        nodes.forEach(function(d) {
+          map[d.name] = d;
+        });
+
+        // For each import, construct a link from the source to target node.
+        nodes.forEach(function(d) {
+          if (d.connections) d.connections.forEach(function(i) {
+            connections.push({source: map[d.name], target: map[i]});
+          });
+        });
+
+        return connections;
+      }
+    };
+  })();
+
+  readJson = function(text, callback)
+  {
+    callback(text ? JSON.parse(text) : null);
+  }
+
+  var w = size;
+  var h = size;
+  var rx = w / 2;
+  var ry = h / 2;
+  var m0;
+  var rotate = 0;
+
+var splines = [];
+
+var cluster = d3.layout.cluster()
+    .size([radialRange, size/2 - margin/2])
+    .sort(function(a, b) { return d3.ascending(a.key, b.key); });
+
+var bundle = d3.layout.bundle();
+
+var line = d3.svg.line.radial()
+    .interpolate("bundle")
+    .tension(tension/100.0)
+    .radius(function(d) { return d.y; })
+    .angle(function(d) { return d.x / 180 * Math.PI; });
+
+// Chrome 15 bug: <http://code.google.com/p/chromium/issues/detail?id=98951>
+//var div = d3.select("#chart").insert("div", "h2")
+//    .style("top", top)
+//    .style("left", left)
+//    .style("width", w + "px")
+//    .style("height", h + "px")
+//    .style("position", "absolute");
+
+var svg = d3.select("#chart").append("svg:svg")
+    .attr("width", w)
+    .attr("height", h)
+  .append("svg:g")
+    .attr("transform", "translate(" + rx + "," + ry + ")");
+
+svg.append("svg:path")
+    .attr("class", "arc")
+    .attr("d", d3.svg.arc().outerRadius(ry - 120).innerRadius(0).startAngle(0).endAngle(2 * Math.PI))
+    .on("mousedown", mousedown);
+
+readJson(JSON.stringify(jsonData), function(connections) {
+  var nodes = cluster.nodes(network.root(connections)),
+      links = network.connections(nodes),
+      splines = bundle(links);
+
+  var path = svg.selectAll("path.link")
+      .data(links)
+    .enter().append("svg:path")
+      .attr("class", function(d) { return "link source-" + d.source.key + " target-" + d.target.key; })
+      .attr("d", function(d, i) { return line(splines[i]); });
+
+  svg.selectAll("g.node")
+      .data(nodes.filter(function(n) { return !n.children; }))
+    .enter().append("svg:g")
+      .attr("class", "node")
+      .attr("id", function(d) { return "node-" + d.key; })
+      .attr("transform", function(d) { return "rotate(" + (d.x - 90) + ")translate(" + d.y + ")"; })
+    .append("svg:text")
+      .attr("dx", function(d) { return d.x < 180 ? 8 : -8; })
+      .attr("dy", ".31em")
+      .attr("font-size", fontSize)
+      .attr("text-anchor", function(d) { return d.x < 180 ? "start" : "end"; })
+      .attr("transform", function(d) { return d.x < 180 ? null : "rotate(180)"; })
+      .text(function(d) { return d.name; })
+      .on("mouseover", mouseover)
+      .on("mouseout", mouseout);
+
+  d3.select("input[type=range]").on("change", function() {
+    line.tension(this.value / 100);
+    path.attr("d", function(d, i) { return line(splines[i]); });
+  });
+});
+
+d3.select(window)
+    .on("mousemove", mousemove)
+    .on("mouseup", mouseup);
+
+function mouse(e) {
+  return [e.pageX - rx, e.pageY - ry];
+}
+
+function mousedown() {
+  m0 = mouse(d3.event);
+  d3.event.preventDefault();
+}
+
+function mousemove() {
+  if (m0) {
+    var m1 = mouse(d3.event),
+        dm = Math.atan2(cross(m0, m1), dot(m0, m1)) * 180 / Math.PI;
+    div.style("-webkit-transform", "translate3d(0," + (ry - rx) + "px,0)rotate3d(0,0,0," + dm + "deg)translate3d(0," + (rx - ry) + "px,0)");
+  }
+}
+
+function mouseup() {
+  if (m0) {
+    var m1 = mouse(d3.event),
+        dm = Math.atan2(cross(m0, m1), dot(m0, m1)) * 180 / Math.PI;
+
+    rotate += dm;
+    if (rotate > 360) rotate -= 360;
+    else if (rotate < 0) rotate += 360;
+    m0 = null;
+
+    div.style("-webkit-transform", "rotate3d(0,0,0,0deg)");
+
+    svg
+        .attr("transform", "translate(" + rx + "," + ry + ")rotate(" + rotate + ")")
+      .selectAll("g.node text")
+        .attr("dx", function(d) { return (d.x + rotate) % 360 < 180 ? 8 : -8; })
+        .attr("text-anchor", function(d) { return (d.x + rotate) % 360 < 180 ? "start" : "end"; })
+        .attr("transform", function(d) { return (d.x + rotate) % 360 < 180 ? null : "rotate(180)"; });
+  }
+}
+
+function mouseover(d) {
+  svg.selectAll("path.link.target-" + d.key)
+      .classed("target", true)
+      .each(updateNodes("source", true));
+
+  svg.selectAll("path.link.source-" + d.key)
+      .classed("source", true)
+      .each(updateNodes("target", true));
+}
+
+function mouseout(d) {
+  svg.selectAll("path.link.source-" + d.key)
+      .classed("source", false)
+      .each(updateNodes("target", false));
+
+  svg.selectAll("path.link.target-" + d.key)
+      .classed("target", false)
+      .each(updateNodes("source", false));
+}
+
+function updateNodes(name, value) {
+  return function(d) {
+    if (value) this.parentNode.appendChild(this);
+    svg.select("#node-" + d[name].key).classed(name, value);
+  };
+}
+
+function cross(a, b) {
+  return a[0] * b[1] - a[1] * b[0];
+}
+
+function dot(a, b) {
+  return a[0] * b[0] + a[1] * b[1];
+}
+}
+
+draw();
+
+<%
+
+   println """
+	\$(function() {
+		\$( "#size-slider" ).slider(
+		{
+	      min: 100,
+		  max: 1500,
+		  value: size,
+		  slide : function(event, ui)
+		  {
+		    \$(size = ui.value);
+		    \$(draw());
+	        \$("#size").val(\$("#size-slider").slider("value"));
+		  }
+		});
+		\$("#size").val(\$("#size-slider").slider("value"));
+	});
+"""
+
+   println """
+	\$(function() {
+		\$( "#radialRange-slider" ).slider(
+		{
+	      min: 1,
+		  max: 360,
+		  value: radialRange,
+		  slide : function(event, ui)
+		  {
+		    \$(radialRange = ui.value);
+		    \$(draw());
+	        \$("#radialRange").val(\$("#radialRange-slider").slider("value"));
+		  }
+		});
+		\$("#radialRange").val(\$("#radialRange-slider").slider("value"));
+	});
+"""
+
+   println """
+	\$(function() {
+		\$( "#margin-slider" ).slider(
+		{
+	      min: 0,
+		  max: 1000,
+		  value: margin,
+		  slide : function(event, ui)
+		  {
+		    \$(margin = ui.value);
+		    \$(draw());
+	        \$("#margin").val(\$("#margin-slider").slider("value"));
+		  }
+		});
+		\$("#margin").val(\$("#margin-slider").slider("value"));
+	});
+"""
+
+   println """
+	\$(function() {
+		\$( "#fontsize-slider" ).slider(
+		{
+	      min: 6,
+		  max: 32,
+		  value: fontSize,
+		  slide : function(event, ui)
+		  {
+		    \$(fontSize = ui.value);
+		    \$(draw());
+	        \$("#fontsize").val(\$("#fontsize-slider").slider("value"));
+		  }
+		});
+		\$("#fontsize").val(\$("#fontsize-slider").slider("value"));
+	});
+"""
+
+   println """
+	\$(function() {
+		\$( "#tension-slider" ).slider(
+		{
+	      min:0,
+		  max: 300,
+		  value: tension,
+		  slide : function(event, ui)
+		  {
+		    \$(tension = ui.value);
+		    \$(draw());
+	        \$("#tension").val(\$("#tension-slider").slider("value"));
+		  }
+		});
+		\$("#tension").val(\$("#tension-slider").slider("value"));
+	});
+"""
+
+   println """
+    \$(function() {
+    	\$( "#chartTitle" ).draggable();
+        \$( "#chartConfig" ).draggable();
+        \$( "#chart" ).draggable();
+    });
+    
+function titleChange(newTitle)
+{
+  d3.select("title").text(newTitle);
+  d3.select("#titletext").text(newTitle);
+}
+
+"""
+
+%>
+</script>
+</div>
+
+<div id="chartConfig" class="demo">
+    <h1>Configuration</h1>
+	<div>
+		<label for="size">Size:</label>
+		<input type="text" id="size" size="5" style="border:0; color:#f6931f; font-weight:bold;" />
+		<div id="size-slider"/>
+	</div>
+	<div>
+		<label for="radialRange">Radial Range:</label>
+		<input type="text" id="radialRange" size="5" style="border:0; color:#f6931f; font-weight:bold;" />
+		<div id="radialRange-slider"/>
+	</div>
+	<div>
+		<label for="margin">Margin:</label>
+		<input type="text" id="margin" size="5" style="border:0; color:#f6931f; font-weight:bold;" />
+		<div id="margin-slider"/>
+	</div>
+	<div>
+		<label for="tension">Tension:</label>
+		<input type="text" id="tension" size="5" style="border:0; color:#f6931f; font-weight:bold;" />
+		<div id="tension-slider"/>
+	</div>
+	<div>
+		<label for="fontsize">Font Size:</label>
+		<input type="text" id="fontsize" size="5" style="border:0; color:#f6931f; font-weight:bold;" />
+		<div id="fontsize-slider"/>
+	</div>
+	<div>
+		<label for="charttitle">Title:</label>
+		<input type="text" id="charttitle" size="20" style="border:2; color:#f6931f; font-weight:10;" onchange="titleChange(this.value)" />
+	</div>
+</div>
+</div>
+
+</body>
+</html>

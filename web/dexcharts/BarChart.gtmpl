@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+  .xaxis path,
+  .xaxis line,
+  .yaxis path,
+  .yaxis line {
+    fill: none;
+    stroke: #000;
+  }
+  
+<%
+  println new File("javascript/jqueryui/latest/jquery-ui.min.css").text
+  println new File("javascript/jqueryui/latest/jquery-ui.theme.min.css").text
+%>
+</style>
+<script>
+<%
+  println new File("javascript/jquery/latest/jquery-2.1.3.min.js").text
+  println new File("javascript/jqueryui/latest/jquery-ui.min.js").text
+  println new File("javascript/underscore/latest/underscore-min.js").text
+  println new File("javascript/d3/latest/d3.min.js").text
+  println new File("javascript/dexjs/latest/dex.js").text
+  println new File("javascript/dexjs/latest/charts/d3/BarChart.js").text
+%>
+</script>
+<body>
+<svg id="ChartArea" width="100%" height="100%"></svg>
+
+<script>
+<%
+  def header = "[" + dexData.header.collect { return "\"$it\"" }.join(',') + "]"
+  def data = []
+  dexData.data.eachWithIndex
+  {
+    row, ri ->
+    data << "[" + row.collect { return "\"$it\"" }.join(',') + "]"
+  }
+  println "var csv = { 'header' : $header,\n 'data' : [" + data.join(',\n') + "] };";
+%>
+
+    var bar = new dex.charts.d3.BarChart({
+      'parent'                              : "#ChartArea",
+      'resizable'                           : false,
+      'csv'                                  : csv
+    });
+    
+    bar.render();
+
+</script>

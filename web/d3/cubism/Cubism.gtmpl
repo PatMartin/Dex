@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<% import com.dexvis.util.DexUtil %>
+<style>
+<%
+   def theme = "flick"
+   println new File("javascript/jqueryui/latest/themes/$theme/jquery-ui.css").text
+   println new File("javascript/jqueryui/latest/themes/$theme/jquery.ui.theme.css").text
+   println new File("javascript/cubism/latest/cubism.css").text
+%>
+</style>
+
+<script type="text/javascript">
+<%
+println new File("javascript/d3/latest/d3.min.js").text
+println new File("javascript/cubism/latest/cubism.v1.min.js").text
+println new File("javascript/d3/latest/lib/colorbrewer/colorbrewer.min.js").text
+println new File("javascript/jqueryui/latest/jquery.1.9.1.min.js").text
+println new File("javascript/jqueryui/latest/ui/minified/jquery-ui.min.js").text
+println new File("javascript/touchpunch/latest/touchpunch.js").text
+println new File("javascript/dex/dexutils.js").text
+%>
+</script>
+
+<!DOCTYPE html>
+<meta charset="utf-8">
+<title>Cubism.js Demo</title>
+
+<body>
+
+<script>
+
+<%
+  println "var dex = " + DexUtil.getCsvString(dexData) + ";"
+  println "var numericHeaders = getNumericHeaders(dex);"
+%>
+
+var context = cubism.context()
+    .step(1e4)
+    .size(1440);
+
+d3.select("body").selectAll(".axis")
+    .data(["top", "bottom"])
+  .enter().append("div")
+    .attr("class", function(d) { return d + " axis"; })
+    .each(function(d) { d3.select(this).call(context.axis().ticks(12).orient(d)); });
+
+d3.select("body").append("div")
+    .attr("class", "rule")
+    .call(context.rule());
+
+console.log("DATA");
+console.dir(d3.range(1, numericHeaders.length).map(getColumn));
+
+var extents = [];
+
+d3.select("body").selectAll(".horizon")
+    .data(d3.range(1, numericHeaders.length).map(getColumn))
+  .enter().insert("div", ".bottom")
+    .attr("class", "horizon")
+    .call(context.horizon().extent([-100, 100]));
+
+context.on("focus", function(i) {
+  d3.selectAll(".value").style("right", i == null ? null : context.size() - i + "px");
+});
+
+
+
+// Replace this with context.graphite and graphite.metric!
+function getColumn(x) {
+  var value = 0,
+      values = [],
+      i = 0,
+      last;
+
+var foo = context.metric(function(start, stop, step, callback) {
+  d3.json("/data", function(data) {
+    if (!data) return callback(new Error("unable to load data"));
+    callback(null, data);
+  });
+});
+
+  console.log("METRIC");
+  var metric = context.metric(function(start, stop, step, callback)
+  {
+    start = +start, stop = +stop;
+    if (isNaN(last)) last = start;
+    console.log("START: " + start + ", STOP: " + stop + ", STEP: " + step);
+    while (last < stop)
+    {
+      last += step;
+      value = Math.max(-10, Math.min(10, value + .8 * Math.random() - .4 + .2 * Math.cos(i += x * .02)));
+      values.push(value);
+    }
+    callback(null, values = values.slice((start - stop) / step));
+  }, x);
+  console.dir(metric);
+  return metric;
+}
+
+</script>

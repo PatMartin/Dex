@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+body {
+  font: 10px sans-serif;
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.x.axis path {
+  //display: none;
+}
+
+.line {
+  fill: none;
+  stroke: steelblue;
+  stroke-width: 1.5px;
+}
+
+</style>
+<body>
+<script src="http://d3js.org/d3.v3.js"></script>
+<script src="../../javascript/dex/dexutils.js"></script>
+<script src="../../javascript/dex/dexcharts.js"></script>
+<script>
+
+// Here is basic CSV data.  CSV will be the core input type
+// for all of our reusable charts:
+var data = [[ "x", "abs(x)", "x^2", "x^3", "cos(x)", "sin(x)" ]];
+
+for (var i=-360;i<=360; i=i+10)
+{
+	data.push([i, Math.abs(i), i*i, i*i*i, Math.cos(i*(Math.PI/180)), Math.sin(i*(Math.PI/180)) ]);
+}
+
+// Extract the header:
+var labels = data[0];
+
+// Remove the header from the data.
+data.splice(0, 1);
+
+// Create an SVG for our chart.
+var svg = d3.select("body").append("svg")
+  .attr("width", 1000)
+  .attr("height", 800)
+  .append("g")
+  .attr("transform", "translate(40,10)");
+
+// Create an array of charts:
+var charts = [];
+
+// Create a chart for each label, assume the x axis is tied to the first label:
+for (var yi=0; yi<labels.length; yi++)
+{
+	// Create the chart:
+  var chart = LineChart(
+	{
+	  'parent'  : svg,
+	  'xoffset' : ((yi%3) * 300) + 50,
+	  'yoffset' : parseInt(yi/3) * 250,
+	  'height'  : 200,
+	  'width'   : 200,
+	  'labels'  : labels,
+	  'data'    : data,
+	  'xi'      : 0,
+	  'yi'      : yi
+	});
+
+	// Add the chart to the list:
+  charts.push(chart);
+}
+
+// Set up each chart to listen to it's peers, then render it:
+for (var i=0; i<charts.length; i++)
+{
+	var listeners = [];
+  for (var j=0; j<charts.length; j++)
+	{
+	  // Make sure we don't talk to ourselves.
+	  if (i != j)
+		{
+		  // Add this listener.
+		  listeners.push(charts[j]);
+		}
+	  // Configure the listeners and render the chart.
+	  charts[i].attr("listeners", listeners)();
+	}
+}
+
+</script>

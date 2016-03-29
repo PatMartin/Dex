@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+
+<style>
+
+        text {
+            font: 12px sans-serif;
+        }
+        svg {
+            display: block;
+        }
+        html, body, #chart, svg {
+            margin: 0px;
+            padding: 0px;
+            height: 100%;
+            width: 100%;
+        }
+
+<% println new File("javascript/nvd3/latest/nv.d3.min.css").text %>
+
+</style>
+
+<body>
+
+  <div id="chart">
+    <svg></svg>
+  </div>
+<%
+  def dexHeader = dexData.getNumericColumns()
+  def colMap = dexData.getColumnMap()
+%>
+
+<script>
+<%
+  println new File("javascript/d3/latest/d3.min.js").text
+  println new File("javascript/nvd3/latest/nv.d3.min.js").text
+  //println new File("javascript/dexjs/latest/dex.js").text
+%>
+</script>
+
+<script type="text/javascript">
+
+nv.addGraph(function() {
+  var chart =
+    nv.models.lineWithFocusChart()
+    .margin({left:100, right:40, top:40, bottom:40})
+  ;
+
+  chart.xAxis
+      .tickFormat(d3.format(',f'))
+      .rotateLabels(0);
+  chart.x2Axis
+      .tickFormat(d3.format(',f'));
+
+  chart.yAxis
+      .tickFormat(d3.format(',f'));
+  chart.y2Axis
+      .tickFormat(d3.format(',f'));
+
+
+var data = [
+<%
+  def seriesList = []
+  (1..(dexHeader.size()-1)).each
+  {
+    i ->
+    def series = "{key: '${dexHeader[i]}', values: ["
+    def points = []
+    data.eachWithIndex
+    {
+      row, ri ->
+      points << "{x:${row[0]},y:${row[i]}}"
+    }
+    series += points.join(",") + "]}";
+    seriesList << series;
+  }
+  println seriesList.join(",\n")
+%>
+];
+
+  d3.select("#chart").selectAll("svg").remove();
+  
+  d3.select("#chart").append("svg")
+      .datum(data)
+    .transition().duration(1)
+      .call(chart);
+
+  nv.utils.windowResize(chart.update);
+
+  return chart;
+});
+
+</script>
+</body></html>

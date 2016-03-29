@@ -1,0 +1,23 @@
+<script type="text/javascript">
+<% import com.dexvis.util.DexUtil %>
+<%
+println new File("javascript/processing/latest/processing.min.js").text
+%>
+</script>
+<script type="application/processing" data-processing-target="ptarget">
+<%
+  println "var jsonData = " + DexUtil.getFlatJSONString(dexData)
+%>
+var message = "Dex, meet processing.  Processing, meet Dex!";
+
+ void setup()
+ {
+   size(200, 200);
+   background(100);
+   stroke(255);
+   ellipse(50, 50, 25, 25);
+   println(message);
+   println("Wow, Dex just sent me " + jsonData.length + " rows of data.");
+}
+ </script>
+<canvas id="ptarget"></canvas>

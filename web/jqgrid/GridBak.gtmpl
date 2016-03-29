@@ -1,0 +1,87 @@
+<html>
+  <head>
+    <title>Grid</title>
+<style>
+<%
+   def theme = "flick"
+   println new File("javascript/jqueryui/latest/themes/$theme/jquery-ui.css").text
+   println new File("javascript/jqueryui/latest/themes/$theme/jquery.ui.theme.css").text
+  println new File("javascript/jqGrid/latest/css/ui.jqgrid.css").text
+%>
+</style>
+<script>
+<%
+  println new File("javascript/jqueryui/latest/jquery.1.9.1.min.js").text
+  println new File("javascript/jqueryui/latest/ui/minified/jquery-ui.min.js").text
+  println new File("javascript/jqGrid/latest/js/i18n/grid.locale-en.js").text
+  println new File("javascript/jqGrid/latest/js/jquery.jqGrid.min.js").text
+
+println """
+
+  jQuery(document).ready(function()
+  {
+"""
+
+  def colModel = []
+  dexData.header.each
+  {
+    colModel << "{name:\"$it\"}"
+  }
+  
+  println "var colNames = [" + dexData.header.collect { "\"$it\"" }.join(",") + "];"
+  println "var colModel = [" + colModel.join(",") + "];"
+
+println """
+    jQuery("#list").jqGrid({
+      datatype: "local",
+      height: "90%",
+      width: "100%",
+      autowidth: true,
+      autoheight: true,
+      shrinkToFit: true,
+      colNames: colNames,
+      colModel: colModel,
+      multiselect: false,
+      rownumbers: true,
+      loadonce:true,
+      viewrecords:true,
+      pager: '#listScroller',
+      caption: "${dexData.data.size()} rows of ${dexData.header.size()} columns."
+    });
+"""
+
+  def mydata = [];
+  dexData.data.each
+  {
+    row ->
+    def rowdata = []
+    row.eachWithIndex
+    {
+      col, ci ->
+      rowdata << "\"" + dexData.header[ci] + "\":\"$col\""
+    }
+    mydata << "{" + rowdata.join(",") + "}"
+  }
+
+println """
+  jQuery(\"#list\").jqGrid('navGrid', '#listNav', {del:false,add:false,edit:false,search:false});
+  jQuery(\"#list").jqGrid('filterToolbar',{stringResult: true,searchOnEnter : false});
+"""
+  println "var mydata = [" + mydata.join(",") + "];"
+
+println """
+var grid = \$("#list");
+for(var i=0;i<mydata.length;i++)
+  grid.jqGrid('addRowData',i+1,mydata[i]);
+  });
+"""
+%>
+ </script>
+
+</head>
+<body>
+  <table id="list"></table>
+  <div id="listNav"></div>
+  <div id="listScroller"></div>
+</body>
+</html>

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+    <head>
+
+<script><% print new File("javascript/webgl/heatmap/webgl-heatmap.js").text %></script>
+<script><% print new File("javascript/leap/leap.min.js").text %></script>
+
+<script type="text/javascript">
+  var heatmap;
+	var raf;
+	var update;
+	var canvas;
+            window.onload = function(){
+                canvas = document.getElementsByTagName('canvas')[0];
+                heatmap = createWebGLHeatmap({canvas: canvas});
+                //var heatmap = createWebGLHeatmap({width: 500, height: 500}); // statically sized heatmap
+
+                // just feeding some mouse coords
+                document.body.appendChild(heatmap.canvas);
+                canvas.onmousemove = function(event){
+                    var x = event.offsetX || event.clientX;
+                    var y = event.offsetY || event.clientY;
+
+					//console.log("X=" + x + ", Y=" + y);
+                    heatmap.addPoint(x, y, 100, 50/255);
+                }
+                canvas.onclick = function(){
+                    heatmap.clear();
+                }
+
+                raf = window.requestAnimationFrame || window.mozRequestAnimationFrame;
+
+                update = function(){
+                    heatmap.adjustSize(); // can be commented out for statically sized heatmaps, resize clears the map
+                    heatmap.update(); // adds the buffered points
+                    heatmap.display(); // adds the buffered points
+                    heatmap.multiply(0.995);
+                    //heatmap.blur();
+                    //heatmap.clamp(0.0, 1.0); // depending on usecase you might want to clamp it
+                    raf(update);
+                }
+                raf(update);
+            }
+
+var pointer;
+var tx, ty;
+
+Leap.loop(function(frame)
+{
+  if (frame.pointables.length > 0)
+  {
+    for (var i=0; i<frame.pointables.length; i++)
+    {
+      pointer = frame.pointables[i];
+	    //console.dir(pointer);
+	    tx = parseInt(pointer.tipPosition[0]);
+	    ty = parseInt(pointer.tipPosition[1]);
+	    var pointerPos = {x:(tx * 5) + window.innerWidth / 2 , y:window.innerHeight - ((ty * 5) - 700) };
+	    var lx = parseInt(pointerPos.x);
+      var ly = parseInt(pointerPos.y);
+
+      heatmap.addPoint(lx, ly, 100, 50/255);
+	  }
+  }
+});
+        </script>
+        <style type="text/css">
+            body,html,canvas{
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 0;
+                font-family: sans-serif;
+                color: black;
+                overflow: hidden;
+            }
+            div.controls{
+                font-weight: bold;
+                position: absolute;
+                top: 10px;
+                left: 10px;
+            }
+        </style>
+    </head>
+    <body>
+        <canvas></canvas>
+    </body>
+</html>

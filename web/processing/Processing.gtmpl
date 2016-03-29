@@ -1,0 +1,21 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>Processing Demo</title>
+<style>
+  #processing-canvas {
+    height : 100%;
+    width  : 100%;
+  }
+</style>
+</head>
+<script type="text/javascript">
+  <% out.println new File("javascript/processing/latest/processing.min.js").text %>
+</script>
+<script type="application/processing" data-processing-target="processing-canvas">
+  <%= processingCode %>
+</script>
+<body>
+  <canvas id="processing-canvas" width="640" height="360"></canvas>
+</body>
+</html>

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+
+<style>
+  html,body{
+    height : 100%;
+    min-height : 100%;
+    width : 100%;
+    min-width : 100%;
+  }
+  
+#WordTreeArea1 {
+  height: 100%;
+  width: 100%;
+}
+
+<%
+  println new File("javascript/jqueryui/latest/jquery-ui.min.css").text
+  println new File("javascript/jqueryui/latest/jquery-ui.theme.min.css").text
+%>
+
+</style>
+<body>
+<script type="text/javascript" src="http://www.google.com/jsapi"></script>
+<script>
+<%
+  println new File("javascript/jquery/latest/jquery-2.1.3.min.js").text
+  println new File("javascript/jqueryui/latest/jquery-ui.min.js").text
+  println new File("javascript/underscore/latest/underscore-min.js").text
+  println new File("javascript/d3/latest/d3.min.js").text
+  println new File("javascript/dexjs/latest/dex.js").text
+  println new File("javascript/dexjs/latest/charts/google/WordTree.js").text
+%>
+</script>
+<div id="WordTreeArea1" class="WordTreeArea"></div>
+
+<script>
+  google.load("visualization", "1.1", {packages:["wordtree"]});
+  google.setOnLoadCallback(drawChart);
+
+  function drawChart() {
+
+    // Turn debug mode on
+    // dex.console.logLevel("DEBUG");
+
+<%
+  def header = "[" + dexData.header.collect { return "\"$it\"" }.join(',') + "]"
+  def data = []
+  dexData.data.eachWithIndex
+  {
+    row, ri ->
+    data << "[" + row.collect { return "\"$it\"" }.join(',') + "]"
+  }
+  println "var csv = { 'header' : $header,\n 'data' : [" + data.join(',\n') + "] };";
+%>
+    dex.console.debug("CSV", csv);
+
+    var wordtree1 = new dex.charts.google.WordTree({
+      'parent'     : "#WordTreeArea1",
+      'id'         : 'wordtree1',
+      'class'      : 'wordtree',
+      'csv'        : csv,
+      'resizeable' : true
+    });
+    wordtree1.render();
+  }
+</script>

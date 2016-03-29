@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+  html,body{
+    height:100%;
+    min-height: 100%;
+    width : 100%;
+    min-width : 100%;
+  }
+
+  #ChartArea {
+    width: 100%;
+    height: 100%;
+  }
+  
+<%
+  println new File("javascript/jqueryui/latest/jquery-ui.min.css").text
+  println new File("javascript/jqueryui/latest/jquery-ui.theme.min.css").text
+%>
+</style>
+<link rel="stylesheet" type="text/css" href="http://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.2/jquery-ui.css">
+<body>
+  <div id="config" style="visibility: hidden">
+  </div>
+<svg id="ChartArea" width="100%" height="100%"></svg>
+<script>
+<%
+  println new File("javascript/jquery/latest/jquery-2.1.3.min.js").text
+  println new File("javascript/jqueryui/latest/jquery-ui.min.js").text
+  println new File("javascript/underscore/latest/underscore-min.js").text
+  println new File("javascript/d3/latest/d3.min.js").text
+  println new File("javascript/dexjs/latest/dex.js").text
+  println new File("javascript/dexjs/latest/charts/d3/MotionLineChart.js").text
+%>
+</script>
+<script>
+
+<%
+  def header = "[" + dexData.header.collect { return "\"$it\"" }.join(',') + "]"
+  def data = []
+  dexData.data.eachWithIndex
+  {
+    row, ri ->
+    data << "[" + row.collect { return "\"$it\"" }.join(',') + "]"
+  }
+  println "var csv = { 'header' : $header,\n 'data' : [" + data.join(',\n') + "] };";
+%>
+
+function setConfiguration(config)
+{
+  dex.console.log("Configuration", config);
+  motionLineChart.config = dex.config.expandAndOverlay(config, motionLineChart.config);
+  save('#config', config);
+  motionLineChart.update();
+}
+
+
+function load(location) {
+  var config = {};
+
+  \$(location + " div").each(function(i) {
+    dex.console.log("Loading Setting: '" + \$(this).attr('id') + "'='" +
+      \$(this).attr('value') + "'"); 
+    config[\$(this).attr('id')] = \$(this).attr('value');
+  });
+
+  dex.console.log("Loaded Configuration:", config);
+  return config;
+}
+
+function save(location, config) {
+  dex.console.log("Saving Configuration To: " + location, config);
+  \$(location).children().remove();
+  _.keys(config).forEach(function (key) {
+    \$(location).append("<div id='" + key + "' value='" + config[key] + "'></div>");
+  });
+}
+
+var config = dex.config.expandAndOverlay({
+  'parent'    : "#ChartArea",
+    'transform' : 'translate(70,50)',
+    'margin.right' : 200,
+    'margin.left'  : 150,
+    'csv' : csv }, load("#config"));
+
+  // Configure a chart.
+  var motionLineChart = new dex.charts.d3.MotionLineChart(config);
+  motionLineChart.render();
+</script>
+</body>
+</html>

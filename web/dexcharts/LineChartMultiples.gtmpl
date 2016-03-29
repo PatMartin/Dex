@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+.floatLeft {
+  float: left
+}
+
+body {
+  font: 10px sans-serif;
+}
+
+.arc path {
+  stroke: #fff;
+}
+
+#ParChart textarea
+{
+    width:100%;
+}
+
+#ParChart .textwrapper
+{
+    border:1px solid #999999;
+    margin:5px 0;
+    padding:5px;
+}
+
+#ParChart path
+{
+  fill: none;
+  /*stroke: #ccc;*/
+  stroke-opacity: .9;
+  shape-rendering: crispEdges;
+}
+
+#ParChart .foreground path
+{
+  fill: none;
+  stroke: steelblue;
+  stroke-opacity: .9;
+}
+
+#ParChart .brush .extent
+{
+  fill-opacity: .3;
+  stroke: #fff;
+  shape-rendering: crispEdges;
+}
+
+#ParChart .axis line, #ParChart .axis path
+{
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+#ParChart .axis text
+{
+  text-shadow: 0 1px 0 #fff;
+}
+
+.node circle {
+  cursor: pointer;
+  fill: #fff;
+  stroke: black;
+  stroke-width: 1px;
+}
+
+.node text {
+  font-size: 11px;
+}
+
+path.link {
+  fill: none;
+  stroke: #ccc;
+  stroke-width: 1px;
+}
+</style>
+<html>
+  <head>
+    <title>DexCharts : Dendrogram</title>
+  </head>
+  <body>
+<script>
+<%
+  println new File("javascript/d3/latest/d3.min.js").text
+  println new File("C:/AWS/DexChartsWS/DexCharts/dex.js").text
+  println new File("C:/AWS/DexChartsWS/DexCharts/js/dex/component/d3/ParallelCoordinates.js").text
+  println new File("C:/AWS/DexChartsWS/DexCharts/js/dex/component/d3/Dendrogram.js").text
+%>
+</script>
+
+<script>
+
+<%
+  def headerStr = "[" + header.collect { return "\"$it\"" }.join(',') + "]"
+  def dataRows = []
+  data.eachWithIndex
+  {
+    row, ri ->
+    dataRows << "[" + row.collect { return "\"$it\"" }.join(',') + "]"
+  }
+  println "var csv = { 'header' : $headerStr,\n 'data' : [" + dataRows.join(',\n') + "] };";
+%>
+
+//dex.console.log("CSV", csv);
+//dex.console.log("GROUPS", dex.csv.group(csv, [0]));
+var groups = dex.csv.group(csv, [0]);
+dex.console.log("GROUPS", groups);
+
+var dendrograms = []
+var height = 400;
+var width = 500;
+
+for (gi=0; gi<groups.length; gi++)
+{
+  var svg = d3.select("body").append("svg")
+    .attr("id", "ChartArea" + gi)
+    .attr("class", "floatLeft")
+    .attr("width", width)
+    .attr("height", height)
+    .append("g");
+
+  dendrograms.push(
+    new Dendrogram(
+    {
+      'parent'            : "#ChartArea" + gi,
+      'height'            : height,
+      'width'             : width,
+      'xoffset'           : 130,
+      'yoffset'           : 0,
+      'csv'               : dex.csv.columnSlice(groups[gi].csv, dex.range(1, groups[gi].csv.header.length-1)),
+      'root.name'         : groups[gi].key,
+      'node.collapsed.circle.radius'      : 8,
+      'node.collapsed.circle.style.color' : "lightgreen",
+      'node.collapsed.label.font.size'    : 18,
+      'node.collapsed.label.x'            : -22,
+      'node.collapsed.label.y'            : -8,
+      'node.collapsed.label.font.weight'  : 'bold',
+      'node.expanded.label.x'             : -10,
+      'node.expanded.label.y'             : -5,
+      'node.expanded.circle.style.color'  : "steelblue",
+      'node.expanded.circle.radius'       : 4,
+      'node.expanded.label.font.size'     : 14,
+      'node.expanded.label.font.color'    : "red",
+      'node.expanded.label.transform'     : 'rotate(0)',
+      'node.collapsed.label.transform'    : 'rotate(0)',
+      'connection.length' : 150,
+    }));
+
+  dendrograms[gi].render();
+}
+
+</script>
+</body>
+</html>

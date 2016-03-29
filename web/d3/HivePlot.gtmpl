@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<%
+import com.dexvis.util.DexUtil
+%>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+    <title>Hive Plot</title>
+<script type="text/javascript">
+<%
+   println new File("javascript/d3/latest/d3.min.js").text
+   println new File("javascript/d3/latest/lib/colorbrewer/colorbrewer.js").text
+%>
+</script>
+
+<style>
+<% 
+   println new File("javascript/jqueryui/latest/jquery-ui.css").text
+   println new File("javascript/jqueryui/latest/jquery-ui.theme.css").text
+   println new File("web/d3/d3.css").text
+%>
+</style>
+
+<script>
+<%
+   println new File("javascript/jqueryui/latest/jquery-ui.css").text
+   println new File("javascript/jqueryui/latest/jquery-ui.theme.css").text
+%>
+</script>
+
+<style type="text/css">
+
+circle.node {
+  cursor: pointer;
+  stroke: #000;
+  stroke-width: .5px;
+}
+
+.axis {
+  stroke: #000;
+  stroke-width: 1.5px;
+}
+
+.node circle {
+  stroke: #000;
+}
+
+.link {
+  fill: none;
+  stroke: #999;
+  stroke-width: 1.5px;
+  stroke-opacity: .3;
+}
+
+.link.active {
+  stroke: red;
+  stroke-width: 2px;
+  stroke-opacity: 1;
+}
+
+.node circle.active {
+  stroke: red;
+  stroke-width: 3px;
+}
+
+    </style>
+  </head>
+  <body>
+
+<div id="chartTitle" class="ui-widget-content">
+  <h1 id="titletext">Hive Plot</h1>
+</div>
+
+<div id="settings" style="visibility: hidden">
+  <div id="chartHeight" value="800"></div>
+  <div id="chartWidth" value="800"></div>
+  <div id="nodeSize" value="5"></div>
+  <div id="innerRadius" value="40"></div>
+  <div id="outerRadius" value="340"></div>
+  <div id="majorAngle" value="160"></div>
+  <div id="minorAngle" value="60"></div>
+  <div id="xoffset" value="90"></div>
+  <div id="yoffset" value="110"></div>
+  <div id="colorScheme" value="1"></div>
+  
+  <div id="titleTop" value="0"></div>
+  <div id="titleLeft" value="0"></div>
+  <div id="chartTop" value="0"></div>
+  <div id="chartLeft" value="0"></div>
+  <div id="chartConfigTop" value="200"></div>
+  <div id="chartConfigLeft" value="600"></div>
+  <div id="colorScheme" value="1"></div>
+</div>
+
+<p id="info">Loading…</p>
+
+<p id="chart" class="ui-widget-content"></p>
+
+<script type="text/javascript">
+
+<%
+  def nameMap = [:]
+  def jsonData = []
+      
+  def key
+  data.eachWithIndex
+  {
+    row, ri ->
+    row.eachWithIndex
+    {
+      col, ci ->
+      if (ci < header.size()-1)
+      {
+        def name = "${header[ci]}.$col"
+        def con  = "${header[ci+1]}.${row[ci+1]}"
+        if (!nameMap.containsKey(name))
+        {
+          nameMap[name] = [ con ]
+        }
+        else
+        {
+          nameMap[name] << con
+        }
+
+        if (!nameMap.containsKey(con))
+        {
+          nameMap[con] = []
+        }
+      }
+    }
+  }
+
+  nameMap.each
+  {
+    name, items ->
+    jsonData << "{\"name\":\"$name\", \"connections\":[" + items.unique().collect { "\"$it\"" }.join(",") + "]}"
+  }
+
+  println "var jsonData = [" + jsonData.join(",") + "];"
+%>
+
+//jsonData =
+//[
+//  { "name" : "A", "connections": [ "B", "C", "D" ] },
+//  { "name" : "B", "connections": [ "C", "D" ] },
+//  { "name" : "C", "connections": [ "D" ] },
+//  { "name" : "D", "connections": [ ] },
+//];
+
+readJson = function(text, callback)
+{
+  callback(text ? JSON.parse(text) : null);
+}
+
+var fill = d3.scale.category10();
+
+function setColorScheme()
+{
+  if (colorScheme == 1)
+  {
+   fill = d3.scale.category10();
+  }
+  else if (colorScheme == 2)
+  {
+    fill = d3.scale.category20();
+  }
+  else if (colorScheme == 3)
+  {
+    fill = d3.scale.category20b();
+  }
+  else if (colorScheme == 4)
+  {
+    fill = d3.scale.category20c();
+  }
+  else if (colorScheme in colorbrewer)
+  {
+    console.log(colorScheme)
+    fill = d3.scale.ordinal().range(colorbrewer[colorScheme][9]);
+  }
+  else
+  {
+    fill = d3.scale.category20();
+  }
+}
+
+var width       = d3.select("#chartWidth").attr("value");
+var height      = d3.select("#chartHeight").attr("value");
+var nodeSize    = d3.select("#nodeSize").attr("value");
+var innerRadius = d3.select("#innerRadius").attr("value");
+var outerRadius = d3.select("#outerRadius").attr("value");
+var majorAngle  = d3.select("#majorAngle").attr("value");
+var minorAngle  = d3.select("#minorAngle").attr("value");
+var xoffset     = d3.select("#xoffset").attr("value");
+var yoffset     = d3.select("#yoffset").attr("value");
+var colorScheme = d3.select("#colorScheme").attr("value");
+
+\$("#chartTitle").position({ top : titleTop, left : titleLeft });
+\$("#chart").position({ top : chartTop, left : chartLeft });
+\$("#chartConfig").position({ top : chartConfigTop, left : chartConfigLeft });
+
+function draw()
+{
+  \$("#chart").html("");
+  drawHivePlot(width, height, nodeSize, innerRadius, outerRadius, majorAngle, minorAngle, yoffset, xoffset);
+}
+
+function drawHivePlot(width, height, nodeSize, innerRadius, outerRadius, majorAngle, minorAngle, yoffset, xoffset)
+{
+  majorAngle = 0.0174532925 * majorAngle;
+  minorAngle = 0.0174532925 * minorAngle;
+
+  var angle = d3.scale.ordinal()
+    .domain(["source", "source-target", "target-source", "target"])
+    .range([0, majorAngle - minorAngle, majorAngle + minorAngle, 2 * majorAngle]);
+
+  var radius = d3.scale.linear()
+    .range([innerRadius, outerRadius]);
+
+  d3.select("#chart").selectAll("svg").remove();
+  var svg = d3.select("#chart").append("svg")
+    .attr("width", width)
+    .attr("height", height)
+    .append("g")
+    .attr("transform", "translate(" + outerRadius * (xoffset/100.0) + "," + outerRadius * (yoffset/100.0) + ")");
+
+  // Load the data and display the plot!
+  readJson(JSON.stringify(jsonData), function(nodes)
+  {
+    var nodesByName = {},
+      links = [],
+      formatNumber = d3.format(",d"),
+      defaultInfo;
+
+    // Construct an index by node name.
+    nodes.forEach(function(d)
+    {
+      d.connectors = [];
+      d.packageName = d.name.split(".")[0];
+      nodesByName[d.name] = d;
+    });
+
+    // Convert the import lists into links with sources and targets.
+    nodes.forEach(function(source)
+    {
+      source.connections.forEach(function(targetName)
+      {
+        var target = nodesByName[targetName];
+        if (!source.source) source.connectors.push(source.source = {node: source, degree: 0});
+        if (!target.target) target.connectors.push(target.target = {node: target, degree: 0});
+        links.push({source: source.source, target: target.target});
+      });
+    });
+
+    // Determine the type of each node, based on incoming and outgoing links.
+    nodes.forEach(function(node)
+    {
+      if (node.source && node.target)
+      {
+        node.type = node.source.type = "target-source";
+        node.target.type = "source-target";
+      }
+      else if (node.source)
+      {
+        node.type = node.source.type = "source";
+      }
+      else if (node.target)
+      {
+        node.type = node.target.type = "target";
+      }
+      else
+      {
+        node.connectors = [{node: node}];
+        node.type = "source";
+      }
+    });
+
+    // Initialize the info display.
+    var info = d3.select("#info")
+      .text(defaultInfo = "Showing " + formatNumber(links.length) + " dependencies among " + formatNumber(nodes.length) + " classes.");
+
+    // Normally, Hive Plots sort nodes by degree along each axis. However, since
+    // this example visualizes a package hierarchy, we get more interesting
+    // results if we group nodes by package. We don't need to sort explicitly
+    // because the data file is already sorted by class name.
+
+    // Nest nodes by type, for computing the rank.
+    var nodesByType = d3.nest()
+      .key(function(d) { return d.type; })
+      .sortKeys(d3.ascending)
+      .entries(nodes);
+
+    // Duplicate the target-source axis as source-target.
+    nodesByType.push({key: "source-target", values: nodesByType[2].values});
+
+    // Compute the rank for each type, with padding between packages.
+    nodesByType.forEach(function(type)
+    {
+      var lastName = type.values[0].packageName, count = 0;
+      type.values.forEach(function(d, i)
+      {
+        if (d.packageName != lastName) lastName = d.packageName, count += 2;
+        d.index = count++;
+      });
+      type.count = count - 1;
+    });
+
+    // Set the radius domain.
+    radius.domain(d3.extent(nodes, function(d) { return d.index; }));
+
+    // Draw the axes.
+    svg.selectAll(".axis")
+      .data(nodesByType)
+      .enter().append("line")
+      .attr("class", "axis")
+      .attr("transform", function(d) { return "rotate(" + degrees(angle(d.key)) + ")"; })
+      .attr("x1", radius(-2))
+      .attr("x2", function(d) { return radius(d.count + 2); });
+
+    // Draw the links.
+    svg.append("g")
+      .attr("class", "links")
+      .selectAll(".link")
+      .data(links)
+      .enter().append("path")
+      .attr("class", "link")
+      .attr("d", link()
+      .angle(function(d) { return angle(d.type); })
+      .radius(function(d) { return radius(d.node.index); }))
+      .on("mouseover", linkMouseover)
+      .on("mouseout", mouseout);
+
+    // Draw the nodes. Note that each node can have up to two connectors,
+    // representing the source (outgoing) and target (incoming) links.
+    svg.append("g")
+      .attr("class", "nodes")
+      .selectAll(".node")
+      .data(nodes)
+      .enter().append("g")
+      .attr("class", "node")
+      .style("fill", function(d) { return fill(d.packageName); })
+      .selectAll("circle")
+      .data(function(d) { return d.connectors; })
+      .enter().append("circle")
+      .attr("transform", function(d) { return "rotate(" + degrees(angle(d.type)) + ")"; })
+      .attr("cx", function(d) { return radius(d.node.index); })
+      .attr("r", nodeSize)
+      .on("mouseover", nodeMouseover)
+      .on("mouseout", mouseout);
+
+    // Highlight the link and connected nodes on mouseover.
+    function linkMouseover(d)
+    {
+      svg.selectAll(".link").classed("active", function(p) { return p === d; });
+      svg.selectAll(".node circle").classed("active", function(p) { return p === d.source || p === d.target; });
+      info.text(d.source.node.name + " -> " + d.target.node.name);
+    }
+
+    // Highlight the node and connected links on mouseover.
+    function nodeMouseover(d)
+    {
+      svg.selectAll(".link").classed("active", function(p) { return p.source === d || p.target === d; });
+      d3.select(this).classed("active", true);
+      info.text(d.node.name);
+    }
+
+    // Clear any highlighted nodes or links.
+    function mouseout()
+    {
+      svg.selectAll(".active").classed("active", false);
+      info.text(defaultInfo);
+    }
+  });
+
+  // A shape generator for Hive links, based on a source and a target.
+  // The source and target are defined in polar coordinates (angle and radius).
+  // Ratio links can also be drawn by using a startRadius and endRadius.
+  // This class is modeled after d3.svg.chord.
+  function link()
+  {
+    var source = function(d) { return d.source; },
+      target = function(d) { return d.target; },
+      angle = function(d) { return d.angle; },
+      startRadius = function(d) { return d.radius; },
+      endRadius = startRadius,
+      arcOffset = -Math.PI / 2;
+
+    function link(d, i)
+    {
+      var s = node(source, this, d, i),
+        t = node(target, this, d, i),
+        x;
+      if (t.a < s.a) x = t, t = s, s = x;
+      if (t.a - s.a > Math.PI) s.a += 2 * Math.PI;
+      var a1 = s.a + (t.a - s.a) / 3,
+        a2 = t.a - (t.a - s.a) / 3;
+      return s.r0 - s.r1 || t.r0 - t.r1
+        ? "M" + Math.cos(s.a) * s.r0 + "," + Math.sin(s.a) * s.r0
+        + "L" + Math.cos(s.a) * s.r1 + "," + Math.sin(s.a) * s.r1
+        + "C" + Math.cos(a1) * s.r1 + "," + Math.sin(a1) * s.r1
+        + " " + Math.cos(a2) * t.r1 + "," + Math.sin(a2) * t.r1
+        + " " + Math.cos(t.a) * t.r1 + "," + Math.sin(t.a) * t.r1
+        + "L" + Math.cos(t.a) * t.r0 + "," + Math.sin(t.a) * t.r0
+        + "C" + Math.cos(a2) * t.r0 + "," + Math.sin(a2) * t.r0
+        + " " + Math.cos(a1) * s.r0 + "," + Math.sin(a1) * s.r0
+        + " " + Math.cos(s.a) * s.r0 + "," + Math.sin(s.a) * s.r0
+        : "M" + Math.cos(s.a) * s.r0 + "," + Math.sin(s.a) * s.r0
+        + "C" + Math.cos(a1) * s.r1 + "," + Math.sin(a1) * s.r1
+        + " " + Math.cos(a2) * t.r1 + "," + Math.sin(a2) * t.r1
+        + " " + Math.cos(t.a) * t.r1 + "," + Math.sin(t.a) * t.r1;
+    }
+
+    function node(method, thiz, d, i)
+    {
+      var node = method.call(thiz, d, i),
+        a = +(typeof angle === "function" ? angle.call(thiz, node, i) : angle) + arcOffset,
+        r0 = +(typeof startRadius === "function" ? startRadius.call(thiz, node, i) : startRadius),
+        r1 = (startRadius === endRadius ? r0 : +(typeof endRadius === "function" ? endRadius.call(thiz, node, i) : endRadius));
+      return {r0: r0, r1: r1, a: a};
+    }
+
+    link.source = function(_)
+    {
+      if (!arguments.length) return source;
+      source = _;
+      return link;
+    };
+
+    link.target = function(_)
+    {
+      if (!arguments.length) return target;
+      target = _;
+      return link;
+    };
+
+    link.angle = function(_)
+    {
+      if (!arguments.length) return angle;
+      angle = _;
+      return link;
+    };
+
+    link.radius = function(_)
+    {
+      if (!arguments.length) return startRadius;
+      startRadius = endRadius = _;
+      return link;
+    };
+
+    link.startRadius = function(_)
+    {
+      if (!arguments.length) return startRadius;
+      startRadius = _;
+      return link;
+    };
+
+    link.endRadius = function(_)
+    {
+      if (!arguments.length) return endRadius;
+      endRadius = _;
+      return link;
+    };
+
+    return link;
+  }
+
+  function degrees(radians)
+  {
+    return radians / Math.PI * 180 - 90;
+  }
+}
+
+draw();
+
+<%
+   println """
+   
+function toggleConfig()
+{
+  if (\$("#chartConfig").css('visibility') == 'hidden')
+  {
+    show("#chartConfig");
+  }
+  else
+  {
+    hide("#chartConfig");
+  }
+}
+
+function hide(elt)
+{
+  \$(elt).css("visibility", "hidden");
+}
+
+function show(elt)
+{
+  \$(elt).css("visibility", "visible");
+}
+
+    \$(function() {
+    	\$( "#chartTitle" ).draggable().zIndex(3);
+        \$( "#chartConfig" ).draggable().zIndex(2);
+        \$( "#chart" ).draggable().zIndex(1);
+    });
+
+  \$(document).keypress(function(e)
+  {
+    if (e.altKey) {
+      console.log("Alt Pressed");
+      toggleConfig();
+    }
+  });
+
+   \$("#chartTitle").draggable(
+   {
+    stop: function(event, ui) {
+    	var pos = \$(this).position();
+    	d3.select("#titleTop").attr("value", pos.top);
+    	d3.select("#titleLeft").attr("value", pos.left);
+    }
+   });
+
+   \$("#chart").draggable(
+   {
+    stop: function(event, ui) {
+
+    	// Show dropped position.
+    	var pos = \$(this).position();
+    	d3.select("#chartTop").attr("value", pos.top);
+    	d3.select("#chartLeft").attr("value", pos.left);
+    }
+   });
+
+   \$("#chartConfig").draggable(
+   {
+    stop: function(event, ui) {
+    	var pos = \$(this).position();
+    	d3.select("#chartConfigTop").attr("value", pos.top);
+    	d3.select("#chartConfigLeft").attr("value", pos.left);
+    }
+   });
+   
+	\$(function() {
+		\$( "#height-slider" ).slider(
+		{
+	      min: 100,
+		  max: 2000,
+		  value: height,
+		  slide : function(event, ui)
+		  {
+		    height = ui.value;
+		    draw();
+	        \$("#height-input").val(height);
+	        d3.select("#chartHeight").attr("value", height);
+		  }
+		});
+		\$("#height-input").val(height);
+		d3.select("#chartHeight").attr("value", height);
+	});
+
+    \$(function()
+    {
+      \$("#height-input").change(function ()
+      {
+          height = parseInt(this.value);
+          draw();
+          d3.select("#chartHeight").attr("value", height);
+          \$("#height-slider").slider("value", height);
+      });
+    });
+
+	\$(function() {
+		\$( "#width-slider" ).slider(
+		{
+	      min: 100,
+		  max: 2000,
+		  value: width,
+		  slide : function(event, ui)
+		  {
+		    width = ui.value;
+		    draw();
+	        \$("#width-input").val(width);
+	        d3.select("#chartWidth").attr("value", width);
+		  }
+		});
+		\$("#width-input").val(width);
+		d3.select("#chartWidth").attr(width);
+	});
+
+    \$(function()
+    {
+      \$("#width-input").change(function ()
+      {
+          width = parseInt(this.value);
+          draw();
+          d3.select("#chartWidth").attr("value", width);
+          \$("#width-slider").slider("value", width);
+      });
+    });
+
+	\$(function() {
+		\$( "#nodesize-slider" ).slider(
+		{
+	      min: 0,
+		  max: 20,
+		  value: nodeSize,
+		  slide : function(event, ui)
+		  {
+		    nodeSize = ui.value;
+		    draw();
+	        \$("#nodesize-input").val(nodeSize);
+	        d3.select("#chartWidth").attr("value", nodeSize);
+		  }
+		});
+		\$("#nodesize-input").val(nodeSize);
+		d3.select("#chartWidth").attr(nodeSize);
+	});
+
+    \$(function()
+    {
+      \$("#nodesize-input").change(function ()
+      {
+          nodeSize = parseInt(this.value);
+          draw();
+          d3.select("#chartWidth").attr("value", nodeSize);
+          \$("#nodesize-slider").slider("value", nodeSize);
+      });
+    });
+
+	\$(function() {
+		\$( "#innerradius-slider" ).slider(
+		{
+	      min: 0,
+		  max: 2000,
+		  value: innerRadius,
+		  slide : function(event, ui)
+		  {
+		    innerRadius = ui.value;
+	        draw();
+	        \$("#innerradius-input").val(innerRadius);
+	        d3.select("#innerRadius").attr("value", innerRadius);
+		  }
+		});
+		\$("#innerradius-input").val(innerRadius);
+		d3.select("#innerRadius").attr("value", innerRadius);
+	});
+
+    \$(function()
+    {
+      \$("#innerradius-input").change(function ()
+      {
+          innerRadius = parseInt(this.value);
+          draw();
+          d3.select("#innerRadius").attr("value", innerRadius);
+          \$("#innerradius-slider").slider("value", innerRadius);
+      });
+    });
+
+	\$(function() {
+		\$( "#outerradius-slider" ).slider(
+		{
+	      min: 100,
+		  max: 2000,
+		  value: outerRadius,
+		  slide : function(event, ui)
+		  {
+		    outerRadius = ui.value;
+	        \$(draw());
+	        \$("#outerradius-input").val(outerRadius);
+	        d3.select("#outerRadius").attr("value", outerRadius);
+		  }
+		});
+		\$("#outerradius-input").val(outerRadius);
+		d3.select("#outerRadius").attr("value", outerRadius);
+	});
+
+    \$(function()
+    {
+      \$("#outerradius-input").change(function ()
+      {
+          outerRadius = parseInt(this.value);
+          draw();
+          d3.select("#outerRadius").attr("value", outerRadius);
+          \$("#outerradius-slider").slider("value", outerRadius);
+      });
+    });
+
+	\$(function() {
+		\$( "#majorangle-slider" ).slider(
+		{
+	      min: 0,
+		  max: 360,
+		  value: majorAngle,
+		  slide : function(event, ui)
+		  {
+		    majorAngle = ui.value;
+	        \$(draw());
+	        \$("#majorangle-input").val(majorAngle);
+	        d3.select("#majorAngle").attr("value", majorAngle);
+		  }
+		});
+		\$("#majorangle-input").val(majorAngle);
+		d3.select("#majorAngle").attr("value", majorAngle);
+	});
+
+    \$(function()
+    {
+      \$("#majorangle-input").change(function ()
+      {
+          majorAngle = parseInt(this.value);
+          draw();
+          d3.select("#majorAngle").attr("value", majorAngle);
+          \$("#majorangle-slider").slider("value", majorAngle);
+      });
+    });
+
+	\$(function() {
+		\$( "#minorangle-slider" ).slider(
+		{
+	      min: 0,
+		  max: 360,
+		  value: minorAngle,
+		  slide : function(event, ui)
+		  {
+		    minorAngle = ui.value;
+	        \$(draw());
+	        \$("#minorangle-input").val(minorAngle);
+	        d3.select("#minorAngle").attr("value", minorAngle);
+		  }
+		});
+		\$("#minorangle-input").val(minorAngle);
+		d3.select("#minorAngle").attr("value", minorAngle);
+	});
+
+    \$(function()
+    {
+      \$("#minorangle-input").change(function ()
+      {
+          minorAngle = parseInt(this.value);
+          draw();
+          d3.select("#minorAngle").attr("value", minorAngle);
+          \$("#minorangle-slider").slider("value", minorAngle);
+      });
+    });
+
+	\$(function() {
+		\$( "#xoffset-slider" ).slider(
+		{
+	      min: 0,
+		  max: 500,
+		  value: xoffset,
+		  slide : function(event, ui)
+		  {
+		    xoffset = ui.value;
+	        draw();
+	        \$("#xoffset-input").val(xoffset);
+	        d3.select("#xoffset").attr("value", xoffset);
+		  }
+		});
+		\$("#xoffset-input").val(xoffset);
+		d3.select("#xoffset").attr("value", xoffset);
+	});
+
+    \$(function()
+    {
+      \$("#xoffset-input").change(function ()
+      {
+          xoffset = parseInt(this.value);
+          draw();
+          d3.select("#xoffset").attr("value", xoffset);
+          \$("#xoffset-slider").slider("value", xoffset);
+      });
+    });
+    
+	\$(function() {
+		\$( "#yoffset-slider" ).slider(
+		{
+	      min: 0,
+		  max: 500,
+		  value: yoffset,
+		  slide : function(event, ui)
+		  {
+		    yoffset = ui.value;
+	        draw();
+	        \$("#yoffset-input").val(yoffset);
+	        d3.select("#yoffset").attr("value", yoffset);
+		  }
+		});
+		\$("#yoffset-input").val(yoffset);
+		d3.select("#yoffset").attr("value", yoffset);
+	});
+
+    \$(function()
+    {
+      \$("#yoffset-input").change(function ()
+      {
+          yoffset = parseInt(this.value);
+          draw();
+          d3.select("#yoffset").attr("value", yoffset);
+          \$("#yoffset-slider").slider("value", yoffset);
+      });
+    });
+
+    \$(function()
+    {
+      \$("#colorschemeSelection").change(function ()
+      {
+          colorScheme = this.value;
+          setColorScheme();
+          draw();
+          d3.select("#colorScheme").attr("value", colorScheme);
+      });
+    });
+
+function titleChange(newTitle)
+{
+  d3.select("title").text(newTitle);
+  d3.select("#titletext").text(newTitle);
+}
+
+"""
+%>
+</script>
+    
+<div id="chartConfig" class="demo">
+    <h1>Configuration</h1>
+	<div>
+		<label for="height">Height:</label>
+		<input type="text" id="height-input" size="5" style="border:0; color:#f6931f; font-weight:bold;" />
+		<div id="height-slider"/>
+	</div>
+	<div>
+		<label for="width">Width:</label>
+		<input type="text" id="width-input" size="5" style="border:0; color:#f6931f; font-weight:bold;" />
+		<div id="width-slider"/>
+	</div>
+	<div>
+		<label for="nodesize">Node Size:</label>
+		<input type="text" id="nodesize-input" size="5" style="border:0; color:#f6931f; font-weight:bold;" />
+		<div id="nodesize-slider"/>
+	</div>
+	<div>
+		<label for="innerradius">Inner Radius:</label>
+		<input type="text" id="innerradius-input" size="5" style="border:0; color:#f6931f; font-weight:bold;" />
+		<div id="innerradius-slider"/>
+	</div>
+	<div>
+		<label for="outerradius">Outer Radius:</label>
+		<input type="text" id="outerradius-input" size="5" style="border:0; color:#f6931f; font-weight:bold;" />
+		<div id="outerradius-slider"/>
+	</div>
+	<div>
+		<label for="majorangle">Major Angle:</label>
+		<input type="text" id="majorangle-input" size="5" style="border:0; color:#f6931f; font-weight:bold;" />
+		<div id="majorangle-slider"/>
+	</div>
+	<div>
+		<label for="minorangle">Minor Angle:</label>
+		<input type="text" id="minorangle-input" size="5" style="border:0; color:#f6931f; font-weight:bold;" />
+		<div id="minorangle-slider"/>
+	</div>
+	<div>
+		<label for="xoffset">X Offset:</label>
+		<input type="text" id="xoffset-input" size="5" style="border:0; color:#f6931f; font-weight:bold;" />
+		<div id="xoffset-slider"/>
+	</div>
+	<div>
+		<label for="yoffset">Y Offset:</label>
+		<input type="text" id="yoffset-input" size="5" style="border:0; color:#f6931f; font-weight:bold;" />
+		<div id="yoffset-slider"/>
+	</div>
+	<div>
+	  <label for="colorschemeSelection">Scheme:</label>
+	  <select id="colorschemeSelection" class="combobox">
+		<option value="1">Category10</option>
+		<option value="2">Category20</option>
+		<option value="3">Category20b</option>
+		<option value="4">Category20c</option>
+		<option value="YlGn">YlGn</option>
+		<option value="YlGnBu">YlGnBu</option>
+		<option value="GnBu">GnBu</option>
+		<option value="BuGn">BuGn</option>
+		<option value="PuBuGn">PuBuGn</option>
+		<option value="PuBu">PuBu</option>
+		<option value="BuPu">BuPu</option>
+		<option value="RdPu">RdPu</option>
+		<option value="PuRd">PuRd</option>
+		<option value="OrRd">OrRd</option>
+		<option value="YlOrRd">YlOrRd</option>
+		<option value="YlOrBr">YlOrBr</option>
+		<option value="Purples">Purples</option>
+		<option value="Blues">Blues</option>
+		<option value="Greens">Greens</option>
+		<option value="Oranges">Oranges</option>
+		<option value="Reds">Reds</option>
+		<option value="Greys">Greys</option>
+		<option value="PuOr">PuOr</option>
+		<option value="BrBG">BrBG</option>
+		<option value="PRGn">PRGn</option>
+		<option value="PiYG">PiYG</option>
+		<option value="RdBu">RdBu</option>
+		<option value="RdGy">RdGy</option>
+		<option value="RdYlBu">RdYlBu</option>
+		<option value="Spectral">Spectral</option>
+		<option value="RdYlGn">RdYlGn</option>
+	  </select>
+	</div>
+	<div>
+		<label for="charttitle">Title:</label>
+		<input type="text" id="charttitle" size="20" style="border:2; color:#f6931f; font-weight:10;" onchange="titleChange(this.value)" />
+	</div>
+</div>
+  </body>
+</html>

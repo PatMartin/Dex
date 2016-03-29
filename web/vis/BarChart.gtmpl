@@ -1,0 +1,117 @@
+<!doctype html>
+<html>
+<head>
+  <title>Dex:Vis:BarChart</title>
+
+<style>
+
+<%
+  println new File("javascript/vis/latest/vis.min.css").text
+  println new File("javascript/jqueryui/latest/jquery-ui.min.css").text
+  println new File("javascript/jqueryui/latest/jquery-ui.theme.min.css").text  
+%>
+
+.vis-item .vis-item-overflow {
+  overflow: visible;
+}
+</style>
+<script>
+<%
+  println new File("javascript/jquery/latest/jquery-2.1.3.min.js").text
+  println new File("javascript/jqueryui/latest/jquery-ui.min.js").text
+  println new File("javascript/underscore/latest/underscore-min.js").text
+  println new File("javascript/d3/latest/d3.min.js").text
+  println new File("javascript/dexjs/latest/dex.js").text
+  println new File("javascript/vis/latest/vis.min.js").text
+%>
+</script>
+</head>
+<body>
+<div style="width:700px; font-size:14px; text-align: justify;">
+    Handle overlap: <select id="dropdownID">
+    <option value="overlap">overlap</option>
+    <option value="sideBySide" selected="selected">sideBySide</option>
+    <option value="stack">stack</option>
+    </select>
+</div>
+<div id="barchart"></div>
+<script type="text/javascript">
+
+// Load dex data.  
+<%
+  def header = "[" + dexData.header.collect { return "\"$it\"" }.join(',') + "]"
+  def data = []
+  dexData.data.eachWithIndex
+  {
+    row, ri ->
+    data << "[" + row.collect { return "\"$it\"" }.join(',') + "]"
+  }
+  println "var csv = { 'header' : $header,\n 'data' : [" + data.join(',\n') + "] };";
+%>
+  var types = dex.csv.guessTypes(csv);
+  dex.console.log("TYPES", types);
+  
+  var firstDateIndex = types.indexOf("date");
+  var ncsv = dex.csv.numericSubset(csv);
+
+  var container = document.getElementById('barchart');
+  var width = window.innerWidth;
+  var height = window.innerHeight;
+      
+  container.setAttribute("style","width:" + width + "px");
+  container.setAttribute("style","height:" + height + "px");
+      
+  var groups = new vis.DataSet();
+
+  //groups.add({id: 0, content: "group0"})
+  //groups.add({id: 1, content: "group1"})
+  //groups.add({id: 2, content: "group2"})
+
+  var numGroups = 0;
+  ncsv.header.map(function(h, ci) {
+    groups.add({id: numGroups, content: h});
+    numGroups++;
+  });
+
+  var items = [];
+
+  for (var ci=0; ci<ncsv.header.length; ci++)
+  {
+    for (var ri=0; ri<ncsv.data.length; ri++)
+    {
+      items.push({ 'x' : csv.data[ri][firstDateIndex],
+                   'y' : ncsv.data[ri][ci],
+                   'group' : ncsv.header[ci]});
+    }
+  }
+  
+  dex.console.log("NCSV", ncsv, firstDateIndex, "ITEMS", items);
+
+
+  var dataset = new vis.DataSet(items);
+  var options = {
+    style:'bar',
+    stack:false,
+    barChart: {width:50, align:'center', sideBySide:true}, // align: left, center, right
+    drawPoints: false,
+    dataAxis: {
+      icons:true
+    },
+    orientation:'top'
+  };
+  var graph2d = new vis.Graph2d(container, items, groups, options);
+
+  var dropdown = document.getElementById("dropdownID");
+  dropdown.onchange = update;
+
+  function update() {
+    var options = {
+      stack:dropdown.value === 'stack',
+      barChart:{sideBySide:dropdown.value === 'sideBySide'}
+    };
+    graph2d.setOptions(options);
+  }
+
+</script>
+</body>
+</html>

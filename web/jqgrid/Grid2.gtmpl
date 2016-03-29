@@ -1,0 +1,103 @@
+<html>
+  <head>
+    <title>Grid</title>
+<style>
+<%
+   def theme = "flick"
+   println new File("javascript/jqueryui/latest/themes/$theme/jquery-ui.css").text
+   println new File("javascript/jqueryui/latest/themes/$theme/jquery.ui.theme.css").text
+   println new File("javascript/jqGrid/latest/css/ui.jqgrid.css").text
+%>
+</style>
+<script>
+<%
+  println new File("javascript/jqueryui/latest/jquery.1.9.1.min.js").text
+  println new File("javascript/jqueryui/latest/ui/minified/jquery-ui.min.js").text
+  println new File("javascript/jqGrid/latest/plugins/ui.multiselect.js").text
+  println new File("javascript/jqGrid/latest/js/i18n/grid.locale-en.js").text
+  //println new File("javascript/jqGrid/latest/plugins/jquery.contextmenu.js").text
+  println new File("javascript/jqGrid/latest/js/jquery.jqGrid.min.js").text
+
+println """
+
+  jQuery(document).ready(function()
+  {
+"""
+
+  def colModel = []
+  dexData.header.each
+  {
+    colModel << "{name:\"$it\", 'hidden':false, 'viewable':true, 'editrules':{ edithidden: true}}"
+  }
+  
+  println "var colNames = [" + dexData.header.collect { "\"$it\"" }.join(",") + "];"
+  println "var colModel = [" + colModel.join(",") + "];"
+
+println """
+  var grid = jQuery("#grid");
+  
+  grid.jqGrid({
+      datatype: "local",
+      height: "90%",
+      width: "100%",
+      autowidth: true,
+      autoheight: true,
+      shrinkToFit: true,
+      colNames: colNames,
+      colModel: colModel,
+      multiselect: false,
+      multipleSearch: true,
+      rownumbers: true,
+      rowNum: ${dexData.data.size()},
+      loadonce:true,
+      hidegrid: true,
+      viewrecords:true,
+      pager: '#pgrid',
+      gridview: true,
+      caption: "${dexData.data.size()} rows of ${dexData.header.size()} columns."
+    });
+    
+    grid.jqGrid('navButtonAdd', '#pgrid',
+      { caption: "",
+        buttonicon: "ui-icon-calculator",
+        title: "Choose Columns",
+        onClickButton: function() {
+          grid.jqGrid('columnChooser');
+        }
+      });
+"""
+
+  def mydata = [];
+  dexData.data.each
+  {
+    row ->
+    def rowdata = []
+    row.eachWithIndex
+    {
+      col, ci ->
+      rowdata << "\"" + dexData.header[ci] + "\":\"$col\""
+    }
+    mydata << "{" + rowdata.join(",") + "}"
+  }
+
+println """
+  jQuery("#grid").jqGrid('navGrid','#pgrid',{del:false,add:false,edit:false},{},{},{},{multipleSearch:true});
+
+"""
+  println "var mydata = [" + mydata.join(",") + "];"
+
+println """
+var grid = \$("#grid");
+for(var i=0;i<mydata.length;i++)
+  grid.jqGrid('addRowData',i+1,mydata[i]);
+  });
+"""
+%>
+ </script>
+
+</head>
+<body>
+  <table id="grid"></table>
+  <div id="pgrid"></div>
+</body>
+</html>

@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+svg {
+  font: 18px sans-serif;
+}
+
+.caption {
+  font-weight: bold;
+}
+
+.key path {
+  display: none;
+}
+
+.key line {
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+</style>
+<body>
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script>
+
+function HorizontalLegend(config)
+{
+  // Default parameters.
+  var p =
+  {
+    labels          : [ "A", "B", "C" ],
+    parent          : null,
+    xoffset         : 20,
+    yoffset         : 20,
+    cellWidth       : 30,
+    cellHeight      : 20,
+    tickLength      : 25,
+    caption         : "Legend",
+    color           : d3.scale.category20c(),
+    captionFontSize : 14,
+    captionXOffset  : 0,
+    captionYOffset  : -6
+  };
+
+  // If we have parameters, override the defaults.
+  if (config !== 'undefined')
+  {
+    for (var prop in config)
+    {
+      p[prop] = config[prop];
+    }
+  }
+  
+	function chart()
+	{
+      // Create our x scale
+      var x = d3.scale.ordinal()
+        .domain(p.labels)
+        .range(d3.range(p.labels.length).map(function(i) { return i * p.cellWidth; }));
+
+      // Create the x axis.
+      var xAxis = d3.svg.axis()
+        .scale(x)
+        .orient("bottom")
+        .tickSize(p.tickLength)
+        .tickPadding(10)
+        .tickValues(p.labels)
+        .tickFormat(function(d) { return d; });
+
+      // Append a graphics node to the supplied svg node.
+      var g = p.parent.append("g")
+        .attr("class", "key")
+        .attr("transform", "translate(" + p.xoffset + "," + p.yoffset + ")");
+
+      // Draw a colored rectangle for each ordinal range.
+      g.selectAll("rect")
+        .data(p.labels)
+        .enter().append("rect")
+        .attr("height", p.cellHeight)
+        .attr("x", function(d, i) { return x(i); })
+        .attr("width", function(d) { return p.cellWidth; })
+        .style("fill", function(d, i)
+        {
+          return p.color(i);
+        });
+
+      // Add the caption.
+      g.call(xAxis).append("text")
+        .attr("class", "caption")
+        .attr("y", p.captionYOffset)
+        .attr("x", p.captionXOffset)
+        .text(p.caption)
+        .style("font-size", p.captionFontSize);
+
+	};
+	
+	// Use this routine to retrieve and update attributes.
+  chart.attr = function(name, value)
+	{
+	  if (arguments.length == 1)
+		{
+		  return p[name];
+		}
+		else if (arguments.length == 2)
+		{
+		  p[name] = value;
+		}
+	  return chart;
+  }
+	
+	chart.update = function()
+	{
+	}
+	
+	return chart;
+}
+
+function VerticalLegend(config)
+{
+  // Default parameters.
+  var p =
+  {
+    labels          : [ "A", "B", "C" ],
+    parent          : null,
+    xoffset         : 50,
+    yoffset         : 30,
+    cellWidth       : 30,
+    cellHeight      : 20,
+    tickLength      : 5,
+    caption         : "Legend",
+    color           : d3.scale.category20c(),
+    captionFontSize : 14,
+    captionXOffset  : -30,
+    captionYOffset  : -20
+  };
+
+  // If we have parameters, override the defaults.
+  if (config !== 'undefined')
+  {
+    for (var prop in config)
+    {
+      p[prop] = config[prop];
+    }
+  }
+  
+	function chart()
+	{
+      // Create our x scale
+      var y = d3.scale.ordinal()
+        .domain(p.labels)
+        .range(d3.range(p.labels.length).map(function(i) { return i * p.cellHeight; }));
+
+      // Create the x axis.
+      var yAxis = d3.svg.axis()
+        .scale(y)
+        .orient("left")
+        .tickSize(p.tickLength)
+        .tickPadding(10)
+        .tickValues(p.labels)
+        .tickFormat(function(d) { return d; });
+
+      // Append a graphics node to the supplied svg node.
+      var g = p.parent.append("g")
+        .attr("class", "key")
+        .attr("transform", "translate(" + p.xoffset + "," + p.yoffset + ")");
+
+      // Draw a colored rectangle for each ordinal range.
+      g.selectAll("rect")
+        .data(p.labels)
+        .enter().append("rect")
+        .attr("height", p.cellHeight)
+        .attr("y", function(d, i) { return y(i); })
+        .attr("width", p.cellWidth)
+        .style("fill", function(d, i)
+        {
+          return p.color(i);
+        });
+
+      // Add the caption.
+      g.call(yAxis).append("text")
+        .attr("class", "caption")
+        .attr("y", p.captionYOffset)
+        .attr("x", p.captionXOffset)
+        .text(p.caption)
+        .style("font-size", p.captionFontSize);
+
+	};
+	
+	// Use this routine to retrieve and update attributes.
+  chart.attr = function(name, value)
+	{
+	  if (arguments.length == 1)
+		{
+		  return p[name];
+		}
+		else if (arguments.length == 2)
+		{
+		  p[name] = value;
+		}
+	  return chart;
+  }
+	
+	chart.update = function()
+	{
+	}
+	
+	return chart;
+}
+
+var header =
+	[ "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M",
+	  "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z" ]
+
+var svg = d3.select("body").append("svg")
+  .attr("width", 960)
+  .attr("height", 500);
+
+var params = {}
+
+var vlegend1 = VerticalLegend({ parent : svg, labels : header });
+vlegend1();
+
+var hlegend1 = HorizontalLegend({ parent : svg, labels : header });
+hlegend1();
+
+hlegend1.attr("yoffset", 90).attr("color", d3.scale.category20())();
+
+</script>

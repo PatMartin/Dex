@@ -1,0 +1,181 @@
+html, body {
+	margin:0;
+	padding:0;
+	overflow:hidden;
+	color: white;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 11px;
+}
+a {
+	outline:none;
+	color:white;
+	text-decoration: none;
+}
+input, button {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	outline: none;
+}
+button {
+	border: 1px solid #20252a;
+	background: url("../img/tab_bg.png") repeat-x;
+	color: white;
+	height: 22px;
+	padding: 4px 5px 4px 5px;
+	cursor: pointer;
+	margin: 10px 0 10px 0;
+	outline: 0;
+}
+button::-moz-focus-inner, input::-moz-focus-inner {
+  border: 0;
+  outline:0;
+}
+button#panel1, button#panel2 {
+	border-right: 0;
+}
+button#panel1 {
+	border-top-left-radius:5px;
+	border-bottom-left-radius:5px;
+}
+button#panel3 {
+	border-top-right-radius:5px;
+	border-bottom-right-radius:5px;
+}
+button#panel1:hover, button#panel2:hover, button#panel3:hover {
+	color:#0b93d5;
+}
+button.active {
+	background: url("../img/tab_bg_a.png") repeat-x;
+	/*border-width: 0 1px 0 0;*/
+}
+#container {
+	background: #000;
+	position: absolute;
+	z-index: 1;
+	bottom: 0;
+}
+div#navigation {
+	width:260px;
+	position: absolute;
+	top: 0;
+	right: 0;
+	background: #475261;
+	height:100%;
+	z-index: 1000;
+	padding: 24px;
+	background: url("../img/bg.jpg") repeat;
+}
+img#logo {
+	display: block;
+	margin: 0 auto;
+}
+div#navigation * input {
+	position: relative;
+	z-index: 1001;
+}
+#toggle_button {
+	position: absolute;
+	right: 5px;
+	top: 5px;
+	z-index: 1001;
+	display: block;
+	width: 39px;
+	height: 39px;
+}
+a.plus {
+	background: url("../img/toggle_plus.png") no-repeat;
+}
+a.minus {
+	background: url("../img/toggle_minus.png") no-repeat;
+}
+div#fxy_panel {
+	position: relative;
+	z-index: 1000;
+}
+div#range_fxy {
+	margin: 10px 0 10px 0;
+}
+div#desc {
+	margin: 10px 0 0 0;
+}
+div.author {
+	position: absolute;
+	bottom: 10px;
+	right:10px;
+	z-index: 1001;
+}
+label {
+	font-weight: bold;
+}
+input {
+	background: url("../img/input_bg.png") repeat-x;
+	border-radius: 3px;
+	padding: 5px;
+	color:white;
+	border: none;
+	outline: none;
+}
+input.submit {
+	color:white;
+	font-weight: bold;
+	border: 1px solid #282e37;
+	background: url("../img/submit_bg.png") repeat-x;
+	border-radius: 3px;
+	padding: 5px;
+	cursor: pointer;
+}
+div.examples {
+	font-weight: bold;
+}
+div.examples button {
+	font-weight: bold;
+	background: url("../img/submit_bg.png") repeat-x;
+	border-radius: 3px;
+	padding: 5px;
+	cursor: pointer;
+	height: 30px;
+}
+input.submit:hover, div.examples button:hover {
+	background: url("../img/submit_bg_h.png") repeat-x;
+}
+input#t1, input#t2, input#u1, input#u2 {
+	width:50px;
+}
+div#parametric_panel, div#supershape_panel {
+	display: none;
+}
+input.val_input, input.val_input2 {
+	width: 20px;
+	margin: 0 0 10px 0;
+	text-align: center;
+}
+div.supershape_slider, div.supershape_slider2 {
+	width:200px;
+	float: left;
+	margin: 6px 10px 0 0;
+}
+div#social {
+	position: absolute;
+	left: 5px;
+	top:5px;
+	z-index: 101;
+	width: 90px;
+}
+input#color {
+	width: 43px;
+	float: right;
+	display:none;
+}
+#fullscreen {
+	font-weight:bold;
+}
+#fullscreen_icon {
+	background: url("../img/fullscreen.png") no-repeat;
+	position: absolute;
+	right: 5px;
+	top: 50px;
+	z-index: 1001;
+	display: block;
+	width: 39px;
+	height: 39px;
+}

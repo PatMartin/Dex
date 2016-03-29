@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>Timeline</title>
+
+<style>
+<%
+   println new File("javascript/timeline/latest/assets/css/timeline.css").text
+   println new File("javascript/timeline/latest/assets/css/styles.css").text
+%>
+</style>
+        <!-- Google Fonts -->
+        <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Dancing+Script|Antic+Slab" />
+        
+        <!--[if lt IE 9]>
+          <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+    </head>
+    
+    <body>
+		<div id="timeline">
+			<!-- Timeline.js will genereate the markup here -->
+		</div>
+
+<script type="text/javascript">
+<%
+println new File("javascript/jquery/latest/js/jquery-1.8.2.min.js").text
+println new File("javascript/timeline/latest/assets/js/timeline.js").text
+%>
+</script>
+
+<script>
+<%
+println """
+	var timeline = new VMM.Timeline();
+	timeline.init("Timeline.json");
+"""
+%>
+</script>
+
+    </body>
+</html>

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+
+<style>
+  html,body{
+    height : 100%;
+    min-height : 100%;
+    width : 100%;
+    min-width : 100%;
+  }
+  
+#TimelineArea {
+  height: 100%;
+  width: 100%;
+}
+</style>
+<body>
+<script type="text/javascript" src="http://www.google.com/jsapi"></script>
+<script>
+<%
+  println new File("javascript/jquery/latest/jquery-2.1.3.min.js").text
+  println new File("javascript/jqueryui/latest/jquery-ui.min.js").text
+  println new File("javascript/underscore/latest/underscore-min.js").text
+  println new File("javascript/d3/latest/d3.min.js").text
+  println new File("javascript/dexjs/latest/dex.js").text
+  println new File("javascript/dexjs/latest/charts/google/Timeline.js").text
+%>
+</script>
+<div id="TimelineArea" class="TimelineArea"></div>
+
+<script>
+  google.load("visualization", "1", {packages : ["timeline"]});
+  google.setOnLoadCallback(drawChart);
+
+  function drawChart() {
+
+<%
+  def header = "[" + dexData.header.collect { return "\"$it\"" }.join(',') + "]"
+  def data = []
+  dexData.data.eachWithIndex
+  {
+    row, ri ->
+    data << "[" + row.collect { return "\"$it\"" }.join(',') + "]"
+  }
+  println "var csv = { 'header' : $header,\n 'data' : [" + data.join(',\n') + "] };";
+%>
+
+    // A simple Timeline
+    var timeline = new dex.charts.google.Timeline({
+      'parent'     : "#TimelineArea",
+      'id'         : 'timeline',
+      'class'      : 'timeline',
+      'csv'        : csv,
+      'resizable' : true
+    });
+    timeline.render();
+}
+</script>

@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<% import com.dexvis.util.DexUtil %>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+    <title>Node Link Tree</title>
+
+<script type="text/javascript">
+<%
+   println new File("javascript/d3/latest/d3.min.js").text
+   println new File("javascript/d3/latest/lib/colorbrewer/colorbrewer.js").text
+%>
+</script>
+
+<style>
+<%
+   println new File("javascript/jqueryui/latest/jquery-ui.css").text
+   println new File("javascript/jqueryui/latest/jquery-ui.theme.css").text
+%>
+</style>
+
+<script>
+
+<%
+   println new File("javascript/jquery/latest/jquery-2.1.3.min.js").text
+   println new File("javascript/jqueryui/latest/jquery-ui.min.js").text
+   
+   println new File("javascript/touchpunch/latest/touchpunch.js").text
+%>
+
+</script>
+
+<style type="text/css">
+
+.node circle {
+  fill: #fff;
+  stroke: steelblue;
+  stroke-width: 1.5px;
+}
+
+.node {
+  font: 10px sans-serif;
+}
+
+.link {
+  fill: none;
+  stroke: #ccc;
+  stroke-width: 1.5px;
+}
+
+</style>
+
+</head>
+<body>
+  <div id="chartTitle" class="ui-widget-content">
+  <h1 id="titletext">Node Link Tree</h1>
+</div>
+
+<div id="chart"></div>
+
+<script type="text/javascript">
+
+var jsonData;
+
+<%
+  def numericColumns = dexData.getNumericColumns()
+  def header = dexData.getHeader()
+  def lastHeader = header[header.size() - 1]
+  
+  println DexUtil.getSizedJSONString(dexData, 100)
+%>
+
+readJson = function(text, callback)
+{
+  callback(text ? JSON.parse(text) : null);
+}
+
+var width = 800,
+    height = 800,
+    nodeRadius = 5;
+    fontSize = 12;
+    
+function draw()
+{
+  drawNodeLinkTree(width, height, nodeRadius, fontSize);
+}
+
+function drawNodeLinkTree(width, height, nodeRadius, fontSize)
+{
+  var diameter = width;
+
+  var tree = d3.layout.tree()
+    .size([360, diameter / 2 - 120])
+    .separation(function(a, b) { return (a.parent == b.parent ? 1 : 2) / a.depth; });
+
+  var diagonal = d3.svg.diagonal.radial()
+    .projection(function(d) { return [d.y, d.x / 180 * Math.PI]; });
+    
+  var svg = d3.select("#chart").append("svg:svg")
+    .attr("width", width)
+    .attr("height", height)
+    .append("g")
+    .attr("transform", "translate(" + diameter / 2 + "," + diameter / 2 + ")");
+
+  readJson(JSON.stringify(jsonData), function(root)
+  {
+    var nodes = tree.nodes(root),
+      links = tree.links(nodes);
+
+    var link = svg.selectAll(".link")
+      .data(links)
+      .enter().append("path")
+      .attr("class", "link")
+      .attr("d", diagonal);
+
+    var node = svg.selectAll(".node")
+      .data(nodes)
+      .enter().append("g")
+      .attr("class", "node")
+      .attr("transform", function(d) { return "rotate(" + (d.x - 90) + ")translate(" + d.y + ")"; })
+
+    node.append("circle")
+      .attr("r", nodeRadius);
+
+    node.append("text")
+      .attr("dy", ".31em")
+      .attr("text-anchor", function(d) { return d.x < 180 ? "start" : "end"; })
+      .attr("font-size", fontSize)
+      .attr("transform", function(d) { return d.x < 180 ? "translate(8)" : "rotate(180)translate(-8)"; })
+      .text(function(d) { return d.name; });
+  });
+
+  d3.select(self.frameElement).style("height", diameter - 150 + "px");
+}
+
+draw();
+
+<%
+   println """
+	\$(function() {
+		\$( "#height-slider" ).slider(
+		{
+	      min: 100,
+		  max: 2000,
+		  value: height,
+		  slide : function(event, ui)
+		  {
+		    d3.select("#chart").html("");
+		    height = ui.value;
+		    draw();
+	        \$("#height").val(\$("#height-slider").slider("value"));
+		  }
+		});
+		\$("#height").val(\$("#height-slider").slider("value"));
+	});
+"""
+
+   println """
+	\$(function() {
+		\$( "#width-slider" ).slider(
+		{
+	      min: 100,
+		  max: 2000,
+		  value: width,
+		  slide : function(event, ui)
+		  {
+		    d3.select("#chart").html("");
+		    width = ui.value;
+		    draw();
+	        \$("#width").val(\$("#width-slider").slider("value"));
+		  }
+		});
+		\$("#width").val(\$("#width-slider").slider("value"));
+	});
+"""
+
+   println """
+	\$(function() {
+		\$( "#noderadius-slider" ).slider(
+		{
+	      min: 1,
+		  max: 100,
+		  value: nodeRadius,
+		  slide : function(event, ui)
+		  {
+		    d3.select("#chart").html("");
+		    nodeRadius = ui.value;
+		    draw();
+	        \$("#noderadius").val(\$("#noderadius-slider").slider("value"));
+		  }
+		});
+		\$("#noderadius").val(\$("#noderadius-slider").slider("value"));
+	});
+"""
+
+   println """
+	\$(function() {
+		\$( "#fontsize-slider" ).slider(
+		{
+	      min: 1,
+		  max: 48,
+		  value: fontSize,
+		  slide : function(event, ui)
+		  {
+		    d3.select("#chart").html("");
+		    fontSize = ui.value;
+		    draw();
+	        \$("#fontsize").val(\$("#fontsize-slider").slider("value"));
+		  }
+		});
+		\$("#fontsize").val(\$("#fontsize-slider").slider("value"));
+	});
+"""
+
+   println """
+    \$(function() {
+    	\$( "#chartTitle" ).draggable();
+        \$( "#chartConfig" ).draggable();
+        \$( "#chart" ).draggable();
+    });
+    
+function titleChange(newTitle)
+{
+  d3.select("title").text(newTitle);
+  d3.select("#titletext").text(newTitle);
+}
+
+"""
+%>
+</script>
+    
+<div id="chartConfig" class="demo">
+    <h1>Configuration</h1>
+	<div>
+		<label for="height">Height:</label>
+		<input type="text" id="height" size="5" style="border:0; color:#f6931f; font-weight:bold;" />
+		<div id="height-slider"/>
+	</div>
+	<div>
+		<label for="width">Width:</label>
+		<input type="text" id="width" size="5" style="border:0; color:#f6931f; font-weight:bold;" />
+		<div id="width-slider"/>
+	</div>
+	<div>
+		<label for="noderadius">Node Radius:</label>
+		<input type="text" id="noderadius" size="5" style="border:0; color:#f6931f; font-weight:bold;" />
+		<div id="noderadius-slider"/>
+	</div>
+	<div>
+		<label for="fontsize">Font Size:</label>
+		<input type="text" id="fontsize" size="5" style="border:0; color:#f6931f; font-weight:bold;" />
+		<div id="fontsize-slider"/>
+	</div>
+	<div>
+		<label for="charttitle">Title:</label>
+		<input type="text" id="charttitle" size="20" style="border:2; color:#f6931f; font-weight:10;" onchange="titleChange(this.value)" />
+	</div>
+</div>
+  </body>
+</html>

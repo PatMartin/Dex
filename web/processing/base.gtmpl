@@ -1,0 +1,7 @@
+<script type="text/javascript">
+  <% println new File("javascript/processing/latest/processing.min.js").text %>
+</script>
+<script type="application/processing" data-processing-target="ptarget">
+  <%= processingCode %>
+</script>
+<canvas id="ptarget"></canvas>

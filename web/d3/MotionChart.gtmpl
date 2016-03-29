@@ -1,0 +1,1439 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+    <title>Motion Chart</title>
+<script type="text/javascript">
+<%
+println new File("javascript/d3/3.0.2/d3.min.js").text
+println new File("javascript/d3/3.0.2/lib/colorbrewer/colorbrewer.js").text
+%>
+</script>
+
+<style>
+<% println new File("javascript/jquery/1.9.1/css/ui-lightness/jquery-ui-1.9.1.custom.css").text %>
+<% println new File("web/d3/d3.css").text %>
+</style>
+
+<style>
+#titletext
+{
+  font-family: "Arial Rounded MT", Arial, Helvetica, sans-serif;
+  font-weight: bold;
+  text-align: left;
+  color: steelblue;
+}
+
+#timeLabel.ui-widget-content {
+    background-color: transparent;
+    background-image:none !important;
+    border:none !important;
+}
+
+#timeLabel
+{
+  float : left;
+  width : 400;
+}
+
+text
+{
+  font: 14px sans-serif;
+}
+
+.dot
+{
+  stroke: #000;
+}
+
+.axis path,.axis line
+{
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.label
+{
+  fill: #777;
+}
+
+// Tooltips?
+label
+{
+  display: inline-block;
+  width: 5em;
+}
+
+.timeLabel
+{
+  font: 500 100px "Helvetica Neue";
+  fill: #ddd;
+}
+
+.year.label.active
+{
+  fill: #aaa;
+}
+
+.overlay
+{
+  fill: none;
+  pointer-events: all;
+  cursor: ew-resize;
+}
+</style>
+<script type="text/javascript">
+<%
+println new File("javascript/d3/3.0.2/d3.min.js").text
+println new File("javascript/d3/3.0.2/lib/colorbrewer/colorbrewer.js").text
+println new File("javascript/jquery/1.9.1/js/jquery-1.8.2.min.js").text
+println new File("javascript/jquery/1.9.1/js/jquery-ui-1.9.1.custom.min.js").text
+println new File("javascript/jquery/touch/jquery.ui.touch-punch-min.js").text
+%>
+</script>
+</head>
+<body>
+<div id="chartTitle" class="ui-widget-content">
+  <h1 id="titletext">Motion Chart</h1>
+</div>
+
+<div id="settings" style="visibility: hidden">
+  <div id="chartHeight" value="600"></div>
+  <div id="chartWidth" value="800"></div>
+  <div id="topMargin" value="40"></div>
+  <div id="bottomMargin" value="50"></div>
+  <div id="leftMargin" value="140"></div>
+  <div id="rightMargin" value="40"></div>
+  <div id="title" value="Motion Chart"></div>
+  <div id="xtitle" value="X"></div>
+  <div id="ytitle" value="Y"></div>
+  <div id="sizetitle" value="Size"></div>
+  <div id="nametitle" value="Name"></div>
+  <div id="categorytitle" value="Category"></div>
+  <div id="xaxisscale" value="Linear"></div>
+  <div id="yaxisscale" value="Linear"></div>
+  <div id="xFormat" value=",d"></div>
+  <div id="yFormat" value=",d"></div>
+  <div id="fontSize" value="12"></div>
+  <div id="timeFontSize" value="100"></div>
+  <div id="yAxisFontSize" value="32"></div>
+  <div id="xAxisFontSize" value="32"></div>
+  <div id="numXTicks" value="10"></div>
+  <div id="numYTicks" value="10"></div>
+  <div id="opacity" value="90"></div>
+  <div id="colorScheme" value="1"></div>
+  <div id="maxDuration" value="1000"></div>
+  
+  <div id="titleTop" value="0"></div>
+  <div id="titleLeft" value="0"></div>
+  <div id="timeLabelTop" value="0"></div>
+  <div id="timeLabelLeft" value="0"></div>
+  <div id="chartTop" value="0"></div>
+  <div id="chartLeft" value="0"></div>
+  <div id="chartConfigTop" value="200"></div>
+  <div id="chartConfigLeft" value="600"></div>
+</div>
+
+<div id="chart"><svg><defs id="gradients"></defs></svg></div>
+<div id="timeLabel" class="ui-widget-content"><svg></svg></div>
+<script>
+var fill;
+
+function shadeColor(color, percent)
+{
+  var R = parseInt(color.substring(1,3),16)
+  var G = parseInt(color.substring(3,5),16)
+  var B = parseInt(color.substring(5,7),16);
+
+  R = parseInt(R * (100 + percent) / 100);
+  G = parseInt(G * (100 + percent) / 100);
+  B = parseInt(B * (100 + percent) / 100);
+
+  R = (R<255)?R:255;  
+  G = (G<255)?G:255;  
+  B = (B<255)?B:255;  
+
+  var RR = ((R.toString(16).length==1)?"0"+R.toString(16):R.toString(16));
+  var GG = ((G.toString(16).length==1)?"0"+G.toString(16):G.toString(16));
+  var BB = ((B.toString(16).length==1)?"0"+B.toString(16):B.toString(16));
+
+  return "#"+RR+GG+BB;
+}
+
+<% println new File("javascript/dex/dexutils.js").text %>
+
+function gradient(baseColor)
+{
+  if (baseColor.charAt(0) == 'r')
+  {
+    baseColor = colorToHex(baseColor);
+  }
+  var gradientId;
+  gradientId = "gradient" + baseColor.substring(1)
+  console.log("GradientId: " + gradientId);
+  console.log("BaseColor : " + baseColor);
+  
+  //var lightColor = shadeColor(baseColor, -10)
+  var darkColor = shadeColor(baseColor, -20) 
+  
+  var grad = d3.select("#gradients").selectAll("#" + gradientId)
+    .data([ gradientId ])
+    .enter()
+    .append("radialGradient")
+    .attr("class", "colorGradient")
+    .attr("id", gradientId)
+    .attr("gradientUnits", "objectBoundingBox")
+    .attr("fx", "30%")
+    .attr("fy", "30%")
+
+  grad.append("stop")
+    .attr("offset", "0%")
+    .attr("style", "stop-color:#FFFFFF")
+  
+  // Middle
+  grad.append("stop")
+    .attr("offset", "40%")
+    .attr("style", "stop-color:" + baseColor)
+
+  // Outer Edges
+  grad.append("stop")
+    .attr("offset", "100%")
+    .attr("style", "stop-color:" + darkColor)
+
+  return "url(#" + gradientId + ")";
+}
+
+function setColorScheme()
+{
+  if (colorScheme == 1)
+  {
+   fill = d3.scale.category10();
+  }
+  else if (colorScheme == 2)
+  {
+    fill = d3.scale.category20();
+  }
+  else if (colorScheme == 3)
+  {
+    fill = d3.scale.category20b();
+  }
+  else if (colorScheme == 4)
+  {
+    fill = d3.scale.category20c();
+  }
+  else if (colorScheme in colorbrewer)
+  {
+    console.log("COLOR-BREWER: " + colorScheme)
+    fill = d3.scale.ordinal().range(colorbrewer[colorScheme][9]);
+  }
+  else
+  {
+    fill = d3.scale.category20();
+  }
+
+  //console.log("SetColorScheme()");
+  // FOO
+  //d3.select("#gradients").html("");
+  d3.selectAll(".colorGradient").remove();
+
+  //console.log("chartSvg: " + d3.select("#chartSvg"));
+
+  //var rects = d3.select("#chartSvg").selectAll("g.cell").selectAll("rect")
+  // .text(function(d) { console.log("D.name" + d.name); return d.name; })
+  // .style("fill", function(d) { console.log("D.name" + d.name); return gradient(fill(d.name)); });
+
+  //rects.append("svg:text")
+  //  .text(function(d) { return d.name; });
+}
+
+var jsonData = [
+                {"name":"United States","category":"America","x":[[1950,15855.86],[1951,16750.74],[1952,17039.38],[1953,17471.28],[1954,16979.26],[1955,17822.45],[1956,17783.27],[1957,17749.5],[1958,17217.39],[1959,18084.11],[1960,18175.43],[1961,18226.62],[1962,18978.45],[1963,19461.1],[1964,20243.98],[1965,21209.93],[1966,22263.22],[1967,22495.68],[1968,23268.21],[1969,23669.41],[1970,23345.77],[1971,23744.67],[1972,24654.04],[1973,25742],[1974,25281.7],[1975,24889.6],[1976,25881.72],[1977,26715.14],[1978,27814.18],[1979,28278.91],[1980,27838.11],[1981,28160.14],[1982,27243.47],[1983,28119.69],[1984,29785.25],[1985,30636.21],[1986,31297.31],[1987,31953.81],[1988,32860.52],[1989,33587.09],[1990,33710.39],[1991,33076.87],[1992,33589.59],[1993,33914.89],[1994,34730.56],[1995,35053.29],[1996,35807],[1997,36847.81],[1998,37811.68],[1999,38912.58],[2000,39758.5],[2001,39474.11],[2002,39535.84],[2003,40044.18],[2004,40956.4],[2005,41674],[2006,42385.18],[2007,42866.22],[2008,42656.49],[2009,41256.08]], "size":[[1950,152271000],[1951,154878000],[1952,157553000],[1953,160184000],[1954,163026000],[1955,165931000],[1956,168903000],[1957,171984000],[1958,174882000],[1959,177830000],[1960,180671000],[1961,183691000],[1962,186538000],[1963,189242000],[1964,191889000],[1965,194303000],[1966,196560000],[1967,198712000],[1968,200706000],[1969,202677000],[1970,205052000],[1971,207661000],[1972,209896000],[1973,211909000],[1974,213854000],[1975,215973000],[1976,218035000],[1977,220239000],[1978,222585000],[1979,225055000],[1980,227726463],[1981,229966237],[1982,232187835],[1983,234307207],[1984,236348292],[1985,238466283],[1986,240650755],[1987,242803533],[1988,245021414],[1989,247341697],[1990,250131894],[1991,253492503],[1992,256894189],[1993,260255352],[1994,263435673],[1995,266557091],[1996,269667391],[1997,272911760],[1998,276115288],[1999,279294713],[2000,282338631],[2001,285023886],[2002,287675526],[2003,290342554],[2004,293027571],[2005,295734134],[2006,298444215],[2007,301139947],[2008,303824646]],"y":[[1800,39.41],[1880,39.41],[1890,45.21],[1901,49.3],[1902,50.5],[1903,50.6],[1904,49.6],[1905,50.3],[1906,50.1],[1907,50.2],[1908,51.9],[1909,52.8],[1910,51.8],[1911,53.4],[1912,54.1],[1913,53.5],[1914,54.6],[1915,55.1],[1916,54.2],[1917,54],[1918,47.2],[1919,55.3],[1920,55.4],[1921,58.2],[1922,58.1],[1923,57.5],[1924,58.5],[1925,58.5],[1926,57.9],[1927,59.4],[1928,58.3],[1929,58.5],[1930,59.6],[1931,60.3],[1932,61],[1933,60.95],[1934,60.31],[1935,60.97],[1936,60.42],[1937,61.11],[1938,62.44],[1939,63.12],[1940,63.28],[1941,63.84],[1942,64.63],[1943,64.34],[1944,65.13],[1945,65.63],[1946,66.33],[1947,66.73],[1948,67.3],[1949,67.68],[1950,68.12],[1951,68.22],[1952,68.44],[1953,68.79],[1954,69.58],[1955,69.63],[1956,69.71],[1957,69.49],[1958,69.76],[1959,69.98],[1960,69.91],[1961,70.32],[1962,70.21],[1963,70.04],[1964,70.33],[1965,70.41],[1966,70.43],[1967,70.76],[1968,70.42],[1969,70.66],[1970,70.92],[1971,71.24],[1972,71.34],[1973,71.54],[1974,72.08],[1975,72.68],[1976,72.99],[1977,73.38],[1978,73.58],[1979,74.03],[1980,73.93],[1981,74.36],[1982,74.65],[1983,74.71],[1984,74.82],[1985,74.79],[1986,74.87],[1987,75.01],[1988,75.03],[1989,75.31],[1990,75.6],[1991,75.8],[1992,76.08],[1993,75.83],[1994,76],[1995,76.09],[1996,76.44],[1997,76.8],[1998,76.97],[1999,76.97],[2000,77.13],[2001,77.25],[2002,77.31],[2003,77.49],[2004,77.92],[2005,77.93],[2006,78.21],[2007,79.09],[2008,79.27],[2009,79.43]]},
+                {"name":"China","category":"East Asia & Pacific","x":[[1950,394.49],[1951,432.35],[1952,473.38],[1953,486.2],[1954,490.39],[1955,507.64],[1956,542.5],[1957,560],[1958,607.89],[1959,604.38],[1960,583.02],[1961,486.83],[1962,484.67],[1963,519.76],[1964,567.77],[1965,617.76],[1966,657.14],[1967,622.45],[1968,594.27],[1969,627.78],[1970,685.35],[1971,699.98],[1972,702.94],[1973,738.22],[1974,735.36],[1975,767.09],[1976,750.79],[1977,786.85],[1978,861.1],[1979,915.22],[1980,934.27],[1981,977.54],[1982,1044.34],[1983,1107.46],[1984,1229.08],[1985,1337.64],[1986,1406.19],[1987,1529.5],[1988,1611.38],[1989,1615.03],[1990,1647.38],[1991,1732.13],[1992,1877.41],[1993,2035.59],[1994,2214.2],[1995,2521.34],[1996,2546.44],[1997,2653.3],[1998,2635.55],[1999,2784.39],[2000,3012.12],[2001,3309.8],[2002,3695.65],[2003,4228.98],[2004,4551.13],[2005,4909.2],[2006,5450.12],[2007,6127.78],[2008,6679.2],[2009,7226.07]],
+                 "size":[[1950,546815000],[1951,557480000],[1952,568910000],[1953,581390000],[1954,595310000],[1955,608655000],[1956,621465000],[1957,637408000],[1958,653235000],[1959,666005000],[1960,667070000],[1961,660330000],[1962,665770000],[1963,682335000],[1964,698355000],[1965,715185000],[1966,735400000],[1967,754550000],[1968,774510000],[1969,796025000],[1970,818315000],[1971,841105000],[1972,862030000],[1973,881940000],[1974,900350000],[1975,916395000],[1976,930685000],[1977,943455000],[1978,956165000],[1979,969005000],[1980,981235000],[1981,993861000],[1982,1000281000],[1983,1023288000],[1984,1036825000],[1985,1051040000],[1986,1066790000],[1987,1084035000],[1988,1101630000],[1989,1118650000],[1990,1135185000],[1991,1150780000],[1992,1164970000],[1993,1178440000],[1994,1191835000],[1995,1204855000],[1996,1217550000],[1997,1230075000],[1998,1241935000],[1999,1252735000],[2000,1262645000],[2001,1271850000],[2002,1280400000],[2003,1288400000],[2004,1295733978],[2005,1303182268],[2006,1310823807],[2007,1318683096],[2008,1326856173]],"y":[[1950,39.25],[1951,39.64],[1952,40.41],[1953,44.56],[1954,46.47],[1955,48.02],[1956,50.45],[1957,50.55],[1958,50.16],[1959,38.4],[1960,31.63],[1961,34.1],[1962,44.5],[1963,51.9],[1964,53.32],[1965,55.65],[1966,56.8],[1967,58.38],[1968,59.41],[1969,60.97],[1970,62.65],[1971,63.74],[1972,63.12],[1973,62.78],[1974,62.5],[1975,62.7],[1976,62.44],[1977,63.97],[1978,64.24],[1979,65.09],[1980,66.12],[1981,66.45],[1982,66.37],[1983,66.54],[1984,66.71],[1985,66.89],[1986,67.08],[1987,67.29],[1988,67.52],[1989,67.77],[1990,68.04],[1991,68.33],[1992,68.64],[1993,68.95],[1994,69.27],[1995,69.6],[1996,69.94],[1997,70.28],[1998,70.62],[1999,70.96],[2000,71.29],[2001,71.59],[2002,71.87],[2003,72.13],[2004,72.35],[2005,72.56],[2006,72.74],[2007,72.92],[2008,73.1],[2009,73.28]]}
+               ];
+
+<%
+   def nameCol     = dexData.getColumn("name")
+   def categoryCol = dexData.getColumn("category")
+   def timeCol     = dexData.getColumn("time")
+   def xCol        = dexData.getColumn("x")
+   def yCol        = dexData.getColumn("y")
+   def sizeCol     = dexData.getColumn("size")
+
+   if (!nameCol || nameCol.size() <= 0)
+   {
+     nameCol = dexData.getColumn(0)
+     categoryCol = dexData.getColumn(1)
+     xCol = dexData.getColumn(2)
+     yCol = dexData.getColumn(3)
+     sizeCol = dexData.getColumn(4)
+   }
+
+   if (!categoryCol)
+   {
+     categoryCol = nameCol
+   }
+
+   def seriesMap = [:]
+   
+   (0..(nameCol.size()-1)).each
+   {
+     i ->
+     def nameMap = [:]
+     def name = nameCol[i]
+     if (seriesMap.containsKey(name))
+     {
+       nameMap = seriesMap[name]
+     }
+     nameMap.name = name
+     nameMap.category = categoryCol[i]
+     if (!nameMap.x)
+     {
+       nameMap.x = []
+     }
+     if (!nameMap.y)
+     {
+       nameMap.y = []
+     }
+     if (!nameMap.size)
+     {
+       nameMap.size = []
+     }
+
+     nameMap.x << [ timeCol[i], xCol[i] ]
+     nameMap.y << [ timeCol[i], yCol[i] ]
+     nameMap.size << [ timeCol[i], sizeCol[i] ]
+     
+     seriesMap[name] = nameMap
+   }
+
+   def series = []
+
+   seriesMap.each
+   {
+     name, nmap ->
+     series << "{ \"name\":\"$name\", \"category\":\"${nmap.category}\", " +
+       "\"x\":${nmap.x},\"y\":${nmap.y},\"size\":${nmap.size}}"
+   }
+
+   println "jsonData = [" + series.join(",") + "];"
+%>
+
+var width         = parseInt(d3.select("#chartWidth").attr("value"));
+var height        = parseInt(d3.select("#chartHeight").attr("value"));
+var topMargin     = parseInt(d3.select("#topMargin").attr("value"));
+var bottomMargin  = parseInt(d3.select("#bottomMargin").attr("value"));
+var leftMargin    = parseInt(d3.select("#leftMargin").attr("value"));
+var rightMargin   = parseInt(d3.select("#rightMargin").attr("value"));
+var title         = d3.select("#title").attr("value");
+var xtitle        = d3.select("#xtitle").attr("value");
+var ytitle        = d3.select("#ytitle").attr("value");
+var nametitle     = d3.select("#nametitle").attr("value");
+var categorytitle = d3.select("#categorytitle").attr("value");
+var sizetitle     = d3.select("#sizetitle").attr("value");
+var xaxisscale    = d3.select("#xaxisscale").attr("value");
+var yaxisscale    = d3.select("#yaxisscale").attr("value");
+var xFormat       = d3.select("#xFormat").attr("value");
+var yFormat       = d3.select("#yFormat").attr("value");
+var fontSize      = parseInt(d3.select("#fontSize").attr("value"));
+var maxDuration   = parseInt(d3.select("#maxDuration").attr("value"));
+var timeFontSize  = parseInt(d3.select("#timeFontSize").attr("value"));
+var yAxisFontSize = parseInt(d3.select("#yAxisFontSize").attr("value"));
+var xAxisFontSize = parseInt(d3.select("#xAxisFontSize").attr("value"));
+var numXTicks     = parseInt(d3.select("#numXTicks").attr("value"));
+var numYTicks     = parseInt(d3.select("#numYTicks").attr("value"));
+var opacity       = parseInt(d3.select("#opacity").attr("value"));
+var colorScheme   = d3.select("#colorScheme").attr("value");
+
+var titleTop = d3.select("#titleTop").attr("value");
+var titleTop = d3.select("#titleLeft").attr("value");
+var timeLabelTop = d3.select("#timeLabelTop").attr("value");
+var timeLabelTop = d3.select("#timeLabelLeft").attr("value");
+var chartTop = d3.select("#chartTop").attr("value");
+var chartLeft = d3.select("#chartLeft").attr("value");
+var chartConfigTop = d3.select("#chartConfigTop").attr("value");
+var chartConfigLeft = d3.select("#chartConfigLeft").attr("value");
+\$("#chartTitle").position({ top : titleTop, left : titleLeft });
+\$("#chart").position({ top : chartTop, left : chartLeft });
+\$("#chartConfig").position({ top : chartConfigTop, left : chartConfigLeft });
+\$("#timeLabel").position({ top : timeLabelTop, left : timeLabelLeft });
+
+function drawAndPlay()
+{
+  d3.select("#chart svg").selectAll("g").remove();
+  drawMotionChart(width, height, topMargin, bottomMargin,
+                  leftMargin, rightMargin, title, xtitle,
+                  ytitle, xaxisscale, yaxisscale, xFormat,
+                  yFormat, fontSize, xAxisFontSize,
+                  yAxisFontSize, opacity, colorScheme, maxDuration,
+                  true);
+}
+
+function draw()
+{
+  d3.select("#chart svg").selectAll("g").remove();
+  drawMotionChart(width, height, topMargin, bottomMargin,
+                  leftMargin, rightMargin, title, xtitle,
+                  ytitle, xaxisscale, yaxisscale, xFormat,
+                  yFormat, fontSize, xAxisFontSize,
+                  yAxisFontSize, opacity, colorScheme, maxDuration,
+                  false);
+}
+
+function drawMotionChart(width, height, topMargin, bottomMargin,
+                         leftMargin, rightMargin, title, xtitle,
+                         ytitle, xaxisscale, yaxisscale, xFormat,
+                         yFormat, fontSize, xAxisFontSize,
+                         yAxisFontSize, opacity, colorScheme, maxDuration,
+                         play)
+{
+  var xMin, xMax, yMin, yMax, sizeMin, sizeMax, yearMin, yearMax, yearLenMax;
+
+  document.title = title;
+  document.getElementById('titletext').innerHTML = title;
+
+  //var colorwheel = d3.select("radialGradient").id()
+  //console.log("JSONDATA: " + jsonData);
+
+  xMax = xMin = jsonData[0].x[0][1]
+  yMax = yMin = jsonData[0].y[0][1]
+  sizeMax = sizeMin = jsonData[0].size[0][1]
+  yearMax = yearMin = jsonData[0].x[0][0]
+  yearLenMax = 0;
+
+  d3.selectAll("circle").remove();
+  d3.selectAll(".timeLabel").remove();
+
+  for (i=0; i<jsonData.length; i++)
+  {
+    //console.log("MAP[" + i + "]: " + jsonData[i])
+    for (j=0; j<jsonData[i].x.length; j++)
+    {
+      yearMax = Math.max(yearMax, jsonData[i].x[j][0]);
+	  yearMin = Math.min(yearMin, jsonData[i].x[j][0]);
+      xMax = Math.max(xMax, jsonData[i].x[j][1]);
+	  xMin = Math.min(xMin, jsonData[i].x[j][1]);
+	  yearLenMax = (jsonData[i].x[j][0]) ? Math.max(yearLenMax, jsonData[i].x[j][0].toString().length) : yearLenMax;
+    }
+    for (j=0; j<jsonData[i].y.length; j++)
+    {
+      yMax = Math.max(yMax, jsonData[i].y[j][1]);
+	  yMin = Math.min(yMin, jsonData[i].y[j][1]);
+    }
+    for (j=0; j<jsonData[i].size.length; j++)
+    {
+	  sizeMax = Math.max(sizeMax, jsonData[i].size[j][1]);
+	  sizeMin = Math.min(sizeMin, jsonData[i].size[j][1]);
+    }
+  }
+
+  // Favor a zero based origin.
+  if (yMin > 0)
+  {
+    if (yaxisscale == "Linear")
+    {
+      if (yMin < (yMax - yMin))
+      {
+        yMin = 0;
+      }
+    }
+    else
+    {
+      yMin = 0;
+    }
+  }
+  
+  // Try to use a zero range if it doesn't throw the graph out of whack:
+  if (xMin > 0)
+  {
+    if (xaxisscale == "Linear")
+    {
+      if (xMin < (xMax - xMin) )
+      {
+        xMin = 0;
+      }
+    }
+    else
+    {
+      xMin = 0;
+    }
+  }
+
+  console.log("XMIN: " + xMin);
+  console.log("XMAX: " + xMax)
+  console.log("YMIN: " + yMin)
+  console.log("YMAX: " + yMax)
+  console.log("SMIN: " + sizeMin)
+  console.log("SMAX: " + sizeMax)
+  console.log("YLEN: " + yearLenMax);
+
+  readJson = function(text, callback)
+  {
+    callback(text ? JSON.parse(text) : null);
+  }
+
+  // Various accessors that specify the four dimensions of data to visualize.
+  function x(d) { return d.x; }
+  function y(d) { return d.y; }
+  function radius(d) { return d.size; }
+  function color(d) { return d.category; }
+  function key(d) { return d.name; }
+
+  // Various scales. These domains make assumptions of data, naturally.
+  var xScale;
+
+  if (xaxisscale == "Linear")
+  {
+    xScale = d3.scale.linear().domain([xMin, xMax]).range([0, width]);
+  }
+  else if (xaxisscale == "Square Root")
+  {
+    xScale = d3.scale.sqrt().domain([xMin, xMax]).range([0, width]);
+  }
+  else
+  {
+    //xScale = d3.scale.sqrt().domain([xMin, xMax]).range([0, width]);
+    xScale = d3.scale.log().domain([xMin, xMax]).range([0, width]);
+  }
+
+  var yScale;
+
+  if (yaxisscale == "Linear")
+  {
+    yScale = d3.scale.linear().domain([yMin, yMax]).range([height, 0]);
+  }
+  else if (yaxisscale == "Square Root")
+  {
+    yScale = d3.scale.sqrt().domain([yMin, yMax]).range([height, 0]);
+  }
+  else
+  {
+    yScale = d3.scale.log().domain([yMin, yMax]).range([height, 0]);
+  }
+
+  var radiusScale = d3.scale.sqrt().domain([sizeMin, sizeMax]).range([1, 80]);
+  var colorScale = d3.scale.category20();
+
+  // The x & y axes.
+  var xAxis = d3.svg.axis().orient("bottom").scale(xScale).ticks(numXTicks, d3.format(xFormat));
+  var yAxis = d3.svg.axis().orient("left").scale(yScale).ticks(numYTicks, d3.format(yFormat));
+
+  //xAxis.append("g").attr("transform", "rotate(-90)")
+
+  // Create the SVG container and set the origin.
+  var svg = d3.select("#chart svg")
+    .attr("width", width + leftMargin + rightMargin)
+    .attr("height", height + topMargin + bottomMargin)
+  .append("g")
+    .attr("transform", "translate(" + leftMargin + "," + topMargin + ")");
+
+  var timeLabelSvg = d3.select("#timeLabel svg")
+    .attr("width", timeFontSize * yearLenMax)
+    .attr("height", timeFontSize)
+    .append("g");
+
+// Add the x-axis.
+svg.append("g")
+    .attr("class", "x axis")
+    .attr("transform", "translate(0," + height + ")")
+    .call(xAxis);
+
+// Add the y-axis.
+svg.append("g")
+    .attr("class", "y axis")
+    .call(yAxis);
+
+// Add an x-axis label.
+svg.append("text")
+.style("font-size", xAxisFontSize + "px")
+    .attr("class", "x label")
+    .attr("text-anchor", "end")
+    .attr("x", width)
+    .attr("y", height - 6)
+    .text(xtitle);
+
+// Add a y-axis label.
+svg.append("text")
+.style("font-size", yAxisFontSize + "px")
+    .attr("class", "y label")
+    .attr("text-anchor", "end")
+    .attr("y", 10)
+    .attr("dy", ".75em")
+    .attr("transform", "rotate(-90)")
+    .text(ytitle);
+
+  // Add the time label
+  var label = timeLabelSvg.append("text")
+    .attr("class", "timeLabel")
+    .attr("text-anchor", "end")
+    .style("font-size", timeFontSize + "px")
+    .attr("y", timeFontSize)
+    .attr("x", timeFontSize * yearLenMax);
+
+  // Load the data.
+  readJson(JSON.stringify(jsonData), function(timedata) {
+
+  // A bisector since some data is sparsely-defined.
+  var bisect = d3.bisector(function(d) { return d[0]; });
+  
+  // Add a dot per nation. Initialize the data at 1800, and set the colors.
+  var dot = svg.append("g")
+      .attr("class", "dots")
+    .selectAll(".dot")
+    // Used to be 1800
+      .data(interpolateData(yearMin))
+    .enter().append("circle")
+      .attr("class", "dot")
+      //.style("fill", function(d) { return colorScale(color(d)); })
+      .style("opacity", opacity / 100.0)
+      .style("fill", function (d) { return gradient(fill(color(d))) })
+      .call(position)
+      .sort(order)
+      .attr("title", function(d, i)
+      {
+        return "<table padding=\"5\"><tr><td><b>" + nametitle + "</b></td><td><b><i>" + d.name + "</b></i></td></tr>\\n" +
+          "<tr><td><b>" + categorytitle + ":</b></td><td>" + d.category + "</td></tr>\\n" +
+          "<tr><td><b>" + xtitle + ":</b></td><td>" + d.x + "</td></tr>\\n" +
+          "<tr><td><b>" + ytitle + "</b></td><td>" + d.y + "</td></tr>\\n" +
+          "<tr><td><b>" + sizetitle + "</b></td><td>" + d.size + "</td></tr></table>";
+      })
+      .on("mouseover", function()
+      {
+    	  d3.select(this).style("stroke-width", "3").style("opacity", 1);
+    	  var el = d3.select(this)
+          var xpos = Number(el.attr('cx'))
+          var ypos = (el.attr('cy') - d.radius - 10)
+      })
+      .on("mouseout", function(){d3.select(this)
+        .style("stroke-width", "1").style("opacity", opacity/100);});
+  
+//.on("mouseover", function(){d3.select(this).style("fill", "aliceblue");})
+//.on("mouseout", function(){d3.select(this).style("fill", "white");})
+  
+  // Add a title.
+  //dot.append("title")
+  //  .text(function(d) { return d.name + ":\\n\\n" + xtitle + "=" + d.x +
+  //                        "\\n" + ytitle + "=" + d.y + "\\nsize = " + d.size});
+
+  // Start a transition that interpolates the data based on year.
+  
+  if (play)
+  {
+    svg.transition()
+      .duration(Math.min(jsonData.length * 1000, maxDuration))
+      .ease("linear")
+      .tween("year", tweenYear)
+      .each("end", enableInteraction);
+  }
+  else
+  {
+    //tween("year", yearMax);
+    displayYear(yearMax);
+    enableInteraction();
+  }
+  
+  // Positions the dots based on data.
+  function position(dot)
+  {
+    dot .attr("cx", function(d) { return xScale(x(d)); })
+        .attr("cy", function(d) { return yScale(y(d)); })
+        .attr("r", function(d) { return radiusScale(radius(d)); });
+  }
+
+  // Defines a sort order so that the smallest dots are drawn on top.
+  function order(a, b)
+  {
+    return radius(b) - radius(a);
+  }
+
+  // After the transition finishes, you can mouseover to change the year.
+  function enableInteraction()
+  {
+    var box = label.node().getBBox();
+
+    var yearScale = d3.scale.linear()
+        .domain([yearMin, yearMax])
+        .range([box.x + 10, box.x + box.width - 10])
+        .clamp(true);
+
+    timeLabelSvg.append("rect")
+        .attr("class", "overlay")
+        .attr("x", box.x)
+        .attr("y", box.y)
+        .attr("width", box.width)
+        .attr("height", box.height)
+        .on("mouseover", mouseover)
+        .on("mouseout", mouseout)
+        .on("mousemove", mousemove)
+        .on("touchmove", mousemove);
+
+    function mouseover()
+    {
+      label.classed("active", true);
+    }
+
+    function mouseout()
+    {
+      label.classed("active", false);
+    }
+
+    function mousemove()
+    {
+      displayYear(yearScale.invert(d3.mouse(this)[0]));
+    }
+  }
+
+  // Tweens the entire chart by first tweening the year, and then the data.
+  // For the interpolated data, the dots and label are redrawn.
+  function tweenYear() {
+    var year = d3.interpolateNumber(yearMin, yearMax);
+    return function(t) { displayYear(year(t)); };
+  }
+
+  // Updates the display to show the specified year.
+  function displayYear(year)
+  {
+    dot.data(interpolateData(year), key).call(position).sort(order);
+    //dot.select("title")
+    //  .text(function(d) { return d.name + ":\\n\\n" + xtitle + "=" + d.x + "\\n" +
+    //                      ytitle + "=" + d.y + "\\nsize = " + d.size});
+    label.text(Math.round(year));
+  }
+
+  // Interpolates the dataset for the given (fractional) year.
+  function interpolateData(year)
+  {
+    return timedata.map(function(d) {
+      return {
+        name: d.name,
+        category: d.category,
+        x: interpolateValues(d.x, year),
+        size: interpolateValues(d.size, year),
+        y: interpolateValues(d.y, year)
+      };
+    });
+  }
+
+  // Finds (and possibly interpolates) the value for the specified year.
+  function interpolateValues(values, year) {
+    var i = bisect.left(values, year, 0, values.length - 1),
+        a = values[i];
+    if (i > 0) {
+      var b = values[i - 1],
+          t = (year - a[0]) / (b[0] - a[0]);
+      return a[1] * (1 - t) + b[1] * t;
+    }
+    return a[1];
+  }
+});
+}
+
+setColorScheme();
+drawAndPlay();
+
+// JQuery begins here:
+
+<%
+   println """
+
+function toggleConfig()
+{
+  if (\$("#chartConfig").css('visibility') == 'hidden')
+  {
+    show("#chartConfig");
+  }
+  else
+  {
+    hide("#chartConfig");
+  }
+}
+
+function hide(elt)
+{
+  \$(elt).css("visibility", "hidden");
+}
+
+function show(elt)
+{
+  \$(elt).css("visibility", "visible");
+}
+
+\$(function()
+{
+  \$(document).tooltip(
+  {
+    track : true
+  });
+});
+
+\$(function()
+{
+  \$( "#chartTitle" ).draggable().zIndex(4);
+  \$( "#timeLabel" ).draggable().zIndex(3);
+  \$( "#chartConfig" ).draggable().zIndex(2);
+  \$( "#chart" ).draggable().zIndex(1);
+});
+
+\$(document).keypress(function(e)
+{
+  if (e.altKey)
+  {
+    console.log("Alt Pressed");
+    toggleConfig();
+  }
+});
+
+\$("#chartTitle").draggable(
+{
+  stop: function(event, ui)
+  {
+    var pos = \$(this).position();
+   	d3.select("#titleTop").attr("value", pos.top);
+   	d3.select("#titleLeft").attr("value", pos.left);
+  }
+});
+
+\$("#chart").draggable(
+{
+  stop: function(event, ui)
+  {
+   	// Show dropped position.
+   	var pos = \$(this).position();
+   	d3.select("#chartTop").attr("value", pos.top);
+   	d3.select("#chartLeft").attr("value", pos.left);
+  }
+});
+
+\$("#chartConfig").draggable(
+{
+  stop: function(event, ui)
+  {
+   	var pos = \$(this).position();
+    d3.select("#chartConfigTop").attr("value", pos.top);
+    d3.select("#chartConfigLeft").attr("value", pos.left);
+  }
+});
+
+\$("#timeLabel").draggable(
+{
+  stop: function(event, ui)
+  {
+   	var pos = \$(this).position();
+    d3.select("#timeLabelTop").attr("value", pos.top);
+    d3.select("#timeLabelLeft").attr("value", pos.left);
+  }
+});
+
+\$(function()
+{
+  \$( "#height-slider" ).slider(
+  {
+    min: 100,
+	max: 2000,
+	value: height,
+	slide : function(event, ui)
+	{
+	  height = ui.value;
+	  draw();
+      \$("#height-input").val(height);
+      d3.select("#chartHeight").attr("value", height);
+	}
+  });
+  \$("#height-input").val(height);
+  d3.select("#chartHeight").attr("value", height);
+});
+
+\$(function()
+{
+  \$("#height-input").change(function ()
+  {
+    height = parseInt(this.value);
+    draw();
+    d3.select("#chartHeight").attr("value", height);
+    \$("#height-slider").slider("value", height);
+  });
+});
+
+\$(function()
+{
+  \$( "#width-slider" ).slider(
+  {
+    min: 100,
+	max: 2000,
+	value: width,
+	slide : function(event, ui)
+	{
+	  width = ui.value;
+	  draw();
+	  \$("#width-input").val(width);
+	  d3.select("#chartWidth").attr("value", width);
+	}
+  });
+  \$("#width-input").val(width);
+  d3.select("#chartWidth").attr(width);
+});
+
+\$(function()
+{
+  \$("#width-input").change(function ()
+  {
+    width = parseInt(this.value);
+    draw();
+    d3.select("#chartWidth").attr("value", width);
+    \$("#width-slider").slider("value", width);
+  });
+});
+
+\$(function()
+{
+  \$( "#topmargin-slider" ).slider(
+  {
+	min: -100,
+	max: 200,
+	value: topMargin,
+	slide : function(event, ui)
+	{
+	  topMargin = ui.value;
+	  draw();
+	  \$("#topmargin-input").val(topMargin);
+	  d3.select("#topMargin").attr("value", topMargin);
+	}
+  });
+  \$("#topmargin-input").val(topMargin);
+  d3.select("#topMargin").attr("value", topMargin);
+});
+
+\$(function()
+{
+  \$("#topmargin-input").change(function ()
+  {
+    topMargin = parseInt(this.value);
+    draw();
+    d3.select("#topMargin").attr("value", topMargin);
+    \$("#topmargin-slider").slider("value", topMargin);
+  });
+});
+    
+\$(function()
+{
+  \$( "#bottommargin-slider" ).slider(
+  {
+    min: -100,
+	max: 200,
+	value: bottomMargin,
+	slide : function(event, ui)
+	{
+	  bottomMargin = ui.value;
+	  draw();
+	  \$("#bottommargin-input").val(bottomMargin);
+	  d3.select("#bottomMargin").attr("value", bottomMargin);
+	}
+  });
+  \$("#bottommargin-input").val(bottomMargin);
+  d3.select("#bottomMargin").attr("value", bottomMargin);
+});
+
+\$(function()
+{
+  \$("#bottommargin-input").change(function ()
+  {
+    bottomMargin = parseInt(this.value);
+    draw();
+    d3.select("#bottomMargin").attr("value", bottomMargin);
+    \$("#bottommargin-slider").slider("value", bottomMargin);
+  });
+});
+
+\$(function()
+{
+  \$( "#leftmargin-slider" ).slider(
+  {
+    min: -100,
+	max: 200,
+	value: leftMargin,
+	slide : function(event, ui)
+	{
+	  leftMargin = ui.value;
+	  draw();
+	  \$("#leftMargin-input").val(leftMargin);
+	  d3.select("#leftMargin").attr("value", leftMargin);
+	}
+  });
+  \$("#leftmargin-input").val(leftMargin);
+  d3.select("#leftMargin").attr("value", leftMargin);
+});
+	
+\$(function()
+{
+  \$("#leftmargin-input").change(function ()
+  {
+    leftMargin = parseInt(this.value);
+    draw();
+    d3.select("#leftMargin").attr("value", leftMargin);
+    \$("#leftmargin-slider").slider("value", leftMargin);
+  });
+});
+    
+	\$(function() {
+		\$( "#rightmargin-slider" ).slider(
+		{
+	      min: -100,
+		  max: 200,
+		  value: rightMargin,
+		  slide : function(event, ui)
+		  {
+		    rightMargin = ui.value;
+		    draw();
+	        \$("#rightmargin-input").val(rightMargin);
+	        d3.select("#rightMargin").attr("value", rightMargin);
+		  }
+		});
+		\$("#rightmargin-input").val(rightMargin);
+		d3.select("#rightMargin").attr("value", rightMargin);
+	});
+
+    \$(function()
+    {
+      \$("#rightmargin-input").change(function ()
+      {
+          rightMargin = parseInt(this.value);
+          draw();
+          d3.select("#rightMargin").attr("value", rightMargin);
+          \$("#rightmargin-slider").slider("value", rightMargin);
+      });
+    });
+
+	\$(function() {
+		\$( "#maxduration-slider" ).slider(
+		{
+	      min: 0,
+		  max: 300000,
+		  value: maxDuration,
+		  slide : function(event, ui)
+		  {
+		    maxDuration = ui.value;
+		    draw();
+	        \$("#maxduration-input").val(maxDuration);
+	        d3.select("#maxDuration").attr("value", maxDuration);
+		  }
+		});
+		\$("#maxduration-input").val(maxDuration);
+		d3.select("#maxDuration").attr(maxDuration);
+	});
+
+    \$(function()
+    {
+      \$("#maxduration-input").change(function ()
+      {
+          maxDuration = parseInt(this.value);
+          draw();
+          d3.select("#maxDuration").attr("value", maxDuration);
+          \$("#maxduration-slider").slider("value", maxDuration);
+      });
+    });
+
+  \$(function() {
+		\$( "#opacity-slider" ).slider(
+		{
+	      min: 0,
+		  max: 100,
+		  value: opacity,
+		  slide : function(event, ui)
+		  {
+		    opacity = ui.value;
+		    d3.select("#opacity").attr("value", opacity);
+	        draw();
+	        \$("#opacity-input").val(opacity);
+		  }
+		});
+		\$("#opacity-input").val(opacity);
+		d3.select("#opacity").attr("value", opacity);
+	});
+
+    \$(function()
+    {
+      \$("#opacity-input").change(function ()
+      {
+          opacity = parseInt(this.value);
+          d3.select("#opacity").attr("value", opacity);
+          draw();
+          \$("#opacity-slider").slider("value", opacity);
+      });
+    });
+
+\$(function()
+{
+  \$( "#fontsize-slider" ).slider(
+  {
+    min: 0,
+	max: 100,
+	value: fontSize,
+	slide : function(event, ui)
+	{
+	  fontSize = ui.value;
+	  d3.select("#fontSize").attr("value", fontSize);
+	  draw();
+	  \$("#fontsize-input").val(fontSize);
+	}
+  });
+  \$("#fontsize-input").val(fontSize);
+  d3.select("#fontSize").attr("value", fontSize);
+});
+
+\$(function()
+{
+  \$("#fontsize-input").change(function ()
+  {
+    fontSize = parseInt(this.value);
+    d3.select("#fontSize").attr("value", fontSize);
+    draw();
+    \$("#fontsize-slider").slider("value", fontSize);
+  });
+});
+
+\$(function()
+{
+  \$( "#timefontsize-slider" ).slider(
+  {
+    min: 0,
+	max: 300,
+	value: timeFontSize,
+	slide : function(event, ui)
+	{
+	  timeFontSize = ui.value;
+	  d3.select("#timeFontSize").attr("value", timeFontSize);
+	  draw();
+	  \$("#timefontsize-input").val(timeFontSize);
+	}
+  });
+  \$("#timefontsize-input").val(timeFontSize);
+  d3.select("#timeFontSize").attr("value", timeFontSize);
+});
+
+\$(function()
+{
+  \$("#timefontsize-input").change(function ()
+  {
+    timeFontSize = parseInt(this.value);
+    d3.select("#timeFontSize").attr("value", timeFontSize);
+    draw();
+    \$("#timefontsize-slider").slider("value", timeFontSize);
+  });
+});
+
+\$(function()
+{
+  \$( "#xaxisfontsize-slider" ).slider(
+  {
+    min: 0,
+	max: 100,
+	value: xAxisFontSize,
+	slide : function(event, ui)
+	{
+	  xAxisFontSize = ui.value;
+	  d3.select("#xAxisFontSize").attr("value", xAxisFontSize);
+	  draw();
+	  \$("#xaxisfontsize-input").val(xAxisFontSize);
+	}
+  });
+  \$("#xaxisfontsize-input").val(xAxisFontSize);
+  d3.select("#xAxisFontSize").attr("value", xAxisFontSize);
+});
+
+\$(function()
+{
+  \$("#xaxisfontsize-input").change(function ()
+  {
+    xAxisFontSize = parseInt(this.value);
+    d3.select("#xAxisFontSize").attr("value", xAxisFontSize);
+    draw();
+    \$("#xaxisfontsize-slider").slider("value", xAxisFontSize);
+  });
+});
+
+\$(function()
+{
+  \$( "#yaxisfontsize-slider" ).slider(
+  {
+    min: 0,
+	max: 100,
+	value: yAxisFontSize,
+	slide : function(event, ui)
+	{
+	  yAxisFontSize = ui.value;
+	  d3.select("#yAxisFontSize").attr("value", yAxisFontSize);
+	  draw();
+	  \$("#yaxisfontsize-input").val(yAxisFontSize);
+	}
+  });
+  \$("#yaxisfontsize-input").val(yAxisFontSize);
+  d3.select("#yAxisFontSize").attr("value", yAxisFontSize);
+});
+
+\$(function()
+{
+  \$("#yaxisfontsize-input").change(function ()
+  {
+    yAxisFontSize = parseInt(this.value);
+    d3.select("#yAxisFontSize").attr("value", yAxisFontSize);
+    draw();
+    \$("#yaxisfontsize-slider").slider("value", yAxisFontSize);
+  });
+});
+
+\$(function()
+{
+  \$("#colorschemeSelection").change(function ()
+  {
+    colorScheme = this.value;
+    d3.select("#colorScheme").attr("value", colorScheme);
+    setColorScheme();
+    draw();
+  });
+});
+
+\$(function()
+{
+  \$("#xaxisscaleSelection").change(function ()
+  {
+    xaxisscale = this.value;
+    d3.select("#xaxisscale").attr("value", xaxisscale);
+    draw();
+  });
+});
+
+\$(function()
+{
+  \$("#yaxisscaleSelection").change(function ()
+  {
+    yaxisscale = this.value;
+    d3.select("#yaxisscale").attr("value", yaxisscale);
+    draw();
+  });
+});
+
+function titleChange(newTitle)
+{
+  d3.select("title").text(newTitle);
+  d3.select("#titletext").text(newTitle);
+  d3.select("#title").attr("value", newTitle);
+}
+
+function xtitleChange(newTitle)
+{
+  xtitle = newTitle;
+  d3.select("#xtitle").attr("value", xtitle);
+  draw();
+}
+
+function ytitleChange(newTitle)
+{
+  ytitle = newTitle;
+  d3.select("#ytitle").attr("value", ytitle);
+  draw();
+}
+
+function sizetitleChange(newTitle)
+{
+  sizetitle = newTitle;
+  d3.select("#sizetitle").attr("value", sizetitle);
+  draw();
+}
+
+function nametitleChange(newTitle)
+{
+  nametitle = newTitle;
+  d3.select("#nametitle").attr("value", nametitle);
+  draw();
+}
+
+function categorytitleChange(newTitle)
+{
+  categorytitle = newTitle;
+  d3.select("#categorytitle").attr("value", categorytitle);
+  draw();
+}
+
+function xformatChange(newFormat)
+{
+  xFormat = newFormat;
+  d3.select("#xFormat").attr("value", xFormat);
+  draw();
+}
+
+function yformatChange(newFormat)
+{
+  yFormat = newFormat;
+  d3.select("#yFormat").attr("value", yFormat);
+  draw();
+}
+
+\$(function()
+{
+  \$("#play-button").click(function ()
+  {
+    drawAndPlay();
+  });
+});
+
+"""
+%>
+
+</script>
+<div id="chartConfig">
+    <h1>Configuration</h1>
+	<div>
+		<label for="height">Height:</label>
+		<input type="text" id="height-input" size="5" style="border:0; color:#f6931f; font-weight:bold;" />
+		<div id="height-slider"/>
+	</div>
+	<div>
+		<label for="width">Width:</label>
+		<input type="text" id="width-input" size="5" style="border:0; color:#f6931f; font-weight:bold;" />
+		<div id="width-slider"/>
+	</div>
+	<div>
+		<label for="topmargin">Top Margin:</label>
+		<input type="text" id="topmargin-input" size="5" style="border:0; color:#f6931f; font-weight:bold;" />
+		<div id="topmargin-slider"/>
+	</div>
+    <div>
+		<label for="bottommargin">Bottom Margin:</label>
+		<input type="text" id="bottommargin-input" size="5" style="border:0; color:#f6931f; font-weight:bold;" />
+		<div id="bottommargin-slider"/>
+	</div>
+	<div>
+		<label for="leftmargin">Left Margin:</label>
+		<input type="text" id="leftmargin-input" size="5" style="border:0; color:#f6931f; font-weight:bold;" />
+		<div id="leftmargin-slider"/>
+	</div>
+	<div>
+		<label for="rightmargin">Right Margin:</label>
+		<input type="text" id="rightmargin-input" size="5" style="border:0; color:#f6931f; font-weight:bold;" />
+		<div id="rightmargin-slider"/>
+	</div>
+	<div>
+		<label for="maxduration">Max Duration:</label>
+		<input type="text" id="maxduration-input" size="6" style="border:0; color:#f6931f; font-weight:bold;" />
+		<div id="maxduration-slider"/>
+	</div>
+	<div>
+		<label for="opacity">Opacity:</label>
+		<input type="text" id="opacity-input" size="5" style="border:0; color:#f6931f; font-weight:bold;" />
+		<div id="opacity-slider"/>
+	</div>
+	<div>
+		<label for="fontsize">Font Size:</label>
+		<input type="text" id="fontsize-input" size="5" style="border:0; color:#f6931f; font-weight:bold;" />
+		<div id="fontsize-slider"/>
+	</div>
+	<div>
+		<label for="timefontsize">Time Font Size:</label>
+		<input type="text" id="timefontsize-input" size="5" style="border:0; color:#f6931f; font-weight:bold;" />
+		<div id="timefontsize-slider"/>
+	</div>
+	<div>
+	  <label title="This option will set the scale for the X axis." for="yaxisscale">X Axis Scale:</label>
+	  <select id="xaxisscaleSelection" class="combobox">
+		<option value="Linear">Linear</option>
+		<option value="Square Root">Square Root</option>
+		<option value="Logarithmic">Logarithmic</option>
+	  </select>
+	</div>
+	<div>
+	  <label title="This option will set the scale for the Y axis." for="yaxisscale">Y Axis Scale:</label>
+	  <select id="yaxisscaleSelection" class="combobox">
+		<option value="Linear">Linear</option>
+		<option value="Square Root">Square Root</option>
+		<option value="Logarithmic">Logarithmic</option>
+	  </select>
+	</div>
+
+	<div>
+	  <label for="colorschemeSelection">Scheme:</label>
+	  <select id="colorschemeSelection" class="combobox">
+		<option value="1">Category10</option>
+		<option value="2">Category20</option>
+		<option value="3">Category20b</option>
+		<option value="4">Category20c</option>
+		<option value="YlGn">YlGn</option>
+		<option value="YlGnBu">YlGnBu</option>
+		<option value="GnBu">GnBu</option>
+		<option value="BuGn">BuGn</option>
+		<option value="PuBuGn">PuBuGn</option>
+		<option value="PuBu">PuBu</option>
+		<option value="BuPu">BuPu</option>
+		<option value="RdPu">RdPu</option>
+		<option value="PuRd">PuRd</option>
+		<option value="OrRd">OrRd</option>
+		<option value="YlOrRd">YlOrRd</option>
+		<option value="YlOrBr">YlOrBr</option>
+		<option value="Purples">Purples</option>
+		<option value="Blues">Blues</option>
+		<option value="Greens">Greens</option>
+		<option value="Oranges">Oranges</option>
+		<option value="Reds">Reds</option>
+		<option value="Greys">Greys</option>
+		<option value="PuOr">PuOr</option>
+		<option value="BrBG">BrBG</option>
+		<option value="PRGn">PRGn</option>
+		<option value="PiYG">PiYG</option>
+		<option value="RdBu">RdBu</option>
+		<option value="RdGy">RdGy</option>
+		<option value="RdYlBu">RdYlBu</option>
+		<option value="Spectral">Spectral</option>
+		<option value="RdYlGn">RdYlGn</option>
+	  </select>
+	</div>
+	<div>
+		<label for="charttitle">Title:</label>
+		<input type="text" id="charttitle" size="20" style="border:2; color:#f6931f; font-weight:10;" onchange="titleChange(this.value)" />
+	</div>
+
+    <!-- X Axis Stuff -->
+	<div>
+		<label for="xtitle">X Title:</label>
+		<input type="text" id="xtitle" size="15" style="border:2; color:#f6931f; font-weight:10;" onchange="xtitleChange(this.value)" />
+	</div>
+	<div>
+		<label for="xformat">X Format:</label>
+		<input type="text" id="xformat" size="15" style="border:2; color:#f6931f; font-weight:10;" onchange="xformatChange(this.value)" />
+	</div>
+	<div>
+		<label for="xaxisfontsize">X Font Size:</label>
+		<input type="text" id="xaxisfontsize-input" size="5" style="border:0; color:#f6931f; font-weight:bold;" />
+		<div id="xaxisfontsize-slider"/>
+	</div>
+
+    <!-- Y Axis -->	
+	<div>
+		<label for="ytitle">Y Title:</label>
+		<input type="text" id="ytitle" size="15" style="border:2; color:#f6931f; font-weight:10;" onchange="ytitleChange(this.value)" />
+	</div>
+	<div>
+		<label for="yformat">Y Format:</label>
+		<input type="text" id="yformat" size="15" style="border:2; color:#f6931f; font-weight:10;" onchange="yformatChange(this.value)" />
+	</div>
+	<div>
+		<label title="This slider and input controls the size of the font of the Y axis label." for="yaxisfontsize">Y Font Size:</label>
+		<input type="text" id="yaxisfontsize-input" size="5" style="border:0; color:#f6931f; font-weight:bold;" />
+		<div id="yaxisfontsize-slider"/>
+	</div>
+
+	<div>
+		<label for="sizetitle">Size:</label>
+		<input type="text" id="sizetitle" size="15" style="border:2; color:#f6931f; font-weight:10;" onchange="sizetitleChange(this.value)" />
+	</div>
+	<div>
+		<label
+		  title="Enter the name of what this data was categorized by here.  It will show up in the tooltips for each of the bubbles."
+		  for="categorytitle">Color:</label>
+		<input type="text" id="categorytitle" size="15" style="border:2; color:#f6931f; font-weight:10;" onchange="categorytitleChange(this.value)" />
+	</div>
+    <div>
+	  <button type="submit" id="play-button">Play</button>
+	</div>
+</div>
+  </body>
+</html>

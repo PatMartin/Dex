@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Finger based box rotation demo</title>
+		<script>
+			var ws;
+			// Support both the WebSocket and MozWebSocket objects
+			if ((typeof(WebSocket) == 'undefined') &&
+				(typeof(MozWebSocket) != 'undefined')) {
+			  WebSocket = MozWebSocket;
+			}
+			// Create the socket with event handlers
+			function init() {
+			  //Create and open the socket
+			  ws = new WebSocket("ws://localhost:6437/");
+			  // On successful connection
+			  ws.onopen = function(event) {
+				document.getElementById("main").style.visibility = "visible";
+				document.getElementById("connection").innerHTML = "WebSocket connection open!";
+			  };
+			  // On message received
+			  ws.onmessage = function(event) {
+				var obj = JSON.parse(event.data);
+				var outputdiv = document.getElementById("output");
+				outputdiv.innerHTML = "";
+				try{
+					var fingervec = obj['pointables'][0]['direction'];
+				}
+				catch(err){
+					//don't care if no data, just don't complain for now
+				}
+				if (fingervec !== undefined){
+					window['rotx'] = fingervec[0];
+					window['roty'] = fingervec[1];
+					window['rotz'] = fingervec[2];
+				}
+				for (var rotation in fingervec){
+					outputdiv.innerHTML += fingervec[rotation]+"<br>";
+				}
+			  };
+			  // On socket close
+			  ws.onclose = function(event) {
+				ws = null;
+				document.getElementById("main").style.visibility = "hidden";
+				document.getElementById("connection").innerHTML = "WebSocket connection closed";
+			  }
+			  //On socket error
+			  ws.onerror = function(event) {
+				alert("Received error");
+			  };
+			}
+		</script>
+	</head>
+	<body onload="init();">
+		<div id='three'></div>
+	<div id="connection">WebSocket not connected</div>
+		<div id="main" style="visibility:hidden">
+			<p>JSON Frame data:</p>
+			<div id="output"></div>
+		</div>
+		<script src="http://mrdoob.github.com/three.js/build/three.min.js"></script>
+		<script>
+			var camera, scene, renderer;
+			var geometry, material, mesh;
+			threeinit();
+			threeanimate();
+			function threeinit() {
+				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera.position.z = 1000;
+				scene = new THREE.Scene();
+				geometry = new THREE.CubeGeometry( 500, 500, 500 );
+				material = new THREE.MeshBasicMaterial( { color: 0x0000ff, wireframe: true } );
+				mesh = new THREE.Mesh( geometry, material );
+				scene.add( mesh );
+				renderer = new THREE.CanvasRenderer();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				document.getElementById('three').appendChild(renderer.domElement);
+			}
+			function threeanimate() {
+				// note: three.js includes requestAnimationFrame shim
+				requestAnimationFrame( threeanimate );
+				mesh.rotation.x = window['roty'];
+				mesh.rotation.y = -window['rotx'];
+				mesh.rotation.z = -window['rotz'];
+				renderer.render( scene, camera );
+			}
+		</script>
+	</body>
+</html>

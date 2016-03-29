@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html><head>
+<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+    <title>Graph Viewer Test</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Visualization of sparse matrices collection with vivagraph.js">
+    <meta name="author" content="Andrei Kashcha">
+
+    <link href="VivaGraph_files/bootstrap.css" rel="stylesheet">
+    <link href="VivaGraph_files/bootstrap-responsive.css" rel="stylesheet">
+    
+    <style type="text/css">
+    body, html { height: 100%;width: 100%; position: absolute; overflow: hidden; margin:0px;}
+    body { padding-top: 46px; }
+/*    canvas { background-color : black;}*/
+    #graphVisualization { width: 100%;}
+    #searchForm { position: absolute; z-index: 2}
+    #settings { position: absolute;width: 225px;right: 4px;top: 58px;overflow-y: auto; }
+    #settings > label { clear: both; float: left; margin-top: 6px; margin-right: 10px; width: 107px; }
+    #toggleLayout { position: absolute; bottom: 50px; margin-left: 50%; cursor: pointer; font-size: 15px;}
+    #about { display: none; }
+    #webglsupport { text-align:center;position: absolute;left: 50%;margin-left: -150px; margin-top: 20px; display: none; }
+    #mouseScrollHint { position: absolute;width: 225px;right: 4px;bottom: 50px;}
+    .share_container { float: right; margin-top: 10px; margin-right: -50px;}
+    
+    .max-height { height: 100%; }
+    .no-overflow { overflow: hidden; }
+    .scrollable { overflow: auto;}
+    .whole-height { position: absolute; bottom: 0px; top: 0px;margin-bottom: 0px; margin-left: 0px;}
+    .take-it-all {position: absolute; bottom: 50px; top: 40px; width: 100%;}
+    .popover-inner { width: 360px;}
+    .popover { margin-left: -50px;}
+    .row { margin-left: 0px;}
+    .modal-body { overflow-y: hidden;}
+    .settings-box { width : 80px; float: left;}
+    </style>
+</head>
+<body data-twttr-rendered="true">
+    <div class="navbar navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </a>
+          <a class="brand" href="#">Yasiv</a>
+          <div class="nav-collapse">
+            <ul class="nav">
+              <li><a href="javascript:$('#about').modal()">About</a></li>
+              <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                      Contact...
+                      <b class="caret"></b>
+                </a>
+                <ul class="dropdown-menu">
+                    <li><a href="mailto:anvaka@yasiv.com">E-mail</a></li>
+                    <li><a href="http://blog.yasiv.com/">Blog</a></li>              
+                    <li><a href="https://twitter.com/#%21/yasivcom">Twitter</a></li>
+                    <li><a href="https://www.facebook.com/pages/Yasiv/234739739945193">Facebook</a></li>
+                </ul>
+              </li>
+
+  
+              <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                      More Visualizations...
+                      <b class="caret"></b>
+                </a>
+                <ul class="dropdown-menu">
+                    <li><a href="http://www.yasiv.com/amazon#/Search?q=Lord%20of%20the%20rings&amp;category=Books&amp;lang=US">Amazon related products</a></li>
+                    <li><a href="http://www.yasiv.com/youtube#/Search?q=Charlie%20bit%20my%20finger%20-%20again%20%21&amp;id=_OBlgSz8sSM">YouTube similar videos</a></li>
+                    <li><a href="http://www.yasiv.com/reddit#/Search?q=videos">Reddit related subreddits</a></li>
+                    <li><a href="http://www.yasiv.com/steam#/Search?q=Team%20Fortress%202&amp;appid=440">Steam games store</a></li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+          
+              <div class="share_container">
+       <iframe allowtransparency="true" id="twitterShare" src="VivaGraph_files/tweet_button.htm" style="width:100px; height:20px;" frameborder="0" scrolling="no"></iframe>
+    </div>
+              <a class="brand" href="https://github.com/anvaka/VivaGraphJS" target="_blank" style="float: right;color: white;text-shadow: 0 1px 0 rgba(255, 255, 255, .1), 0 0 30px rgba(255, 255, 255, .125);-webkit-transition: all .2s linear;-moz-transition: all .2s linear;transition: all .2s linear;">vivagraph.js</a>
+
+
+        </div>
+      </div>
+    </div>
+    <div class="container no-overflow take-it-all">
+        <div class="row max-height">
+            <div class="whole-height" id="graphVisualization">
+            <canvas height="842" width="1231"></canvas></div>
+            <div class="span2 well scrollable whole-height" id="sideNavigation">
+                <h3>Choose Graph:</h3>
+                <div class="sidebar-nav">
+                    <ul class="nav nav-list" id="graphsContainer"><li class="nav-header">Favorite Graphs</li><li class="active" id="HBblckhole"><a href="#HB/blckhole">HB/blckhole</a></li><li id="Bairw5151"><a href="#Bai/rw5151">Bai/rw5151</a></li><li id="HBbcsstm13"><a href="#HB/bcsstm13">HB/bcsstm13</a></li><li id="HBjagmesh6"><a href="#HB/jagmesh6">HB/jagmesh6</a></li><li id="HBwatt_1"><a href="#HB/watt_1">HB/watt_1</a></li><li id="HBlshp1882"><a href="#HB/lshp1882">HB/lshp1882</a></li><li id="HBplat1919"><a href="#HB/plat1919">HB/plat1919</a></li><li id="HBbcsstk26"><a href="#HB/bcsstk26">HB/bcsstk26</a></li><li id="HBbcsstm26"><a href="#HB/bcsstm26">HB/bcsstm26</a></li><li id="Baitols2000"><a href="#Bai/tols2000">Bai/tols2000</a></li><li id="Baidw1024"><a href="#Bai/dw1024">Bai/dw1024</a></li><li id="Bairdb2048"><a href="#Bai/rdb2048">Bai/rdb2048</a></li><li id="PajekCSphd"><a href="#Pajek/CSphd">Pajek/CSphd</a></li><li id="GHS_indeflaser"><a href="#GHS_indef/laser">GHS_indef/laser</a></li><li class="nav-header">Bai</li><li id="Baibfwa398"><a href="#Bai/bfwa398">bfwa398</a></li><li id="Baibfwa62"><a href="#Bai/bfwa62">bfwa62</a></li><li id="Baibfwb398"><a href="#Bai/bfwb398">bfwb398</a></li><li id="Baibfwb62"><a href="#Bai/bfwb62">bfwb62</a></li><li id="Baibfwb782"><a href="#Bai/bfwb782">bfwb782</a></li><li id="Baibwm200"><a href="#Bai/bwm200">bwm200</a></li><li id="Baicdde1"><a href="#Bai/cdde1">cdde1</a></li><li id="Baicdde2"><a href="#Bai/cdde2">cdde2</a></li><li id="Baicdde3"><a href="#Bai/cdde3">cdde3</a></li><li id="Baicdde4"><a href="#Bai/cdde4">cdde4</a></li><li id="Baicdde5"><a href="#Bai/cdde5">cdde5</a></li><li id="Baicdde6"><a href="#Bai/cdde6">cdde6</a></li><li id="Baick104"><a href="#Bai/ck104">ck104</a></li><li id="Baick400"><a href="#Bai/ck400">ck400</a></li><li id="Baick656"><a href="#Bai/ck656">ck656</a></li><li id="Baidw256A"><a href="#Bai/dw256A">dw256A</a></li><li id="Baidw256B"><a href="#Bai/dw256B">dw256B</a></li><li id="Baidwa512"><a href="#Bai/dwa512">dwa512</a></li><li id="Baidwb512"><a href="#Bai/dwb512">dwb512</a></li><li id="Baidwg961a"><a href="#Bai/dwg961a">dwg961a</a></li><li id="Bailop163"><a href="#Bai/lop163">lop163</a></li><li id="Baimhdb416"><a href="#Bai/mhdb416">mhdb416</a></li><li id="Baiodepa400"><a href="#Bai/odepa400">odepa400</a></li><li id="Baiodepb400"><a href="#Bai/odepb400">odepb400</a></li><li id="Baiolm100"><a href="#Bai/olm100">olm100</a></li><li id="Baiolm1000"><a href="#Bai/olm1000">olm1000</a></li><li id="Baiolm500"><a href="#Bai/olm500">olm500</a></li><li id="Baipde225"><a href="#Bai/pde225">pde225</a></li><li id="Baipde900"><a href="#Bai/pde900">pde900</a></li><li id="Baiqh1484"><a href="#Bai/qh1484">qh1484</a></li><li id="Baiqh768"><a href="#Bai/qh768">qh768</a></li><li id="Baiqh882"><a href="#Bai/qh882">qh882</a></li><li id="Bairdb1250"><a href="#Bai/rdb1250">rdb1250</a></li><li id="Bairdb1250l"><a href="#Bai/rdb1250l">rdb1250l</a></li><li id="Bairdb200"><a href="#Bai/rdb200">rdb200</a></li><li id="Bairdb200l"><a href="#Bai/rdb200l">rdb200l</a></li><li id="Bairdb450"><a href="#Bai/rdb450">rdb450</a></li><li id="Bairdb450l"><a href="#Bai/rdb450l">rdb450l</a></li><li id="Bairdb800l"><a href="#Bai/rdb800l">rdb800l</a></li><li id="Bairdb968"><a href="#Bai/rdb968">rdb968</a></li><li id="Bairw136"><a href="#Bai/rw136">rw136</a></li><li id="Bairw496"><a href="#Bai/rw496">rw496</a></li><li id="Baitols1090"><a href="#Bai/tols1090">tols1090</a></li><li id="Baitols2000"><a href="#Bai/tols2000">tols2000</a></li><li id="Baitols340"><a href="#Bai/tols340">tols340</a></li><li id="Baitols90"><a href="#Bai/tols90">tols90</a></li><li id="Baitub100"><a href="#Bai/tub100">tub100</a></li><li id="Baitub1000"><a href="#Bai/tub1000">tub1000</a></li><li class="nav-header">Barabasi</li><li id="BarabasiNotreDame_yeast"><a href="#Barabasi/NotreDame_yeast">NotreDame_yeast</a></li><li class="nav-header">Bates</li><li id="BatesChem97ZtZ"><a href="#Bates/Chem97ZtZ">Chem97ZtZ</a></li><li class="nav-header">FEMLAB</li><li id="FEMLABpoisson2D"><a href="#FEMLAB/poisson2D">poisson2D</a></li><li id="FEMLABproblem1"><a href="#FEMLAB/problem1">problem1</a></li><li class="nav-header">FIDAP</li><li id="FIDAPex1"><a href="#FIDAP/ex1">ex1</a></li><li id="FIDAPex5"><a href="#FIDAP/ex5">ex5</a></li><li class="nav-header">GHS_indef</li><li id="GHS_indeflaser"><a href="#GHS_indef/laser">laser</a></li><li class="nav-header">Grund</li><li id="Grundb1_ss"><a href="#Grund/b1_ss">b1_ss</a></li><li id="Grundb2_ss"><a href="#Grund/b2_ss">b2_ss</a></li><li id="Grundb_dyn"><a href="#Grund/b_dyn">b_dyn</a></li><li id="Grundd_dyn"><a href="#Grund/d_dyn">d_dyn</a></li><li id="Grundd_dyn1"><a href="#Grund/d_dyn1">d_dyn1</a></li><li id="Grundd_ss"><a href="#Grund/d_ss">d_ss</a></li><li id="Grundpoli"><a href="#Grund/poli">poli</a></li><li class="nav-header">Gset</li><li id="GsetG11"><a href="#Gset/G11">G11</a></li><li id="GsetG12"><a href="#Gset/G12">G12</a></li><li id="GsetG13"><a href="#Gset/G13">G13</a></li><li id="GsetG14"><a href="#Gset/G14">G14</a></li><li id="GsetG15"><a href="#Gset/G15">G15</a></li><li id="GsetG16"><a href="#Gset/G16">G16</a></li><li id="GsetG17"><a href="#Gset/G17">G17</a></li><li id="GsetG18"><a href="#Gset/G18">G18</a></li><li id="GsetG19"><a href="#Gset/G19">G19</a></li><li id="GsetG20"><a href="#Gset/G20">G20</a></li><li id="GsetG21"><a href="#Gset/G21">G21</a></li><li id="GsetG32"><a href="#Gset/G32">G32</a></li><li id="GsetG33"><a href="#Gset/G33">G33</a></li><li id="GsetG34"><a href="#Gset/G34">G34</a></li><li id="GsetG35"><a href="#Gset/G35">G35</a></li><li id="GsetG36"><a href="#Gset/G36">G36</a></li><li id="GsetG37"><a href="#Gset/G37">G37</a></li><li id="GsetG38"><a href="#Gset/G38">G38</a></li><li id="GsetG39"><a href="#Gset/G39">G39</a></li><li id="GsetG40"><a href="#Gset/G40">G40</a></li><li id="GsetG41"><a href="#Gset/G41">G41</a></li><li id="GsetG42"><a href="#Gset/G42">G42</a></li><li id="GsetG43"><a href="#Gset/G43">G43</a></li><li id="GsetG44"><a href="#Gset/G44">G44</a></li><li id="GsetG45"><a href="#Gset/G45">G45</a></li><li id="GsetG46"><a href="#Gset/G46">G46</a></li><li id="GsetG47"><a href="#Gset/G47">G47</a></li><li id="GsetG48"><a href="#Gset/G48">G48</a></li><li id="GsetG49"><a href="#Gset/G49">G49</a></li><li id="GsetG50"><a href="#Gset/G50">G50</a></li><li id="GsetG51"><a href="#Gset/G51">G51</a></li><li id="GsetG52"><a href="#Gset/G52">G52</a></li><li id="GsetG53"><a href="#Gset/G53">G53</a></li><li id="GsetG54"><a href="#Gset/G54">G54</a></li><li id="GsetG55"><a href="#Gset/G55">G55</a></li><li id="GsetG57"><a href="#Gset/G57">G57</a></li><li class="nav-header">Hamrle</li><li id="HamrleHamrle1"><a href="#Hamrle/Hamrle1">Hamrle1</a></li><li class="nav-header">HB</li><li id="HB1138_bus"><a href="#HB/1138_bus">1138_bus</a></li><li id="HB494_bus"><a href="#HB/494_bus">494_bus</a></li><li id="HB662_bus"><a href="#HB/662_bus">662_bus</a></li><li id="HB685_bus"><a href="#HB/685_bus">685_bus</a></li><li id="HBabb313"><a href="#HB/abb313">abb313</a></li><li id="HBarc130"><a href="#HB/arc130">arc130</a></li><li id="HBash219"><a href="#HB/ash219">ash219</a></li><li id="HBash292"><a href="#HB/ash292">ash292</a></li><li id="HBash331"><a href="#HB/ash331">ash331</a></li><li id="HBash608"><a href="#HB/ash608">ash608</a></li><li id="HBash85"><a href="#HB/ash85">ash85</a></li><li id="HBash958"><a href="#HB/ash958">ash958</a></li><li id="HBbcspwr01"><a href="#HB/bcspwr01">bcspwr01</a></li><li id="HBbcspwr02"><a href="#HB/bcspwr02">bcspwr02</a></li><li id="HBbcspwr03"><a href="#HB/bcspwr03">bcspwr03</a></li><li id="HBbcspwr04"><a href="#HB/bcspwr04">bcspwr04</a></li><li id="HBbcspwr05"><a href="#HB/bcspwr05">bcspwr05</a></li><li id="HBbcspwr06"><a href="#HB/bcspwr06">bcspwr06</a></li><li id="HBbcspwr07"><a href="#HB/bcspwr07">bcspwr07</a></li><li id="HBbcspwr08"><a href="#HB/bcspwr08">bcspwr08</a></li><li id="HBbcspwr09"><a href="#HB/bcspwr09">bcspwr09</a></li><li id="HBbcsstk01"><a href="#HB/bcsstk01">bcsstk01</a></li><li id="HBbcsstk02"><a href="#HB/bcsstk02">bcsstk02</a></li><li id="HBbcsstk03"><a href="#HB/bcsstk03">bcsstk03</a></li><li id="HBbcsstk04"><a href="#HB/bcsstk04">bcsstk04</a></li><li id="HBbcsstk05"><a href="#HB/bcsstk05">bcsstk05</a></li><li id="HBbcsstk06"><a href="#HB/bcsstk06">bcsstk06</a></li><li id="HBbcsstk07"><a href="#HB/bcsstk07">bcsstk07</a></li><li id="HBbcsstk19"><a href="#HB/bcsstk19">bcsstk19</a></li><li id="HBbcsstk20"><a href="#HB/bcsstk20">bcsstk20</a></li><li id="HBbcsstk22"><a href="#HB/bcsstk22">bcsstk22</a></li><li id="HBbcsstm01"><a href="#HB/bcsstm01">bcsstm01</a></li><li id="HBbcsstm02"><a href="#HB/bcsstm02">bcsstm02</a></li><li id="HBbcsstm03"><a href="#HB/bcsstm03">bcsstm03</a></li><li id="HBbcsstm04"><a href="#HB/bcsstm04">bcsstm04</a></li><li id="HBbcsstm05"><a href="#HB/bcsstm05">bcsstm05</a></li><li id="HBbcsstm06"><a href="#HB/bcsstm06">bcsstm06</a></li><li id="HBbcsstm07"><a href="#HB/bcsstm07">bcsstm07</a></li><li id="HBbcsstm08"><a href="#HB/bcsstm08">bcsstm08</a></li><li id="HBbcsstm09"><a href="#HB/bcsstm09">bcsstm09</a></li><li id="HBbcsstm11"><a href="#HB/bcsstm11">bcsstm11</a></li><li id="HBbcsstm19"><a href="#HB/bcsstm19">bcsstm19</a></li><li id="HBbcsstm20"><a href="#HB/bcsstm20">bcsstm20</a></li><li id="HBbcsstm21"><a href="#HB/bcsstm21">bcsstm21</a></li><li id="HBbcsstm22"><a href="#HB/bcsstm22">bcsstm22</a></li><li id="HBbcsstm23"><a href="#HB/bcsstm23">bcsstm23</a></li><li id="HBbcsstm24"><a href="#HB/bcsstm24">bcsstm24</a></li><li id="HBbcsstm26"><a href="#HB/bcsstm26">bcsstm26</a></li><li id="HBblckhole"><a href="#HB/blckhole">blckhole</a></li><li id="HBbp_0"><a href="#HB/bp_0">bp_0</a></li><li id="HBbp_1000"><a href="#HB/bp_1000">bp_1000</a></li><li id="HBbp_1200"><a href="#HB/bp_1200">bp_1200</a></li><li id="HBbp_1400"><a href="#HB/bp_1400">bp_1400</a></li><li id="HBbp_1600"><a href="#HB/bp_1600">bp_1600</a></li><li id="HBbp_200"><a href="#HB/bp_200">bp_200</a></li><li id="HBbp_400"><a href="#HB/bp_400">bp_400</a></li><li id="HBbp_600"><a href="#HB/bp_600">bp_600</a></li><li id="HBbp_800"><a href="#HB/bp_800">bp_800</a></li><li id="HBcan_1054"><a href="#HB/can_1054">can_1054</a></li><li id="HBcan_1072"><a href="#HB/can_1072">can_1072</a></li><li id="HBcan_144"><a href="#HB/can_144">can_144</a></li><li id="HBcan_161"><a href="#HB/can_161">can_161</a></li><li id="HBcan_187"><a href="#HB/can_187">can_187</a></li><li id="HBcan_229"><a href="#HB/can_229">can_229</a></li><li id="HBcan_24"><a href="#HB/can_24">can_24</a></li><li id="HBcan_256"><a href="#HB/can_256">can_256</a></li><li id="HBcan_268"><a href="#HB/can_268">can_268</a></li><li id="HBcan_292"><a href="#HB/can_292">can_292</a></li><li id="HBcan_445"><a href="#HB/can_445">can_445</a></li><li id="HBcan_61"><a href="#HB/can_61">can_61</a></li><li id="HBcan_62"><a href="#HB/can_62">can_62</a></li><li id="HBcan_634"><a href="#HB/can_634">can_634</a></li><li id="HBcan_715"><a href="#HB/can_715">can_715</a></li><li id="HBcan_73"><a href="#HB/can_73">can_73</a></li><li id="HBcan_838"><a href="#HB/can_838">can_838</a></li><li id="HBcan_96"><a href="#HB/can_96">can_96</a></li><li id="HBcurtis54"><a href="#HB/curtis54">curtis54</a></li><li id="HBdwt_1005"><a href="#HB/dwt_1005">dwt_1005</a></li><li id="HBdwt_1007"><a href="#HB/dwt_1007">dwt_1007</a></li><li id="HBdwt_1242"><a href="#HB/dwt_1242">dwt_1242</a></li><li id="HBdwt_162"><a href="#HB/dwt_162">dwt_162</a></li><li id="HBdwt_193"><a href="#HB/dwt_193">dwt_193</a></li><li id="HBdwt_198"><a href="#HB/dwt_198">dwt_198</a></li><li id="HBdwt_209"><a href="#HB/dwt_209">dwt_209</a></li><li id="HBdwt_221"><a href="#HB/dwt_221">dwt_221</a></li><li id="HBdwt_234"><a href="#HB/dwt_234">dwt_234</a></li><li id="HBdwt_245"><a href="#HB/dwt_245">dwt_245</a></li><li id="HBdwt_2680"><a href="#HB/dwt_2680">dwt_2680</a></li><li id="HBdwt_307"><a href="#HB/dwt_307">dwt_307</a></li><li id="HBdwt_310"><a href="#HB/dwt_310">dwt_310</a></li><li id="HBdwt_346"><a href="#HB/dwt_346">dwt_346</a></li><li id="HBdwt_361"><a href="#HB/dwt_361">dwt_361</a></li><li id="HBdwt_419"><a href="#HB/dwt_419">dwt_419</a></li><li id="HBdwt_492"><a href="#HB/dwt_492">dwt_492</a></li><li id="HBdwt_503"><a href="#HB/dwt_503">dwt_503</a></li><li id="HBdwt_512"><a href="#HB/dwt_512">dwt_512</a></li><li id="HBdwt_59"><a href="#HB/dwt_59">dwt_59</a></li><li id="HBdwt_592"><a href="#HB/dwt_592">dwt_592</a></li><li id="HBdwt_607"><a href="#HB/dwt_607">dwt_607</a></li><li id="HBdwt_66"><a href="#HB/dwt_66">dwt_66</a></li><li id="HBdwt_72"><a href="#HB/dwt_72">dwt_72</a></li><li id="HBdwt_758"><a href="#HB/dwt_758">dwt_758</a></li><li id="HBdwt_869"><a href="#HB/dwt_869">dwt_869</a></li><li id="HBdwt_87"><a href="#HB/dwt_87">dwt_87</a></li><li id="HBdwt_878"><a href="#HB/dwt_878">dwt_878</a></li><li id="HBdwt_918"><a href="#HB/dwt_918">dwt_918</a></li><li id="HBdwt_992"><a href="#HB/dwt_992">dwt_992</a></li><li id="HBeris1176"><a href="#HB/eris1176">eris1176</a></li><li id="HBfs_183_1"><a href="#HB/fs_183_1">fs_183_1</a></li><li id="HBfs_183_3"><a href="#HB/fs_183_3">fs_183_3</a></li><li id="HBfs_183_4"><a href="#HB/fs_183_4">fs_183_4</a></li><li id="HBfs_183_6"><a href="#HB/fs_183_6">fs_183_6</a></li><li id="HBfs_541_1"><a href="#HB/fs_541_1">fs_541_1</a></li><li id="HBfs_541_2"><a href="#HB/fs_541_2">fs_541_2</a></li><li id="HBfs_541_3"><a href="#HB/fs_541_3">fs_541_3</a></li><li id="HBfs_541_4"><a href="#HB/fs_541_4">fs_541_4</a></li><li id="HBfs_680_1"><a href="#HB/fs_680_1">fs_680_1</a></li><li id="HBfs_680_2"><a href="#HB/fs_680_2">fs_680_2</a></li><li id="HBfs_680_3"><a href="#HB/fs_680_3">fs_680_3</a></li><li id="HBgent113"><a href="#HB/gent113">gent113</a></li><li id="HBgr_30_30"><a href="#HB/gr_30_30">gr_30_30</a></li><li id="HBgre_1107"><a href="#HB/gre_1107">gre_1107</a></li><li id="HBgre_115"><a href="#HB/gre_115">gre_115</a></li><li id="HBgre_185"><a href="#HB/gre_185">gre_185</a></li><li id="HBgre_216a"><a href="#HB/gre_216a">gre_216a</a></li><li id="HBgre_216b"><a href="#HB/gre_216b">gre_216b</a></li><li id="HBgre_343"><a href="#HB/gre_343">gre_343</a></li><li id="HBgre_512"><a href="#HB/gre_512">gre_512</a></li><li id="HBhor_131"><a href="#HB/hor_131">hor_131</a></li><li id="HBibm32"><a href="#HB/ibm32">ibm32</a></li><li id="HBillc1033"><a href="#HB/illc1033">illc1033</a></li><li id="HBimpcol_a"><a href="#HB/impcol_a">impcol_a</a></li><li id="HBimpcol_b"><a href="#HB/impcol_b">impcol_b</a></li><li id="HBimpcol_c"><a href="#HB/impcol_c">impcol_c</a></li><li id="HBimpcol_d"><a href="#HB/impcol_d">impcol_d</a></li><li id="HBimpcol_e"><a href="#HB/impcol_e">impcol_e</a></li><li id="HBjagmesh1"><a href="#HB/jagmesh1">jagmesh1</a></li><li id="HBjagmesh2"><a href="#HB/jagmesh2">jagmesh2</a></li><li id="HBjagmesh3"><a href="#HB/jagmesh3">jagmesh3</a></li><li id="HBjagmesh4"><a href="#HB/jagmesh4">jagmesh4</a></li><li id="HBjagmesh5"><a href="#HB/jagmesh5">jagmesh5</a></li><li id="HBjagmesh6"><a href="#HB/jagmesh6">jagmesh6</a></li><li id="HBjagmesh7"><a href="#HB/jagmesh7">jagmesh7</a></li><li id="HBjagmesh8"><a href="#HB/jagmesh8">jagmesh8</a></li><li id="HBjagmesh9"><a href="#HB/jagmesh9">jagmesh9</a></li><li id="HBjgl009"><a href="#HB/jgl009">jgl009</a></li><li id="HBjgl011"><a href="#HB/jgl011">jgl011</a></li><li id="HBjpwh_991"><a href="#HB/jpwh_991">jpwh_991</a></li><li id="HBlap_25"><a href="#HB/lap_25">lap_25</a></li><li id="HBlns_131"><a href="#HB/lns_131">lns_131</a></li><li id="HBlns_511"><a href="#HB/lns_511">lns_511</a></li><li id="HBlnsp_131"><a href="#HB/lnsp_131">lnsp_131</a></li><li id="HBlnsp_511"><a href="#HB/lnsp_511">lnsp_511</a></li><li id="HBlock_700"><a href="#HB/lock_700">lock_700</a></li><li id="HBlshp1009"><a href="#HB/lshp1009">lshp1009</a></li><li id="HBlshp1270"><a href="#HB/lshp1270">lshp1270</a></li><li id="HBlshp1561"><a href="#HB/lshp1561">lshp1561</a></li><li id="HBlshp1882"><a href="#HB/lshp1882">lshp1882</a></li><li id="HBlshp2233"><a href="#HB/lshp2233">lshp2233</a></li><li id="HBlshp2614"><a href="#HB/lshp2614">lshp2614</a></li><li id="HBlshp3025"><a href="#HB/lshp3025">lshp3025</a></li><li id="HBlshp3466"><a href="#HB/lshp3466">lshp3466</a></li><li id="HBlshp_265"><a href="#HB/lshp_265">lshp_265</a></li><li id="HBlshp_406"><a href="#HB/lshp_406">lshp_406</a></li><li id="HBlshp_577"><a href="#HB/lshp_577">lshp_577</a></li><li id="HBlshp_778"><a href="#HB/lshp_778">lshp_778</a></li><li id="HBlund_a"><a href="#HB/lund_a">lund_a</a></li><li id="HBlund_b"><a href="#HB/lund_b">lund_b</a></li><li id="HBmcca"><a href="#HB/mcca">mcca</a></li><li id="HBnnc261"><a href="#HB/nnc261">nnc261</a></li><li id="HBnnc666"><a href="#HB/nnc666">nnc666</a></li><li id="HBnos1"><a href="#HB/nos1">nos1</a></li><li id="HBnos2"><a href="#HB/nos2">nos2</a></li><li id="HBnos4"><a href="#HB/nos4">nos4</a></li><li id="HBnos5"><a href="#HB/nos5">nos5</a></li><li id="HBnos6"><a href="#HB/nos6">nos6</a></li><li id="HBnos7"><a href="#HB/nos7">nos7</a></li><li id="HBorsirr_1"><a href="#HB/orsirr_1">orsirr_1</a></li><li id="HBorsirr_2"><a href="#HB/orsirr_2">orsirr_2</a></li><li id="HBplat362"><a href="#HB/plat362">plat362</a></li><li id="HBplskz362"><a href="#HB/plskz362">plskz362</a></li><li id="HBpores_1"><a href="#HB/pores_1">pores_1</a></li><li id="HBpores_3"><a href="#HB/pores_3">pores_3</a></li><li id="HBrgg010"><a href="#HB/rgg010">rgg010</a></li><li id="HBsaylr1"><a href="#HB/saylr1">saylr1</a></li><li id="HBsaylr3"><a href="#HB/saylr3">saylr3</a></li><li id="HBsherman1"><a href="#HB/sherman1">sherman1</a></li><li id="HBsherman4"><a href="#HB/sherman4">sherman4</a></li><li id="HBshl_0"><a href="#HB/shl_0">shl_0</a></li><li id="HBshl_200"><a href="#HB/shl_200">shl_200</a></li><li id="HBshl_400"><a href="#HB/shl_400">shl_400</a></li><li id="HBsstmodel"><a href="#HB/sstmodel">sstmodel</a></li><li id="HBsteam1"><a href="#HB/steam1">steam1</a></li><li id="HBsteam3"><a href="#HB/steam3">steam3</a></li><li id="HBstr_0"><a href="#HB/str_0">str_0</a></li><li id="HBstr_200"><a href="#HB/str_200">str_200</a></li><li id="HBstr_400"><a href="#HB/str_400">str_400</a></li><li id="HBstr_600"><a href="#HB/str_600">str_600</a></li><li id="HBwell1033"><a href="#HB/well1033">well1033</a></li><li id="HBwest0067"><a href="#HB/west0067">west0067</a></li><li id="HBwest0132"><a href="#HB/west0132">west0132</a></li><li id="HBwest0156"><a href="#HB/west0156">west0156</a></li><li id="HBwest0167"><a href="#HB/west0167">west0167</a></li><li id="HBwest0381"><a href="#HB/west0381">west0381</a></li><li id="HBwest0479"><a href="#HB/west0479">west0479</a></li><li id="HBwest0497"><a href="#HB/west0497">west0497</a></li><li id="HBwest0655"><a href="#HB/west0655">west0655</a></li><li id="HBwest0989"><a href="#HB/west0989">west0989</a></li><li id="HBwest1505"><a href="#HB/west1505">west1505</a></li><li id="HBwest2021"><a href="#HB/west2021">west2021</a></li><li id="HBwill199"><a href="#HB/will199">will199</a></li><li id="HBwill57"><a href="#HB/will57">will57</a></li><li id="HBwm1"><a href="#HB/wm1">wm1</a></li><li id="HBwm2"><a href="#HB/wm2">wm2</a></li><li id="HBwm3"><a href="#HB/wm3">wm3</a></li><li id="HByoung1c"><a href="#HB/young1c">young1c</a></li><li id="HByoung2c"><a href="#HB/young2c">young2c</a></li><li id="HByoung3c"><a href="#HB/young3c">young3c</a></li><li id="HByoung4c"><a href="#HB/young4c">young4c</a></li><li class="nav-header">JGD_BIBD</li><li id="JGD_BIBDbibd_11_5"><a href="#JGD_BIBD/bibd_11_5">bibd_11_5</a></li><li id="JGD_BIBDbibd_12_4"><a href="#JGD_BIBD/bibd_12_4">bibd_12_4</a></li><li id="JGD_BIBDbibd_12_5"><a href="#JGD_BIBD/bibd_12_5">bibd_12_5</a></li><li id="JGD_BIBDbibd_15_3"><a href="#JGD_BIBD/bibd_15_3">bibd_15_3</a></li><li id="JGD_BIBDbibd_17_3"><a href="#JGD_BIBD/bibd_17_3">bibd_17_3</a></li><li id="JGD_BIBDbibd_17_4"><a href="#JGD_BIBD/bibd_17_4">bibd_17_4</a></li><li id="JGD_BIBDbibd_17_4b"><a href="#JGD_BIBD/bibd_17_4b">bibd_17_4b</a></li><li id="JGD_BIBDbibd_81_2"><a href="#JGD_BIBD/bibd_81_2">bibd_81_2</a></li><li id="JGD_BIBDbibd_9_3"><a href="#JGD_BIBD/bibd_9_3">bibd_9_3</a></li><li id="JGD_BIBDbibd_9_5"><a href="#JGD_BIBD/bibd_9_5">bibd_9_5</a></li><li class="nav-header">JGD_CAG</li><li id="JGD_CAGCAG_mat364"><a href="#JGD_CAG/CAG_mat364">CAG_mat364</a></li><li id="JGD_CAGCAG_mat72"><a href="#JGD_CAG/CAG_mat72">CAG_mat72</a></li><li class="nav-header">JGD_Forest</li><li id="JGD_ForestTF10"><a href="#JGD_Forest/TF10">TF10</a></li><li id="JGD_ForestTF11"><a href="#JGD_Forest/TF11">TF11</a></li><li id="JGD_ForestTF12"><a href="#JGD_Forest/TF12">TF12</a></li><li id="JGD_ForestTF13"><a href="#JGD_Forest/TF13">TF13</a></li><li class="nav-header">JGD_Franz</li><li id="JGD_FranzFranz1"><a href="#JGD_Franz/Franz1">Franz1</a></li><li id="JGD_FranzFranz3"><a href="#JGD_Franz/Franz3">Franz3</a></li><li class="nav-header">JGD_G5</li><li id="JGD_G5IG5-10"><a href="#JGD_G5/IG5-10">IG5-10</a></li><li id="JGD_G5IG5-6"><a href="#JGD_G5/IG5-6">IG5-6</a></li><li id="JGD_G5IG5-7"><a href="#JGD_G5/IG5-7">IG5-7</a></li><li id="JGD_G5IG5-8"><a href="#JGD_G5/IG5-8">IG5-8</a></li><li id="JGD_G5IG5-9"><a href="#JGD_G5/IG5-9">IG5-9</a></li><li class="nav-header">JGD_GL6</li><li id="JGD_GL6GL6_D_10"><a href="#JGD_GL6/GL6_D_10">GL6_D_10</a></li><li id="JGD_GL6GL6_D_6"><a href="#JGD_GL6/GL6_D_6">GL6_D_6</a></li><li id="JGD_GL6GL6_D_7"><a href="#JGD_GL6/GL6_D_7">GL6_D_7</a></li><li id="JGD_GL6GL6_D_8"><a href="#JGD_GL6/GL6_D_8">GL6_D_8</a></li><li id="JGD_GL6GL6_D_9"><a href="#JGD_GL6/GL6_D_9">GL6_D_9</a></li><li class="nav-header">JGD_GL7d</li><li id="JGD_GL7dGL7d10"><a href="#JGD_GL7d/GL7d10">GL7d10</a></li><li id="JGD_GL7dGL7d11"><a href="#JGD_GL7d/GL7d11">GL7d11</a></li><li id="JGD_GL7dGL7d26"><a href="#JGD_GL7d/GL7d26">GL7d26</a></li><li class="nav-header">JGD_Homology</li><li id="JGD_Homologych3-3-b1"><a href="#JGD_Homology/ch3-3-b1">ch3-3-b1</a></li><li id="JGD_Homologych3-3-b2"><a href="#JGD_Homology/ch3-3-b2">ch3-3-b2</a></li><li id="JGD_Homologych4-4-b1"><a href="#JGD_Homology/ch4-4-b1">ch4-4-b1</a></li><li id="JGD_Homologych4-4-b2"><a href="#JGD_Homology/ch4-4-b2">ch4-4-b2</a></li><li id="JGD_Homologych4-4-b3"><a href="#JGD_Homology/ch4-4-b3">ch4-4-b3</a></li><li id="JGD_Homologych5-5-b1"><a href="#JGD_Homology/ch5-5-b1">ch5-5-b1</a></li><li id="JGD_Homologych5-5-b2"><a href="#JGD_Homology/ch5-5-b2">ch5-5-b2</a></li><li id="JGD_Homologych5-5-b3"><a href="#JGD_Homology/ch5-5-b3">ch5-5-b3</a></li><li id="JGD_Homologych5-5-b4"><a href="#JGD_Homology/ch5-5-b4">ch5-5-b4</a></li><li id="JGD_Homologych6-6-b1"><a href="#JGD_Homology/ch6-6-b1">ch6-6-b1</a></li><li id="JGD_Homologych6-6-b2"><a href="#JGD_Homology/ch6-6-b2">ch6-6-b2</a></li><li id="JGD_Homologych6-6-b5"><a href="#JGD_Homology/ch6-6-b5">ch6-6-b5</a></li><li id="JGD_Homologych7-6-b1"><a href="#JGD_Homology/ch7-6-b1">ch7-6-b1</a></li><li id="JGD_Homologych7-7-b1"><a href="#JGD_Homology/ch7-7-b1">ch7-7-b1</a></li><li id="JGD_Homologych7-8-b1"><a href="#JGD_Homology/ch7-8-b1">ch7-8-b1</a></li><li id="JGD_Homologych7-9-b1"><a href="#JGD_Homology/ch7-9-b1">ch7-9-b1</a></li><li id="JGD_Homologych8-8-b1"><a href="#JGD_Homology/ch8-8-b1">ch8-8-b1</a></li><li id="JGD_Homologycis-n4c6-b1"><a href="#JGD_Homology/cis-n4c6-b1">cis-n4c6-b1</a></li><li id="JGD_Homologycis-n4c6-b15"><a href="#JGD_Homology/cis-n4c6-b15">cis-n4c6-b15</a></li><li id="JGD_Homologycis-n4c6-b2"><a href="#JGD_Homology/cis-n4c6-b2">cis-n4c6-b2</a></li><li id="JGD_Homologyklein-b1"><a href="#JGD_Homology/klein-b1">klein-b1</a></li><li id="JGD_Homologyklein-b2"><a href="#JGD_Homology/klein-b2">klein-b2</a></li><li id="JGD_Homologymk10-b1"><a href="#JGD_Homology/mk10-b1">mk10-b1</a></li><li id="JGD_Homologymk10-b2"><a href="#JGD_Homology/mk10-b2">mk10-b2</a></li><li id="JGD_Homologymk10-b4"><a href="#JGD_Homology/mk10-b4">mk10-b4</a></li><li id="JGD_Homologymk11-b1"><a href="#JGD_Homology/mk11-b1">mk11-b1</a></li><li id="JGD_Homologymk12-b1"><a href="#JGD_Homology/mk12-b1">mk12-b1</a></li><li id="JGD_Homologymk9-b1"><a href="#JGD_Homology/mk9-b1">mk9-b1</a></li><li id="JGD_Homologymk9-b2"><a href="#JGD_Homology/mk9-b2">mk9-b2</a></li><li id="JGD_Homologymk9-b3"><a href="#JGD_Homology/mk9-b3">mk9-b3</a></li><li id="JGD_Homologyn2c6-b1"><a href="#JGD_Homology/n2c6-b1">n2c6-b1</a></li><li id="JGD_Homologyn2c6-b10"><a href="#JGD_Homology/n2c6-b10">n2c6-b10</a></li><li id="JGD_Homologyn2c6-b2"><a href="#JGD_Homology/n2c6-b2">n2c6-b2</a></li><li id="JGD_Homologyn2c6-b3"><a href="#JGD_Homology/n2c6-b3">n2c6-b3</a></li><li id="JGD_Homologyn2c6-b9"><a href="#JGD_Homology/n2c6-b9">n2c6-b9</a></li><li id="JGD_Homologyn3c4-b1"><a href="#JGD_Homology/n3c4-b1">n3c4-b1</a></li><li id="JGD_Homologyn3c4-b2"><a href="#JGD_Homology/n3c4-b2">n3c4-b2</a></li><li id="JGD_Homologyn3c4-b3"><a href="#JGD_Homology/n3c4-b3">n3c4-b3</a></li><li id="JGD_Homologyn3c4-b4"><a href="#JGD_Homology/n3c4-b4">n3c4-b4</a></li><li id="JGD_Homologyn3c5-b1"><a href="#JGD_Homology/n3c5-b1">n3c5-b1</a></li><li id="JGD_Homologyn3c5-b2"><a href="#JGD_Homology/n3c5-b2">n3c5-b2</a></li><li id="JGD_Homologyn3c5-b3"><a href="#JGD_Homology/n3c5-b3">n3c5-b3</a></li><li id="JGD_Homologyn3c5-b4"><a href="#JGD_Homology/n3c5-b4">n3c5-b4</a></li><li id="JGD_Homologyn3c5-b5"><a href="#JGD_Homology/n3c5-b5">n3c5-b5</a></li><li id="JGD_Homologyn3c5-b6"><a href="#JGD_Homology/n3c5-b6">n3c5-b6</a></li><li id="JGD_Homologyn3c5-b7"><a href="#JGD_Homology/n3c5-b7">n3c5-b7</a></li><li id="JGD_Homologyn3c6-b1"><a href="#JGD_Homology/n3c6-b1">n3c6-b1</a></li><li id="JGD_Homologyn3c6-b10"><a href="#JGD_Homology/n3c6-b10">n3c6-b10</a></li><li id="JGD_Homologyn3c6-b11"><a href="#JGD_Homology/n3c6-b11">n3c6-b11</a></li><li id="JGD_Homologyn3c6-b2"><a href="#JGD_Homology/n3c6-b2">n3c6-b2</a></li><li id="JGD_Homologyn3c6-b3"><a href="#JGD_Homology/n3c6-b3">n3c6-b3</a></li><li id="JGD_Homologyn4c5-b1"><a href="#JGD_Homology/n4c5-b1">n4c5-b1</a></li><li id="JGD_Homologyn4c5-b10"><a href="#JGD_Homology/n4c5-b10">n4c5-b10</a></li><li id="JGD_Homologyn4c5-b11"><a href="#JGD_Homology/n4c5-b11">n4c5-b11</a></li><li id="JGD_Homologyn4c5-b2"><a href="#JGD_Homology/n4c5-b2">n4c5-b2</a></li><li id="JGD_Homologyn4c5-b3"><a href="#JGD_Homology/n4c5-b3">n4c5-b3</a></li><li id="JGD_Homologyn4c5-b9"><a href="#JGD_Homology/n4c5-b9">n4c5-b9</a></li><li id="JGD_Homologyn4c6-b1"><a href="#JGD_Homology/n4c6-b1">n4c6-b1</a></li><li id="JGD_Homologyn4c6-b15"><a href="#JGD_Homology/n4c6-b15">n4c6-b15</a></li><li id="JGD_Homologyn4c6-b2"><a href="#JGD_Homology/n4c6-b2">n4c6-b2</a></li><li class="nav-header">JGD_Kocay</li><li id="JGD_KocayTrec10"><a href="#JGD_Kocay/Trec10">Trec10</a></li><li id="JGD_KocayTrec3"><a href="#JGD_Kocay/Trec3">Trec3</a></li><li id="JGD_KocayTrec4"><a href="#JGD_Kocay/Trec4">Trec4</a></li><li id="JGD_KocayTrec5"><a href="#JGD_Kocay/Trec5">Trec5</a></li><li id="JGD_KocayTrec6"><a href="#JGD_Kocay/Trec6">Trec6</a></li><li id="JGD_KocayTrec7"><a href="#JGD_Kocay/Trec7">Trec7</a></li><li id="JGD_KocayTrec8"><a href="#JGD_Kocay/Trec8">Trec8</a></li><li id="JGD_KocayTrec9"><a href="#JGD_Kocay/Trec9">Trec9</a></li><li class="nav-header">JGD_Margulies</li><li id="JGD_Marguliescat_ears_2_1"><a href="#JGD_Margulies/cat_ears_2_1">cat_ears_2_1</a></li><li id="JGD_Marguliescat_ears_2_4"><a href="#JGD_Margulies/cat_ears_2_4">cat_ears_2_4</a></li><li id="JGD_Marguliescat_ears_3_1"><a href="#JGD_Margulies/cat_ears_3_1">cat_ears_3_1</a></li><li id="JGD_Marguliescat_ears_4_1"><a href="#JGD_Margulies/cat_ears_4_1">cat_ears_4_1</a></li><li id="JGD_Marguliesflower_4_1"><a href="#JGD_Margulies/flower_4_1">flower_4_1</a></li><li id="JGD_Marguliesflower_5_1"><a href="#JGD_Margulies/flower_5_1">flower_5_1</a></li><li id="JGD_Marguliesflower_7_1"><a href="#JGD_Margulies/flower_7_1">flower_7_1</a></li><li id="JGD_Marguliesflower_8_1"><a href="#JGD_Margulies/flower_8_1">flower_8_1</a></li><li id="JGD_Margulieskneser_6_2_1"><a href="#JGD_Margulies/kneser_6_2_1">kneser_6_2_1</a></li><li id="JGD_Margulieswheel_3_1"><a href="#JGD_Margulies/wheel_3_1">wheel_3_1</a></li><li id="JGD_Margulieswheel_4_1"><a href="#JGD_Margulies/wheel_4_1">wheel_4_1</a></li><li id="JGD_Margulieswheel_5_1"><a href="#JGD_Margulies/wheel_5_1">wheel_5_1</a></li><li id="JGD_Margulieswheel_6_1"><a href="#JGD_Margulies/wheel_6_1">wheel_6_1</a></li><li id="JGD_Margulieswheel_7_1"><a href="#JGD_Margulies/wheel_7_1">wheel_7_1</a></li><li class="nav-header">JGD_Relat</li><li id="JGD_Relatrel3"><a href="#JGD_Relat/rel3">rel3</a></li><li id="JGD_Relatrel4"><a href="#JGD_Relat/rel4">rel4</a></li><li id="JGD_Relatrel5"><a href="#JGD_Relat/rel5">rel5</a></li><li id="JGD_Relatrel6"><a href="#JGD_Relat/rel6">rel6</a></li><li id="JGD_Relatrelat3"><a href="#JGD_Relat/relat3">relat3</a></li><li id="JGD_Relatrelat4"><a href="#JGD_Relat/relat4">relat4</a></li><li id="JGD_Relatrelat5"><a href="#JGD_Relat/relat5">relat5</a></li><li id="JGD_Relatrelat6"><a href="#JGD_Relat/relat6">relat6</a></li><li class="nav-header">JGD_SL6</li><li id="JGD_SL6D_10"><a href="#JGD_SL6/D_10">D_10</a></li><li id="JGD_SL6D_11"><a href="#JGD_SL6/D_11">D_11</a></li><li id="JGD_SL6D_5"><a href="#JGD_SL6/D_5">D_5</a></li><li id="JGD_SL6D_6"><a href="#JGD_SL6/D_6">D_6</a></li><li class="nav-header">JGD_SPG</li><li id="JGD_SPG08blocks"><a href="#JGD_SPG/08blocks">08blocks</a></li><li id="JGD_SPGEX1"><a href="#JGD_SPG/EX1">EX1</a></li><li id="JGD_SPGEX2"><a href="#JGD_SPG/EX2">EX2</a></li><li class="nav-header">JGD_Trefethen</li><li id="JGD_TrefethenTrefethen_150"><a href="#JGD_Trefethen/Trefethen_150">Trefethen_150</a></li><li id="JGD_TrefethenTrefethen_20"><a href="#JGD_Trefethen/Trefethen_20">Trefethen_20</a></li><li id="JGD_TrefethenTrefethen_200"><a href="#JGD_Trefethen/Trefethen_200">Trefethen_200</a></li><li id="JGD_TrefethenTrefethen_200b"><a href="#JGD_Trefethen/Trefethen_200b">Trefethen_200b</a></li><li id="JGD_TrefethenTrefethen_20b"><a href="#JGD_Trefethen/Trefethen_20b">Trefethen_20b</a></li><li id="JGD_TrefethenTrefethen_300"><a href="#JGD_Trefethen/Trefethen_300">Trefethen_300</a></li><li id="JGD_TrefethenTrefethen_500"><a href="#JGD_Trefethen/Trefethen_500">Trefethen_500</a></li><li id="JGD_TrefethenTrefethen_700"><a href="#JGD_Trefethen/Trefethen_700">Trefethen_700</a></li><li class="nav-header">LPnetlib</li><li id="LPnetliblp_adlittle"><a href="#LPnetlib/lp_adlittle">lp_adlittle</a></li><li id="LPnetliblp_afiro"><a href="#LPnetlib/lp_afiro">lp_afiro</a></li><li id="LPnetliblp_agg"><a href="#LPnetlib/lp_agg">lp_agg</a></li><li id="LPnetliblp_agg2"><a href="#LPnetlib/lp_agg2">lp_agg2</a></li><li id="LPnetliblp_agg3"><a href="#LPnetlib/lp_agg3">lp_agg3</a></li><li id="LPnetliblp_bandm"><a href="#LPnetlib/lp_bandm">lp_bandm</a></li><li id="LPnetliblp_beaconfd"><a href="#LPnetlib/lp_beaconfd">lp_beaconfd</a></li><li id="LPnetliblp_blend"><a href="#LPnetlib/lp_blend">lp_blend</a></li><li id="LPnetliblp_bnl1"><a href="#LPnetlib/lp_bnl1">lp_bnl1</a></li><li id="LPnetliblp_bore3d"><a href="#LPnetlib/lp_bore3d">lp_bore3d</a></li><li id="LPnetliblp_brandy"><a href="#LPnetlib/lp_brandy">lp_brandy</a></li><li id="LPnetliblp_capri"><a href="#LPnetlib/lp_capri">lp_capri</a></li><li id="LPnetliblp_czprob"><a href="#LPnetlib/lp_czprob">lp_czprob</a></li><li id="LPnetliblp_degen2"><a href="#LPnetlib/lp_degen2">lp_degen2</a></li><li id="LPnetliblp_e226"><a href="#LPnetlib/lp_e226">lp_e226</a></li><li id="LPnetliblp_etamacro"><a href="#LPnetlib/lp_etamacro">lp_etamacro</a></li><li id="LPnetliblp_fffff800"><a href="#LPnetlib/lp_fffff800">lp_fffff800</a></li><li id="LPnetliblp_finnis"><a href="#LPnetlib/lp_finnis">lp_finnis</a></li><li id="LPnetliblp_fit1p"><a href="#LPnetlib/lp_fit1p">lp_fit1p</a></li><li id="LPnetliblp_ganges"><a href="#LPnetlib/lp_ganges">lp_ganges</a></li><li id="LPnetliblp_gfrd_pnc"><a href="#LPnetlib/lp_gfrd_pnc">lp_gfrd_pnc</a></li><li id="LPnetliblp_grow15"><a href="#LPnetlib/lp_grow15">lp_grow15</a></li><li id="LPnetliblp_grow7"><a href="#LPnetlib/lp_grow7">lp_grow7</a></li><li id="LPnetliblp_israel"><a href="#LPnetlib/lp_israel">lp_israel</a></li><li id="LPnetliblp_kb2"><a href="#LPnetlib/lp_kb2">lp_kb2</a></li><li id="LPnetliblp_ken_07"><a href="#LPnetlib/lp_ken_07">lp_ken_07</a></li><li id="LPnetliblp_lotfi"><a href="#LPnetlib/lp_lotfi">lp_lotfi</a></li><li id="LPnetliblp_modszk1"><a href="#LPnetlib/lp_modszk1">lp_modszk1</a></li><li id="LPnetliblp_perold"><a href="#LPnetlib/lp_perold">lp_perold</a></li><li id="LPnetliblp_pilot4"><a href="#LPnetlib/lp_pilot4">lp_pilot4</a></li><li id="LPnetliblp_qap8"><a href="#LPnetlib/lp_qap8">lp_qap8</a></li><li id="LPnetliblp_recipe"><a href="#LPnetlib/lp_recipe">lp_recipe</a></li><li id="LPnetliblp_sc105"><a href="#LPnetlib/lp_sc105">lp_sc105</a></li><li id="LPnetliblp_sc205"><a href="#LPnetlib/lp_sc205">lp_sc205</a></li><li id="LPnetliblp_sc50a"><a href="#LPnetlib/lp_sc50a">lp_sc50a</a></li><li id="LPnetliblp_sc50b"><a href="#LPnetlib/lp_sc50b">lp_sc50b</a></li><li id="LPnetliblp_scagr25"><a href="#LPnetlib/lp_scagr25">lp_scagr25</a></li><li id="LPnetliblp_scagr7"><a href="#LPnetlib/lp_scagr7">lp_scagr7</a></li><li id="LPnetliblp_scfxm1"><a href="#LPnetlib/lp_scfxm1">lp_scfxm1</a></li><li id="LPnetliblp_scfxm2"><a href="#LPnetlib/lp_scfxm2">lp_scfxm2</a></li><li id="LPnetliblp_scfxm3"><a href="#LPnetlib/lp_scfxm3">lp_scfxm3</a></li><li id="LPnetliblp_scorpion"><a href="#LPnetlib/lp_scorpion">lp_scorpion</a></li><li id="LPnetliblp_scrs8"><a href="#LPnetlib/lp_scrs8">lp_scrs8</a></li><li id="LPnetliblp_scsd1"><a href="#LPnetlib/lp_scsd1">lp_scsd1</a></li><li id="LPnetliblp_scsd6"><a href="#LPnetlib/lp_scsd6">lp_scsd6</a></li><li id="LPnetliblp_sctap1"><a href="#LPnetlib/lp_sctap1">lp_sctap1</a></li><li id="LPnetliblp_sctap2"><a href="#LPnetlib/lp_sctap2">lp_sctap2</a></li><li id="LPnetliblp_sctap3"><a href="#LPnetlib/lp_sctap3">lp_sctap3</a></li><li id="LPnetliblp_share1b"><a href="#LPnetlib/lp_share1b">lp_share1b</a></li><li id="LPnetliblp_share2b"><a href="#LPnetlib/lp_share2b">lp_share2b</a></li><li id="LPnetliblp_shell"><a href="#LPnetlib/lp_shell">lp_shell</a></li><li id="LPnetliblp_ship04l"><a href="#LPnetlib/lp_ship04l">lp_ship04l</a></li><li id="LPnetliblp_ship04s"><a href="#LPnetlib/lp_ship04s">lp_ship04s</a></li><li id="LPnetliblp_ship08s"><a href="#LPnetlib/lp_ship08s">lp_ship08s</a></li><li id="LPnetliblp_ship12s"><a href="#LPnetlib/lp_ship12s">lp_ship12s</a></li><li id="LPnetliblp_sierra"><a href="#LPnetlib/lp_sierra">lp_sierra</a></li><li id="LPnetliblp_stair"><a href="#LPnetlib/lp_stair">lp_stair</a></li><li id="LPnetliblp_standata"><a href="#LPnetlib/lp_standata">lp_standata</a></li><li id="LPnetliblp_standgub"><a href="#LPnetlib/lp_standgub">lp_standgub</a></li><li id="LPnetliblp_standmps"><a href="#LPnetlib/lp_standmps">lp_standmps</a></li><li id="LPnetliblp_stocfor1"><a href="#LPnetlib/lp_stocfor1">lp_stocfor1</a></li><li id="LPnetliblp_tuff"><a href="#LPnetlib/lp_tuff">lp_tuff</a></li><li id="LPnetliblp_vtp_base"><a href="#LPnetlib/lp_vtp_base">lp_vtp_base</a></li><li id="LPnetliblpi_bgdbg1"><a href="#LPnetlib/lpi_bgdbg1">lpi_bgdbg1</a></li><li id="LPnetliblpi_bgetam"><a href="#LPnetlib/lpi_bgetam">lpi_bgetam</a></li><li id="LPnetliblpi_bgprtr"><a href="#LPnetlib/lpi_bgprtr">lpi_bgprtr</a></li><li id="LPnetliblpi_box1"><a href="#LPnetlib/lpi_box1">lpi_box1</a></li><li id="LPnetliblpi_chemcom"><a href="#LPnetlib/lpi_chemcom">lpi_chemcom</a></li><li id="LPnetliblpi_cplex2"><a href="#LPnetlib/lpi_cplex2">lpi_cplex2</a></li><li id="LPnetliblpi_ex72a"><a href="#LPnetlib/lpi_ex72a">lpi_ex72a</a></li><li id="LPnetliblpi_ex73a"><a href="#LPnetlib/lpi_ex73a">lpi_ex73a</a></li><li id="LPnetliblpi_forest6"><a href="#LPnetlib/lpi_forest6">lpi_forest6</a></li><li id="LPnetliblpi_galenet"><a href="#LPnetlib/lpi_galenet">lpi_galenet</a></li><li id="LPnetliblpi_itest2"><a href="#LPnetlib/lpi_itest2">lpi_itest2</a></li><li id="LPnetliblpi_itest6"><a href="#LPnetlib/lpi_itest6">lpi_itest6</a></li><li id="LPnetliblpi_klein1"><a href="#LPnetlib/lpi_klein1">lpi_klein1</a></li><li id="LPnetliblpi_klein2"><a href="#LPnetlib/lpi_klein2">lpi_klein2</a></li><li id="LPnetliblpi_mondou2"><a href="#LPnetlib/lpi_mondou2">lpi_mondou2</a></li><li id="LPnetliblpi_pang"><a href="#LPnetlib/lpi_pang">lpi_pang</a></li><li id="LPnetliblpi_pilot4i"><a href="#LPnetlib/lpi_pilot4i">lpi_pilot4i</a></li><li id="LPnetliblpi_qual"><a href="#LPnetlib/lpi_qual">lpi_qual</a></li><li id="LPnetliblpi_reactor"><a href="#LPnetlib/lpi_reactor">lpi_reactor</a></li><li id="LPnetliblpi_refinery"><a href="#LPnetlib/lpi_refinery">lpi_refinery</a></li><li id="LPnetliblpi_vol1"><a href="#LPnetlib/lpi_vol1">lpi_vol1</a></li><li id="LPnetliblpi_woodinfe"><a href="#LPnetlib/lpi_woodinfe">lpi_woodinfe</a></li><li class="nav-header">MathWorks</li><li id="MathWorksHarvard500"><a href="#MathWorks/Harvard500">Harvard500</a></li><li id="MathWorksPd_rhs"><a href="#MathWorks/Pd_rhs">Pd_rhs</a></li><li id="MathWorkspivtol"><a href="#MathWorks/pivtol">pivtol</a></li><li id="MathWorksQRpivot"><a href="#MathWorks/QRpivot">QRpivot</a></li><li class="nav-header">Meszaros</li><li id="Meszaroscep1"><a href="#Meszaros/cep1">cep1</a></li><li id="Meszaroscr42"><a href="#Meszaros/cr42">cr42</a></li><li id="Meszarosde063155"><a href="#Meszaros/de063155">de063155</a></li><li id="Meszarosde063157"><a href="#Meszaros/de063157">de063157</a></li><li id="Meszarosde080285"><a href="#Meszaros/de080285">de080285</a></li><li id="Meszarosfarm"><a href="#Meszaros/farm">farm</a></li><li id="Meszarosgams10a"><a href="#Meszaros/gams10a">gams10a</a></li><li id="Meszarosgams10am"><a href="#Meszaros/gams10am">gams10am</a></li><li id="Meszarosgams30a"><a href="#Meszaros/gams30a">gams30a</a></li><li id="Meszarosgams30am"><a href="#Meszaros/gams30am">gams30am</a></li><li id="Meszarosgams60am"><a href="#Meszaros/gams60am">gams60am</a></li><li id="Meszarosgas11"><a href="#Meszaros/gas11">gas11</a></li><li id="Meszarosiiasa"><a href="#Meszaros/iiasa">iiasa</a></li><li id="Meszarosiprob"><a href="#Meszaros/iprob">iprob</a></li><li id="Meszaroskleemin"><a href="#Meszaros/kleemin">kleemin</a></li><li id="Meszarosl9"><a href="#Meszaros/l9">l9</a></li><li id="Meszarosmodel1"><a href="#Meszaros/model1">model1</a></li><li id="Meszarosmodel2"><a href="#Meszaros/model2">model2</a></li><li id="Meszarosnemsafm"><a href="#Meszaros/nemsafm">nemsafm</a></li><li id="Meszarosnemscem"><a href="#Meszaros/nemscem">nemscem</a></li><li id="Meszarosnsic"><a href="#Meszaros/nsic">nsic</a></li><li id="Meszarosp0033"><a href="#Meszaros/p0033">p0033</a></li><li id="Meszarosp0040"><a href="#Meszaros/p0040">p0040</a></li><li id="Meszarosp0201"><a href="#Meszaros/p0201">p0201</a></li><li id="Meszarosp0282"><a href="#Meszaros/p0282">p0282</a></li><li id="Meszarosp0291"><a href="#Meszaros/p0291">p0291</a></li><li id="Meszarosp0548"><a href="#Meszaros/p0548">p0548</a></li><li id="Meszarosp2756"><a href="#Meszaros/p2756">p2756</a></li><li id="Meszarosproblem"><a href="#Meszaros/problem">problem</a></li><li id="Meszarosqiulp"><a href="#Meszaros/qiulp">qiulp</a></li><li id="Meszarosrefine"><a href="#Meszaros/refine">refine</a></li><li id="Meszarosrosen7"><a href="#Meszaros/rosen7">rosen7</a></li><li id="Meszarosscagr7-2c"><a href="#Meszaros/scagr7-2c">scagr7-2c</a></li><li id="Meszarosscrs8-2b"><a href="#Meszaros/scrs8-2b">scrs8-2b</a></li><li id="Meszarosscrs8-2c"><a href="#Meszaros/scrs8-2c">scrs8-2c</a></li><li id="Meszarossmall"><a href="#Meszaros/small">small</a></li><li id="Meszaroszed"><a href="#Meszaros/zed">zed</a></li><li class="nav-header">Morandini</li><li id="Morandinirobot"><a href="#Morandini/robot">robot</a></li><li id="Morandinirotor1"><a href="#Morandini/rotor1">rotor1</a></li><li class="nav-header">Muite</li><li id="MuiteChebyshev1"><a href="#Muite/Chebyshev1">Chebyshev1</a></li><li class="nav-header">NYPA</li><li id="NYPAMaragal_1"><a href="#NYPA/Maragal_1">Maragal_1</a></li><li id="NYPAMaragal_2"><a href="#NYPA/Maragal_2">Maragal_2</a></li><li class="nav-header">Oberwolfach</li><li id="OberwolfachLF10"><a href="#Oberwolfach/LF10">LF10</a></li><li id="OberwolfachLFAT5"><a href="#Oberwolfach/LFAT5">LFAT5</a></li><li class="nav-header">Pajek</li><li id="PajekCities"><a href="#Pajek/Cities">Cities</a></li><li id="PajekCSphd"><a href="#Pajek/CSphd">CSphd</a></li><li id="Pajekdivorce"><a href="#Pajek/divorce">divorce</a></li><li id="PajekEPA"><a href="#Pajek/EPA">EPA</a></li><li id="PajekErdos02"><a href="#Pajek/Erdos02">Erdos02</a></li><li id="PajekErdos971"><a href="#Pajek/Erdos971">Erdos971</a></li><li id="PajekErdos972"><a href="#Pajek/Erdos972">Erdos972</a></li><li id="PajekErdos981"><a href="#Pajek/Erdos981">Erdos981</a></li><li id="PajekErdos982"><a href="#Pajek/Erdos982">Erdos982</a></li><li id="PajekErdos991"><a href="#Pajek/Erdos991">Erdos991</a></li><li id="PajekErdos992"><a href="#Pajek/Erdos992">Erdos992</a></li><li id="PajekEVA"><a href="#Pajek/EVA">EVA</a></li><li id="Pajekfootball"><a href="#Pajek/football">football</a></li><li id="PajekGD00_a"><a href="#Pajek/GD00_a">GD00_a</a></li><li id="PajekGD00_c"><a href="#Pajek/GD00_c">GD00_c</a></li><li id="PajekGD01_a"><a href="#Pajek/GD01_a">GD01_a</a></li><li id="PajekGD01_A"><a href="#Pajek/GD01_A">GD01_A</a></li><li id="PajekGD01_b"><a href="#Pajek/GD01_b">GD01_b</a></li><li id="PajekGD01_c"><a href="#Pajek/GD01_c">GD01_c</a></li><li id="PajekGD02_a"><a href="#Pajek/GD02_a">GD02_a</a></li><li id="PajekGD02_b"><a href="#Pajek/GD02_b">GD02_b</a></li><li id="PajekGD06_Java"><a href="#Pajek/GD06_Java">GD06_Java</a></li><li id="PajekGD06_theory"><a href="#Pajek/GD06_theory">GD06_theory</a></li><li id="PajekGD95_a"><a href="#Pajek/GD95_a">GD95_a</a></li><li id="PajekGD95_b"><a href="#Pajek/GD95_b">GD95_b</a></li><li id="PajekGD95_c"><a href="#Pajek/GD95_c">GD95_c</a></li><li id="PajekGD96_a"><a href="#Pajek/GD96_a">GD96_a</a></li><li id="PajekGD96_b"><a href="#Pajek/GD96_b">GD96_b</a></li><li id="PajekGD96_c"><a href="#Pajek/GD96_c">GD96_c</a></li><li id="PajekGD96_d"><a href="#Pajek/GD96_d">GD96_d</a></li><li id="PajekGD97_a"><a href="#Pajek/GD97_a">GD97_a</a></li><li id="PajekGD97_b"><a href="#Pajek/GD97_b">GD97_b</a></li><li id="PajekGD97_c"><a href="#Pajek/GD97_c">GD97_c</a></li><li id="PajekGD98_a"><a href="#Pajek/GD98_a">GD98_a</a></li><li id="PajekGD98_b"><a href="#Pajek/GD98_b">GD98_b</a></li><li id="PajekGD98_c"><a href="#Pajek/GD98_c">GD98_c</a></li><li id="PajekGD99_b"><a href="#Pajek/GD99_b">GD99_b</a></li><li id="PajekGD99_c"><a href="#Pajek/GD99_c">GD99_c</a></li><li id="PajekGlossGT"><a href="#Pajek/GlossGT">GlossGT</a></li><li id="PajekJournals"><a href="#Pajek/Journals">Journals</a></li><li id="PajekKohonen"><a href="#Pajek/Kohonen">Kohonen</a></li><li id="PajekRagusa16"><a href="#Pajek/Ragusa16">Ragusa16</a></li><li id="PajekRagusa18"><a href="#Pajek/Ragusa18">Ragusa18</a></li><li id="PajekRoget"><a href="#Pajek/Roget">Roget</a></li><li id="PajekSandi_authors"><a href="#Pajek/Sandi_authors">Sandi_authors</a></li><li id="PajekSandi_sandi"><a href="#Pajek/Sandi_sandi">Sandi_sandi</a></li><li id="PajekSciMet"><a href="#Pajek/SciMet">SciMet</a></li><li id="PajekSmaGri"><a href="#Pajek/SmaGri">SmaGri</a></li><li id="PajekSmallW"><a href="#Pajek/SmallW">SmallW</a></li><li id="PajekStranke94"><a href="#Pajek/Stranke94">Stranke94</a></li><li id="PajekTina_AskCal"><a href="#Pajek/Tina_AskCal">Tina_AskCal</a></li><li id="PajekTina_AskCog"><a href="#Pajek/Tina_AskCog">Tina_AskCog</a></li><li id="PajekTina_DisCal"><a href="#Pajek/Tina_DisCal">Tina_DisCal</a></li><li id="PajekTina_DisCog"><a href="#Pajek/Tina_DisCog">Tina_DisCog</a></li><li id="PajekUSAir97"><a href="#Pajek/USAir97">USAir97</a></li><li id="PajekUSpowerGrid"><a href="#Pajek/USpowerGrid">USpowerGrid</a></li><li id="PajekWorldCities"><a href="#Pajek/WorldCities">WorldCities</a></li><li id="Pajekyeast"><a href="#Pajek/yeast">yeast</a></li><li class="nav-header">Pothen</li><li id="Pothenmesh1e1"><a href="#Pothen/mesh1e1">mesh1e1</a></li><li id="Pothenmesh1em1"><a href="#Pothen/mesh1em1">mesh1em1</a></li><li id="Pothenmesh1em6"><a href="#Pothen/mesh1em6">mesh1em6</a></li><li id="Pothenmesh2e1"><a href="#Pothen/mesh2e1">mesh2e1</a></li><li id="Pothenmesh2em5"><a href="#Pothen/mesh2em5">mesh2em5</a></li><li id="Pothenmesh3e1"><a href="#Pothen/mesh3e1">mesh3e1</a></li><li id="Pothenmesh3em5"><a href="#Pothen/mesh3em5">mesh3em5</a></li><li id="Pothensphere2"><a href="#Pothen/sphere2">sphere2</a></li><li id="Pothensphere3"><a href="#Pothen/sphere3">sphere3</a></li><li class="nav-header">Qaplib</li><li id="Qapliblp_nug05"><a href="#Qaplib/lp_nug05">lp_nug05</a></li><li id="Qapliblp_nug06"><a href="#Qaplib/lp_nug06">lp_nug06</a></li><li id="Qapliblp_nug07"><a href="#Qaplib/lp_nug07">lp_nug07</a></li><li id="Qapliblp_nug08"><a href="#Qaplib/lp_nug08">lp_nug08</a></li><li class="nav-header">Rajat</li><li id="Rajatrajat02"><a href="#Rajat/rajat02">rajat02</a></li><li id="Rajatrajat05"><a href="#Rajat/rajat05">rajat05</a></li><li id="Rajatrajat11"><a href="#Rajat/rajat11">rajat11</a></li><li id="Rajatrajat14"><a href="#Rajat/rajat14">rajat14</a></li><li id="Rajatrajat19"><a href="#Rajat/rajat19">rajat19</a></li><li class="nav-header">Sandia</li><li id="Sandiaoscil_dcop_01"><a href="#Sandia/oscil_dcop_01">oscil_dcop_01</a></li><li id="Sandiaoscil_dcop_02"><a href="#Sandia/oscil_dcop_02">oscil_dcop_02</a></li><li id="Sandiaoscil_dcop_03"><a href="#Sandia/oscil_dcop_03">oscil_dcop_03</a></li><li id="Sandiaoscil_dcop_04"><a href="#Sandia/oscil_dcop_04">oscil_dcop_04</a></li><li id="Sandiaoscil_dcop_05"><a href="#Sandia/oscil_dcop_05">oscil_dcop_05</a></li><li id="Sandiaoscil_dcop_06"><a href="#Sandia/oscil_dcop_06">oscil_dcop_06</a></li><li id="Sandiaoscil_dcop_07"><a href="#Sandia/oscil_dcop_07">oscil_dcop_07</a></li><li id="Sandiaoscil_dcop_08"><a href="#Sandia/oscil_dcop_08">oscil_dcop_08</a></li><li id="Sandiaoscil_dcop_09"><a href="#Sandia/oscil_dcop_09">oscil_dcop_09</a></li><li id="Sandiaoscil_dcop_10"><a href="#Sandia/oscil_dcop_10">oscil_dcop_10</a></li><li id="Sandiaoscil_dcop_11"><a href="#Sandia/oscil_dcop_11">oscil_dcop_11</a></li><li id="Sandiaoscil_dcop_12"><a href="#Sandia/oscil_dcop_12">oscil_dcop_12</a></li><li id="Sandiaoscil_dcop_13"><a href="#Sandia/oscil_dcop_13">oscil_dcop_13</a></li><li id="Sandiaoscil_dcop_14"><a href="#Sandia/oscil_dcop_14">oscil_dcop_14</a></li><li id="Sandiaoscil_dcop_15"><a href="#Sandia/oscil_dcop_15">oscil_dcop_15</a></li><li id="Sandiaoscil_dcop_16"><a href="#Sandia/oscil_dcop_16">oscil_dcop_16</a></li><li id="Sandiaoscil_dcop_17"><a href="#Sandia/oscil_dcop_17">oscil_dcop_17</a></li><li id="Sandiaoscil_dcop_18"><a href="#Sandia/oscil_dcop_18">oscil_dcop_18</a></li><li id="Sandiaoscil_dcop_19"><a href="#Sandia/oscil_dcop_19">oscil_dcop_19</a></li><li id="Sandiaoscil_dcop_20"><a href="#Sandia/oscil_dcop_20">oscil_dcop_20</a></li><li id="Sandiaoscil_dcop_21"><a href="#Sandia/oscil_dcop_21">oscil_dcop_21</a></li><li id="Sandiaoscil_dcop_22"><a href="#Sandia/oscil_dcop_22">oscil_dcop_22</a></li><li id="Sandiaoscil_dcop_23"><a href="#Sandia/oscil_dcop_23">oscil_dcop_23</a></li><li id="Sandiaoscil_dcop_24"><a href="#Sandia/oscil_dcop_24">oscil_dcop_24</a></li><li id="Sandiaoscil_dcop_25"><a href="#Sandia/oscil_dcop_25">oscil_dcop_25</a></li><li id="Sandiaoscil_dcop_26"><a href="#Sandia/oscil_dcop_26">oscil_dcop_26</a></li><li id="Sandiaoscil_dcop_27"><a href="#Sandia/oscil_dcop_27">oscil_dcop_27</a></li><li id="Sandiaoscil_dcop_28"><a href="#Sandia/oscil_dcop_28">oscil_dcop_28</a></li><li id="Sandiaoscil_dcop_29"><a href="#Sandia/oscil_dcop_29">oscil_dcop_29</a></li><li id="Sandiaoscil_dcop_30"><a href="#Sandia/oscil_dcop_30">oscil_dcop_30</a></li><li id="Sandiaoscil_dcop_31"><a href="#Sandia/oscil_dcop_31">oscil_dcop_31</a></li><li id="Sandiaoscil_dcop_32"><a href="#Sandia/oscil_dcop_32">oscil_dcop_32</a></li><li id="Sandiaoscil_dcop_33"><a href="#Sandia/oscil_dcop_33">oscil_dcop_33</a></li><li id="Sandiaoscil_dcop_34"><a href="#Sandia/oscil_dcop_34">oscil_dcop_34</a></li><li id="Sandiaoscil_dcop_35"><a href="#Sandia/oscil_dcop_35">oscil_dcop_35</a></li><li id="Sandiaoscil_dcop_36"><a href="#Sandia/oscil_dcop_36">oscil_dcop_36</a></li><li id="Sandiaoscil_dcop_37"><a href="#Sandia/oscil_dcop_37">oscil_dcop_37</a></li><li id="Sandiaoscil_dcop_38"><a href="#Sandia/oscil_dcop_38">oscil_dcop_38</a></li><li id="Sandiaoscil_dcop_39"><a href="#Sandia/oscil_dcop_39">oscil_dcop_39</a></li><li id="Sandiaoscil_dcop_40"><a href="#Sandia/oscil_dcop_40">oscil_dcop_40</a></li><li id="Sandiaoscil_dcop_41"><a href="#Sandia/oscil_dcop_41">oscil_dcop_41</a></li><li id="Sandiaoscil_dcop_42"><a href="#Sandia/oscil_dcop_42">oscil_dcop_42</a></li><li id="Sandiaoscil_dcop_43"><a href="#Sandia/oscil_dcop_43">oscil_dcop_43</a></li><li id="Sandiaoscil_dcop_44"><a href="#Sandia/oscil_dcop_44">oscil_dcop_44</a></li><li id="Sandiaoscil_dcop_45"><a href="#Sandia/oscil_dcop_45">oscil_dcop_45</a></li><li id="Sandiaoscil_dcop_46"><a href="#Sandia/oscil_dcop_46">oscil_dcop_46</a></li><li id="Sandiaoscil_dcop_47"><a href="#Sandia/oscil_dcop_47">oscil_dcop_47</a></li><li id="Sandiaoscil_dcop_48"><a href="#Sandia/oscil_dcop_48">oscil_dcop_48</a></li><li id="Sandiaoscil_dcop_49"><a href="#Sandia/oscil_dcop_49">oscil_dcop_49</a></li><li id="Sandiaoscil_dcop_50"><a href="#Sandia/oscil_dcop_50">oscil_dcop_50</a></li><li id="Sandiaoscil_dcop_51"><a href="#Sandia/oscil_dcop_51">oscil_dcop_51</a></li><li id="Sandiaoscil_dcop_52"><a href="#Sandia/oscil_dcop_52">oscil_dcop_52</a></li><li id="Sandiaoscil_dcop_53"><a href="#Sandia/oscil_dcop_53">oscil_dcop_53</a></li><li id="Sandiaoscil_dcop_54"><a href="#Sandia/oscil_dcop_54">oscil_dcop_54</a></li><li id="Sandiaoscil_dcop_55"><a href="#Sandia/oscil_dcop_55">oscil_dcop_55</a></li><li id="Sandiaoscil_dcop_56"><a href="#Sandia/oscil_dcop_56">oscil_dcop_56</a></li><li id="Sandiaoscil_dcop_57"><a href="#Sandia/oscil_dcop_57">oscil_dcop_57</a></li><li id="Sandiaoscil_trans_01"><a href="#Sandia/oscil_trans_01">oscil_trans_01</a></li><li class="nav-header">TOKAMAK</li><li id="TOKAMAKutm300"><a href="#TOKAMAK/utm300">utm300</a></li><li class="nav-header">vanHeukelum</li><li id="vanHeukelumcage3"><a href="#vanHeukelum/cage3">cage3</a></li><li id="vanHeukelumcage4"><a href="#vanHeukelum/cage4">cage4</a></li><li id="vanHeukelumcage5"><a href="#vanHeukelum/cage5">cage5</a></li><li id="vanHeukelumcage6"><a href="#vanHeukelum/cage6">cage6</a></li><li id="vanHeukelumcage7"><a href="#vanHeukelum/cage7">cage7</a></li><li class="nav-header">YZhou</li><li id="YZhoucircuit204"><a href="#YZhou/circuit204">circuit204</a></li></ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="progress" style="width: 200px; text-align: center; position: absolute; left: 50%; margin-left: -75px; display: none;">
+        <div class="progress progress-striped"><div class="bar" style="width: 100%;"></div></div>
+        Loading...
+    </div>
+
+
+    <div id="settings">
+        <h3>Layout Settings</h3>
+  <label><i data-original-title="Hook's law coefficient. The smaller number loosens edges length" class="icon-question-sign"></i> Spring Coeff: </label>
+  <input value="0.0008" class="settings-box" id="springCoeff" type="text">
+  
+  <label><i data-original-title="Ideal length of edges in pixels" class="icon-question-sign"></i> Spring Length: </label>
+  <input value="30" class="settings-box" id="springLength" type="text">
+
+  <label><i data-original-title="Coulomb's law coefficient. The smaller number makes repeling force stronger. Making it positive makes node attract each other :)" class="icon-question-sign"></i> Gravity Coeff: </label>
+  <input value="-1.2" class="settings-box" id="gravity" type="text">
+
+  <label><i data-original-title="System cooldown coeffecient. The larger it is the faster system will stop" class="icon-question-sign"></i> Drag Coeff: </label>
+  <input value="0.009" class="settings-box" id="drag" type="text">
+
+  <label><i data-original-title="Barnes-Hut simulation coefficient. Values larger than 1 will make system converge faster but not necessary to the best layout" class="icon-question-sign"></i> Theta Coeff: </label>
+  <input value="0.8" class="settings-box" id="theta" type="text">
+
+  <button type="submit" class="btn">Reset to default</button>
+  
+    <div style="display: block;" id="description"><h3>HB/blckhole</h3><div><b>Nodes: </b>2132</div><div><b>Edges: </b>8502</div><div><b>Image: </b><br><img data-original-title="" src="VivaGraph_files/HBblckhole.gif"></div></div>
+
+    </div>
+    
+    <div id="toggleLayout"><i class="icon-pause"></i>Pause layout</div>
+
+
+        <div id="about" class="modal">
+            <div class="modal-header">
+                <button class="close" data-dismiss="modal">x</button>
+                <h3>About Yasiv</h3>
+            </div>
+            <div class="modal-body">
+                <div>
+                    This is just a demonstration of my open source graph drawing library <a href="https://github.com/anvaka/VivaGraphJS">vivagraph.js</a>.
+                    My goal is to create the fastest graph drawing library in the browser.
+                    Hope you enjoy it and join the project :). Also please feel free to check out my other visualizations.
+                    I would really love to hear what you think. 
+                </div><br>
+                <div>
+                    <a href="mailto:anvaka@yasiv.com" style="">Andrei Kashcha</a>
+                </div>
+                <div>
+                <iframe data-twttr-rendered="true" title="Twitter Follow Button" style="width: 112px; height: 20px;" class="twitter-follow-button" src="VivaGraph_files/follow_button.htm" allowtransparency="true" frameborder="0" scrolling="no"></iframe>
+                </div>
+                 <br>
+
+                <div>
+                    Site uses <a href="http://www.cise.ufl.edu/research/sparse/matrices/">collection of sparse matrices</a> of the University of Florida. 
+                    For more details follow these references:
+                    <ul>
+                        <li>T. A. Davis, The University of Florida 
+Sparse Matrix Collection, ACM Transactions on Mathematical Software 
+(submitted, 2009), also available as a tech report at <a href="http://www.cise.ufl.edu/%7Edavis/techreports/matrices.pdf">http://www.cise.ufl.edu/~davis/techreports/matrices.pdf</a></li>
+                        <li>I. S. Duff, R. G. Grimes, and J. G. Lewis, 
+Sparse Matrix Test Problems, ACM Transactions on Mathematical Software, 
+vol. 15, no. 1. pp. 1-14, 1989, <a href="http://doi.acm.org/10.1145/62038.62043">http://doi.acm.org/10.1145/62038.62043</a></li>
+                        <li>Matrices snapshots prepared by the <a href="http://infochimps.org/">infochimps.org</a> team using <a href="http://infochimps.org/datasets/math-matrices-sparse_matrices">community curated metadata</a></li>
+                        <li>The static graph images are rendered by <a href="http://www2.research.att.com/%7Eyifanhu/SOFTWARE/SFDP/index.html">SFDP algorithm</a>, created by <a href="http://www2.research.att.com/%7Eyifanhu/">Dr. Yifan Hu</a></li>
+                    </ul>
+                </div><br><br>
+            </div>
+        </div>
+        
+        
+        <div id="webglsupport">
+            <div class="alert alert-error">Your browser seem not to support WebGL. <br>
+               I'm falling back to SVG rendering but it's slow.<br> 
+               Click <a href="http://get.webgl.org/troubleshooting">here</a> to troubleshoot 
+               WebGL and get better performance.<br> 
+               Check <a href="http://www.youtube.com/watch?v=L5KrtGB8oA4">this video</a> to see this site in action.
+            </div>
+        </div>
+<!--         <div id='webglsupport'>
+            <div class="alert alert-error">I'm currently experiencing problems with EC2 server. <br/>
+               Sorry about that. I have a video which shows this site in action: <br/>
+               <a href='http://www.youtube.com/watch?v=L5KrtGB8oA4'>WebGL graph rendering</a> <br/>
+               Sigh, if you would excuse my lame error, please come back later. <br/> 
+               I'm trying to fix problem as we speak.
+            </div>
+        </div> -->
+<div id="mouseScrollHint">
+    <span class="label label-inverse">Use mouse wheel to zoom in/zoom out</span>
+</div>
+<script src="VivaGraph_files/ga.js" async="" type="text/javascript"></script><script src="VivaGraph_files/widgets.js" id="twitter-wjs"></script><script src="VivaGraph_files/vivagraph.js"></script>
+<script src="VivaGraph_files/graphsdb.js"></script>
+<script src="VivaGraph_files/jquery.js"></script>
+<script src="VivaGraph_files/bootstrap.js"></script>
+
+<script type="text/javascript">
+/*global Viva $ graphsDb window console*/
+function settingsMonitor(layout, inputsCollection, renderer) {
+    var fields = {},
+        fieldIds = [],
+        i,
+        defaults = {},
+        
+        valueChanged = function() {
+            var newValue = parseFloat(this.value);
+            if (!isNaN(newValue)) {
+                layout[this.id](newValue);
+                renderer.resume();
+            }
+        };
+    
+    for(i = 0; i < inputsCollection.length; ++i) {
+        if (layout.hasOwnProperty(inputsCollection[i].id)) {
+            var id = inputsCollection[i].id;
+            fieldIds.push(id);
+            fields[id] = $(inputsCollection[i]);
+        } else {
+            console.log('Unknown layout parameter: ' + inputsCollection[i].id);
+        }
+    }
+    
+    for(i = 0; i < fieldIds.length; ++i) {
+        var name =fieldIds[i],
+            defaultValue = layout[name](); 
+        defaults[name] = defaultValue;
+        fields[name].val(defaultValue).change(valueChanged);
+    }
+    
+    return {
+        updateToDefault : function() {
+            for(var k in defaults) {
+                if (defaults.hasOwnProperty(k)) {
+                    fields[k].val(defaults[k]);
+                    layout[k](defaults[k]);
+                }
+            }
+            renderer.resume();
+        }
+    };
+}
+
+function simpleCache() {
+    var supported = window.hasOwnProperty('localStorage');
+    
+    return {
+        get : function(key) {
+            if (!supported) { return null; }
+            return JSON.parse(window.localStorage.getItem(key));
+        },
+        put : function(key, value) {
+            if (!supported) { return false;}
+            try {
+                window.localStorage.setItem(key, JSON.stringify(value));
+            } catch(err) {
+                // TODO: make something clever than this in case of quata exceeded.
+                window.localStorage.clear();
+            }
+        }
+    };
+}
+
+function run() {
+        var buildNavigationUI = function() {
+            var container = $('#graphsContainer'),
+                groups = {},
+                i;
+            
+            container.append('<li class="nav-header">Favorite Graphs</li>');
+            
+            for(i = 0; i < graphsDb.favGraphs.length; ++i) {
+                var item = graphsDb.favGraphs[i];
+                container.append('<li id="' + item.replace('/', '') + '"><a href="#' + item + '">' + item + '</a>');
+            }
+            
+            for (i = 0; i < graphsDb.graphsCollection.length; ++i) {
+                var item = graphsDb.graphsCollection[i].split('/');
+                if(!groups.hasOwnProperty(item[0])){
+                    groups[item[0]] = [item[1]];
+                } else {
+                    groups[item[0]].push(item[1]);
+                }
+            }
+            
+            for(var k in groups) {
+                if (groups.hasOwnProperty(k)) {
+                    var subitems = groups[k];
+                    container.append('<li class="nav-header">' + k + '</li>');
+                    for(i = 0; i < subitems.length; ++i) {
+                        var id = k + '/' + subitems[i];
+                        container.append('<li id="' + k + subitems[i] + '"><a href="#' + id  + '">' + subitems[i] + '</a>');
+                    }
+                }
+            }
+        },
+        
+      updateShareButtons = function(){
+           var twitterFrame = $('#twitterShare')[0];
+           twitterFrame.contentWindow.location.replace("http://platform.twitter.com/widgets/tweet_button.html?counturl=http%3A%2F%2Fwww.yasiv.com%2Fgraphs&text=Javascript%20graph%20drawing%20with%20vivagraph.js%20and%20webgl&via=yasivcom&url=" + window.escape(window.location.href));
+       },
+       
+       checkSupport = function() {
+             if (window.WebGLRenderingContext) {
+                  var elem = document.createElement('canvas');
+                  
+                  if (!elem.getContext || !elem.getContext('experimental-webgl')) {
+                      $('#webglsupport').show();
+                      return false;
+                  }
+                  return true; 
+             }
+             return false;
+       },
+       
+       webglSupported = checkSupport();
+        
+        buildNavigationUI();
+        
+        var graph = Viva.Graph.graph(),
+            descriptionContainer = $('#description'),
+            isPaused = false,
+            cache = simpleCache();
+
+        var layout = Viva.Graph.Layout.forceDirected(graph, {
+           springLength : 30,
+           springCoeff : 0.0008,
+           dragCoeff : 0.009,
+           gravity : -1.2,
+           theta : 0.8
+        });
+        
+        var graphics = webglSupported ? Viva.Graph.View.webglGraphics() : Viva.Graph.View.svgGraphics();
+               
+        var renderer = Viva.Graph.View.renderer(graph,
+            {
+                layout     : layout,
+                graphics   : graphics,
+                renderLinks : true,
+                container : document.getElementById('graphVisualization')
+            });
+            
+        renderer.run();
+
+        var renderGraph = function(edges) {
+            graph.beginUpdate();
+            for(var i = 0; i < edges.length - 1; i += 2) {
+                graph.addLink(edges[i], edges[i + 1]);
+            }
+
+            graph.endUpdate();
+            updateShareButtons();
+        }, 
+        
+        setDescription = function(description) {
+            if (graph.name) {
+                var thumbnail = 'http://www2.research.att.com/~yifanhu/GALLERY/GRAPHS/GIF_THUMBNAIL/',
+                    full = 'http://www2.research.att.com/~yifanhu/GALLERY/GRAPHS/GIF_SMALL/',
+                    parts = graph.name.split('/'),
+                    imgName = parts[0] + '@' + parts[1] + '.gif'; 
+                descriptionContainer.append('<h3>' + graph.name + '</h3>');
+                descriptionContainer.append('<div><b>Nodes: </b>' + graph.getNodesCount() + '</div>');
+                descriptionContainer.append('<div><b>Edges: </b>' + graph.getLinksCount() + '</div>');
+                descriptionContainer.append('<div><b>Image: </b><br/><img src="' + thumbnail + imgName + '" /></div>');
+                $('img', descriptionContainer).popover({content : '<img src="' + full + imgName + '" />', placement : 'left'});
+                
+                descriptionContainer.show();
+            }
+        },
+        
+        graphUpdated = function(data) {
+            $('#progress').hide();
+             // unpack graph data to normal array.
+            renderGraph(JSON.parse(data.graph));
+            setDescription(data.description);
+            $('#toggleLayout').html('<i class="icon-pause"></i>Pause layout');
+        },
+        
+        loadGraph = function(search) {
+            $('#progress').show();
+            descriptionContainer.empty().hide();
+
+            graph.clear();
+            
+            var cachedGraph = cache.get(search);
+            if (cachedGraph) {
+                graphUpdated(cachedGraph);
+            } else {
+                var url = 'http://data.yasiv.com/graph/' + search + '?callback=?';
+                
+                $.ajax({
+                  url: url,
+                  dataType: 'jsonp',
+                  success: function(data) {
+                      cache.put(search, data);
+                      graphUpdated(data);
+                  }
+                });
+            }
+            return false;            
+        },
+        
+        getCurrentGraphName = function() {
+            var query = window.location.hash,
+                graphMatch = query.match(/\#(.+\/.+)/i);
+            return graphMatch ? graphMatch[1] : null;
+        },
+        
+        toggleLayout = function() {
+            isPaused = !isPaused;
+            if (isPaused) {
+                $('#toggleLayout').html('<i class="icon-play"></i>Resume layout');
+                renderer.pause();
+            } else {
+                $('#toggleLayout').html('<i class="icon-pause"></i>Pause layout');
+                renderer.resume();
+            }
+            return false;
+        },
+ 
+        visualizeCurrentHash = function() {
+            var graphName = getCurrentGraphName();
+            
+            graph.name = graphName;
+            if (graphName) { 
+                loadGraph(graphName);
+                var currentItem = $('#' + graphName.replace('/', ''));
+                $('.active').removeClass('active');
+                currentItem.addClass('active');
+            }
+        };
+    
+        $(window).hashchange(visualizeCurrentHash);
+        $(window).keydown(function(e) {
+            if (e.keyCode === 32) { // toggle on spacebar; 
+                toggleLayout(); 
+            }
+        });
+    
+        $('#toggleLayout').click(function() {
+            toggleLayout();
+        });
+        var settings = $('#settings'); 
+        $('i', settings).tooltip({placement : 'left'});
+        var monitor = settingsMonitor(layout, $('input', settings), renderer);
+        $('.btn', settings).click(function(){ monitor.updateToDefault(); });
+        visualizeCurrentHash();
+        
+        r = renderer;
+        l = layout;
+        g = graph;
+    }
+    
+    $(run);
+</script>
+
+    <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+    <script type="text/javascript">
+
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-17876667-1']);
+        _gaq.push(['_trackPageview']);
+
+        (function () {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+
+
+
+</body></html>

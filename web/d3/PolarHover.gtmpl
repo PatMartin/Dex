@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+  <title>Polar Hover Effect</title>
+  <script src="http://d3js.org/d3.v3.min.js"></script>
+  <style type="text/css">
+path {
+  fill: none;
+  stroke: black;
+  stroke-width: 2px;
+}
+.axis text {
+  font: 13px sans-serif;
+}
+
+.axis line,
+.axis circle {
+  fill: none;
+  stroke: #777;
+  stroke-dasharray: 1,4;
+}
+
+.line {
+  fill: none;
+  stroke: red;
+  stroke-width: 1.5px;
+}
+</style>
+<body>
+  <div id="graph1"></div>
+<script type="text/javascript">
+
+var w = 500,
+    h = 500,
+    p = 20,
+    rayon = 190;
+
+var data = d3.range(0, 24, .001).map(function(x) {
+  return[x, 145+12*Math.cos((2*Math.PI/24)*(3*x-14))+14*Math.cos(5*(2*Math.PI/24)*(x-2))];
+});
+
+var rScale = d3.scale.linear()
+    .domain([120, 170])
+    .range([30, rayon ]);
+
+var xScale = d3.scale.linear()
+    .domain([0, 24])
+    .range([0, 2*Math.PI]);
+
+var svgLine2 = d3.svg.line.radial()
+    .radius(function(d) { return rScale(d[1]); })
+    .angle(function(d) { return xScale(d[0]); });
+
+var vis2 = d3.select("#graph1")
+    .append("svg")
+    .attr("width", w)
+    .attr("height", h)
+    .attr("class", "graph")
+    .append("g")
+    .attr("transform", "translate(" + (w / 2 + p) + "," + (h / 2 - p) + ")")
+    .on("mousemove", mousemove2);
+
+// background rect catches mouse interactions
+// is there a simpler way to achieve this?
+vis2.append("rect")
+  .attr("transform", "translate(" + -(w / 2 + p) + "," + -(h / 2 - p) + ")")
+  .attr("width", w+2*p)
+  .attr("height", h+2*p)
+  .style("fill", "transparent");
+
+var gr = vis2.append("g")
+    .attr("class", "r axis")
+  .selectAll("g")
+    .data(rScale.ticks(10))
+  .enter().append("g");
+
+gr.append("circle")
+    .attr("r", rScale);
+
+gr.append("text")
+    .attr("y", function(d) { return -rScale(d) - 4; })
+    .attr("transform", "rotate(7)")
+    .style("text-anchor", "middle")
+    .text(function(d) { return d; });
+
+var ga = vis2.append("g")
+    .attr("class", "a axis")
+  .selectAll("g")
+    .data(d3.range(0, 360, 15))
+  .enter().append("g")
+    .attr("transform", function(d) { return "rotate(" + (d-90) + ")"; });
+
+ga.append("line")
+    .attr("x1", 30)
+    .attr("x2", rayon);
+
+ga.append("text")
+    .attr("x", rayon + 6)
+    .attr("dy", ".35em")
+    .style("text-anchor", function(d) { return d > 180 && d < 360 ? "end" : null; })
+    .attr("transform", function(d) { return d > 180 && d < 360 ? "rotate(180 " + (rayon + 6) + ",0)" : null; })
+    .text(function(d) { return d/15 + "hr"; });
+
+var line2 = vis2.append("path")
+    .datum(data)
+    .attr("class", "line")
+    .attr("d", svgLine2);
+
+var circleguide2 = vis2.append("circle")
+      .attr("cx", 0)
+      .attr("cy", 0)
+      .attr("r", 0)
+      .attr("fill", "green");
+
+function mousemove2() {
+      var mouse = d3.mouse(this);
+      var mx = mouse[0];
+      var my = mouse[1];
+
+      var omega = Math.atan2(mx, my);
+
+      var index = Math.round(1000*(xScale.invert(-omega)+12));
+      
+      var d = data[index];
+      var r = rScale(d[1]);
+
+      var nx = r*Math.sin(omega);
+      var ny = r*Math.cos(omega);
+
+    circleguide2.data(d).attr("opacity", 1)
+      .attr("cx", nx)
+      .attr("cy", ny)
+      .attr("r", 4)
+      .attr("fill", "skyblue")
+      .attr("stroke", "red")
+};
+
+    </script>
+  </div>
+</body>

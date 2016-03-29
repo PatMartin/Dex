@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en" ng-app="DexApp" data-framework="angularjs">
+
+<head>
+    <meta charset="utf-8">
+    <style>
+<%
+  println new File("javascript/angular/plugins/ui.layout/latest/ui-layout.css").text
+  println new File("javascript/jqueryui/latest/jquery-ui.min.css").text
+  //println new File("javascript/jqueryui/latest/jquery-ui.theme.min.css").text
+  //println new File("javascript/bootstrap/latest/css/bootstrap.min.css").text
+%>
+
+.section {
+  margin-top: 30px;
+  margin-bottom: 30px;
+}
+
+.list {
+  border: 1px solid #000;
+  border-radius: 10px;
+  list-style: none outside none;
+  margin: 10px;
+  padding: 10px;
+}
+
+.item {
+  padding: 5px 5px;
+  margin: 5px 0;
+  border: 2px solid #444;
+  border-radius: 5px;
+  background-color: #EA8A8A;
+
+  font-size: 1.1em;
+  font-weight: bold;
+  text-align: center;
+  cursor: move;
+}
+
+</style>
+</head>
+<script>
+
+<%
+  println new File("javascript/jquery/latest/jquery-2.1.3.min.js").text
+  println new File("javascript/jqueryui/latest/jquery-ui.min.js").text
+  println new File("javascript/angular/latest/angular.min.js").text
+
+
+  println new File("javascript/underscore/latest/underscore-min.js").text
+  println new File("javascript/d3/latest/d3.min.js").text
+  println new File("javascript/dexjs/latest/dex.js").text
+
+  println new File("javascript/dexjs/latest/charts/d3/Dendrogram.js").text
+  println new File("javascript/dexjs/latest/charts/d3/Chord.js").text
+  println new File("javascript/dexjs/latest/charts/d3/Sankey.js").text
+  println new File("javascript/dexjs/latest/charts/d3/ParallelCoordinates.js").text
+  println new File("javascript/dexjs/latest/charts/d3/MotionBarChart.js").text
+  println new File("javascript/dexjs/latest/charts/d3/ClusteredForce.js").text
+  println new File("javascript/dexjs/latest/charts/d3/Scatterplot.js").text
+  
+  println new File("javascript/angular/plugins/ui.bootstrap/latest/ui-bootstrap.min.js").text
+  println new File("web/angular/DexApp.js").text
+  println new File("web/angular/DexCtrl.js").text
+  println new File("javascript/angular/plugins/ui.layout/latest/ui-layout.min.js").text
+  println new File("javascript/angular/plugins/sortable/latest/sortable.min.js").text
+
+%>
+
+</script>
+
+<body>
+  <div ui-layout="{flow: 'row'}">
+    <div id="header" ui-layout-container size="30px" style="background: steelblue"><center><b>DEX : Chart Explorer</b></center></div>
+    <div ui-layout-container>
+    <div ui-layout="{flow: 'column'}">
+      <div id="config" ui-layout-container size="15%">
+        <select id="select-chart">
+        <option value="dendrogram">Dendrogram</option>
+        <option value="chord">Chord Diagram</option>
+        <option value="sankey">Sankey Diagram</option>
+        <option value="par-coord">Parallel Coordinates</option>
+        <option value="motion-bar-chart">Motion Bar Chart</option>
+        <option value="clustered-force">Clustered Force</option>
+        <option value="scatterplot">Scatterplot</option>
+        <option value="pie-chart">Pie Chart</option>
+         </select>
+        <div ng-controller="connectedController" class="section row connectedItemsExample">
+          <div class="col-sm-offset-2 col-sm-4">
+            <center><b>Selected Columns</b></center>
+            <ul ui-sortable="sortableOptions" ng-model="selectedColumns" class="list">
+              <li ng-repeat="item in selectedColumns" class="item">{{item.text}}</li>
+            </ul>
+          </div>
+          <center><b>DIMENSIONS</b></center>
+          <div class="col-sm-4">
+            <ul ui-sortable="sortableOptions" ng-model="stringColumns" class="list">
+              <li ng-repeat="item in stringColumns" class="item">{{item.text}}</li>
+            </ul>
+          </div>
+          <center><b>NUMERICS</b></center>
+          <div class="col-sm-4">
+            <ul ui-sortable="sortableOptions" ng-model="numericColumns" class="list">
+              <li ng-repeat="item in numericColumns" class="item">{{item.text}}</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div id="display" ui-layout-container>
+        <svg id="ChartArea" width="100%" height="100%"></svg>
+      </div>
+    </div>
+    </div>
+</div>
+
+<script>
+var csv;
+<%
+  def header = "[" + dexData.header.collect { return "\"$it\"" }.join(',') + "]"
+  def data = []
+  dexData.data.eachWithIndex
+  {
+    row, ri ->
+    data << "[" + row.collect { return "\"$it\"" }.join(',') + "]"
+  }
+  println "csv = { 'header' : $header,\n 'data' : [" + data.join(',\n') + "] };";
+%>
+
+var chart = new dex.charts.d3.Chord({
+        'parent'    : "#ChartArea",
+        'csv'       : { header : [], data : [] }
+    });
+    
+\$("#select-chart").change(function() {
+
+  var value = \$(this).val();
+  var oldCsv = chart.attr("csv");
+
+  dex.console.log("CHART TYPE", value);
+
+  \$("#ChartArea").empty();
+
+  if (value == "dendrogram")
+  {
+    chart = new dex.charts.d3.Dendrogram({
+        'parent'    : "#ChartArea",
+        'transform' : 'scale(.8)translate(50,20)',
+        'csv'       : oldCsv
+    });
+  }
+  else if (value == "chord")
+  {
+    chart = new dex.charts.d3.Chord({
+        'parent'    : "#ChartArea",
+        'csv'       : oldCsv
+    });
+  }
+  else if (value == "motion-bar-chart")
+  {
+    chart = new dex.charts.d3.MotionBarChart({
+      'parent'    : "#ChartArea",
+      'transform' : 'translate(50,50)',
+      'csv' : oldCsv
+    });
+  }
+  else if (value == "par-coord")
+  {
+    chart = new dex.charts.d3.ParallelCoordinates({
+      'parent': "#ChartArea",
+      'csv': oldCsv,
+      'normalize': false
+    });
+  }
+  else if (value == "scatterplot")
+  {
+    chart = new dex.charts.d3.ScatterPlot({
+        'parent'           : "#ChartArea",
+        'csv'              : oldCsv,
+        'unselectedRadius' : 2,
+        'selectedRadius'   : 4,
+        'unselectedColor'  : "steelblue"
+      }
+    );
+  }
+  else if (value == "pie-chart")
+  {
+    chart = new dex.charts.d3.PieChart({
+        'parent'     : "#ChartArea",
+        'csv'        : oldCsv
+    });
+  }
+  else if (value == "clustered-force")
+  {
+    chart = new dex.charts.d3.ClusteredForce({
+        'parent' : "#ChartArea",
+        'csv'    : oldCsv
+      }
+  );
+  }
+  else
+  {
+    chart = new dex.charts.d3.Sankey({
+      'parent' : "#ChartArea",
+      'csv'    : oldCsv
+    });
+  }
+
+  chart.render();
+});
+
+chart.render();
+
+</script>
+</body>
+</html>

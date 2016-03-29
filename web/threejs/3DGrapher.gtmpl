@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+        <meta charset="utf-8">
+        <title>3d grapher - webgl ploter</title>
+		<meta name="description" content="This is 3d grapher (webgl grapher). Draw functions, parametric equations and supershapes.">
+<style>
+<% println new File("web/threejs/3DGrapher_files/jquery-ui-1.css").text %>
+<% println new File("web/threejs/3DGrapher_files/colorpicker.css").text %>
+<% println new File("web/threejs/3DGrapher_files/style.css").text %>
+</style>
+
+<script>
+<% println new File("web/threejs/3DGrapher_files/cbgapi.loaded_0").text %>
+</script>
+<script>
+<% println new File("web/threejs/3DGrapher_files/all.js").text %>
+
+<% println new File("web/threejs/3DGrapher_files/widgets.js").text %>
+<% println new File("web/threejs/3DGrapher_files/plusone.js").text %>
+<% println new File("web/threejs/3DGrapher_files/jquery.js").text %>
+<% println new File("web/threejs/3DGrapher_files/jquery-ui-1.js").text %>
+<% println new File("web/threejs/3DGrapher_files/THREEx.js").text %>
+<% println new File("web/threejs/3DGrapher_files/colorpicker.js").text %>
+</script>
+
+	<style type="text/css">
+	<% println new File("web/threejs/3DGrapher_files/fb.css").text %>
+	</style></head>
+    <body data-twttr-rendered="true">
+
+		<div id="navigation">
+			<br>
+				<img id="logo" src="../web/threejs/3DGrapher_files/3d-grapher.png" alt="3d grapher">
+			<div id="desc">In equations can use predefined functions: sin, cos, tan, exp, pow, sqrt, abs, ln, asin, acos, atan and constant pi.<br>
+			Click and drag to rotate.<br>
+			Mouse scroll to zoom in (zoom out).<br><br><a id="fullscreen" href="#">SHOW ON FULL SCREEN</a></div>
+			<br>
+				<input id="ifshadows" value="1" checked="checked" type="checkbox"><label>Shadows</label>
+				<input id="iftexture" value="1" checked="checked" type="checkbox"><label>Texture</label>
+				<input id="ifcolor" value="0" type="checkbox"><label>Color</label>
+				<input name="color" id="color" value="307462" type="text">
+			<br>
+				<button id="panel1" class="active bpanels">Function</button><button id="panel2" class="bpanels">Parametric</button><button id="panel3" class="bpanels">Supershape</button>
+			<div id="fxy_panel" class="panel">
+				<label>Equation f(x,y):</label><br><br>
+				<input name="fxy" id="fxy" value="cos(x*2)*sin(y)" style="width:185px;" type="text">
+				<input name="plot_fxy" value="Draw" id="plot_fxy" class="submit" type="submit">
+				<br><br><label>Range:</label>
+				<div class="ui-slider ui-slider-horizontal ui-widget ui-widget-content ui-corner-all" id="range_fxy"><a style="left: 33.3333%;" class="ui-slider-handle ui-state-default ui-corner-all" href="#"></a></div>
+				<div class="examples">Examples:<br>
+				<button id="fxy_ex1">Peano surface</button>
+				<button id="fxy_ex2">Surface of the bell</button>
+				</div>
+			</div>
+			<div id="parametric_panel" class="panel">
+				<label>Parametric equations:</label><br><br>
+				<label>x(t,u) = </label><input id="x_tu" style="width:180px;" value="cos(t)*sin(u)" type="text"><br><br>
+				<label>y(t,u) = </label><input id="y_tu" style="width:180px;" value="sin(t)*sin(u)" type="text"><br><br>
+				<label>z(t,u) = </label><input id="z_tu" style="width:180px;" value="cos(u)" type="text"><br><br>
+				t = [<input id="t1" value="0" type="text">,<input id="t2" value="2*pi" type="text">]<br><br>
+				u = [<input id="u1" value="0" type="text">,<input id="u2" value="pi" type="text">]<br><br>
+				<input name="plot_parametric" value="Draw" id="plot_parametric" class="submit" type="submit"><br><br>
+				<div class="examples">Examples:<br>
+				<button id="par_ex1">Dini's surface</button>
+				<button id="par_ex2">Mobius strip</button>
+				<button id="par_ex3">Enneper</button>
+				</div>
+			</div>
+			<div id="supershape_panel" class="panel">
+				<div id="slider_a" class="supershape_slider2 ui-slider ui-slider-horizontal ui-widget ui-widget-content ui-corner-all"><a style="left: 10%;" class="ui-slider-handle ui-state-default ui-corner-all" href="#"></a></div><input class="val_input2" value="1" id="a_value" type="text"><br>
+				<div id="slider_b" class="supershape_slider2 ui-slider ui-slider-horizontal ui-widget ui-widget-content ui-corner-all"><a style="left: 10%;" class="ui-slider-handle ui-state-default ui-corner-all" href="#"></a></div><input class="val_input2" value="1" id="b_value" type="text"><br>
+				<div id="slider_m" class="supershape_slider ui-slider ui-slider-horizontal ui-widget ui-widget-content ui-corner-all"><a style="left: 55%;" class="ui-slider-handle ui-state-default ui-corner-all" href="#"></a></div><input class="val_input" value="2" id="m_value" type="text"><br>
+				<div id="slider_n1" class="supershape_slider ui-slider ui-slider-horizontal ui-widget ui-widget-content ui-corner-all"><a style="left: 70%;" class="ui-slider-handle ui-state-default ui-corner-all" href="#"></a></div><input class="val_input" value="8" id="n1_value" type="text"><br>
+				<div id="slider_n2" class="supershape_slider ui-slider ui-slider-horizontal ui-widget ui-widget-content ui-corner-all"><a style="left: 60%;" class="ui-slider-handle ui-state-default ui-corner-all" href="#"></a></div><input class="val_input" value="4" id="n2_value" type="text"><br>
+				<div id="slider_n3" class="supershape_slider ui-slider ui-slider-horizontal ui-widget ui-widget-content ui-corner-all"><a style="left: 55%;" class="ui-slider-handle ui-state-default ui-corner-all" href="#"></a></div><input class="val_input" value="2" id="n3_value" type="text"><br>
+				<br>
+				<div id="slider_a2" class="supershape_slider2 ui-slider ui-slider-horizontal ui-widget ui-widget-content ui-corner-all"><a style="left: 10%;" class="ui-slider-handle ui-state-default ui-corner-all" href="#"></a></div><input class="val_input2" value="1" id="a2_value" type="text"><br>
+				<div id="slider_b2" class="supershape_slider2 ui-slider ui-slider-horizontal ui-widget ui-widget-content ui-corner-all"><a style="left: 10%;" class="ui-slider-handle ui-state-default ui-corner-all" href="#"></a></div><input class="val_input2" value="1" id="b2_value" type="text"><br>
+				<div id="slider_m2" class="supershape_slider ui-slider ui-slider-horizontal ui-widget ui-widget-content ui-corner-all"><a style="left: 80%;" class="ui-slider-handle ui-state-default ui-corner-all" href="#"></a></div><input class="val_input" value="12" id="m2_value" type="text"><br>
+				<div id="slider_n12" class="supershape_slider ui-slider ui-slider-horizontal ui-widget ui-widget-content ui-corner-all"><a style="left: 57.5%;" class="ui-slider-handle ui-state-default ui-corner-all" href="#"></a></div><input class="val_input" value="3" id="n12_value" type="text"><br>
+				<div id="slider_n22" class="supershape_slider ui-slider ui-slider-horizontal ui-widget ui-widget-content ui-corner-all"><a style="left: 87.5%;" class="ui-slider-handle ui-state-default ui-corner-all" href="#"></a></div><input class="val_input" value="15" id="n22_value" type="text"><br>
+				<div id="slider_n32" class="supershape_slider ui-slider ui-slider-horizontal ui-widget ui-widget-content ui-corner-all"><a style="left: 72.5%;" class="ui-slider-handle ui-state-default ui-corner-all" href="#"></a></div><input class="val_input" value="9" id="n32_value" type="text"><br>
+
+				<input name="plot_supershape" value="Draw supershape" id="plot_supershape" class="submit" type="hidden">
+				<input name="random_supershape" value="Random supershape" id="random_supershape" class="submit" type="submit">
+			</div>
+		</div>
+        <div id="container">
+
+        <canvas height="886" width="1231"></canvas></div>
+		<div class="author">
+			More <a href="http://www.webdev20.pl/"><strong>html5 demos</strong></a> and <a href="http://designconcept.webdev20.pl/projekty"><strong>projects</strong></a>.
+		</div>
+		<a id="toggle_button" href="#" class="minus"></a>
+		<a id="fullscreen_icon" href="#"></a>
+		<div id="social">
+			<!-- Umieść ten tag w miejscu, w którym chcesz wygenerować przycisk +1. -->
+			<div id="___plusone_0" style="height: 24px; width: 106px; display: inline-block; text-indent: 0px; margin: 0px; padding: 0px; background: none repeat scroll 0% 0% transparent; border-style: none; float: none; line-height: normal; font-size: 1px; vertical-align: baseline;"><iframe title="+1" data-gapiattached="true" allowtransparency="true" src="3DGrapher_files/fastbutton.htm" name="I0_1357501856226" id="I0_1357501856226" vspace="0" tabindex="0" style="position: static; top: 0px; width: 106px; margin: 0px; border-style: none; left: 0px; visibility: visible; height: 24px;" marginwidth="0" marginheight="0" hspace="0" frameborder="0" scrolling="no" width="100%"></iframe></div>
+			<!-- Umieść to wywołanie generujące w odpowiednim miejscu. -->
+			<script>
+			  window.___gcfg = {lang: 'en-GB'};
+
+			  (function() {
+				var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+				po.src = 'https://apis.google.com/js/plusone.js';
+				var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+			  })();
+			</script>
+			<iframe data-twttr-rendered="true" title="Twitter Tweet Button" style="width: 109px; height: 20px;" class="twitter-share-button twitter-count-horizontal" src="3DGrapher_files/tweet_button.htm" allowtransparency="true" frameborder="0" scrolling="no"></iframe>
+
+    <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+			<div fb-xfbml-state="rendered" style="float: right;" class="fb-like fb_edge_widget_with_comment fb_iframe_widget" data-href="http://www.webdev20.pl/skins/default/js/demos/3d_grapher/webgl_ploter.html" data-send="false" data-layout="button_count" data-width="80" data-show-faces="false" data-font="arial"><span style="height: 21px; width: 93px;"><iframe src="3DGrapher_files/like.htm" class="fb_ltr" title="Like this content on Facebook." style="border: medium none; overflow: hidden; height: 21px; width: 93px;" name="feeb652ff7ad9a" id="f1b7b5be93bed22" scrolling="no"></iframe></span></div>
+		</div>
+<script>
+<% println new File("web/threejs/3DGrapher_files/Three.js").text %>
+<% println new File("web/threejs/3DGrapher_files/rAF.js").text %>
+<% println new File("web/threejs/3DGrapher_files/generator.js").text %>
+<% println new File("web/threejs/3DGrapher_files/ploter.js").text %>
+</script>
+<div id="collorpicker_147" class="colorpicker"><div style="background-color: rgb(0, 255, 187);" class="colorpicker_color"><div><div style="left: 87px; top: 81px;"></div></div></div><div class="colorpicker_hue"><div style="top: 81px;"></div></div><div style="background-color: rgb(48, 116, 98);" class="colorpicker_new_color"></div><div style="background-color: rgb(48, 116, 98);" class="colorpicker_current_color"></div><div class="colorpicker_hex"><input value="307462" maxlength="6" size="6" type="text"></div><div class="colorpicker_rgb_r colorpicker_field"><input value="48" maxlength="3" size="3" type="text"><span></span></div><div class="colorpicker_rgb_g colorpicker_field"><input value="116" maxlength="3" size="3" type="text"><span></span></div><div class="colorpicker_rgb_b colorpicker_field"><input value="98" maxlength="3" size="3" type="text"><span></span></div><div class="colorpicker_hsb_h colorpicker_field"><input value="164.11764705882354" maxlength="3" size="3" type="text"><span></span></div><div class="colorpicker_hsb_s colorpicker_field"><input value="58.62068965517241" maxlength="3" size="3" type="text"><span></span></div><div class="colorpicker_hsb_b colorpicker_field"><input value="45.490196078431374" maxlength="3" size="3" type="text"><span></span></div><div class="colorpicker_submit"></div></div>
+	<script></script>
+	<div class=" fb_reset" id="fb-root"><div style="position: absolute; top: -10000px; height: 0px; width: 0px;"><div><iframe tabindex="-1" src="3DGrapher_files/xd_arbiter.htm" name="fb_xdm_frame_http" id="fb_xdm_frame_http"></iframe><iframe tabindex="-1" src="3DGrapher_files/xd_arbiter_002.htm" name="fb_xdm_frame_https" id="fb_xdm_frame_https"></iframe></div></div><div style="position: absolute; top: -10000px; height: 0px; width: 0px;"><div></div></div></div>
+	<script>(function(d, s, id) {
+	  var js, fjs = d.getElementsByTagName(s)[0];
+	  if (d.getElementById(id)) return;
+	  js = d.createElement(s); js.id = id;
+	  js.src = "//connect.facebook.net/pl_PL/all.js#xfbml=1";
+	  fjs.parentNode.insertBefore(js, fjs);
+	}(document, 'script', 'facebook-jssdk'));</script>
+    
+
+</body></html>

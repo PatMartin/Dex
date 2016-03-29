@@ -1,0 +1,149 @@
+<!doctype html>
+<html>
+<head>
+  <title>Dex:Vis:BarChart</title>
+
+<style>
+
+<%
+  println new File("javascript/vis/latest/vis.min.css").text
+  println new File("javascript/jqueryui/latest/jquery-ui.min.css").text
+  println new File("javascript/jqueryui/latest/jquery-ui.theme.min.css").text  
+%>
+
+.vis-item .vis-item-overflow {
+  overflow: visible;
+}
+</style>
+<script>
+<%
+  println new File("javascript/jquery/latest/jquery-2.1.3.min.js").text
+  println new File("javascript/jqueryui/latest/jquery-ui.min.js").text
+  println new File("javascript/underscore/latest/underscore-min.js").text
+  println new File("javascript/d3/latest/d3.min.js").text
+  println new File("javascript/dexjs/latest/dex.js").text
+  println new File("javascript/vis/latest/vis.min.js").text
+%>
+</script>
+</head>
+<body onload="drawVisualization();">
+<div style="width:700px; font-size:14px; text-align: justify;">
+    Handle overlap: <select id="styleDropdown">
+      <option value="bar">bar</option>
+      <option value="bar-color">bar-color</option>
+      <option value="bar-size">bar-size</option>
+
+      <option value="dot">dot</option>
+      <option value="dot-line">dot-line</option>
+      <option value="dot-color">dot-color</option>
+      <option value="dot-size">dot-size</option>
+
+      <option value="grid">grid</option>
+      <option value="line">line</option>
+      <option value="surface" selected="selected">surface</option>
+    </select>
+</div>
+<div id="graph3d"></div>
+<script type="text/javascript">
+
+// Load dex data.  
+<%
+  def header = "[" + dexData.header.collect { return "\"$it\"" }.join(',') + "]"
+  def data = []
+  dexData.data.eachWithIndex
+  {
+    row, ri ->
+    data << "[" + row.collect { return "\"$it\"" }.join(',') + "]"
+  }
+  println "var csv = { 'header' : $header,\n 'data' : [" + data.join(',\n') + "] };";
+%>
+  var types = dex.csv.guessTypes(csv);
+  dex.console.log("TYPES", types);
+
+  var data = null;
+  var graph = null;
+
+/*
+  function custom(x, y, t) {
+      return Math.sin(x/50 + t/10) * Math.cos(y/50 + t/10) * 50 + 50;
+  }
+*/
+  var items = [];
+
+  var ncsv = dex.csv.numericSubset(csv);
+
+  dex.console.log(ncsv);
+  if (ncsv.header.length < 4)
+  {
+    dex.console.log("ERROR: No numeric data, faking some data...");
+    for (var t=0; t<10; t++)
+    {
+      for (var x=0; x<10; x++)
+      {
+        for (var y=0; y<10; y++)
+        {
+          for (var z=0; z<10; z++)
+          {
+            items.push({x:x, y:y, z:z, filter:t, style:z});
+          }
+        }
+      }
+    }
+  }
+  else if (ncsv.header.length == 3)
+  {
+    ncsv.data.map(function(row) {
+    //dex.console.log("ROW:", row);
+      items.push({x:+row[0], y:+row[1], z:+row[2], filter:+0, style:+row[2]});
+    });
+  }
+  else
+  {
+    ncsv.data.map(function(row) {
+    //dex.console.log("ROW:", row);
+      items.push({x:+row[1], y:+row[2], z:+row[3], filter:+row[0], style:+row[3]});
+    });
+  }
+
+  dex.console.log("ITEMS", items);
+
+  // Called when the Visualization API is loaded.
+  function drawVisualization() {
+
+    dex.console.log("Draw vis");
+  //dex.console.log("DATA", data);
+
+    // create our graph
+    var container = document.getElementById('graph3d');
+    var width = window.innerWidth;
+    var height = window.innerHeight;
+
+    var style = document.getElementById('styleDropdown').value;
+    data = new vis.DataSet(items);
+  
+    // specify options
+    var options = {
+      width:  width+'px',
+      height: (height-50)+'px',
+      'style': style,
+      showPerspective: true,
+      showGrid: true,
+      showShadow: false,
+      // showAnimationControls: false,
+      keepAspectRatio: true,
+      verticalRatio: 0.5,
+      animationInterval: 100, // milliseconds
+      animationPreload: true,
+      filterValue: 'time'
+    };
+      
+    container.setAttribute("style","width:" + width + "px");
+    container.setAttribute("style","height:" + (height-50) + "px");
+    graph = new vis.Graph3d(container, data, options);
+  }
+  
+  document.getElementById('styleDropdown').onchange = drawVisualization;
+  
+</script>
+</body>
+</html>

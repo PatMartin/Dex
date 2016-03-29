@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+.chart {}
+
+.main text
+{
+  font: 10px sans-serif;	
+}
+
+.axis line, .axis path
+{
+  shape-rendering: crispEdges;
+  stroke: black;
+  fill: none;
+}
+
+circle
+{
+  fill: steelblue;
+}
+</style>
+<body>
+<script src="http://d3js.org/d3.v3.js"></script>
+<script src="../../javascript/dex/dexutils.js"></script>
+<script src="../../javascript/dex/dexcharts.js"></script>
+<script>
+
+// Data setup.
+var numRows = 100;
+var numCols = 4;
+var data = [];
+var maxRange = 100;
+var minRange = 0;
+
+for (var ri = 0; ri<numRows; ri++)
+{
+	var row = [ ri ];
+	for (var ci = 0; ci<numCols; ci++)
+	{
+		row.push(Math.random() * maxRange - minRange);
+	}
+	data.push(row);
+}
+
+var labels = [ "X" ];
+for (var ci = 0; ci < numCols; ci++)
+{
+	labels.push("C" + ci);
+}
+
+var svg = d3.select('body')
+  .append('svg:svg')
+  .attr('width', 800)
+  .attr('height', 600)
+  .attr('class', 'chart');
+
+var plot1 = ScatterPlot(
+  {
+	  parent : svg,
+	  width  : 400,
+	  height : 400,
+	  labels : labels,
+	  data   : data,
+	  unselectedRadius : 2,
+	  selectedRadius: 4,
+	  unselectedColor : "steelblue"
+  }
+);
+
+plot1();
+
+</script>

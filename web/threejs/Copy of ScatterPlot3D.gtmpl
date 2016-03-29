@@ -1,0 +1,330 @@
+<% import com.dexvis.util.DexUtil %>
+<html>
+  <head>
+<script>
+<%
+  println new File("javascript/three/latest/three.min.js").text
+%>
+</script>
+    <style type="text/css">
+      body {
+        margin: 0px;
+        padding: 0px;
+      }
+    </style>
+
+<!-- raf.js -->
+    <script>
+          window.requestAnimationFrame =
+          window.requestAnimationFrame ||
+          window.webkitRequestAnimationFrame ||
+          window.mozRequestAnimationFrame ||
+          window.oRequestAnimationFrame ||
+          window.msRequestAnimationFrame ||
+          (function () {
+
+              var requests = {},
+                  TARGET_FPS = 60,
+                  raf_handle = 1,
+                  timeout_handle = -1;
+
+              function isVisible(element) {
+                  return element.offsetWidth > 0 && element.offsetHeight > 0;
+              }
+
+              window.requestAnimationFrame = function requestAnimationFrame(callback, element) {
+                  var cb_handle = raf_handle;
+                  raf_handle = raf_handle + 1;
+                  requests[cb_handle] = {callback: callback, element: element};
+
+                  if (timeout_handle === -1) {
+                      timeout_handle = setTimeout(function () {
+                          var cur_requests = requests,
+                              time = +new Date(),
+                              keys = Object.keys(cur_requests),
+                              len = keys.length,
+                              i,
+                              request;
+
+                          requests = {};
+                          timeout_handle = -1;
+
+                          for (i = 0; i < len; i += 1) {
+                              request = cur_requests[keys[i]];
+                              if (!request.element || isVisible(request.element)) {
+                                  request.callback(time);
+                              }
+                          }
+                      }, 1000 / TARGET_FPS);
+                  }
+
+                  return cb_handle;
+              };
+
+              window.cancelRequestAnimationFrame = function cancelRequestAnimationFrame(handle) {
+
+                  delete requests[handle];
+
+                  if (Object.keys(requests).length === 0) {
+                      clearTimeout(timeout_handle);
+                      timeout_handle = -1;
+                  }
+              };
+
+              return window.requestAnimationFrame;
+          }());
+
+      window.cancelRequestAnimationFrame =
+          window.cancelRequestAnimationFrame ||
+          window.webkitCancelRequestAnimationFrame ||
+          window.mozCancelRequestAnimationFrame ||
+          window.oCancelRequestAnimationFrame ||
+          window.msCancelRequestAnimationFrame;
+    
+    </script>
+
+  </head>
+
+  <body>
+    <script>
+    
+<%
+  def numericData = dexData.getNumericData()
+  def maxX = dexData.getData()[0][0] as Double
+  def maxY = dexData.getData()[0][1] as Double
+  def maxZ = dexData.getData()[0][2] as Double
+  def minX = maxX
+  def minY = maxY
+  def minZ = maxZ
+  
+  numericData.getData().eachWithIndex
+  {
+    row, ri ->
+    def x = row[0] as Double
+    def y = row[1] as Double
+    def z = row[2] as Double
+    maxX = (x > maxX) ? x : maxX
+    minX = (x < minX) ? x : minX
+    maxY = (y > maxY) ? y : maxY
+    minY = (y < minY) ? y : minY
+    maxZ = (z > maxZ) ? z : maxZ
+    minZ = (z < minZ) ? z : minZ
+  }
+  
+  println "var bounds = { minx : $minX, maxx : $maxX, miny : $minY, maxy : $maxY, minz : $minZ, maxz : $maxZ };"
+  println "var dexHeader = " + numericData.getHeader().collect { return "\"$it\"" } + ";"
+  println "var dexData = ${numericData.getData()};"
+%>
+
+      // <!--
+function mousewheel(event) {
+
+    var fovMAX = 160;
+    var fovMIN = 1;
+
+    camera.fov -= event.wheelDeltaY * 0.05;
+    camera.fov = Math.max( Math.min( camera.fov, fovMAX ), fovMIN );
+    camera.projectionMatrix = new THREE.Matrix4().makePerspective(camera.fov, window.innerWidth / window.innerHeight, camera.near, camera.far);
+
+}
+
+      function createTextCanvas(text, color, font, size) {
+        size = size || 24;
+        var canvas = document.createElement('canvas');
+        var ctx = canvas.getContext('2d');
+        var fontStr = (size + 'px ') + (font || 'Arial');
+        ctx.font = fontStr;
+        var w = ctx.measureText(text).width;
+        var h = Math.ceil(size);
+        canvas.width = w;
+        canvas.height = h;
+        ctx.font = fontStr;
+        ctx.fillStyle = color || 'black';
+        ctx.fillText(text, 0, Math.ceil(size*0.8));
+        return canvas;
+      }
+
+      function createText2D(text, color, font, size, segW, segH) {
+        var canvas = createTextCanvas(text, color, font, size);
+        var plane = new THREE.PlaneGeometry(canvas.width, canvas.height, segW, segH);
+        var tex = new THREE.Texture(canvas);
+        tex.needsUpdate = true;
+        var planeMat = new THREE.MeshBasicMaterial({
+          map: tex, color: 0xffffff, transparent: true
+        });
+        var mesh = new THREE.Mesh(plane, planeMat);
+        mesh.scale.set(0.25, 0.25, 0.25);
+        mesh.doubleSided = true;
+        return mesh;
+      }
+
+      var renderer = new THREE.WebGLRenderer({antialias: true});
+      var w = window.innerWidth;
+      var h = window.innerHeight;
+      renderer.setSize(w, h);
+      document.body.appendChild(renderer.domElement);
+
+      renderer.setClearColorHex(0xEEEEEE, 1.0);
+
+      // Used to be 10,000
+      var camera = new THREE.PerspectiveCamera( 45, w/h, 1, 1000 );
+      camera.position.z = bounds.maxz;
+      camera.position.x = 0;
+      camera.position.y = bounds.maxy;
+
+      var scene = new THREE.Scene();
+      scene.fog = new THREE.FogExp2( 0xFFFFFF, 0.0035 );
+
+      var scatterPlot = new THREE.Object3D();
+      scene.add(scatterPlot);
+
+      scatterPlot.rotation.y = 0.5;
+      function v(x,y,z){ return new THREE.Vertex(new THREE.Vector3(x,y,z)); }
+
+      var lineGeo = new THREE.CubeGeometry(bounds.maxx - bounds.maxx, bounds.maxy - bounds.miny,
+        bounds.maxz - bounds.minz);
+
+      //var lineGeo = new THREE.Geometry();
+      
+//      lineGeo.vertices.push(
+//        v(bounds.xmin, 0, 0), v(bounds.xmax, 0, 0),
+//        v(0, bounds.ymin, 0), v(0, bounds.ymax, 0),
+//        v(0, 0, bounds.zmin), v(0, 0, bounds.zmax),
+//
+//        v(bounds.xmin, bounds.ymax, bounds.zmin), v(bounds.xmax, bounds.ymax, bounds.zmin),
+//        v(bounds.xmin, bounds.ymin, bounds.zmin), v(bounds.xmax, bounds.ymin, bounds.zmin),
+//        v(bounds.xmin, bounds.ymax, bounds.zmax), v(bounds.xmax, bounds.ymax, bounds.zmax),
+//        v(bounds.xmin, bounds.ymin, bounds.zmax), v(bounds.xmax, bounds.ymin, bounds.zmax),
+//
+//        v(bounds.xmin, 0, bounds.zmax), v(bounds.xmax, 0, bounds.zmax),
+//        v(bounds.xmin, 0, bounds.zmin), v(bounds.xmax, 0, bounds.zmin),
+//        v(bounds.xmin, bounds.ymax, 0), v(bounds.xmax, bounds.ymax, 0),
+//        v(bounds.xmin, bounds.ymin, 0), v(bounds.xmax, bounds.ymin, 0),
+//
+//        v(bounds.xmax, bounds.ymin, bounds.zmin), v(bounds.xmax, bounds.ymax, bounds.zmin),
+//        v(bounds.xmin, bounds.ymin, bounds.zmin), v(bounds.xmin, bounds.ymax, bounds.zmin),
+//        v(bounds.xmax, bounds.ymin, bounds.zmax), v(bounds.xmax, bounds.ymax, bounds.zmax),
+//        v(bounds.xmin, bounds.ymin, bounds.zmax), v(bounds.xmin, bounds.ymax, bounds.zmax),
+//
+//        v(0, bounds.ymin, bounds.zmax), v(0, bounds.ymax, bounds.zmax),
+//        v(0, bounds.ymin, bounds.zmin), v(0, bounds.ymax, bounds.zmin),
+//        v(bounds.xmax, bounds.ymin, 0), v(bounds.xmax, bounds.ymax, 0),
+//        v(bounds.xmin, bounds.ymin, 0), v(bounds.xmin, bounds.ymax, 0),
+//
+//        v(bounds.xmax, bounds.ymax, bounds.zmin), v(bounds.xmax, bounds.ymax, bounds.zmax),
+//        v(bounds.xmax, bounds.ymin, bounds.zmin), v(bounds.xmax, bounds.ymin, bounds.zmax),
+//        v(bounds.xmin, bounds.ymax, bounds.zmin), v(bounds.xmin, bounds.ymax, bounds.zmax),
+//        v(bounds.xmin, bounds.ymin, bounds.zmin), v(bounds.xmin, bounds.ymin, bounds.zmax),
+//
+//        v(bounds.xmin, 0, bounds.zmin), v(bounds.xmin, 0, bounds.zmax),
+//        v(bounds.xmax, 0, bounds.zmin), v(bounds.xmax, 0, bounds.zmax),
+//        v(0, bounds.ymax, bounds.zmin), v(0, bounds.ymax, bounds.zmax),
+//        v(0, bounds.ymin, bounds.zmin), v(0, bounds.ymin, bounds.zmax)
+//      );
+
+      var lineMat = new THREE.LineBasicMaterial({color: 0xff0000, lineWidth: 1});
+      var line = new THREE.Line(lineGeo, lineMat);
+      line.type = THREE.Lines;
+      scatterPlot.add(line);
+
+      var titleX = createText2D("-" + dexHeader[0]);
+      titleX.position.x = -60;
+      scatterPlot.add(titleX);
+
+      var titleX = createText2D(dexHeader[0]);
+      titleX.position.x = 60;
+      scatterPlot.add(titleX);
+
+      var titleX = createText2D('-' + dexHeader[1]);
+      titleX.position.y = -60;
+      scatterPlot.add(titleX);
+
+      var titleX = createText2D(dexHeader[1]);
+      titleX.position.y = 60;
+      scatterPlot.add(titleX);
+
+      var titleX = createText2D('-' + dexHeader[2]);
+      titleX.position.z = -60;
+      scatterPlot.add(titleX);
+
+      var titleX = createText2D(dexHeader[2]);
+      titleX.position.z = 60;
+      scatterPlot.add(titleX);
+
+      var mat = new THREE.ParticleBasicMaterial({vertexColors:true, size: 1.5});
+
+      var pointGeo = new THREE.Geometry();
+
+//      var pointCount = 1000;
+
+      for (var i=0; i<dexData.length; i++)
+      {
+        //var x = Math.random() * 100 - 50;
+        //var y = x*0.8+Math.random() * 20 - 10;
+        //var z = x*0.7+Math.random() * 30 - 15;
+        pointGeo.vertices.push(new THREE.Vertex( new THREE.Vector3(dexData[i][0], dexData[i][1], dexData[i][2]) ));
+        //pointGeo.vertices[i].angle = Math.atan2(z,x);
+        //pointGeo.vertices[i].radius = Math.sqrt(x*x+z*z);
+        //pointGeo.vertices[i].speed = (z/100)*(x/100);
+        //pointGeo.colors.push(new THREE.Color().setHSV(
+        //  (x+50)/100, (z+50)/100, (y+50)/100));
+        //pointGeo.colors.push(new THREE.Color().setRGB(Math.random(), Math.random(), Math.random()));
+        pointGeo.colors.push(new THREE.Color().setRGB(0, 0, 1));
+      }
+
+      var points = new THREE.ParticleSystem(pointGeo, mat);
+      scatterPlot.add(points);
+
+      renderer.render(scene, camera);
+      var paused = false;
+      var last = new Date().getTime();
+      var down = false;
+      var sx = 0, sy = 0;
+      window.onmousedown = function (ev){
+        down = true; sx = ev.clientX; sy = ev.clientY;
+      };
+
+window.addEventListener('DOMMouseScroll', mousewheel, false);
+window.addEventListener('mousewheel', mousewheel, false);
+      
+      window.onmouseup = function(){ down = false; };
+      window.onmousemove = function(ev) {
+        if (down) {
+          var dx = ev.clientX - sx;
+          var dy = ev.clientY - sy;
+          scatterPlot.rotation.y += dx*0.01;
+          camera.position.y += dy;
+          sx += dx;
+          sy += dy;
+        }
+      }
+      var animating = false;
+      window.ondblclick = function() { animating = !animating; };
+      function animate(t) {
+        if (!paused) {
+          last = t;
+          if (animating) {
+            var v = pointGeo.vertices;
+            for (var i=0; i<v.length; i++) {
+              var u = v[i];
+              u.angle += u.speed * 0.01;
+              u.position.x = Math.cos(u.angle)*u.radius;
+              u.position.z = Math.sin(u.angle)*u.radius;
+            }
+            pointGeo.__dirtyVertices = true;
+          }
+          renderer.clear();
+          camera.lookAt(scene.position);
+          renderer.render(scene, camera);
+        }
+        window.requestAnimationFrame(animate, renderer.domElement);
+      };
+      animate(new Date().getTime());
+      onmessage = function(ev) {
+        paused = (ev.data == 'pause');
+      };
+      //-->
+    </script>
+  </body>
+
+</html>

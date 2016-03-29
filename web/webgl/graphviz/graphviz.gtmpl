@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Graph Visualization</title>
+    <script type="text/javascript">
+    <% println new File("web/webgl/graphviz/build/graph.js").text %>
+    </script>
+
+    <script type="text/javascript">
+      var drawing;
+
+<%
+    println "var data = [[" + header.collect { "\"$it\"" }.join(",") + "],";
+    def rows = []
+    data.eachWithIndex
+    {
+      row, ri ->
+      rows << "[" + row.collect { "\"$it\"" }.join(",") + "]"
+    }
+    println rows.join(",") + "];";
+%>
+      
+      function createDrawing() {
+        var index = parseInt(location.search.split("?")[1]);
+        if(isNaN(index)) {
+          index = 1;
+        }
+        /* Change these values to draw more nodes (numNodes) */
+        switch(index) {
+          case 0:
+            drawing = new Drawing.SimpleGraph({layout: '2d', selection: false, numNodes: 200, showStats: true, showInfo: true}, data);
+            break;
+          case 1:
+            drawing = new Drawing.SimpleGraph({layout: '3d', selection: true, numNodes: 200, graphLayout:{attraction: 5, repulsion: 0.5}, showStats: true, showInfo: true}, data);
+            break;
+          case 2:
+            drawing = new Drawing.SphereGraph({numNodes: 50, showStats: true, showInfo: true}, data);
+            break;
+          default:
+              drawing = new Drawing.SimpleGraph({layout: '3d', selection: true, numNodes: 50, showStats: true, showInfo: true}, data);
+        }
+        document.getElementById("drawing_select").selectedIndex = index;
+      }
+    </script>
+        
+    <style type="text/css"> 
+      body {
+        margin: 0;
+        padding: 0;
+        background-color: #f0f0f0;
+        font: 11px courier;
+        overflow: hidden;
+      }
+      #graph-info {
+        position: absolute;
+        top: 0px;
+        left: 40%;
+        margin: 10px;
+        background-color: #ffffe0;
+        color: #333;
+        padding: 5px 10px;
+      }
+      #options {
+        position: absolute;
+        top: 0;
+        right: 0;
+        z-index: 10;
+      }
+    </style>
+  </head>
+  <body onload="createDrawing()">
+    <div id="options">
+      <form>
+        <p>
+          <label>Drawing</label><br>
+          <select id="drawing_select" onchange="window.location.href = '?' + this.selectedIndex;">
+            <option>2D-Force-Directed</option>
+            <option selected="selected">3D-Force-Directed</option>
+            <option>Sphere Graph</option>
+          </select>
+        </p>
+        <p>
+          <input type="checkbox" id="show_labels" onclick="drawing.show_labels = this.checked;">
+          <label for="show_labels">Show labels</label>
+        </p>
+        <p>
+          <input type="button" value="Stop layout" onclick="drawing.stop_calculating();"> 
+        </p>
+      </form>
+    </div>
+
+    <div style="position: absolute; bottom: 0;">
+      Rotate: Left Mouse Button and Move<br />
+      Zoom: Press Key S + Left Mouse Button and Move<br /> 
+      Drag: Press Key D + Left Mouse Button and Move
+    </div>    
+  </body>
+</html>

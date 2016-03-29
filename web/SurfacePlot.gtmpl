@@ -1,0 +1,96 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<%
+import org.apache.commons.io.FileUtils
+import com.dexvis.util.DexUtil
+%>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+
+<!--[if IE]>
+<script type="text/javascript">
+<% println FileUtils.readFileToString(new File("javascript/jsurfaceplot/excanvas.js")) %>
+</script>
+<![endif]-->
+
+<script type="text/javascript">
+<% println FileUtils.readFileToString(new File("javascript/jsurfaceplot/SurfacePlot.js")) %>
+</script>
+<script type="text/javascript">
+<% println FileUtils.readFileToString(new File("javascript/jsurfaceplot/ColourGradient.js")) %>
+</script>
+
+<script type="text/javascript" src="http://www.google.com/jsapi"></script>
+<title>SurfacePlot test stub</title>
+</head>
+<body>
+<script type='text/javascript'>
+	google.load("visualization", "1");
+	google.setOnLoadCallback(setUp);
+			
+	function isIE()
+    {
+		return /msie/i.test(navigator.userAgent) && !/opera/i.test(navigator.userAgent);
+    }
+
+	function setUp()
+	{
+<%
+   println "var dexData = $data;"
+   println "var dexHeader = " + header.collect{ "\"$it\"" } + ";"
+%>
+		var numRows = dexData.length;
+		var numCols = dexHeader.length;
+		
+		var tooltipStrings = new Array();
+		var data = new google.visualization.DataTable();
+				
+		for (var i = 0; i < numCols; i++)
+		{
+        	data.addColumn('number', 'col'+i);
+		}
+
+        data.addRows(numRows);
+		var d = 360 / numRows;
+				
+		for (var i = 0; i < numRows; i++) 
+		{
+          data.addRow(dexData[i]);
+						
+		  //tooltipStrings[idx] = "x:" + i + ", y:" + j + " = " + value;
+		}
+
+		var surfacePlot = new greg.ross.visualisation.SurfacePlot(document.getElementById("surfacePlotDiv"));
+				
+		// Don't fill polygons in IE. It's too slow.
+		var fillPly = !isIE();
+				
+		// Define a colour gradient.
+		var colour1 = {red:0, green:0, blue:255};
+		var colour2 = {red:0, green:255, blue:255};
+		var colour3 = {red:0, green:255, blue:0};
+		var colour4 = {red:255, green:255, blue:0};
+		var colour5 = {red:255, green:0, blue:0};
+		var colours = [colour1, colour2, colour3, colour4, colour5];
+				
+		// Axis labels.
+		var xAxisHeader	= "X";
+		var yAxisHeader	= "Y";
+		var zAxisHeader	= "Z";
+				
+		var options = {xPos: 300, yPos: 50, width: 500, height: 500, colourGradient: colours, fillPolygons: fillPly,
+			tooltips: tooltipStrings, xTitle: xAxisHeader, yTitle: yAxisHeader, zTitle: zAxisHeader};
+			
+		surfacePlot.draw(data, options);
+	}
+			
+</script>
+		
+<div id='surfacePlotDiv'>
+	<!-- SurfacePlot goes here... -->
+			
+			
+		</div>
+		
+	</body>
+</html>

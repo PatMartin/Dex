@@ -1,0 +1,38 @@
+{
+  "timeline":
+  {
+    "headline":"Internet Release Schedule",
+    "type":"default",
+		"startDate":"2013,1",
+		"text":"<span>Account Online, CBOL US, Mobile US</span>",
+		"asset":
+    {
+      "media":"http://graphics8.nytimes.com/images/2009/02/24/business/24citigroup.600.jpg",
+      "credit":"",
+      "caption":""
+    },
+		"date":
+		[
+<%
+  def events = []
+  def startDate, headLine, text, media, credit, caption
+  def event
+  dexData.data.eachWithIndex
+  {
+    row, ri ->
+    if (row[4] =~ /^\d+\/\d+\/\d+$/)
+    {
+      def m = row[4] =~ /^(\d+)\/(\d+)\/(\d+)$/
+      event = "{ \"startDate\":\"${m[0][3]},${m[0][1]},${m[0][2]}\","
+      event += "\"headline\":\"${row[0]}\",";
+      event += "\"text\": \"${row[0]}<br><table><tr><td><b>Project</b></td><td>${row[1]}</td></tr><tr><td>Release</td><td>${row[2]}</td></tr><tr><td>Project Manager</td><td>${row[5]}</td></tr><tr><td>E0</td><td>${row[6]}</td></tr><tr><td>E1</td><td>${row[7]}</td></tr><tr><td>E2</td><td>${row[8]}</td></tr><tr><td>Actual</td><td>${row[9]}</td></tr></table>\","
+      event += "\"asset\": { \"media\":\"\",\"credit\":\"\",\"caption\":\"\"}}"
+      events << event
+    }
+  }
+  
+  println events.join(",")
+%>
+    ]
+  }
+}

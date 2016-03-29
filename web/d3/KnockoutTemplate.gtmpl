@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+  body { font-family: arial; font-size: 14px; }
+  .application { padding: 1em; background-color: #EEEEDD; border: 1px solid #CCC; max-width: 655px; }
+  .application input { font-family: Arial; }
+  .application b { font-weight: bold; }
+  .application p { margin-top: 0.9em; margin-bottom: 0.9em; }
+  .application select[multiple] { width: 100%; height: 8em; }
+  .application h2 { margin-top: 0.4em; font-weight: bold; font-size: 1.2em; }
+</style>
+<body>
+<script type="text/javascript">
+<% println new File("javascript/knockout/knockout.min.js").text %>
+</script>
+<html>
+  <head>
+    <title>Clustered Force</title>
+<body>
+  <div class='application'>   
+    <p>First name: <input data-bind='value: firstName' /></p> 
+    <p>Last name: <input data-bind='value: lastName' /></p> 
+    <h2>Hello, <span data-bind='text: fullName'> </span>!</h2>  
+  </div>
+</body>
+</html>
+
+<script>
+  var viewModel = function(first, last) {
+    this.firstName = ko.observable(first);
+    this.lastName = ko.observable(last);
+ 
+    this.fullName = ko.computed(function()
+    {
+        return this.firstName() + " " + this.lastName();
+    }, this);
+  };
+  ko.applyBindings(new viewModel("Planet", "Earth"));
+</script>
+

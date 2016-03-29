@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+    <title>Multiple Pie Charts</title>
+    <script type="text/javascript" src="http://mbostock.github.com/d3/d3.js?2.4.5"></script>
+    <script type="text/javascript" src="http://mbostock.github.com/d3/d3.layout.js?2.4.5"></script>
+    <style type="text/css">
+body
+{
+  text-align: center;
+}
+    </style>
+  </head>
+  <body>
+    <script type="text/javascript">
+
+// Define the data as a two-dimensional array of numbers. If you had other
+// data to associate with each number, replace each number with an object, e.g.,
+// `{key: "value"}`.
+
+function randomMatrix(numColumns, numRows, min, max)
+{
+	var matrix = new Array(numRows);
+	
+	for (var row = 0; row < numRows; row++)
+	{
+		matrix[row] = new Array(numColumns);
+		for (var col = 0; col < numColumns; col++)
+	  {
+			matrix[row][col] = Math.random() * (max-min) + min;
+		}
+	}
+	return matrix;
+}
+
+var data = randomMatrix(3, 100, 1, 2800);
+
+console.dir(data);
+
+var m = 10,
+    r = 50,
+    z = d3.scale.category20();
+
+var colors = [ "red", "lightgreen", "green", ]
+
+// Insert an svg:svg element (with margin) for each row in our dataset. A
+// child svg:g element translates the origin to the pie center.
+var svg = d3.select("body").selectAll("svg")
+    .data(data)
+  .enter().append("svg:svg")
+    .attr("width", (r + m) * 2)
+    .attr("height", (r + m) * 2)
+  .append("svg:g")
+    .attr("transform", "translate(" + (r + m) + "," + (r + m) + ")");
+
+var circles = svg.selectAll("circle")
+   .data(function(d, i) { return d; })
+	 .enter().append("circle")
+	 .attr("r", function(d, i) { return 2 * Math.sqrt(d/Math.PI);})
+	 .style("fill", function(d, i) { return colors[i%colors.length]; })
+	 .attr("opacity", 1);
+
+circles.sort(function(a,b)
+{
+	if (a==b)
+	{
+		return 0;
+	}
+	else if (a<b)
+  {
+		return 1;
+  }
+	return -1;
+});
+    </script>
+  </body>
+</html>

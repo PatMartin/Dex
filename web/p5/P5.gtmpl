@@ -1,0 +1,20 @@
+<script type="text/javascript" src="http://fbug.googlecode.com/svn/lite/branches/firebug1.4/content/firebug-lite-dev.js"></script>
+
+<script type="text/javascript">
+  <% out.println new File("javascript/p5/latest/p5.min.js").text %>
+</script>
+<script>
+<%
+  def newHeader = "[" + header.collect { return "'$it'" }.join(',') + "]"
+  def newData = []
+
+  data.eachWithIndex
+  {
+    row, ri ->
+    newData << "[" + row.collect { return "'$it'" }.join(',') + "]"
+  }
+  out.println "\nvar header = $newHeader;\nvar data = [" + newData.join(',\n') + "];";
+%>
+
+  <%= p5Code %>
+</script>

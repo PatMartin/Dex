@@ -1,0 +1,183 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head id="Head">
+    <title>Demonstration of the vertical headers</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+    <link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.5/themes/redmond/jquery-ui.css" />
+    <link rel="stylesheet" type="text/css" href="http://www.ok-soft-gmbh.com/jqGrid/jquery.jqGrid-3.8/css/ui.jqgrid.css" />
+    <link rel="stylesheet" type="text/css" href="http://www.ok-soft-gmbh.com/jqGrid/jquery.jqGrid-3.8/src/css/jquery.searchFilter.css" />
+    <link rel="stylesheet" type="text/css" href="http://www.ok-soft-gmbh.com/jqGrid/jquery.jqGrid-3.8/src/css/ui.multiselect.css" />
+    <!--<link rel="stylesheet" type="text/css" href="http://www.ok-soft-gmbh.com/jqGrid/jquery.jqGrid-3.8/css/ui.jqgrid.css" />-->
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.3/jquery.js"></script>
+    <!--<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.3/jquery.min.js"></script>-->
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.5/jquery-ui.js"></script>
+    <!--<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.5/jquery-ui.min.js"></script>-->
+    <script type="text/javascript" src="http://www.ok-soft-gmbh.com/jqGrid/jquery.jqGrid-3.8/src/ui.multiselect.js"></script>
+    <script type="text/javascript" src="http://www.ok-soft-gmbh.com/jqGrid/jquery.jqGrid-3.8/src/i18n/grid.locale-en.js"></script>
+    <script type="text/javascript" src="http://www.ok-soft-gmbh.com/jqGrid/jquery.jqGrid-3.8/src/grid.base-fixed.js"></script>
+    <script type="text/javascript" src="http://www.ok-soft-gmbh.com/jqGrid/jquery.jqGrid-3.8/src/grid.common.js"></script>
+    <script type="text/javascript" src="http://www.ok-soft-gmbh.com/jqGrid/jquery.jqGrid-3.8/src/grid.formedit.js"></script>
+    <script type="text/javascript" src="http://www.ok-soft-gmbh.com/jqGrid/jquery.jqGrid-3.8/src/grid.inlinedit.js"></script>
+    <script type="text/javascript" src="http://www.ok-soft-gmbh.com/jqGrid/jquery.jqGrid-3.8/src/grid.custom.js"></script>
+    <script type="text/javascript" src="http://www.ok-soft-gmbh.com/jqGrid/jquery.jqGrid-3.8/src/jquery.fmatter.js"></script>
+    <script type="text/javascript" src="http://www.ok-soft-gmbh.com/jqGrid/jquery.jqGrid-3.8/src/grid.grouping.js"></script>
+    <script type="text/javascript" src="http://www.ok-soft-gmbh.com/jqGrid/jquery.jqGrid-3.8/src/grid.jqueryui.js"></script>
+    <script type="text/javascript" src="http://www.ok-soft-gmbh.com/jqGrid/jquery.jqGrid-3.8/src/jquery.searchFilter.js"></script>
+    <script type="text/javascript" src="http://www.ok-soft-gmbh.com/jqGrid/jquery.jqGrid-3.8/src/jqDnR.js"></script>
+    <script type="text/javascript" src="http://www.ok-soft-gmbh.com/jqGrid/jquery.jqGrid-3.8/src/jqModal.js"></script>
+    <!--<script type="text/javascript" src="http://www.ok-soft-gmbh.com/jqGrid/jquery.jqGrid-3.8/js/i18n/grid.locale-en.js"></script>
+    <script type="text/javascript" src="http://www.ok-soft-gmbh.com/jqGrid/jquery.jqGrid-3.8/js/jquery.jqGrid.min.js"></script>-->
+
+    <style type="text/css">
+    .rotate
+    {
+        -webkit-transform: rotate(-90deg);    /* Safari 3.1+, Chrome */
+        -moz-transform: rotate(-90deg);       /* Firefox 3.5+ */
+        -o-transform: rotate(-90deg);         /* Opera starting with 10.50+ */
+        filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=3);       /* IE6, IE7 */
+        /*-ms-filter: "progid:DXImageTransform.Microsoft.BasicImage(rotation=3)";*/   /* IE8 */
+        zoom: 1;
+    }
+    </style>
+
+    <script type="text/javascript">
+    //<![CDATA[
+        jQuery(document).ready(function() {
+            // we use workaround from http://www.trirand.com/blog/?page_id=393/bugs/in-multiple-search-second-and-subsequent-ops-are-sent-as-undefined-in-ie6/
+            // to fix the bug in the jQuery.clone (see http://bugs.jquery.com/ticket/6793 and
+            // dscussion on the http://api.jquery.com/clone/
+            jQuery.event.special.click = {
+                setup: function() {
+                    if (jQuery(this).hasClass("ui-search")) {
+                        jQuery(this).bind("click", jQuery.event.special.click.handler);
+                    }
+                    return false;
+                },
+                teardown: function() {
+                    jQuery(this).unbind("click", jQuery.event.special.click.handler);
+                    return false;
+                },
+                handler: function(event) {
+                    //jQuery(".ui-searchFilter td.ops select").attr("name", "op");
+                    jQuery(".ui-searchFilter td.ops select").filter(function () {
+                        return \$(this).css("display") != "none";
+                    }).attr("name", "op");
+                }
+            };
+            var rotateCheckboxColumnHeaders = function (grid, headerHeight) {
+                // we use grid as context (if one have more as one table on tnhe page)
+                var trHead = jQuery("thead:first tr", grid.hdiv);
+                var cm = grid.getGridParam("colModel");
+                jQuery("thead:first tr th").height(headerHeight);
+                headerHeight = jQuery("thead:first tr th").height();
+
+                for (var iCol = 0; iCol < cm.length; iCol++) {
+                    var cmi = cm[iCol];
+                    if (cmi.formatter === 'checkbox') {
+                        // we must set width of column header div BEFOR adding class "rotate" to
+                        // prevent text cutting based on the current column width
+                        var headDiv = jQuery("th:eq(" + iCol + ") div", trHead);
+                        headDiv.width(headerHeight).addClass("rotate");
+                        if (!jQuery.browser.msie) {
+                            if (jQuery.browser.mozilla) {
+                                headDiv.css("left", (cmi.width - headerHeight) / 2 + 3).css("bottom", 7);
+                            }
+                            else {
+                                headDiv.css("left", (cmi.width - headerHeight) / 2);
+                            }
+                        }
+                        else {
+                            var ieVer = jQuery.browser.version.substr(0, 3);
+                            // Internet Explorer
+                            if (ieVer !== "6.0" && ieVer !== "7.0") {
+                                jQuery("span", headDiv).css("left", 0);
+                                headDiv.css("left", cmi.width / 2 - 4).css("bottom", headerHeight / 2);
+                            }
+                            else {
+                                headDiv.css("left", 3);
+                            }
+                            headDiv.parent().css("zoom",1);
+                        }
+                    }
+                }
+            };
+            var myData = [
+                { orderID: "10", orderDate: "2010-09-18", shipmentDate: "2010-09-20", orderStatus: "2" },
+                { orderID: "15", orderDate: "2010-09-20", shipmentDate: "2010-09-24", orderStatus: "3" },
+                { orderID: "20", orderDate: "2010-10-16", shipmentDate: "2010-10-17", orderStatus: "1" }
+            ];
+            // decode 'orderStatus' column and add additional boolean data based on the bitmap mask
+            for (var i=0, l=myData.length; i<l; i++) {
+                var myRow = myData[i];
+                var orderStatus = parseInt(myRow.orderStatus, 10);
+                myRow.airPost = (orderStatus & 2) != 0? "1": "0";
+                myRow.heavy = (orderStatus & 1) != 0? "1": "0";
+            }
+            var grid = jQuery('#list');
+            grid.jqGrid({
+                data: myData,
+                datatype: 'local',
+                caption: 'Order Details',
+                height: 'auto',
+                gridview: true,
+                rownumbers: true,
+                viewrecords: true,
+                pager: '#pager',
+                /*loadComplete: function(data) {
+                    var ids = grid.jqGrid ('getDataIDs');
+                    if (ids) {
+                        for (var i=0, l=ids.length; i<l; i++) {
+                            var rowId = ids[i];
+                            var rowData = grid.jqGrid ('getRowData', rowId );
+                            var orderStatus = parseInt(rowData.orderStatus, 10);
+                            rowData.airPost = (orderStatus & 2) != 0? "1": "0";
+                            rowData.heavy = (orderStatus & 1) != 0? "1": "0";
+                            grid.jqGrid ('setRowData', rowId, rowData);
+                        }
+                        grid[0].refreshIndex();
+                    }
+                },*/
+                rownumbers: true,
+                colNames: ['Order ID', 'Order', 'Shipment', 'Air-Post', 'Heavy', 'RowVersion'],
+                colModel: [
+                    { name: 'orderID', index: 'orderID', key:true, width: 120, sorttype: 'int' },
+                    { name: 'orderDate', index: 'orderDate', width: 180,
+                      sorttype: 'date', formatter: 'date' },
+                    { name: 'shipmentDate', index: 'shipmentDate', width: 180,
+                      sorttype: 'date', formatter: 'date' },
+                    { name: 'airPost', width: 21, index: 'airPost', formatter: 'checkbox', align: 'center',
+                      editoptions: { value: "1:0" }, stype: 'select', searchoptions: { value: "1:Yes;0:No" } },
+                    { name: 'heavy', width: 21, index: 'heavy', formatter: 'checkbox', align: 'center',
+                      editoptions: { value: "1:0" }, stype: "select", searchoptions: { value: "1:Yes;0:No" } },
+                    { name: 'orderStatus', index: 'orderStatus', width: 50, hidden: true }
+                ]
+            }).jqGrid ('navGrid', '#pager', { edit: false, add: false, del: false, refresh: true, view: false },
+                        {},{},{},{multipleSearch:true})
+              .jqGrid ('navButtonAdd', '#pager', { caption: "", buttonicon: "ui-icon-calculator", title: "choose columns",
+                  onClickButton: function() {
+                      grid.jqGrid('columnChooser');
+                      setTimeout(function(){
+                          //var d=\$("div.ui-dialog[aria-labelledby='ui-dialog-title-colchooser_list']")
+                          //d.height(530);
+                          \$("div#colchooser_list",d[0]).height(400);
+                          \$("div.selected, div.available",d[0]).height(350);
+                          \$("div.selected, div.available","div#colchooser_list").height(350);
+                      });
+                  }
+              });
+
+            rotateCheckboxColumnHeaders (grid, 90);
+
+        });
+        //]]>
+    </script>
+</head>
+
+<body>
+    <div>
+        <table id="list"><tbody><tr><td/></tr></tbody></table>
+        <div id="pager"></div>
+    </div>
+</body>
+</html>

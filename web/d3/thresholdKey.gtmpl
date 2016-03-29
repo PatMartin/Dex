@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<% import com.dexvis.util.DexUtil %>
+<meta charset="utf-8">
+<style>
+
+svg {
+  font: 10px sans-serif;
+}
+
+.caption {
+  font-weight: bold;
+}
+
+.key path {
+  display: none;
+}
+
+.key line {
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+</style>
+<body>
+<script type="text/javascript">
+<%
+println new File("javascript/d3/latest/d3.min.js").text
+println new File("javascript/d3/latest/lib/colorbrewer/colorbrewer.js").text
+println new File("javascript/jquery/latest/js/jquery-1.8.2.min.js").text
+println new File("javascript/jquery/latest/js/jquery-ui-1.9.1.custom.min.js").text
+println new File("javascript/touchpunch/latest/touchpunch.js").text
+println new File("javascript/dex/dexutils.js").text
+%>
+</script>
+<script>
+
+<% println "var dex = " + DexUtil.getCsvString(dexData) %>
+
+var svg = d3.select("body").append("svg")
+  .attr("width", 960)
+  .attr("height", 500);
+
+var params = {}
+
+appendOrdinalHorizontalLegend(svg, dex[0], { palette : d3.scale.category10() });
+appendOrdinalHorizontalLegend(svg, dex[0], {
+  palette : d3.scale.category20(),
+  yoffset : 100
+});
+
+appendOrdinalHorizontalLegend(svg, dex[0], {
+  caption : "Yet another legend...",
+  palette : d3.scale.category20c(),
+  yoffset : 200
+});
+
+</script>

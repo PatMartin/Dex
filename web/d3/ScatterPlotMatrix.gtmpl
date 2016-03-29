@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<%
+import com.dexvis.util.DexUtil
+import com.dexvis.tmi.TMITable
+import com.dexvis.dex.DexData
+%>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+    <title>Scatter Plot Matrix</title>
+
+<script type="text/javascript">
+<%
+println new File("javascript/d3/latest/d3.min.js").text
+println new File("javascript/d3/latest/lib/colorbrewer/colorbrewer.js").text
+%>
+</script>
+
+<style>
+<%
+  println new File("javascript/jqueryui/latest/jquery-ui.min.css").text
+  println new File("javascript/jqueryui/latest/jquery-ui.theme.min.css").text
+  println new File("web/d3/d3.css").text
+%>
+</style>
+
+<script>
+<%
+  println new File("javascript/jquery/latest/jquery-2.1.3.min.js").text
+  println new File("javascript/jqueryui/latest/jquery-ui.min.js").text
+    println new File("javascript/jquery/latest/jquery-2.1.3.min.js").text
+  println new File("javascript/jqueryui/latest/jquery-ui.min.js").text
+  println new File("javascript/underscore/latest/underscore-min.js").text
+  println new File("javascript/d3/latest/d3.min.js").text
+  println new File("javascript/dexjs/latest/dex.js").text
+%>
+</script>
+
+<style type="text/css">
+
+svg {
+  font-size: 14px;
+}
+
+.axis {
+  shape-rendering: crispEdges;
+}
+
+.axis line {
+  stroke: #ddd;
+  stroke-width: .5px;
+}
+
+.axis path {
+  display: none;
+}
+
+rect.extent {
+  fill: #000;
+  fill-opacity: .125;
+  stroke: #fff;
+}
+
+rect.frame {
+  fill: #fff;
+  fill-opacity: .7;
+  stroke: #aaa;
+}
+
+circle {
+  fill: #ccc;
+  fill-opacity: .5;
+}
+
+.legend circle {
+  fill-opacity: 1;
+}
+
+.legend text {
+  font-size: 18px;
+  font-style: oblique;
+}
+
+.cell text {
+  pointer-events: none;
+}
+
+.setosa {
+  fill: #800;
+}
+
+.versicolor {
+  fill: #080;
+}
+
+.virginica {
+  fill: #008;
+}
+</style>
+
+</head>
+<body>
+<div id="chartTitle" class="ui-widget-content">
+  <h1 id="titletext">ScatterPlot Matrix</h1>
+</div>
+
+<div id="chart"></div><br>
+<svg id="topLegend"></svg>
+
+<script type="text/javascript">
+<%
+  def dataString = ""
+  def rowList = []
+
+  //dexData.renameHeader(0, "category")
+  def numericHeaders = dexData.getNumericColumns()
+  //def numericHeaders = dexData.getHeader()
+
+  dexData.data.each
+  { row ->
+    def List<String> nvpList = []
+    state.dexData.header.eachWithIndex
+    { h, i ->
+      //if (h in numericHeaders)
+      //{
+        nvpList << "\"$h\":\"${row[i]}\""
+      //}
+      //else if (i == 0)
+      //{
+        nvpList << "\"$h\":\"${row[i]}\""
+      //}
+    }
+    rowList << "{" + nvpList.join(",") + "}"
+  }
+
+  dataString += "[" + rowList.join(",") + "];"
+
+  println "var columnNames = ${dexData.getHeader().collect { "\"$it\"" }};"
+  println "var categories = ${dexData.getColumn(0).unique().collect { "\"$it\"" }};"
+  println "var numericHeaders = " + numericHeaders.collect { "\"$it\"" } + ";"
+  println "var jsonData = $dataString;"
+%>
+
+readJson = function(text, callback)
+{
+  callback(text ? JSON.parse(text) : null);
+}
+
+var size       = 800,
+    fontSize   = 12,
+    minOpacity = 20;
+    
+function draw()
+{
+  d3.select("#chart").html("");
+  d3.select("#topLegend").html("");
+  drawScatterPlotMatrix(size, fontSize);
+}
+
+function drawScatterPlotMatrix(size, fontSize)
+{
+  function contains(a, obj)
+  {
+    var i = a.length;
+    while (i--)
+    {
+      if (a[i] === obj)
+      {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  readJson(JSON.stringify(jsonData), function(data)
+  {
+    // Size parameters.
+    var padding = 8,
+        n = columnNames.length;
+    var unselectedRadius = 4;
+    var selectedRadius = 4;
+
+    var width = size;
+    var height = size;
+    var margin = 50;
+    size = (size / columnNames.length) - (margin / columnNames.length);// - (padding * (columnNames.length + 1))
+
+    //var color = d3.scale.category10();
+    //var color = d3.scale.ordinal().domain( categories )
+    //  .range(d3.scale.category10());
+    
+    var color = d3.scale.ordinal()
+      .domain(categories)
+      .range(colorbrewer.HiContrast[9]);
+
+    // Position scales.
+    var x = {}, y = {};
+    
+    columnNames.forEach(function(columnName)
+    {
+      var value = function(d) { return d[columnName]; };
+      var numericValue = function(d) { return Number(d[columnName]); };
+      var range = [padding, size-padding];
+      var domain;
+
+      if (contains(numericHeaders, columnName))
+      {
+        domain = d3.extent(data, numericValue);
+//console.dir(data.map(function(d) { return d[columnName]; }));
+        x[columnName] = d3.scale.linear().domain(domain).range(range);
+        y[columnName] = d3.scale.linear().domain(domain).range(range);
+      }
+      else
+      {
+        domain = data.map(function(d) { return d[columnName]; });
+
+        x[columnName] = d3.scale.ordinal()
+          .domain(domain)
+          .rangePoints(range);
+        y[columnName] = d3.scale.ordinal()
+          .domain(domain)
+          .rangePoints(range);
+      }
+    });
+
+    // Axes.
+    var axis = d3.svg.axis()
+      .ticks(5)
+      .tickSize(size * n);
+
+    // Brush.
+    var brush = d3.svg.brush()
+      .on("brushstart", brushstart)
+      .on("brush", brush)
+      .on("brushend", brushend);
+
+    // Root panel.
+    var svg = d3.select("#chart").append("svg:svg")
+      .attr("width", width)
+      .attr("height", height)
+      .append("svg:g")
+      .attr("transform", "translate(0,0)");
+
+    // Legend.
+    //var legend = svg.selectAll("g.legend")
+    //  .data(categories)
+    //  .enter().append("svg:g")
+    //  .attr("class", "legend")
+    //  .attr("transform", function(d, i) { return "translate(-179," + (i * 20 + 594) + ")"; });
+
+    var topLegend = d3.select("#topLegend")
+      .attr("width", 200)
+      .attr("height", categories.length * 20)
+      .append("svg:g");
+
+    var legend = topLegend.selectAll("g.legend")
+      .data(categories)
+      .enter().append("svg:g")
+      .attr("class", "legend")
+      .attr("transform", function(d, i) { return "translate(10," + (i * 20 + 10) + ")"; });
+
+    legend.append("svg:circle")
+      .attr("class", String)
+      .attr("r", 5)
+      .style("fill", function(d)
+      {
+        return color(d);
+      });
+
+    legend.append("svg:text")
+      .attr("x", 12)
+      .attr("dy", ".31em")
+      .text(function(d) { return d; });
+
+    // X-axis.
+    svg.selectAll("g.x.axis")
+      .data(columnNames)
+      .enter().append("svg:g")
+      .attr("class", "x axis")
+      .attr("transform", function(d, i)
+      {
+        //return "translate(" + (i * size) + ",0)";
+        return "translate(" + (i * size + padding) + ", " + 0 + ")";
+      })
+      .each(function(d) { d3.select(this).call(axis.scale(x[d]).orient("bottom")); });
+
+    var xaxis = svg.selectAll("g.x.axis")
+
+    xaxis.selectAll("text")
+      .attr("transform", function(d)
+      {
+        return "translate(" + this.getBBox().height/2 + "," +
+            this.getBBox().width/2 + ")";
+      });
+
+
+    // Y-axis.
+    svg.selectAll("g.y.axis")
+      .data(columnNames)
+      .enter().append("svg:g")
+      .attr("class", "y axis")
+      .attr("transform", function(d, i) { return "translate(0," + i * size + ")"; })
+      .each(function(d) { d3.select(this).call(axis.scale(y[d]).orient("right")); });
+
+    // Cell and plot.
+    var cell = svg.selectAll("g.cell")
+      .data(cross(columnNames, columnNames))
+      .enter().append("svg:g")
+      .attr("class", "cell")
+      .attr("transform", function(d) { return "translate(" + d.i * size + "," + d.j * size + ")"; })
+      .each(plot);
+
+    // Titles for the diagonal.
+    cell.filter(function(d) { return d.i == d.j; }).append("svg:text")
+      .attr("x", padding)
+      .attr("y", padding)
+      .attr("dy", ".71em")
+      .attr("font-size", fontSize)
+      .text(function(d) { return d.x; });
+
+    function plot(p)
+    {
+      var cell = d3.select(this);
+
+      // Plot frame.
+      cell.append("svg:rect")
+        .attr("class", "frame")
+        .attr("x", padding)
+        .attr("y", padding)
+        .attr("width", size - padding)
+        .attr("height", size - padding);
+
+      // Plot dots.
+      cell.selectAll("circle")
+        .data(data)
+        .enter().append("svg:circle")
+          //.attr("class", function(d) { return d[columnNames[0]]; })
+          .attr("cx", function(d)
+          {
+            return x[p.x](d[p.x]);
+          })
+          .attr("cy", function(d)
+          {
+            return y[p.y](d[p.y]);
+          })
+          .attr("r", selectedRadius)
+          .style("fill", function(d)
+          {
+            return color(d[columnNames[0]]);
+          })
+          .style("opacity", 1.0);
+
+      // Plot brush.
+      cell.call(brush.x(x[p.x]).y(y[p.y]));
+    }
+
+    // Clear the previously-active brush, if any.
+    function brushstart(p)
+    {
+      if (brush.data !== p)
+      {
+        cell.call(brush.clear());
+        brush.x(x[p.x]).y(y[p.y]).data = p;
+      }
+    }
+
+    // Highlight the selected circles.
+    function brush(p)
+    {
+      var e = brush.extent();
+      var xval;
+      var yval;
+      var active = false;
+
+      svg.selectAll(".cell circle")
+      .style("opacity", function(d)
+      {
+        xval = d[p.x];
+        yval = d[p.y];
+        
+        if (!contains(numericHeaders, p.x))
+        {
+          xval = x[p.x](d[p.x])
+        }
+        
+        if (!contains(numericHeaders, p.y))
+        {
+          yval = y[p.y](d[p.y])
+        }
+
+        return e[0][0] <= xval && xval <= e[1][0]
+          && e[0][1] <= yval && yval <= e[1][1]
+          ? 1.0 : minOpacity / 100.0;
+      })
+      .attr("r", function(d)
+      {
+        xval = d[p.x];
+        yval = d[p.y];
+        
+        if (!contains(numericHeaders, p.x))
+        {
+          xval = x[p.x](d[p.x])
+        }
+        
+        if (!contains(numericHeaders, p.y))
+        {
+          yval = y[p.y](d[p.y])
+        }
+        
+        return e[0][0] <= xval && xval <= e[1][0]
+          && e[0][1] <= yval && yval <= e[1][1]
+          ? selectedRadius : unselectedRadius;
+      })
+      .style("fill", function(d)
+      {
+        xval = d[p.x];
+        yval = d[p.y];
+        
+        if (!contains(numericHeaders, p.x))
+        {
+          xval = x[p.x](d[p.x])
+        }
+        
+        if (!contains(numericHeaders, p.y))
+        {
+          yval = y[p.y](d[p.y])
+        }
+        
+        console.log("COLUMN-NAME: " + columnNames[0] + "=" +
+        d[columnNames[0]] + "=color " +
+        color(d[columnNames[0]]));
+        return e[0][0] <= xval && xval <= e[1][0]
+          && e[0][1] <= yval && yval <= e[1][1]
+          ? color(d[columnNames[0]]) : color(d[columnNames[0]]);
+      });
+    }
+
+    // If the brush is empty, select all circles.
+    function brushend()
+    {
+      if (brush.empty())
+      svg.selectAll(".cell circle").style("opacity", function(d)
+      {
+        return 1.0;
+      })
+      .attr("r", selectedRadius)
+      .style("fill", function(d) { return color(d[columnNames[0]]); });
+    }
+
+    function cross(a, b)
+    {
+      var c = [], n = a.length, m = b.length, i, j;
+      for (i = -1; ++i < n;) for (j = -1; ++j < m;) c.push({x: a[i], i: i, y: b[j], j: j});
+      return c;
+    }
+  });
+}
+
+draw();
+
+<%
+   println """
+	\$(function() {
+		\$( "#size-slider" ).slider(
+		{
+	      min: 100,
+		  max: 2000,
+		  value: size,
+		  slide : function(event, ui)
+		  {
+		    size = ui.value;
+		    draw();
+	        \$("#size").val(\$("#size-slider").slider("value"));
+		  }
+		});
+		\$("#size").val(\$("#size-slider").slider("value"));
+	});
+
+	\$(function() {
+		\$( "#fontsize-slider" ).slider(
+		{
+	      min: 1,
+		  max: 48,
+		  value: fontSize,
+		  slide : function(event, ui)
+		  {
+		    fontSize = ui.value;
+		    draw();
+	        \$("#fontsize").val(\$("#fontsize-slider").slider("value"));
+		  }
+		});
+		\$("#fontsize").val(\$("#fontsize-slider").slider("value"));
+	});
+
+	\$(function() {
+		\$( "#minopacity-slider" ).slider(
+		{
+	      min: 1,
+		  max: 100,
+		  value: minOpacity,
+		  slide : function(event, ui)
+		  {
+		    minOpacity = ui.value;
+		    draw();
+	        \$("#minopacity").val(\$("#minopacity-slider").slider("value"));
+		  }
+		});
+		\$("#minopacity").val(\$("#minopacity-slider").slider("value"));
+	});
+
+    \$(function() {
+    	\$( "#chartTitle" ).draggable();
+        \$( "#chartConfig" ).draggable();
+        \$( "#topLegend" ).draggable();
+        \$( "#chart" ).draggable();
+    });
+
+function titleChange(newTitle)
+{
+  d3.select("title").text(newTitle);
+  d3.select("#titletext").text(newTitle);
+}
+
+"""
+%>
+</script>
+
+<div id="chartConfig" class="demo">
+    <h1>Configuration</h1>
+	<div>
+		<label for="size">Size:</label>
+		<input type="text" id="size" size="5" style="border:0; color:#f6931f; font-weight:bold;" />
+		<div id="size-slider"/>
+	</div>
+	<div>
+		<label for="minopacity">Minimum Opacity:</label>
+		<input type="text" id="minopacity" size="5" style="border:0; color:#f6931f; font-weight:bold;" />
+		<div id="minopacity-slider"/>
+	</div>
+	<div>
+		<label for="fontsize">Font Size:</label>
+		<input type="text" id="fontsize" size="5" style="border:0; color:#f6931f; font-weight:bold;" />
+		<div id="fontsize-slider"/>
+	</div>
+	<div>
+		<label for="charttitle">Title:</label>
+		<input type="text" id="charttitle" size="20" style="border:2; color:#f6931f; font-weight:10;" onchange="titleChange(this.value)" />
+	</div>
+</div>
+  </body>
+</html>
