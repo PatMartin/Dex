@@ -1,0 +1,199 @@
+<dex-project version="0.8">
+   <tasks class="java.util.ArrayList">
+      <task-item name="Read CSV" active="false">
+         <task class="com.dexvis.dex.task.input.ReadCsv">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+            <fileText>C:\dex\data\thrones.csv</fileText>
+            <limitRows>false</limitRows>
+            <rowLimitText>0</rowLimitText>
+            <lastDir>C:\dex\data</lastDir>
+         </task>
+      </task-item>
+      <task-item name="Replace All" active="false">
+         <task class="com.dexvis.dex.task.tablemanipulation.ReplaceAll">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+            <replace>^$</replace>
+            <with>NA</with>
+         </task>
+      </task-item>
+      <task-item name="View Data" active="false">
+         <task class="com.dexvis.dex.task.utilities.ViewData">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+         </task>
+      </task-item>
+      <task-item name="Select Columns" active="false">
+         <task class="com.dexvis.dex.task.tablemanipulation.SelectColumns">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+            <columnList>&lt;com.dexvis.simple.types.SimpleListSelectionView&gt;
+  &lt;sourceList&gt;
+    &lt;string&gt;year&lt;/string&gt;
+    &lt;string&gt;battle_number&lt;/string&gt;
+    &lt;string&gt;attacker_king&lt;/string&gt;
+    &lt;string&gt;defender_king&lt;/string&gt;
+    &lt;string&gt;attacker_2&lt;/string&gt;
+    &lt;string&gt;attacker_3&lt;/string&gt;
+    &lt;string&gt;attacker_4&lt;/string&gt;
+    &lt;string&gt;defender_2&lt;/string&gt;
+    &lt;string&gt;defender_3&lt;/string&gt;
+    &lt;string&gt;defender_4&lt;/string&gt;
+    &lt;string&gt;attacker_outcome&lt;/string&gt;
+    &lt;string&gt;battle_type&lt;/string&gt;
+    &lt;string&gt;major_death&lt;/string&gt;
+    &lt;string&gt;major_capture&lt;/string&gt;
+    &lt;string&gt;attacker_size&lt;/string&gt;
+    &lt;string&gt;defender_size&lt;/string&gt;
+    &lt;string&gt;attacker_commander&lt;/string&gt;
+    &lt;string&gt;defender_commander&lt;/string&gt;
+    &lt;string&gt;summer&lt;/string&gt;
+    &lt;string&gt;location&lt;/string&gt;
+    &lt;string&gt;region&lt;/string&gt;
+    &lt;string&gt;note&lt;/string&gt;
+  &lt;/sourceList&gt;
+  &lt;targetList&gt;
+    &lt;string&gt;attacker_1&lt;/string&gt;
+    &lt;string&gt;defender_1&lt;/string&gt;
+    &lt;string&gt;name&lt;/string&gt;
+  &lt;/targetList&gt;
+&lt;/com.dexvis.simple.types.SimpleListSelectionView&gt;</columnList>
+         </task>
+      </task-item>
+      <task-item name="Sequence Diagram" active="false">
+         <task class="com.dexvis.dex.task.vis.uml.SequenceDiagram">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+         </task>
+      </task-item>
+      <task-item name="Class Diagram" active="false">
+         <task class="com.dexvis.dex.task.vis.uml.ClassDiagram">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+         </task>
+      </task-item>
+      <task-item name="Read CSV" active="true">
+         <task class="com.dexvis.dex.task.input.ReadCsv">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+            <fileText>C:\dex2ws\Dex\data\drwho.csv</fileText>
+            <limitRows>false</limitRows>
+            <rowLimitText>0</rowLimitText>
+            <lastDir>C:\dex2ws\Dex\data</lastDir>
+         </task>
+      </task-item>
+      <task-item name="View Data" active="false">
+         <task class="com.dexvis.dex.task.utilities.ViewData">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+         </task>
+      </task-item>
+      <task-item name="Select Columns" active="true">
+         <task class="com.dexvis.dex.task.tablemanipulation.SelectColumns">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+            <columnList>&lt;com.dexvis.simple.types.SimpleListSelectionView&gt;
+  &lt;sourceList&gt;
+    &lt;string&gt;No Villains&lt;/string&gt;
+    &lt;string&gt;% of Villains&lt;/string&gt;
+    &lt;string&gt;Doc. no.&lt;/string&gt;
+    &lt;string&gt;ID&lt;/string&gt;
+    &lt;string&gt;Stories  total&lt;/string&gt;
+    &lt;string&gt;Story titles&lt;/string&gt;
+    &lt;string&gt;Episodes&lt;/string&gt;
+    &lt;string&gt;Doctor actor&lt;/string&gt;
+  &lt;/sourceList&gt;
+  &lt;targetList&gt;
+    &lt;string&gt;Villain&lt;/string&gt;
+    &lt;string&gt;Motivation&lt;/string&gt;
+  &lt;/targetList&gt;
+&lt;/com.dexvis.simple.types.SimpleListSelectionView&gt;</columnList>
+         </task>
+      </task-item>
+      <task-item name="Add Column" active="true">
+         <task class="com.dexvis.dex.task.tablemanipulation.AddColumn">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+            <colName>NONE</colName>
+            <colValue></colValue>
+         </task>
+      </task-item>
+      <task-item name="View Data" active="false">
+         <task class="com.dexvis.dex.task.utilities.ViewData">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+         </task>
+      </task-item>
+      <task-item name="Class Diagram" active="true">
+         <task class="com.dexvis.dex.task.vis.uml.ClassDiagram">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+         </task>
+      </task-item>
+      <task-item name="Sequence Diagram" active="false">
+         <task class="com.dexvis.dex.task.vis.uml.SequenceDiagram">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+         </task>
+      </task-item>
+      <task-item name="Force Diagram" active="false">
+         <task class="com.dexvis.dex.task.vis.dexcharts.ForceDiagram">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+         </task>
+      </task-item>
+      <task-item name="Sankey Diagram" active="false">
+         <task class="com.dexvis.dex.task.vis.dexcharts.Sankey">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+         </task>
+      </task-item>
+      <task-item name="Network" active="false">
+         <task class="com.dexvis.dex.task.vis.dexcharts.Network">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper">
+                  <property>
+                     <name>Height</name>
+                     <target>height</target>
+                     <category>Dimensions</category>
+                     <value class="java.lang.Integer">600</value>
+                  </property>
+                  <property>
+                     <name>Width</name>
+                     <target>width</target>
+                     <category>Dimensions</category>
+                     <value class="java.lang.Integer">800</value>
+                  </property>
+                  <property>
+                     <name>Transform</name>
+                     <target>transform</target>
+                     <category>Dimensions</category>
+                  </property>
+                  <property>
+                     <name>Resizable</name>
+                     <target>resizable</target>
+                     <category>Dimensions</category>
+                     <value class="java.lang.Boolean">true</value>
+                  </property>
+               </properties>
+            </prop-sheet>
+         </task>
+      </task-item>
+   </tasks>
+</dex-project>
