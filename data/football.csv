@@ -1,0 +1,1573 @@
+Institution ID,Institution,Game Date,Opponent ID,Opponent Name,Score For,Score Against,Location
+5,Akron,8/30/2012,128,UCF,14,56,Home
+5,Akron,9/8/2012,231,FIU,38,41,Away
+5,Akron,9/15/2012,446,Morgan St.,66,6,Home
+5,Akron,9/22/2012,694,Tennessee,26,47,Away
+5,Akron,9/29/2012,414,Miami (OH),49,56,Home
+5,Akron,10/6/2012,71,Bowling Green,10,24,Home
+5,Akron,10/13/2012,519,Ohio,28,34,Away
+5,Akron,10/20/2012,503,Northern Ill.,7,37,Home
+5,Akron,10/27/2012,129,Central Mich.,14,35,Away
+5,Akron,11/3/2012,331,Kent St.,24,35,Away
+5,Akron,11/10/2012,400,Massachusetts,14,22,Home
+5,Akron,11/20/2012,709,Toledo,23,35,Away
+8,Alabama,9/1/2012,418,Michigan,41,14,Neutral Site
+8,Alabama,9/8/2012,772,Western Ky.,35,0,Home
+8,Alabama,9/15/2012,31,Arkansas,52,0,Away
+8,Alabama,9/22/2012,229,Fla. Atlantic,40,7,Home
+8,Alabama,9/29/2012,433,Ole Miss,33,14,Home
+8,Alabama,10/13/2012,434,Missouri,42,10,Away
+8,Alabama,10/20/2012,694,Tennessee,44,13,Away
+8,Alabama,10/27/2012,430,Mississippi St.,38,7,Home
+8,Alabama,11/3/2012,365,LSU,21,17,Away
+8,Alabama,11/10/2012,697,Texas A&M,24,29,Home
+8,Alabama,11/17/2012,769,Western Caro.,49,0,Home
+8,Alabama,11/24/2012,37,Auburn,49,0,Home
+8,Alabama,12/1/2012,257,Georgia,32,28,Neutral Site
+8,Alabama,1/7/2013,513,Notre Dame,42,14,Neutral Site
+9,UAB,9/1/2012,716,Troy,29,39,Home
+9,UAB,9/15/2012,648,South Carolina,6,49,Away
+9,UAB,9/22/2012,518,Ohio St.,15,29,Away
+9,UAB,9/29/2012,719,Tulsa,42,49,Home
+9,UAB,10/6/2012,655,Southeastern La.,52,3,Home
+9,UAB,10/13/2012,288,Houston,17,39,Away
+9,UAB,10/20/2012,196,East Carolina,35,42,Home
+9,UAB,10/27/2012,718,Tulane,45,55,Away
+9,UAB,11/3/2012,664,Southern Miss.,27,19,Away
+9,UAB,11/10/2012,388,Marshall,38,31,Home
+9,UAB,11/17/2012,404,Memphis,9,46,Home
+9,UAB,11/24/2012,128,UCF,24,49,Away
+28,Arizona St.,8/30/2012,501,Northern Ariz.,63,6,Home
+28,Arizona St.,9/8/2012,301,Illinois,45,14,Home
+28,Arizona St.,9/15/2012,434,Missouri,20,24,Away
+28,Arizona St.,9/22/2012,732,Utah,37,7,Home
+28,Arizona St.,9/29/2012,107,California,27,17,Away
+28,Arizona St.,10/11/2012,157,Colorado,51,17,Away
+28,Arizona St.,10/18/2012,529,Oregon,21,43,Home
+28,Arizona St.,10/27/2012,110,UCLA,43,45,Home
+28,Arizona St.,11/3/2012,528,Oregon St.,26,36,Away
+28,Arizona St.,11/10/2012,657,Southern California,17,38,Away
+28,Arizona St.,11/17/2012,754,Washington St.,46,7,Home
+28,Arizona St.,11/23/2012,29,Arizona,41,34,Away
+28,Arizona St.,12/29/2012,726,Navy,62,28,Neutral Site
+29,Arizona,9/1/2012,709,Toledo,24,17,Home
+29,Arizona,9/8/2012,521,Oklahoma St.,59,38,Home
+29,Arizona,9/15/2012,647,South Carolina St.,56,0,Home
+29,Arizona,9/22/2012,529,Oregon,0,49,Away
+29,Arizona,9/29/2012,528,Oregon St.,35,38,Home
+29,Arizona,10/6/2012,674,Stanford,48,54,Away
+29,Arizona,10/20/2012,756,Washington,52,17,Home
+29,Arizona,10/27/2012,657,Southern California,39,36,Home
+29,Arizona,11/3/2012,110,UCLA,10,66,Away
+29,Arizona,11/10/2012,157,Colorado,56,31,Home
+29,Arizona,11/17/2012,732,Utah,34,24,Away
+29,Arizona,11/23/2012,28,Arizona St.,34,41,Home
+29,Arizona,12/15/2012,466,Nevada,49,48,Neutral Site
+30,Arkansas St.,9/1/2012,529,Oregon,34,57,Away
+30,Arkansas St.,9/8/2012,404,Memphis,33,28,Home
+30,Arkansas St.,9/15/2012,463,Nebraska,13,42,Away
+30,Arkansas St.,9/22/2012,17,Alcorn St.,56,0,Home
+30,Arkansas St.,9/29/2012,772,Western Ky.,13,26,Home
+30,Arkansas St.,10/4/2012,231,FIU,34,20,Away
+30,Arkansas St.,10/13/2012,646,South Ala.,36,29,Home
+30,Arkansas St.,10/23/2012,671,La.-Lafayette,50,27,Away
+30,Arkansas St.,11/3/2012,497,North Texas,37,19,Away
+30,Arkansas St.,11/8/2012,498,La.-Monroe,45,23,Home
+30,Arkansas St.,11/17/2012,716,Troy,41,34,Away
+30,Arkansas St.,12/1/2012,419,Middle Tenn.,45,0,Home
+30,Arkansas St.,1/6/2013,331,Kent St.,17,13,Neutral Site
+31,Arkansas,9/1/2012,315,Jacksonville St.,49,24,Home
+31,Arkansas,9/8/2012,498,La.-Monroe,31,34,Away
+31,Arkansas,9/15/2012,8,Alabama,0,52,Home
+31,Arkansas,9/22/2012,587,Rutgers,26,35,Home
+31,Arkansas,9/29/2012,697,Texas A&M,10,58,Away
+31,Arkansas,10/6/2012,37,Auburn,24,7,Away
+31,Arkansas,10/13/2012,334,Kentucky,49,7,Home
+31,Arkansas,10/27/2012,433,Ole Miss,27,30,Home
+31,Arkansas,11/3/2012,719,Tulsa,19,15,Home
+31,Arkansas,11/10/2012,648,South Carolina,20,38,Away
+31,Arkansas,11/17/2012,430,Mississippi St.,14,45,Away
+31,Arkansas,11/23/2012,365,LSU,13,20,Home
+37,Auburn,9/1/2012,147,Clemson,19,26,Neutral Site
+37,Auburn,9/8/2012,430,Mississippi St.,10,28,Away
+37,Auburn,9/15/2012,498,La.-Monroe,31,28,Home
+37,Auburn,9/22/2012,365,LSU,10,12,Home
+37,Auburn,10/6/2012,31,Arkansas,7,24,Home
+37,Auburn,10/13/2012,433,Ole Miss,20,41,Away
+37,Auburn,10/20/2012,736,Vanderbilt,13,17,Away
+37,Auburn,10/27/2012,697,Texas A&M,21,63,Home
+37,Auburn,11/3/2012,472,New Mexico St.,42,7,Home
+37,Auburn,11/10/2012,257,Georgia,0,38,Home
+37,Auburn,11/17/2012,6,Alabama A&M,51,7,Home
+37,Auburn,11/24/2012,8,Alabama,0,49,Away
+47,Ball St.,8/30/2012,204,Eastern Mich.,37,26,Home
+47,Ball St.,9/8/2012,147,Clemson,27,52,Away
+47,Ball St.,9/15/2012,306,Indiana,41,39,Away
+47,Ball St.,9/22/2012,651,South Fla.,31,27,Home
+47,Ball St.,9/29/2012,331,Kent St.,43,45,Away
+47,Ball St.,10/6/2012,503,Northern Ill.,23,35,Home
+47,Ball St.,10/13/2012,774,Western Mich.,30,24,Home
+47,Ball St.,10/20/2012,129,Central Mich.,41,30,Away
+47,Ball St.,10/27/2012,725,Army,30,22,Away
+47,Ball St.,11/6/2012,709,Toledo,34,27,Away
+47,Ball St.,11/14/2012,519,Ohio,52,27,Home
+47,Ball St.,11/23/2012,414,Miami (OH),31,24,Away
+47,Ball St.,12/21/2012,128,UCF,17,38,Away
+51,Baylor,9/2/2012,663,SMU,59,24,Home
+51,Baylor,9/15/2012,624,Sam Houston St.,48,23,Home
+51,Baylor,9/21/2012,498,La.-Monroe,47,42,Away
+51,Baylor,9/29/2012,768,West Virginia,63,70,Away
+51,Baylor,10/13/2012,698,TCU,21,49,Home
+51,Baylor,10/20/2012,703,Texas,50,56,Away
+51,Baylor,10/27/2012,311,Iowa St.,21,35,Away
+51,Baylor,11/3/2012,328,Kansas,41,14,Home
+51,Baylor,11/10/2012,522,Oklahoma,34,42,Away
+51,Baylor,11/17/2012,327,Kansas St.,52,24,Home
+51,Baylor,11/24/2012,700,Texas Tech,52,45,Neutral Site
+51,Baylor,12/1/2012,521,Oklahoma St.,41,34,Home
+51,Baylor,12/27/2012,110,UCLA,49,26,Neutral Site
+66,Boise St.,8/31/2012,416,Michigan St.,13,17,Away
+66,Boise St.,9/15/2012,414,Miami (OH),39,12,Home
+66,Boise St.,9/20/2012,77,BYU,7,6,Home
+66,Boise St.,9/29/2012,473,New Mexico,32,29,Away
+66,Boise St.,10/6/2012,664,Southern Miss.,40,14,Away
+66,Boise St.,10/13/2012,96,Fresno St.,20,10,Home
+66,Boise St.,10/20/2012,465,UNLV,32,7,Home
+66,Boise St.,10/27/2012,811,Wyoming,45,14,Away
+66,Boise St.,11/3/2012,626,San Diego St.,19,21,Home
+66,Boise St.,11/10/2012,277,Hawaii,49,14,Away
+66,Boise St.,11/17/2012,156,Colorado St.,42,14,Home
+66,Boise St.,12/1/2012,466,Nevada,27,21,Away
+66,Boise St.,12/22/2012,756,Washington,28,26,Neutral Site
+67,Boston College,9/1/2012,415,Miami (FL),32,41,Home
+67,Boston College,9/8/2012,380,Maine,34,3,Home
+67,Boston College,9/15/2012,509,Northwestern,13,22,Away
+67,Boston College,9/29/2012,147,Clemson,31,45,Home
+67,Boston College,10/6/2012,725,Army,31,34,Away
+67,Boston College,10/13/2012,234,Florida St.,7,51,Away
+67,Boston College,10/20/2012,255,Georgia Tech,17,37,Away
+67,Boston College,10/27/2012,392,Maryland,20,17,Home
+67,Boston College,11/3/2012,749,Wake Forest,14,28,Away
+67,Boston College,11/10/2012,513,Notre Dame,6,21,Home
+67,Boston College,11/17/2012,742,Virginia Tech,23,30,Home
+67,Boston College,11/24/2012,490,North Carolina St.,10,27,Away
+71,Bowling Green,9/1/2012,235,Florida,14,27,Away
+71,Bowling Green,9/8/2012,295,Idaho,21,13,Home
+71,Bowling Green,9/15/2012,709,Toledo,15,27,Away
+71,Bowling Green,9/22/2012,742,Virginia Tech,0,37,Away
+71,Bowling Green,9/29/2012,572,Rhode Island,48,8,Home
+71,Bowling Green,10/6/2012,5,Akron,24,10,Away
+71,Bowling Green,10/13/2012,414,Miami (OH),37,12,Home
+71,Bowling Green,10/20/2012,400,Massachusetts,24,0,Away
+71,Bowling Green,10/27/2012,204,Eastern Mich.,24,3,Home
+71,Bowling Green,11/7/2012,519,Ohio,26,14,Away
+71,Bowling Green,11/17/2012,331,Kent St.,24,31,Home
+71,Bowling Green,11/23/2012,86,Buffalo,21,7,Neutral Site
+71,Bowling Green,12/27/2012,630,San Jose St.,20,29,Neutral Site
+77,BYU,8/30/2012,754,Washington St.,30,6,Home
+77,BYU,9/8/2012,758,Weber St.,45,13,Home
+77,BYU,9/15/2012,732,Utah,21,24,Away
+77,BYU,9/20/2012,66,Boise St.,6,7,Away
+77,BYU,9/28/2012,277,Hawaii,47,0,Home
+77,BYU,10/5/2012,731,Utah St.,6,3,Home
+77,BYU,10/13/2012,528,Oregon St.,24,42,Home
+77,BYU,10/20/2012,513,Notre Dame,14,17,Away
+77,BYU,10/27/2012,255,Georgia Tech,41,17,Away
+77,BYU,11/10/2012,295,Idaho,52,13,Home
+77,BYU,11/17/2012,630,San Jose St.,14,20,Away
+77,BYU,11/24/2012,472,New Mexico St.,50,14,Away
+77,BYU,12/20/2012,626,San Diego St.,23,6,Neutral Site
+86,Buffalo,9/1/2012,257,Georgia,23,45,Away
+86,Buffalo,9/8/2012,446,Morgan St.,56,34,Home
+86,Buffalo,9/19/2012,331,Kent St.,7,23,Home
+86,Buffalo,9/29/2012,164,Connecticut,17,24,Away
+86,Buffalo,10/6/2012,519,Ohio,31,38,Away
+86,Buffalo,10/13/2012,503,Northern Ill.,3,45,Away
+86,Buffalo,10/20/2012,545,Pittsburgh,6,20,Home
+86,Buffalo,10/27/2012,709,Toledo,20,25,Home
+86,Buffalo,11/3/2012,414,Miami (OH),27,24,Home
+86,Buffalo,11/10/2012,774,Western Mich.,29,24,Home
+86,Buffalo,11/17/2012,400,Massachusetts,29,19,Away
+86,Buffalo,11/23/2012,71,Bowling Green,7,21,Neutral Site
+96,Fresno St.,9/1/2012,758,Weber St.,37,10,Home
+96,Fresno St.,9/8/2012,529,Oregon,25,42,Away
+96,Fresno St.,9/15/2012,157,Colorado,69,14,Home
+96,Fresno St.,9/22/2012,719,Tulsa,26,27,Away
+96,Fresno St.,9/29/2012,626,San Diego St.,52,40,Home
+96,Fresno St.,10/6/2012,156,Colorado St.,28,7,Away
+96,Fresno St.,10/13/2012,66,Boise St.,10,20,Away
+96,Fresno St.,10/20/2012,811,Wyoming,42,14,Home
+96,Fresno St.,10/27/2012,473,New Mexico,49,32,Away
+96,Fresno St.,11/3/2012,277,Hawaii,45,10,Home
+96,Fresno St.,11/10/2012,466,Nevada,52,36,Away
+96,Fresno St.,11/24/2012,721,Air Force,48,15,Home
+96,Fresno St.,12/24/2012,663,SMU,10,43,Neutral Site
+107,California,9/1/2012,466,Nevada,24,31,Home
+107,California,9/8/2012,667,Southern Utah,50,31,Home
+107,California,9/15/2012,518,Ohio St.,28,35,Away
+107,California,9/22/2012,657,Southern California,9,27,Away
+107,California,9/29/2012,28,Arizona St.,17,27,Home
+107,California,10/6/2012,110,UCLA,43,17,Home
+107,California,10/13/2012,754,Washington St.,31,17,Away
+107,California,10/20/2012,674,Stanford,3,21,Home
+107,California,10/27/2012,732,Utah,27,49,Away
+107,California,11/2/2012,756,Washington,13,21,Home
+107,California,11/10/2012,529,Oregon,17,59,Home
+107,California,11/17/2012,528,Oregon St.,14,62,Away
+110,UCLA,8/30/2012,574,Rice,49,24,Away
+110,UCLA,9/8/2012,463,Nebraska,36,30,Home
+110,UCLA,9/15/2012,288,Houston,37,6,Home
+110,UCLA,9/22/2012,528,Oregon St.,20,27,Home
+110,UCLA,9/29/2012,157,Colorado,42,14,Away
+110,UCLA,10/6/2012,107,California,17,43,Away
+110,UCLA,10/13/2012,732,Utah,21,14,Home
+110,UCLA,10/27/2012,28,Arizona St.,45,43,Away
+110,UCLA,11/3/2012,29,Arizona,66,10,Home
+110,UCLA,11/10/2012,754,Washington St.,44,36,Away
+110,UCLA,11/17/2012,657,Southern California,38,28,Home
+110,UCLA,11/24/2012,674,Stanford,17,35,Home
+110,UCLA,11/30/2012,674,Stanford,24,27,Away
+110,UCLA,12/27/2012,51,Baylor,26,49,Neutral Site
+128,UCF,8/30/2012,5,Akron,56,14,Away
+128,UCF,9/8/2012,518,Ohio St.,16,31,Away
+128,UCF,9/15/2012,231,FIU,33,20,Home
+128,UCF,9/29/2012,434,Missouri,16,21,Home
+128,UCF,10/4/2012,196,East Carolina,40,20,Home
+128,UCF,10/13/2012,664,Southern Miss.,38,31,Home
+128,UCF,10/20/2012,404,Memphis,35,17,Away
+128,UCF,10/27/2012,388,Marshall,54,17,Away
+128,UCF,11/3/2012,663,SMU,42,17,Home
+128,UCF,11/10/2012,704,UTEP,31,24,Away
+128,UCF,11/17/2012,719,Tulsa,21,23,Away
+128,UCF,11/24/2012,9,UAB,49,24,Home
+128,UCF,12/1/2012,719,Tulsa,27,33,Away
+128,UCF,12/21/2012,47,Ball St.,38,17,Neutral Site
+129,Central Mich.,8/30/2012,654,Southeast Mo. St.,38,27,Home
+129,Central Mich.,9/8/2012,416,Michigan St.,7,41,Home
+129,Central Mich.,9/22/2012,312,Iowa,32,31,Away
+129,Central Mich.,9/29/2012,503,Northern Ill.,24,55,Away
+129,Central Mich.,10/6/2012,709,Toledo,35,50,Away
+129,Central Mich.,10/12/2012,726,Navy,13,31,Home
+129,Central Mich.,10/20/2012,47,Ball St.,30,41,Home
+129,Central Mich.,10/27/2012,5,Akron,35,14,Home
+129,Central Mich.,11/3/2012,774,Western Mich.,31,42,Home
+129,Central Mich.,11/10/2012,204,Eastern Mich.,34,31,Away
+129,Central Mich.,11/17/2012,414,Miami (OH),30,16,Home
+129,Central Mich.,11/23/2012,400,Massachusetts,42,21,Away
+129,Central Mich.,12/26/2012,772,Western Ky.,24,21,Neutral Site
+140,Cincinnati,9/6/2012,545,Pittsburgh,34,10,Home
+140,Cincinnati,9/15/2012,178,Delaware St.,23,7,Home
+140,Cincinnati,9/29/2012,742,Virginia Tech,27,24,Neutral Site
+140,Cincinnati,10/6/2012,414,Miami (OH),52,14,Home
+140,Cincinnati,10/13/2012,236,Fordham,49,17,Home
+140,Cincinnati,10/20/2012,709,Toledo,23,29,Away
+140,Cincinnati,10/26/2012,367,Louisville,31,34,Away
+140,Cincinnati,11/3/2012,688,Syracuse,35,24,Home
+140,Cincinnati,11/10/2012,690,Temple,34,10,Away
+140,Cincinnati,11/17/2012,587,Rutgers,3,10,Home
+140,Cincinnati,11/23/2012,651,South Fla.,27,10,Home
+140,Cincinnati,12/1/2012,164,Connecticut,34,17,Away
+140,Cincinnati,12/27/2012,193,Duke,48,34,Neutral Site
+147,Clemson,9/1/2012,37,Auburn,26,19,Neutral Site
+147,Clemson,9/8/2012,47,Ball St.,52,27,Home
+147,Clemson,9/15/2012,244,Furman,41,7,Home
+147,Clemson,9/22/2012,234,Florida St.,37,49,Away
+147,Clemson,9/29/2012,67,Boston College,45,31,Away
+147,Clemson,10/6/2012,255,Georgia Tech,47,31,Home
+147,Clemson,10/20/2012,742,Virginia Tech,38,17,Home
+147,Clemson,10/25/2012,749,Wake Forest,42,13,Away
+147,Clemson,11/3/2012,193,Duke,56,20,Away
+147,Clemson,11/10/2012,392,Maryland,45,10,Home
+147,Clemson,11/17/2012,490,North Carolina St.,62,48,Home
+147,Clemson,11/24/2012,648,South Carolina,17,27,Home
+147,Clemson,12/31/2012,365,LSU,25,24,Neutral Site
+156,Colorado St.,9/1/2012,157,Colorado,22,17,Neutral Site
+156,Colorado St.,9/8/2012,493,North Dakota St.,7,22,Home
+156,Colorado St.,9/15/2012,630,San Jose St.,20,40,Away
+156,Colorado St.,9/22/2012,731,Utah St.,19,31,Home
+156,Colorado St.,9/29/2012,721,Air Force,21,42,Away
+156,Colorado St.,10/6/2012,96,Fresno St.,7,28,Home
+156,Colorado St.,10/13/2012,626,San Diego St.,14,38,Away
+156,Colorado St.,10/27/2012,277,Hawaii,42,27,Home
+156,Colorado St.,11/3/2012,811,Wyoming,31,45,Away
+156,Colorado St.,11/10/2012,465,UNLV,33,11,Home
+156,Colorado St.,11/17/2012,66,Boise St.,14,42,Away
+156,Colorado St.,11/24/2012,473,New Mexico,24,20,Home
+157,Colorado,9/1/2012,156,Colorado St.,17,22,Neutral Site
+157,Colorado,9/8/2012,102,Sacramento St.,28,30,Home
+157,Colorado,9/15/2012,96,Fresno St.,14,69,Away
+157,Colorado,9/22/2012,754,Washington St.,35,34,Away
+157,Colorado,9/29/2012,110,UCLA,14,42,Home
+157,Colorado,10/11/2012,28,Arizona St.,17,51,Home
+157,Colorado,10/20/2012,657,Southern California,6,50,Away
+157,Colorado,10/27/2012,529,Oregon,14,70,Away
+157,Colorado,11/3/2012,674,Stanford,0,48,Home
+157,Colorado,11/10/2012,29,Arizona,31,56,Away
+157,Colorado,11/17/2012,756,Washington,3,38,Home
+157,Colorado,11/23/2012,732,Utah,35,42,Home
+164,Connecticut,8/30/2012,400,Massachusetts,37,0,Home
+164,Connecticut,9/8/2012,490,North Carolina St.,7,10,Home
+164,Connecticut,9/15/2012,392,Maryland,24,21,Away
+164,Connecticut,9/22/2012,774,Western Mich.,24,30,Away
+164,Connecticut,9/29/2012,86,Buffalo,24,17,Home
+164,Connecticut,10/6/2012,587,Rutgers,3,19,Away
+164,Connecticut,10/13/2012,690,Temple,14,17,Home
+164,Connecticut,10/19/2012,688,Syracuse,10,40,Away
+164,Connecticut,11/3/2012,651,South Fla.,6,13,Away
+164,Connecticut,11/9/2012,545,Pittsburgh,24,17,Home
+164,Connecticut,11/24/2012,367,Louisville,23,20,Away
+164,Connecticut,12/1/2012,140,Cincinnati,17,34,Home
+193,Duke,9/1/2012,231,FIU,46,26,Home
+193,Duke,9/8/2012,674,Stanford,13,50,Away
+193,Duke,9/15/2012,489,N.C. Central,54,17,Home
+193,Duke,9/22/2012,404,Memphis,38,14,Home
+193,Duke,9/29/2012,749,Wake Forest,34,27,Away
+193,Duke,10/6/2012,746,Virginia,42,17,Home
+193,Duke,10/13/2012,742,Virginia Tech,20,41,Away
+193,Duke,10/20/2012,457,North Carolina,33,30,Home
+193,Duke,10/27/2012,234,Florida St.,7,48,Away
+193,Duke,11/3/2012,147,Clemson,20,56,Home
+193,Duke,11/17/2012,255,Georgia Tech,24,42,Away
+193,Duke,11/24/2012,415,Miami (FL),45,52,Home
+193,Duke,12/27/2012,140,Cincinnati,34,48,Neutral Site
+196,East Carolina,9/1/2012,27,Appalachian St.,35,13,Home
+196,East Carolina,9/8/2012,648,South Carolina,10,48,Away
+196,East Carolina,9/15/2012,664,Southern Miss.,24,14,Away
+196,East Carolina,9/22/2012,457,North Carolina,6,27,Away
+196,East Carolina,9/29/2012,704,UTEP,28,18,Home
+196,East Carolina,10/4/2012,128,UCF,20,40,Away
+196,East Carolina,10/13/2012,404,Memphis,41,7,Home
+196,East Carolina,10/20/2012,9,UAB,42,35,Away
+196,East Carolina,10/27/2012,726,Navy,28,56,Home
+196,East Carolina,11/3/2012,288,Houston,48,28,Home
+196,East Carolina,11/17/2012,718,Tulane,28,23,Away
+196,East Carolina,11/23/2012,388,Marshall,65,59,Home
+196,East Carolina,12/22/2012,671,La.-Lafayette,34,43,Neutral Site
+204,Eastern Mich.,8/30/2012,47,Ball St.,26,37,Away
+204,Eastern Mich.,9/8/2012,299,Illinois St.,14,31,Home
+204,Eastern Mich.,9/15/2012,559,Purdue,16,54,Away
+204,Eastern Mich.,9/22/2012,416,Michigan St.,7,23,Away
+204,Eastern Mich.,10/6/2012,331,Kent St.,14,41,Home
+204,Eastern Mich.,10/13/2012,709,Toledo,47,52,Home
+204,Eastern Mich.,10/20/2012,725,Army,48,38,Home
+204,Eastern Mich.,10/27/2012,71,Bowling Green,3,24,Away
+204,Eastern Mich.,11/1/2012,519,Ohio,14,45,Away
+204,Eastern Mich.,11/10/2012,129,Central Mich.,31,34,Home
+204,Eastern Mich.,11/17/2012,774,Western Mich.,29,23,Away
+204,Eastern Mich.,11/23/2012,503,Northern Ill.,7,49,Home
+229,Fla. Atlantic,8/31/2012,748,Wagner,7,3,Home
+229,Fla. Atlantic,9/8/2012,419,Middle Tenn.,17,31,Away
+229,Fla. Atlantic,9/15/2012,257,Georgia,20,56,Away
+229,Fla. Atlantic,9/22/2012,8,Alabama,7,40,Away
+229,Fla. Atlantic,9/29/2012,497,North Texas,14,20,Home
+229,Fla. Atlantic,10/13/2012,498,La.-Monroe,14,35,Away
+229,Fla. Atlantic,10/20/2012,646,South Ala.,34,37,Away
+229,Fla. Atlantic,10/27/2012,716,Troy,34,27,Home
+229,Fla. Atlantic,11/3/2012,726,Navy,17,24,Away
+229,Fla. Atlantic,11/10/2012,772,Western Ky.,37,28,Away
+229,Fla. Atlantic,11/16/2012,231,FIU,24,34,Home
+229,Fla. Atlantic,12/1/2012,671,La.-Lafayette,21,35,Home
+231,FIU,9/1/2012,193,Duke,26,46,Away
+231,FIU,9/8/2012,5,Akron,41,38,Home
+231,FIU,9/15/2012,128,UCF,20,33,Away
+231,FIU,9/22/2012,367,Louisville,21,28,Home
+231,FIU,9/29/2012,671,La.-Lafayette,20,48,Away
+231,FIU,10/4/2012,30,Arkansas St.,20,34,Home
+231,FIU,10/13/2012,419,Middle Tenn.,30,34,Home
+231,FIU,10/20/2012,716,Troy,37,38,Away
+231,FIU,10/27/2012,772,Western Ky.,6,14,Home
+231,FIU,11/3/2012,646,South Ala.,28,20,Away
+231,FIU,11/16/2012,229,Fla. Atlantic,34,24,Away
+231,FIU,11/24/2012,498,La.-Monroe,17,23,Home
+234,Florida St.,9/1/2012,454,Murray St.,69,3,Home
+234,Florida St.,9/8/2012,632,Savannah St.,55,0,Home
+234,Florida St.,9/15/2012,749,Wake Forest,52,0,Home
+234,Florida St.,9/22/2012,147,Clemson,49,37,Home
+234,Florida St.,9/29/2012,651,South Fla.,30,17,Away
+234,Florida St.,10/6/2012,490,North Carolina St.,16,17,Away
+234,Florida St.,10/13/2012,67,Boston College,51,7,Home
+234,Florida St.,10/20/2012,415,Miami (FL),33,20,Away
+234,Florida St.,10/27/2012,193,Duke,48,7,Home
+234,Florida St.,11/8/2012,742,Virginia Tech,28,22,Away
+234,Florida St.,11/17/2012,392,Maryland,41,14,Away
+234,Florida St.,11/24/2012,235,Florida,26,37,Home
+234,Florida St.,12/1/2012,255,Georgia Tech,21,15,Neutral Site
+234,Florida St.,1/1/2013,503,Northern Ill.,31,10,Neutral Site
+235,Florida,9/1/2012,71,Bowling Green,27,14,Home
+235,Florida,9/8/2012,697,Texas A&M,20,17,Away
+235,Florida,9/15/2012,694,Tennessee,37,20,Away
+235,Florida,9/22/2012,334,Kentucky,38,0,Home
+235,Florida,10/6/2012,365,LSU,14,6,Home
+235,Florida,10/13/2012,736,Vanderbilt,31,17,Away
+235,Florida,10/20/2012,648,South Carolina,44,11,Home
+235,Florida,10/27/2012,257,Georgia,9,17,Neutral Site
+235,Florida,11/3/2012,434,Missouri,14,7,Home
+235,Florida,11/10/2012,671,La.-Lafayette,27,20,Home
+235,Florida,11/17/2012,315,Jacksonville St.,23,0,Home
+235,Florida,11/24/2012,234,Florida St.,37,26,Away
+235,Florida,1/2/2013,367,Louisville,23,33,Neutral Site
+255,Georgia Tech,9/3/2012,742,Virginia Tech,17,20,Away
+255,Georgia Tech,9/8/2012,1320,Presbyterian,59,3,Home
+255,Georgia Tech,9/15/2012,746,Virginia,56,20,Home
+255,Georgia Tech,9/22/2012,415,Miami (FL),36,42,Home
+255,Georgia Tech,9/29/2012,419,Middle Tenn.,28,49,Home
+255,Georgia Tech,10/6/2012,147,Clemson,31,47,Away
+255,Georgia Tech,10/20/2012,67,Boston College,37,17,Home
+255,Georgia Tech,10/27/2012,77,BYU,17,41,Home
+255,Georgia Tech,11/3/2012,392,Maryland,33,13,Away
+255,Georgia Tech,11/10/2012,457,North Carolina,68,50,Away
+255,Georgia Tech,11/17/2012,193,Duke,42,24,Home
+255,Georgia Tech,11/24/2012,257,Georgia,10,42,Away
+255,Georgia Tech,12/1/2012,234,Florida St.,15,21,Neutral Site
+255,Georgia Tech,12/31/2012,657,Southern California,21,7,Neutral Site
+257,Georgia,9/1/2012,86,Buffalo,45,23,Home
+257,Georgia,9/8/2012,434,Missouri,41,20,Away
+257,Georgia,9/15/2012,229,Fla. Atlantic,56,20,Home
+257,Georgia,9/22/2012,736,Vanderbilt,48,3,Home
+257,Georgia,9/29/2012,694,Tennessee,51,44,Home
+257,Georgia,10/6/2012,648,South Carolina,7,35,Away
+257,Georgia,10/20/2012,334,Kentucky,29,24,Away
+257,Georgia,10/27/2012,235,Florida,17,9,Neutral Site
+257,Georgia,11/3/2012,433,Ole Miss,37,10,Home
+257,Georgia,11/10/2012,37,Auburn,38,0,Away
+257,Georgia,11/17/2012,253,Ga. Southern,45,14,Home
+257,Georgia,11/24/2012,255,Georgia Tech,42,10,Home
+257,Georgia,12/1/2012,8,Alabama,28,32,Neutral Site
+257,Georgia,1/1/2013,463,Nebraska,45,31,Neutral Site
+277,Hawaii,9/1/2012,657,Southern California,10,49,Away
+277,Hawaii,9/15/2012,346,Lamar,54,2,Home
+277,Hawaii,9/22/2012,466,Nevada,24,69,Home
+277,Hawaii,9/28/2012,77,BYU,0,47,Away
+277,Hawaii,10/6/2012,626,San Diego St.,14,52,Away
+277,Hawaii,10/13/2012,473,New Mexico,23,35,Home
+277,Hawaii,10/27/2012,156,Colorado St.,27,42,Away
+277,Hawaii,11/3/2012,96,Fresno St.,10,45,Away
+277,Hawaii,11/10/2012,66,Boise St.,14,49,Home
+277,Hawaii,11/16/2012,721,Air Force,7,21,Away
+277,Hawaii,11/24/2012,465,UNLV,48,10,Home
+277,Hawaii,12/1/2012,646,South Ala.,23,7,Home
+288,Houston,9/1/2012,670,Texas St.,13,30,Home
+288,Houston,9/8/2012,366,Louisiana Tech,49,56,Home
+288,Houston,9/15/2012,110,UCLA,6,37,Away
+288,Houston,9/29/2012,574,Rice,35,14,Neutral Site
+288,Houston,10/6/2012,497,North Texas,44,21,Home
+288,Houston,10/13/2012,9,UAB,39,17,Home
+288,Houston,10/18/2012,663,SMU,42,72,Away
+288,Houston,10/27/2012,704,UTEP,45,35,Home
+288,Houston,11/3/2012,196,East Carolina,28,48,Away
+288,Houston,11/10/2012,719,Tulsa,7,41,Home
+288,Houston,11/17/2012,388,Marshall,41,44,Away
+288,Houston,11/24/2012,718,Tulane,40,17,Home
+295,Idaho,8/30/2012,207,Eastern Wash.,3,20,Home
+295,Idaho,9/8/2012,71,Bowling Green,13,21,Away
+295,Idaho,9/15/2012,365,LSU,14,63,Away
+295,Idaho,9/22/2012,811,Wyoming,37,40,Home
+295,Idaho,9/29/2012,457,North Carolina,0,66,Away
+295,Idaho,10/6/2012,472,New Mexico St.,26,18,Home
+295,Idaho,10/13/2012,670,Texas St.,7,38,Away
+295,Idaho,10/20/2012,366,Louisiana Tech,28,70,Away
+295,Idaho,11/3/2012,630,San Jose St.,13,42,Home
+295,Idaho,11/10/2012,77,BYU,13,52,Away
+295,Idaho,11/17/2012,706,UTSA,27,34,Home
+295,Idaho,11/24/2012,731,Utah St.,9,45,Away
+301,Illinois,9/1/2012,774,Western Mich.,24,7,Home
+301,Illinois,9/8/2012,28,Arizona St.,14,45,Away
+301,Illinois,9/15/2012,48,Charleston So.,44,0,Home
+301,Illinois,9/22/2012,366,Louisiana Tech,24,52,Home
+301,Illinois,9/29/2012,539,Penn St.,7,35,Home
+301,Illinois,10/6/2012,796,Wisconsin,14,31,Away
+301,Illinois,10/13/2012,418,Michigan,0,45,Away
+301,Illinois,10/27/2012,306,Indiana,17,31,Home
+301,Illinois,11/3/2012,518,Ohio St.,22,52,Away
+301,Illinois,11/10/2012,428,Minnesota,3,17,Home
+301,Illinois,11/17/2012,559,Purdue,17,20,Home
+301,Illinois,11/24/2012,509,Northwestern,14,50,Away
+306,Indiana,9/1/2012,305,Indiana St.,24,17,Home
+306,Indiana,9/8/2012,400,Massachusetts,45,6,Away
+306,Indiana,9/15/2012,47,Ball St.,39,41,Home
+306,Indiana,9/29/2012,509,Northwestern,29,44,Away
+306,Indiana,10/6/2012,416,Michigan St.,27,31,Home
+306,Indiana,10/13/2012,518,Ohio St.,49,52,Home
+306,Indiana,10/20/2012,726,Navy,30,31,Away
+306,Indiana,10/27/2012,301,Illinois,31,17,Away
+306,Indiana,11/3/2012,312,Iowa,24,21,Home
+306,Indiana,11/10/2012,796,Wisconsin,14,62,Home
+306,Indiana,11/17/2012,539,Penn St.,22,45,Away
+306,Indiana,11/24/2012,559,Purdue,35,56,Away
+311,Iowa St.,9/1/2012,719,Tulsa,38,23,Home
+311,Iowa St.,9/8/2012,312,Iowa,9,6,Away
+311,Iowa St.,9/15/2012,771,Western Ill.,37,3,Home
+311,Iowa St.,9/29/2012,700,Texas Tech,13,24,Home
+311,Iowa St.,10/6/2012,698,TCU,37,23,Away
+311,Iowa St.,10/13/2012,327,Kansas St.,21,27,Home
+311,Iowa St.,10/20/2012,521,Oklahoma St.,10,31,Away
+311,Iowa St.,10/27/2012,51,Baylor,35,21,Home
+311,Iowa St.,11/3/2012,522,Oklahoma,20,35,Home
+311,Iowa St.,11/10/2012,703,Texas,7,33,Away
+311,Iowa St.,11/17/2012,328,Kansas,51,23,Away
+311,Iowa St.,11/23/2012,768,West Virginia,24,31,Home
+311,Iowa St.,12/31/2012,719,Tulsa,17,31,Neutral Site
+312,Iowa,9/1/2012,503,Northern Ill.,18,17,Neutral Site
+312,Iowa,9/8/2012,311,Iowa St.,6,9,Home
+312,Iowa,9/15/2012,504,UNI,27,16,Home
+312,Iowa,9/22/2012,129,Central Mich.,31,32,Home
+312,Iowa,9/29/2012,428,Minnesota,31,13,Home
+312,Iowa,10/13/2012,416,Michigan St.,19,16,Away
+312,Iowa,10/20/2012,539,Penn St.,14,38,Home
+312,Iowa,10/27/2012,509,Northwestern,17,28,Away
+312,Iowa,11/3/2012,306,Indiana,21,24,Away
+312,Iowa,11/10/2012,559,Purdue,24,27,Home
+312,Iowa,11/17/2012,418,Michigan,17,42,Away
+312,Iowa,11/23/2012,463,Nebraska,7,13,Home
+327,Kansas St.,9/1/2012,669,Missouri St.,51,9,Home
+327,Kansas St.,9/8/2012,415,Miami (FL),52,13,Home
+327,Kansas St.,9/15/2012,497,North Texas,35,21,Home
+327,Kansas St.,9/22/2012,522,Oklahoma,24,19,Away
+327,Kansas St.,10/6/2012,328,Kansas,56,16,Home
+327,Kansas St.,10/13/2012,311,Iowa St.,27,21,Away
+327,Kansas St.,10/20/2012,768,West Virginia,55,14,Away
+327,Kansas St.,10/27/2012,700,Texas Tech,55,24,Home
+327,Kansas St.,11/3/2012,521,Oklahoma St.,44,30,Home
+327,Kansas St.,11/10/2012,698,TCU,23,10,Away
+327,Kansas St.,11/17/2012,51,Baylor,24,52,Away
+327,Kansas St.,12/1/2012,703,Texas,42,24,Home
+327,Kansas St.,1/3/2013,529,Oregon,17,35,Neutral Site
+328,Kansas,9/1/2012,649,South Dakota St.,31,17,Home
+328,Kansas,9/8/2012,574,Rice,24,25,Home
+328,Kansas,9/15/2012,698,TCU,6,20,Home
+328,Kansas,9/22/2012,503,Northern Ill.,23,30,Away
+328,Kansas,10/6/2012,327,Kansas St.,16,56,Away
+328,Kansas,10/13/2012,521,Oklahoma St.,14,20,Home
+328,Kansas,10/20/2012,522,Oklahoma,7,52,Away
+328,Kansas,10/27/2012,703,Texas,17,21,Home
+328,Kansas,11/3/2012,51,Baylor,14,41,Away
+328,Kansas,11/10/2012,700,Texas Tech,34,41,Away
+328,Kansas,11/17/2012,311,Iowa St.,23,51,Home
+328,Kansas,12/1/2012,768,West Virginia,10,59,Away
+331,Kent St.,8/30/2012,711,Towson,41,21,Home
+331,Kent St.,9/8/2012,334,Kentucky,14,47,Away
+331,Kent St.,9/19/2012,86,Buffalo,23,7,Away
+331,Kent St.,9/29/2012,47,Ball St.,45,43,Home
+331,Kent St.,10/6/2012,204,Eastern Mich.,41,14,Away
+331,Kent St.,10/13/2012,725,Army,31,17,Away
+331,Kent St.,10/20/2012,774,Western Mich.,41,24,Home
+331,Kent St.,10/27/2012,587,Rutgers,35,23,Away
+331,Kent St.,11/3/2012,5,Akron,35,24,Home
+331,Kent St.,11/10/2012,414,Miami (OH),48,32,Away
+331,Kent St.,11/17/2012,71,Bowling Green,31,24,Away
+331,Kent St.,11/23/2012,519,Ohio,28,6,Home
+331,Kent St.,11/30/2012,503,Northern Ill.,37,44,Neutral Site
+331,Kent St.,1/6/2013,30,Arkansas St.,13,17,Neutral Site
+334,Kentucky,9/2/2012,367,Louisville,14,32,Away
+334,Kentucky,9/8/2012,331,Kent St.,47,14,Home
+334,Kentucky,9/15/2012,772,Western Ky.,31,32,Home
+334,Kentucky,9/22/2012,235,Florida,0,38,Away
+334,Kentucky,9/29/2012,648,South Carolina,17,38,Home
+334,Kentucky,10/6/2012,430,Mississippi St.,14,27,Home
+334,Kentucky,10/13/2012,31,Arkansas,7,49,Away
+334,Kentucky,10/20/2012,257,Georgia,24,29,Home
+334,Kentucky,10/27/2012,434,Missouri,10,33,Away
+334,Kentucky,11/3/2012,736,Vanderbilt,0,40,Home
+334,Kentucky,11/17/2012,625,Samford,34,3,Home
+334,Kentucky,11/24/2012,694,Tennessee,17,37,Away
+365,LSU,9/1/2012,497,North Texas,41,14,Home
+365,LSU,9/8/2012,756,Washington,41,3,Home
+365,LSU,9/15/2012,295,Idaho,63,14,Home
+365,LSU,9/22/2012,37,Auburn,12,10,Away
+365,LSU,9/29/2012,711,Towson,38,22,Home
+365,LSU,10/6/2012,235,Florida,6,14,Away
+365,LSU,10/13/2012,648,South Carolina,23,21,Home
+365,LSU,10/20/2012,697,Texas A&M,24,19,Away
+365,LSU,11/3/2012,8,Alabama,17,21,Home
+365,LSU,11/10/2012,430,Mississippi St.,37,17,Home
+365,LSU,11/17/2012,433,Ole Miss,41,35,Home
+365,LSU,11/23/2012,31,Arkansas,20,13,Away
+365,LSU,12/31/2012,147,Clemson,24,25,Neutral Site
+366,Louisiana Tech,9/8/2012,288,Houston,56,49,Away
+366,Louisiana Tech,9/15/2012,574,Rice,56,37,Home
+366,Louisiana Tech,9/22/2012,301,Illinois,52,24,Away
+366,Louisiana Tech,9/29/2012,746,Virginia,44,38,Away
+366,Louisiana Tech,10/6/2012,465,UNLV,58,31,Home
+366,Louisiana Tech,10/13/2012,697,Texas A&M,57,59,Home
+366,Louisiana Tech,10/20/2012,295,Idaho,70,28,Home
+366,Louisiana Tech,10/27/2012,472,New Mexico St.,28,14,Away
+366,Louisiana Tech,11/3/2012,706,UTSA,51,27,Home
+366,Louisiana Tech,11/10/2012,670,Texas St.,62,55,Away
+366,Louisiana Tech,11/17/2012,731,Utah St.,41,48,Home
+366,Louisiana Tech,11/24/2012,630,San Jose St.,43,52,Away
+367,Louisville,9/2/2012,334,Kentucky,32,14,Home
+367,Louisville,9/8/2012,669,Missouri St.,35,7,Home
+367,Louisville,9/15/2012,457,North Carolina,39,34,Home
+367,Louisville,9/22/2012,231,FIU,28,21,Away
+367,Louisville,9/29/2012,664,Southern Miss.,21,17,Away
+367,Louisville,10/13/2012,545,Pittsburgh,45,35,Away
+367,Louisville,10/20/2012,651,South Fla.,27,25,Home
+367,Louisville,10/26/2012,140,Cincinnati,34,31,Home
+367,Louisville,11/3/2012,690,Temple,45,17,Home
+367,Louisville,11/10/2012,688,Syracuse,26,45,Away
+367,Louisville,11/24/2012,164,Connecticut,20,23,Home
+367,Louisville,11/29/2012,587,Rutgers,20,17,Away
+367,Louisville,1/2/2013,235,Florida,33,23,Away
+388,Marshall,9/1/2012,768,West Virginia,34,69,Away
+388,Marshall,9/8/2012,769,Western Caro.,52,24,Home
+388,Marshall,9/15/2012,519,Ohio,24,27,Home
+388,Marshall,9/22/2012,574,Rice,54,51,Away
+388,Marshall,9/29/2012,559,Purdue,41,51,Away
+388,Marshall,10/6/2012,719,Tulsa,38,45,Home
+388,Marshall,10/20/2012,664,Southern Miss.,59,24,Away
+388,Marshall,10/27/2012,128,UCF,17,54,Home
+388,Marshall,11/3/2012,404,Memphis,38,28,Home
+388,Marshall,11/10/2012,9,UAB,31,38,Away
+388,Marshall,11/17/2012,288,Houston,44,41,Home
+388,Marshall,11/23/2012,196,East Carolina,59,65,Away
+392,Maryland,9/1/2012,786,William & Mary,7,6,Home
+392,Maryland,9/8/2012,690,Temple,36,27,Away
+392,Maryland,9/15/2012,164,Connecticut,21,24,Home
+392,Maryland,9/22/2012,768,West Virginia,21,31,Away
+392,Maryland,10/6/2012,749,Wake Forest,19,14,Home
+392,Maryland,10/13/2012,746,Virginia,27,20,Away
+392,Maryland,10/20/2012,490,North Carolina St.,18,20,Home
+392,Maryland,10/27/2012,67,Boston College,17,20,Away
+392,Maryland,11/3/2012,255,Georgia Tech,13,33,Home
+392,Maryland,11/10/2012,147,Clemson,10,45,Away
+392,Maryland,11/17/2012,234,Florida St.,14,41,Home
+392,Maryland,11/24/2012,457,North Carolina,38,45,Away
+400,Massachusetts,8/30/2012,164,Connecticut,0,37,Away
+400,Massachusetts,9/8/2012,306,Indiana,6,45,Home
+400,Massachusetts,9/15/2012,418,Michigan,13,63,Away
+400,Massachusetts,9/22/2012,414,Miami (OH),16,27,Away
+400,Massachusetts,9/29/2012,519,Ohio,34,37,Home
+400,Massachusetts,10/6/2012,774,Western Mich.,14,52,Away
+400,Massachusetts,10/20/2012,71,Bowling Green,0,24,Home
+400,Massachusetts,10/27/2012,736,Vanderbilt,7,49,Away
+400,Massachusetts,11/3/2012,503,Northern Ill.,0,63,Away
+400,Massachusetts,11/10/2012,5,Akron,22,14,Away
+400,Massachusetts,11/17/2012,86,Buffalo,19,29,Home
+400,Massachusetts,11/23/2012,129,Central Mich.,21,42,Home
+404,Memphis,9/1/2012,695,Tenn.-Martin,17,20,Home
+404,Memphis,9/8/2012,30,Arkansas St.,28,33,Away
+404,Memphis,9/15/2012,419,Middle Tenn.,30,48,Home
+404,Memphis,9/22/2012,193,Duke,14,38,Away
+404,Memphis,10/6/2012,574,Rice,14,10,Home
+404,Memphis,10/13/2012,196,East Carolina,7,41,Away
+404,Memphis,10/20/2012,128,UCF,17,35,Home
+404,Memphis,10/27/2012,663,SMU,13,44,Away
+404,Memphis,11/3/2012,388,Marshall,28,38,Away
+404,Memphis,11/10/2012,718,Tulane,37,23,Home
+404,Memphis,11/17/2012,9,UAB,46,9,Away
+404,Memphis,11/24/2012,664,Southern Miss.,42,24,Home
+414,Miami (OH),9/1/2012,518,Ohio St.,10,56,Away
+414,Miami (OH),9/8/2012,659,Southern Ill.,30,14,Home
+414,Miami (OH),9/15/2012,66,Boise St.,12,39,Away
+414,Miami (OH),9/22/2012,400,Massachusetts,27,16,Home
+414,Miami (OH),9/29/2012,5,Akron,56,49,Away
+414,Miami (OH),10/6/2012,140,Cincinnati,14,52,Away
+414,Miami (OH),10/13/2012,71,Bowling Green,12,37,Away
+414,Miami (OH),10/27/2012,519,Ohio,23,20,Home
+414,Miami (OH),11/3/2012,86,Buffalo,24,27,Away
+414,Miami (OH),11/10/2012,331,Kent St.,32,48,Home
+414,Miami (OH),11/17/2012,129,Central Mich.,16,30,Away
+414,Miami (OH),11/23/2012,47,Ball St.,24,31,Home
+415,Miami (FL),9/1/2012,67,Boston College,41,32,Away
+415,Miami (FL),9/8/2012,327,Kansas St.,13,52,Away
+415,Miami (FL),9/15/2012,61,Bethune-Cookman,38,10,Home
+415,Miami (FL),9/22/2012,255,Georgia Tech,42,36,Away
+415,Miami (FL),9/29/2012,490,North Carolina St.,44,37,Home
+415,Miami (FL),10/6/2012,513,Notre Dame,3,41,Neutral Site
+415,Miami (FL),10/13/2012,457,North Carolina,14,18,Home
+415,Miami (FL),10/20/2012,234,Florida St.,20,33,Home
+415,Miami (FL),11/1/2012,742,Virginia Tech,30,12,Home
+415,Miami (FL),11/10/2012,746,Virginia,40,41,Away
+415,Miami (FL),11/17/2012,651,South Fla.,40,9,Home
+415,Miami (FL),11/24/2012,193,Duke,52,45,Away
+416,Michigan St.,8/31/2012,66,Boise St.,17,13,Home
+416,Michigan St.,9/8/2012,129,Central Mich.,41,7,Away
+416,Michigan St.,9/15/2012,513,Notre Dame,3,20,Home
+416,Michigan St.,9/22/2012,204,Eastern Mich.,23,7,Home
+416,Michigan St.,9/29/2012,518,Ohio St.,16,17,Home
+416,Michigan St.,10/6/2012,306,Indiana,31,27,Away
+416,Michigan St.,10/13/2012,312,Iowa,16,19,Home
+416,Michigan St.,10/20/2012,418,Michigan,10,12,Away
+416,Michigan St.,10/27/2012,796,Wisconsin,16,13,Away
+416,Michigan St.,11/3/2012,463,Nebraska,24,28,Home
+416,Michigan St.,11/17/2012,509,Northwestern,20,23,Home
+416,Michigan St.,11/24/2012,428,Minnesota,26,10,Away
+416,Michigan St.,12/29/2012,698,TCU,17,16,Neutral Site
+418,Michigan,9/1/2012,8,Alabama,14,41,Neutral Site
+418,Michigan,9/8/2012,721,Air Force,31,25,Home
+418,Michigan,9/15/2012,400,Massachusetts,63,13,Home
+418,Michigan,9/22/2012,513,Notre Dame,6,13,Away
+418,Michigan,10/6/2012,559,Purdue,44,13,Away
+418,Michigan,10/13/2012,301,Illinois,45,0,Home
+418,Michigan,10/20/2012,416,Michigan St.,12,10,Home
+418,Michigan,10/27/2012,463,Nebraska,9,23,Away
+418,Michigan,11/3/2012,428,Minnesota,35,13,Away
+418,Michigan,11/10/2012,509,Northwestern,38,31,Home
+418,Michigan,11/17/2012,312,Iowa,42,17,Home
+418,Michigan,11/24/2012,518,Ohio St.,21,26,Away
+418,Michigan,1/1/2013,648,South Carolina,28,33,Neutral Site
+419,Middle Tenn.,8/30/2012,402,McNeese St.,21,27,Home
+419,Middle Tenn.,9/8/2012,229,Fla. Atlantic,31,17,Home
+419,Middle Tenn.,9/15/2012,404,Memphis,48,30,Away
+419,Middle Tenn.,9/29/2012,255,Georgia Tech,49,28,Away
+419,Middle Tenn.,10/6/2012,498,La.-Monroe,17,31,Home
+419,Middle Tenn.,10/13/2012,231,FIU,34,30,Away
+419,Middle Tenn.,10/20/2012,430,Mississippi St.,3,45,Away
+419,Middle Tenn.,10/27/2012,497,North Texas,38,21,Home
+419,Middle Tenn.,11/1/2012,772,Western Ky.,34,29,Away
+419,Middle Tenn.,11/17/2012,646,South Ala.,20,12,Away
+419,Middle Tenn.,11/24/2012,716,Troy,24,21,Home
+419,Middle Tenn.,12/1/2012,30,Arkansas St.,0,45,Away
+428,Minnesota,8/30/2012,465,UNLV,30,27,Away
+428,Minnesota,9/8/2012,469,New Hampshire,44,7,Home
+428,Minnesota,9/15/2012,774,Western Mich.,28,23,Home
+428,Minnesota,9/22/2012,688,Syracuse,17,10,Home
+428,Minnesota,9/29/2012,312,Iowa,13,31,Away
+428,Minnesota,10/13/2012,509,Northwestern,13,21,Home
+428,Minnesota,10/20/2012,796,Wisconsin,13,38,Away
+428,Minnesota,10/27/2012,559,Purdue,44,28,Home
+428,Minnesota,11/3/2012,418,Michigan,13,35,Home
+428,Minnesota,11/10/2012,301,Illinois,17,3,Away
+428,Minnesota,11/17/2012,463,Nebraska,14,38,Away
+428,Minnesota,11/24/2012,416,Michigan St.,10,26,Home
+428,Minnesota,12/28/2012,700,Texas Tech,31,34,Neutral Site
+430,Mississippi St.,9/1/2012,314,Jackson St.,56,9,Home
+430,Mississippi St.,9/8/2012,37,Auburn,28,10,Home
+430,Mississippi St.,9/15/2012,716,Troy,30,24,Away
+430,Mississippi St.,9/22/2012,646,South Ala.,30,10,Home
+430,Mississippi St.,10/6/2012,334,Kentucky,27,14,Away
+430,Mississippi St.,10/13/2012,694,Tennessee,41,31,Home
+430,Mississippi St.,10/20/2012,419,Middle Tenn.,45,3,Home
+430,Mississippi St.,10/27/2012,8,Alabama,7,38,Away
+430,Mississippi St.,11/3/2012,697,Texas A&M,13,38,Home
+430,Mississippi St.,11/10/2012,365,LSU,17,37,Away
+430,Mississippi St.,11/17/2012,31,Arkansas,45,14,Home
+430,Mississippi St.,11/24/2012,433,Ole Miss,24,41,Away
+430,Mississippi St.,1/1/2013,509,Northwestern,20,34,Neutral Site
+433,Ole Miss,9/1/2012,1004,Central Ark.,49,27,Home
+433,Ole Miss,9/8/2012,704,UTEP,28,10,Home
+433,Ole Miss,9/15/2012,703,Texas,31,66,Home
+433,Ole Miss,9/22/2012,718,Tulane,39,0,Away
+433,Ole Miss,9/29/2012,8,Alabama,14,33,Away
+433,Ole Miss,10/6/2012,697,Texas A&M,27,30,Home
+433,Ole Miss,10/13/2012,37,Auburn,41,20,Home
+433,Ole Miss,10/27/2012,31,Arkansas,30,27,Away
+433,Ole Miss,11/3/2012,257,Georgia,10,37,Away
+433,Ole Miss,11/10/2012,736,Vanderbilt,26,27,Home
+433,Ole Miss,11/17/2012,365,LSU,35,41,Away
+433,Ole Miss,11/24/2012,430,Mississippi St.,41,24,Home
+433,Ole Miss,1/5/2013,545,Pittsburgh,38,17,Neutral Site
+434,Missouri,9/1/2012,655,Southeastern La.,62,10,Home
+434,Missouri,9/8/2012,257,Georgia,20,41,Home
+434,Missouri,9/15/2012,28,Arizona St.,24,20,Home
+434,Missouri,9/22/2012,648,South Carolina,10,31,Away
+434,Missouri,9/29/2012,128,UCF,21,16,Away
+434,Missouri,10/6/2012,736,Vanderbilt,15,19,Home
+434,Missouri,10/13/2012,8,Alabama,10,42,Home
+434,Missouri,10/27/2012,334,Kentucky,33,10,Home
+434,Missouri,11/3/2012,235,Florida,7,14,Away
+434,Missouri,11/10/2012,694,Tennessee,51,48,Away
+434,Missouri,11/17/2012,688,Syracuse,27,31,Home
+434,Missouri,11/24/2012,697,Texas A&M,29,59,Away
+457,North Carolina,9/1/2012,1068,Elon,62,0,Home
+457,North Carolina,9/8/2012,749,Wake Forest,27,28,Away
+457,North Carolina,9/15/2012,367,Louisville,34,39,Away
+457,North Carolina,9/22/2012,196,East Carolina,27,6,Home
+457,North Carolina,9/29/2012,295,Idaho,66,0,Home
+457,North Carolina,10/6/2012,742,Virginia Tech,48,34,Home
+457,North Carolina,10/13/2012,415,Miami (FL),18,14,Away
+457,North Carolina,10/20/2012,193,Duke,30,33,Away
+457,North Carolina,10/27/2012,490,North Carolina St.,43,35,Home
+457,North Carolina,11/10/2012,255,Georgia Tech,50,68,Home
+457,North Carolina,11/15/2012,746,Virginia,37,13,Away
+457,North Carolina,11/24/2012,392,Maryland,45,38,Home
+463,Nebraska,9/1/2012,664,Southern Miss.,49,20,Home
+463,Nebraska,9/8/2012,110,UCLA,30,36,Away
+463,Nebraska,9/15/2012,30,Arkansas St.,42,13,Home
+463,Nebraska,9/22/2012,294,Idaho St.,73,7,Home
+463,Nebraska,9/29/2012,796,Wisconsin,30,27,Home
+463,Nebraska,10/6/2012,518,Ohio St.,38,63,Away
+463,Nebraska,10/20/2012,509,Northwestern,29,28,Away
+463,Nebraska,10/27/2012,418,Michigan,23,9,Home
+463,Nebraska,11/3/2012,416,Michigan St.,28,24,Away
+463,Nebraska,11/10/2012,539,Penn St.,32,23,Home
+463,Nebraska,11/17/2012,428,Minnesota,38,14,Home
+463,Nebraska,11/23/2012,312,Iowa,13,7,Away
+463,Nebraska,12/1/2012,796,Wisconsin,31,70,Neutral Site
+463,Nebraska,1/1/2013,257,Georgia,31,45,Neutral Site
+465,UNLV,8/30/2012,428,Minnesota,27,30,Home
+465,UNLV,9/8/2012,501,Northern Ariz.,14,17,Home
+465,UNLV,9/14/2012,754,Washington St.,27,35,Home
+465,UNLV,9/22/2012,721,Air Force,38,35,Home
+465,UNLV,9/29/2012,731,Utah St.,13,35,Away
+465,UNLV,10/6/2012,366,Louisiana Tech,31,58,Away
+465,UNLV,10/13/2012,466,Nevada,37,42,Home
+465,UNLV,10/20/2012,66,Boise St.,7,32,Away
+465,UNLV,10/27/2012,626,San Diego St.,13,24,Away
+465,UNLV,11/3/2012,473,New Mexico,35,7,Home
+465,UNLV,11/10/2012,156,Colorado St.,11,33,Away
+465,UNLV,11/17/2012,811,Wyoming,23,28,Home
+465,UNLV,11/24/2012,277,Hawaii,10,48,Away
+466,Nevada,9/1/2012,107,California,31,24,Away
+466,Nevada,9/8/2012,651,South Fla.,31,32,Home
+466,Nevada,9/15/2012,508,Northwestern St.,45,34,Home
+466,Nevada,9/22/2012,277,Hawaii,69,24,Away
+466,Nevada,9/29/2012,670,Texas St.,34,21,Away
+466,Nevada,10/6/2012,811,Wyoming,35,28,Home
+466,Nevada,10/13/2012,465,UNLV,42,37,Away
+466,Nevada,10/20/2012,626,San Diego St.,38,39,Home
+466,Nevada,10/26/2012,721,Air Force,31,48,Away
+466,Nevada,11/10/2012,96,Fresno St.,36,52,Home
+466,Nevada,11/17/2012,473,New Mexico,31,24,Away
+466,Nevada,12/1/2012,66,Boise St.,21,27,Home
+466,Nevada,12/15/2012,29,Arizona,48,49,Neutral Site
+472,New Mexico St.,8/30/2012,102,Sacramento St.,49,19,Home
+472,New Mexico St.,9/8/2012,519,Ohio,24,51,Away
+472,New Mexico St.,9/15/2012,704,UTEP,28,41,Away
+472,New Mexico St.,9/22/2012,473,New Mexico,14,27,Home
+472,New Mexico St.,9/29/2012,706,UTSA,14,35,Home
+472,New Mexico St.,10/6/2012,295,Idaho,18,26,Away
+472,New Mexico St.,10/20/2012,731,Utah St.,7,41,Away
+472,New Mexico St.,10/27/2012,366,Louisiana Tech,14,28,Home
+472,New Mexico St.,11/3/2012,37,Auburn,7,42,Away
+472,New Mexico St.,11/10/2012,630,San Jose St.,7,47,Home
+472,New Mexico St.,11/24/2012,77,BYU,14,50,Home
+472,New Mexico St.,12/1/2012,670,Texas St.,28,66,Away
+473,New Mexico,9/1/2012,665,Southern U.,66,21,Home
+473,New Mexico,9/8/2012,703,Texas,0,45,Away
+473,New Mexico,9/15/2012,700,Texas Tech,14,49,Away
+473,New Mexico,9/22/2012,472,New Mexico St.,27,14,Away
+473,New Mexico,9/29/2012,66,Boise St.,29,32,Home
+473,New Mexico,10/6/2012,670,Texas St.,35,14,Home
+473,New Mexico,10/13/2012,277,Hawaii,35,23,Away
+473,New Mexico,10/20/2012,721,Air Force,23,28,Away
+473,New Mexico,10/27/2012,96,Fresno St.,32,49,Home
+473,New Mexico,11/3/2012,465,UNLV,7,35,Away
+473,New Mexico,11/10/2012,811,Wyoming,23,28,Home
+473,New Mexico,11/17/2012,466,Nevada,24,31,Home
+473,New Mexico,11/24/2012,156,Colorado St.,20,24,Away
+490,North Carolina St.,8/31/2012,694,Tennessee,21,35,Neutral Site
+490,North Carolina St.,9/8/2012,164,Connecticut,10,7,Away
+490,North Carolina St.,9/15/2012,646,South Ala.,31,7,Home
+490,North Carolina St.,9/22/2012,141,Citadel,52,14,Home
+490,North Carolina St.,9/29/2012,415,Miami (FL),37,44,Away
+490,North Carolina St.,10/6/2012,234,Florida St.,17,16,Home
+490,North Carolina St.,10/20/2012,392,Maryland,20,18,Away
+490,North Carolina St.,10/27/2012,457,North Carolina,35,43,Away
+490,North Carolina St.,11/3/2012,746,Virginia,6,33,Home
+490,North Carolina St.,11/10/2012,749,Wake Forest,37,6,Home
+490,North Carolina St.,11/17/2012,147,Clemson,48,62,Away
+490,North Carolina St.,11/24/2012,67,Boston College,27,10,Home
+490,North Carolina St.,12/31/2012,736,Vanderbilt,24,38,Neutral Site
+497,North Texas,9/1/2012,365,LSU,14,41,Away
+497,North Texas,9/8/2012,699,Texas Southern,34,7,Home
+497,North Texas,9/15/2012,327,Kansas St.,21,35,Away
+497,North Texas,9/22/2012,716,Troy,7,14,Home
+497,North Texas,9/29/2012,229,Fla. Atlantic,20,14,Away
+497,North Texas,10/6/2012,288,Houston,21,44,Away
+497,North Texas,10/16/2012,671,La.-Lafayette,30,23,Home
+497,North Texas,10/27/2012,419,Middle Tenn.,21,38,Away
+497,North Texas,11/3/2012,30,Arkansas St.,19,37,Home
+497,North Texas,11/10/2012,646,South Ala.,24,14,Home
+497,North Texas,11/17/2012,498,La.-Monroe,16,42,Away
+497,North Texas,11/24/2012,772,Western Ky.,24,25,Away
+498,La.-Monroe,9/8/2012,31,Arkansas,34,31,Home
+498,La.-Monroe,9/15/2012,37,Auburn,28,31,Away
+498,La.-Monroe,9/21/2012,51,Baylor,42,47,Home
+498,La.-Monroe,9/29/2012,718,Tulane,63,10,Away
+498,La.-Monroe,10/6/2012,419,Middle Tenn.,31,17,Away
+498,La.-Monroe,10/13/2012,229,Fla. Atlantic,35,14,Home
+498,La.-Monroe,10/20/2012,772,Western Ky.,43,42,Away
+498,La.-Monroe,10/27/2012,646,South Ala.,38,24,Home
+498,La.-Monroe,11/3/2012,671,La.-Lafayette,24,40,Home
+498,La.-Monroe,11/8/2012,30,Arkansas St.,23,45,Away
+498,La.-Monroe,11/17/2012,497,North Texas,42,16,Home
+498,La.-Monroe,11/24/2012,231,FIU,23,17,Away
+498,La.-Monroe,12/28/2012,519,Ohio,14,45,Neutral Site
+503,Northern Ill.,9/1/2012,312,Iowa,17,18,Home
+503,Northern Ill.,9/8/2012,695,Tenn.-Martin,35,7,Home
+503,Northern Ill.,9/15/2012,725,Army,41,40,Away
+503,Northern Ill.,9/22/2012,328,Kansas,30,23,Home
+503,Northern Ill.,9/29/2012,129,Central Mich.,55,24,Home
+503,Northern Ill.,10/6/2012,47,Ball St.,35,23,Away
+503,Northern Ill.,10/13/2012,86,Buffalo,45,3,Home
+503,Northern Ill.,10/20/2012,5,Akron,37,7,Away
+503,Northern Ill.,10/27/2012,774,Western Mich.,48,34,Away
+503,Northern Ill.,11/3/2012,400,Massachusetts,63,0,Home
+503,Northern Ill.,11/14/2012,709,Toledo,31,24,Home
+503,Northern Ill.,11/23/2012,204,Eastern Mich.,49,7,Away
+503,Northern Ill.,11/30/2012,331,Kent St.,44,37,Neutral Site
+503,Northern Ill.,1/1/2013,234,Florida St.,10,31,Neutral Site
+509,Northwestern,9/1/2012,688,Syracuse,42,41,Away
+509,Northwestern,9/8/2012,736,Vanderbilt,23,13,Home
+509,Northwestern,9/15/2012,67,Boston College,22,13,Home
+509,Northwestern,9/22/2012,650,South Dakota,38,7,Home
+509,Northwestern,9/29/2012,306,Indiana,44,29,Home
+509,Northwestern,10/6/2012,539,Penn St.,28,39,Away
+509,Northwestern,10/13/2012,428,Minnesota,21,13,Away
+509,Northwestern,10/20/2012,463,Nebraska,28,29,Home
+509,Northwestern,10/27/2012,312,Iowa,28,17,Home
+509,Northwestern,11/10/2012,418,Michigan,31,38,Away
+509,Northwestern,11/17/2012,416,Michigan St.,23,20,Away
+509,Northwestern,11/24/2012,301,Illinois,50,14,Home
+509,Northwestern,1/1/2013,430,Mississippi St.,34,20,Neutral Site
+513,Notre Dame,9/1/2012,726,Navy,50,10,Neutral Site
+513,Notre Dame,9/8/2012,559,Purdue,20,17,Home
+513,Notre Dame,9/15/2012,416,Michigan St.,20,3,Away
+513,Notre Dame,9/22/2012,418,Michigan,13,6,Home
+513,Notre Dame,10/6/2012,415,Miami (FL),41,3,Neutral Site
+513,Notre Dame,10/13/2012,674,Stanford,20,13,Home
+513,Notre Dame,10/20/2012,77,BYU,17,14,Home
+513,Notre Dame,10/27/2012,522,Oklahoma,30,13,Away
+513,Notre Dame,11/3/2012,545,Pittsburgh,29,26,Home
+513,Notre Dame,11/10/2012,67,Boston College,21,6,Away
+513,Notre Dame,11/17/2012,749,Wake Forest,38,0,Home
+513,Notre Dame,11/24/2012,657,Southern California,22,13,Away
+513,Notre Dame,1/7/2013,8,Alabama,14,42,Neutral Site
+518,Ohio St.,9/1/2012,414,Miami (OH),56,10,Home
+518,Ohio St.,9/8/2012,128,UCF,31,16,Home
+518,Ohio St.,9/15/2012,107,California,35,28,Home
+518,Ohio St.,9/22/2012,9,UAB,29,15,Home
+518,Ohio St.,9/29/2012,416,Michigan St.,17,16,Away
+518,Ohio St.,10/6/2012,463,Nebraska,63,38,Home
+518,Ohio St.,10/13/2012,306,Indiana,52,49,Away
+518,Ohio St.,10/20/2012,559,Purdue,29,22,Home
+518,Ohio St.,10/27/2012,539,Penn St.,35,23,Away
+518,Ohio St.,11/3/2012,301,Illinois,52,22,Home
+518,Ohio St.,11/17/2012,796,Wisconsin,21,14,Away
+518,Ohio St.,11/24/2012,418,Michigan,26,21,Home
+519,Ohio,9/1/2012,539,Penn St.,24,14,Away
+519,Ohio,9/8/2012,472,New Mexico St.,51,24,Home
+519,Ohio,9/15/2012,388,Marshall,27,24,Away
+519,Ohio,9/22/2012,485,Norfolk St.,44,10,Home
+519,Ohio,9/29/2012,400,Massachusetts,37,34,Away
+519,Ohio,10/6/2012,86,Buffalo,38,31,Home
+519,Ohio,10/13/2012,5,Akron,34,28,Home
+519,Ohio,10/27/2012,414,Miami (OH),20,23,Away
+519,Ohio,11/1/2012,204,Eastern Mich.,45,14,Home
+519,Ohio,11/7/2012,71,Bowling Green,14,26,Home
+519,Ohio,11/14/2012,47,Ball St.,27,52,Away
+519,Ohio,11/23/2012,331,Kent St.,6,28,Away
+519,Ohio,12/28/2012,498,La.-Monroe,45,14,Neutral Site
+521,Oklahoma St.,9/1/2012,632,Savannah St.,84,0,Home
+521,Oklahoma St.,9/8/2012,29,Arizona,38,59,Away
+521,Oklahoma St.,9/15/2012,671,La.-Lafayette,65,24,Home
+521,Oklahoma St.,9/29/2012,703,Texas,36,41,Home
+521,Oklahoma St.,10/13/2012,328,Kansas,20,14,Away
+521,Oklahoma St.,10/20/2012,311,Iowa St.,31,10,Home
+521,Oklahoma St.,10/27/2012,698,TCU,36,14,Home
+521,Oklahoma St.,11/3/2012,327,Kansas St.,30,44,Away
+521,Oklahoma St.,11/10/2012,768,West Virginia,55,34,Home
+521,Oklahoma St.,11/17/2012,700,Texas Tech,59,21,Home
+521,Oklahoma St.,11/24/2012,522,Oklahoma,48,51,Away
+521,Oklahoma St.,12/1/2012,51,Baylor,34,41,Away
+521,Oklahoma St.,1/1/2013,559,Purdue,58,14,Neutral Site
+522,Oklahoma,9/1/2012,704,UTEP,24,7,Away
+522,Oklahoma,9/8/2012,228,Florida A&M,69,13,Home
+522,Oklahoma,9/22/2012,327,Kansas St.,19,24,Home
+522,Oklahoma,10/6/2012,700,Texas Tech,41,20,Away
+522,Oklahoma,10/13/2012,703,Texas,63,21,Neutral Site
+522,Oklahoma,10/20/2012,328,Kansas,52,7,Home
+522,Oklahoma,10/27/2012,513,Notre Dame,13,30,Home
+522,Oklahoma,11/3/2012,311,Iowa St.,35,20,Away
+522,Oklahoma,11/10/2012,51,Baylor,42,34,Home
+522,Oklahoma,11/17/2012,768,West Virginia,50,49,Away
+522,Oklahoma,11/24/2012,521,Oklahoma St.,51,48,Home
+522,Oklahoma,12/1/2012,698,TCU,24,17,Away
+522,Oklahoma,1/4/2013,697,Texas A&M,13,41,Neutral Site
+528,Oregon St.,9/8/2012,796,Wisconsin,10,7,Home
+528,Oregon St.,9/22/2012,110,UCLA,27,20,Away
+528,Oregon St.,9/29/2012,29,Arizona,38,35,Away
+528,Oregon St.,10/6/2012,754,Washington St.,19,6,Home
+528,Oregon St.,10/13/2012,77,BYU,42,24,Away
+528,Oregon St.,10/20/2012,732,Utah,21,7,Home
+528,Oregon St.,10/27/2012,756,Washington,17,20,Away
+528,Oregon St.,11/3/2012,28,Arizona St.,36,26,Home
+528,Oregon St.,11/10/2012,674,Stanford,23,27,Away
+528,Oregon St.,11/17/2012,107,California,62,14,Home
+528,Oregon St.,11/24/2012,529,Oregon,24,48,Home
+528,Oregon St.,12/1/2012,483,Nicholls St.,77,3,Home
+528,Oregon St.,12/29/2012,703,Texas,27,31,Neutral Site
+529,Oregon,9/1/2012,30,Arkansas St.,57,34,Home
+529,Oregon,9/8/2012,96,Fresno St.,42,25,Home
+529,Oregon,9/15/2012,692,Tennessee Tech,63,14,Home
+529,Oregon,9/22/2012,29,Arizona,49,0,Home
+529,Oregon,9/29/2012,754,Washington St.,51,26,Neutral Site
+529,Oregon,10/6/2012,756,Washington,52,21,Home
+529,Oregon,10/18/2012,28,Arizona St.,43,21,Away
+529,Oregon,10/27/2012,157,Colorado,70,14,Home
+529,Oregon,11/3/2012,657,Southern California,62,51,Away
+529,Oregon,11/10/2012,107,California,59,17,Away
+529,Oregon,11/17/2012,674,Stanford,14,17,Home
+529,Oregon,11/24/2012,528,Oregon St.,48,24,Away
+529,Oregon,1/3/2013,327,Kansas St.,35,17,Neutral Site
+539,Penn St.,9/1/2012,519,Ohio,14,24,Home
+539,Penn St.,9/8/2012,746,Virginia,16,17,Away
+539,Penn St.,9/15/2012,726,Navy,34,7,Home
+539,Penn St.,9/22/2012,690,Temple,24,13,Home
+539,Penn St.,9/29/2012,301,Illinois,35,7,Away
+539,Penn St.,10/6/2012,509,Northwestern,39,28,Home
+539,Penn St.,10/20/2012,312,Iowa,38,14,Away
+539,Penn St.,10/27/2012,518,Ohio St.,23,35,Home
+539,Penn St.,11/3/2012,559,Purdue,34,9,Away
+539,Penn St.,11/10/2012,463,Nebraska,23,32,Away
+539,Penn St.,11/17/2012,306,Indiana,45,22,Home
+539,Penn St.,11/24/2012,796,Wisconsin,24,21,Home
+545,Pittsburgh,9/1/2012,817,Youngstown St.,17,31,Home
+545,Pittsburgh,9/6/2012,140,Cincinnati,10,34,Away
+545,Pittsburgh,9/15/2012,742,Virginia Tech,35,17,Home
+545,Pittsburgh,9/22/2012,1092,Gardner-Webb,55,10,Home
+545,Pittsburgh,10/5/2012,688,Syracuse,13,14,Away
+545,Pittsburgh,10/13/2012,367,Louisville,35,45,Home
+545,Pittsburgh,10/20/2012,86,Buffalo,20,6,Away
+545,Pittsburgh,10/27/2012,690,Temple,47,17,Home
+545,Pittsburgh,11/3/2012,513,Notre Dame,26,29,Away
+545,Pittsburgh,11/9/2012,164,Connecticut,17,24,Away
+545,Pittsburgh,11/24/2012,587,Rutgers,27,6,Home
+545,Pittsburgh,12/1/2012,651,South Fla.,27,3,Away
+545,Pittsburgh,1/5/2013,433,Ole Miss,17,38,Neutral Site
+559,Purdue,9/1/2012,202,Eastern Ky.,48,6,Home
+559,Purdue,9/8/2012,513,Notre Dame,17,20,Away
+559,Purdue,9/15/2012,204,Eastern Mich.,54,16,Home
+559,Purdue,9/29/2012,388,Marshall,51,41,Home
+559,Purdue,10/6/2012,418,Michigan,13,44,Home
+559,Purdue,10/13/2012,796,Wisconsin,14,38,Home
+559,Purdue,10/20/2012,518,Ohio St.,22,29,Away
+559,Purdue,10/27/2012,428,Minnesota,28,44,Away
+559,Purdue,11/3/2012,539,Penn St.,9,34,Home
+559,Purdue,11/10/2012,312,Iowa,27,24,Away
+559,Purdue,11/17/2012,301,Illinois,20,17,Away
+559,Purdue,11/24/2012,306,Indiana,56,35,Home
+559,Purdue,1/1/2013,521,Oklahoma St.,14,58,Neutral Site
+574,Rice,8/30/2012,110,UCLA,24,49,Home
+574,Rice,9/8/2012,328,Kansas,25,24,Away
+574,Rice,9/15/2012,366,Louisiana Tech,37,56,Away
+574,Rice,9/22/2012,388,Marshall,51,54,Home
+574,Rice,9/29/2012,288,Houston,14,35,Neutral Site
+574,Rice,10/6/2012,404,Memphis,10,14,Away
+574,Rice,10/13/2012,706,UTSA,34,14,Home
+574,Rice,10/20/2012,719,Tulsa,24,28,Away
+574,Rice,10/27/2012,664,Southern Miss.,44,17,Home
+574,Rice,11/3/2012,718,Tulane,49,47,Away
+574,Rice,11/17/2012,663,SMU,36,14,Home
+574,Rice,11/24/2012,704,UTEP,33,24,Away
+574,Rice,12/29/2012,721,Air Force,33,14,Neutral Site
+587,Rutgers,9/1/2012,718,Tulane,24,12,Away
+587,Rutgers,9/8/2012,290,Howard,26,0,Home
+587,Rutgers,9/13/2012,651,South Fla.,23,13,Away
+587,Rutgers,9/22/2012,31,Arkansas,35,26,Away
+587,Rutgers,10/6/2012,164,Connecticut,19,3,Home
+587,Rutgers,10/13/2012,688,Syracuse,23,15,Home
+587,Rutgers,10/20/2012,690,Temple,35,10,Away
+587,Rutgers,10/27/2012,331,Kent St.,23,35,Home
+587,Rutgers,11/10/2012,725,Army,28,7,Home
+587,Rutgers,11/17/2012,140,Cincinnati,10,3,Away
+587,Rutgers,11/24/2012,545,Pittsburgh,6,27,Away
+587,Rutgers,11/29/2012,367,Louisville,17,20,Home
+587,Rutgers,12/28/2012,742,Virginia Tech,10,13,Neutral Site
+626,San Diego St.,9/1/2012,756,Washington,12,21,Away
+626,San Diego St.,9/8/2012,725,Army,42,7,Home
+626,San Diego St.,9/15/2012,494,North Dakota,49,41,Home
+626,San Diego St.,9/22/2012,630,San Jose St.,34,38,Home
+626,San Diego St.,9/29/2012,96,Fresno St.,40,52,Away
+626,San Diego St.,10/6/2012,277,Hawaii,52,14,Home
+626,San Diego St.,10/13/2012,156,Colorado St.,38,14,Home
+626,San Diego St.,10/20/2012,466,Nevada,39,38,Away
+626,San Diego St.,10/27/2012,465,UNLV,24,13,Home
+626,San Diego St.,11/3/2012,66,Boise St.,21,19,Away
+626,San Diego St.,11/10/2012,721,Air Force,28,9,Home
+626,San Diego St.,11/24/2012,811,Wyoming,42,28,Away
+626,San Diego St.,12/20/2012,77,BYU,6,23,Home
+630,San Jose St.,8/31/2012,674,Stanford,17,20,Away
+630,San Jose St.,9/8/2012,108,UC Davis,45,13,Home
+630,San Jose St.,9/15/2012,156,Colorado St.,40,20,Home
+630,San Jose St.,9/22/2012,626,San Diego St.,38,34,Away
+630,San Jose St.,9/29/2012,726,Navy,12,0,Away
+630,San Jose St.,10/13/2012,731,Utah St.,27,49,Home
+630,San Jose St.,10/20/2012,706,UTSA,52,24,Away
+630,San Jose St.,10/27/2012,670,Texas St.,31,20,Home
+630,San Jose St.,11/3/2012,295,Idaho,42,13,Away
+630,San Jose St.,11/10/2012,472,New Mexico St.,47,7,Away
+630,San Jose St.,11/17/2012,77,BYU,20,14,Home
+630,San Jose St.,11/24/2012,366,Louisiana Tech,52,43,Home
+630,San Jose St.,12/27/2012,71,Bowling Green,29,20,Neutral Site
+646,South Ala.,9/1/2012,706,UTSA,31,33,Home
+646,South Ala.,9/8/2012,483,Nicholls St.,9,3,Home
+646,South Ala.,9/15/2012,490,North Carolina St.,7,31,Away
+646,South Ala.,9/22/2012,430,Mississippi St.,10,30,Away
+646,South Ala.,9/29/2012,716,Troy,10,31,Home
+646,South Ala.,10/13/2012,30,Arkansas St.,29,36,Away
+646,South Ala.,10/20/2012,229,Fla. Atlantic,37,34,Home
+646,South Ala.,10/27/2012,498,La.-Monroe,24,38,Away
+646,South Ala.,11/3/2012,231,FIU,20,28,Home
+646,South Ala.,11/10/2012,497,North Texas,14,24,Away
+646,South Ala.,11/17/2012,419,Middle Tenn.,12,20,Home
+646,South Ala.,11/24/2012,671,La.-Lafayette,30,52,Away
+646,South Ala.,12/1/2012,277,Hawaii,7,23,Away
+648,South Carolina,8/30/2012,736,Vanderbilt,17,13,Away
+648,South Carolina,9/8/2012,196,East Carolina,48,10,Home
+648,South Carolina,9/15/2012,9,UAB,49,6,Home
+648,South Carolina,9/22/2012,434,Missouri,31,10,Home
+648,South Carolina,9/29/2012,334,Kentucky,38,17,Away
+648,South Carolina,10/6/2012,257,Georgia,35,7,Home
+648,South Carolina,10/13/2012,365,LSU,21,23,Away
+648,South Carolina,10/20/2012,235,Florida,11,44,Away
+648,South Carolina,10/27/2012,694,Tennessee,38,35,Home
+648,South Carolina,11/10/2012,31,Arkansas,38,20,Home
+648,South Carolina,11/17/2012,2915,Wofford,24,7,Home
+648,South Carolina,11/24/2012,147,Clemson,27,17,Away
+648,South Carolina,1/1/2013,418,Michigan,33,28,Neutral Site
+651,South Fla.,9/1/2012,693,Chattanooga,34,13,Home
+651,South Fla.,9/8/2012,466,Nevada,32,31,Away
+651,South Fla.,9/13/2012,587,Rutgers,13,23,Home
+651,South Fla.,9/22/2012,47,Ball St.,27,31,Away
+651,South Fla.,9/29/2012,234,Florida St.,17,30,Home
+651,South Fla.,10/6/2012,690,Temple,28,37,Away
+651,South Fla.,10/20/2012,367,Louisville,25,27,Away
+651,South Fla.,10/27/2012,688,Syracuse,36,37,Home
+651,South Fla.,11/3/2012,164,Connecticut,13,6,Home
+651,South Fla.,11/17/2012,415,Miami (FL),9,40,Away
+651,South Fla.,11/23/2012,140,Cincinnati,10,27,Away
+651,South Fla.,12/1/2012,545,Pittsburgh,3,27,Home
+657,Southern California,9/1/2012,277,Hawaii,49,10,Home
+657,Southern California,9/8/2012,688,Syracuse,42,29,Neutral Site
+657,Southern California,9/15/2012,674,Stanford,14,21,Away
+657,Southern California,9/22/2012,107,California,27,9,Home
+657,Southern California,10/4/2012,732,Utah,38,28,Away
+657,Southern California,10/13/2012,756,Washington,24,14,Away
+657,Southern California,10/20/2012,157,Colorado,50,6,Home
+657,Southern California,10/27/2012,29,Arizona,36,39,Away
+657,Southern California,11/3/2012,529,Oregon,51,62,Home
+657,Southern California,11/10/2012,28,Arizona St.,38,17,Home
+657,Southern California,11/17/2012,110,UCLA,28,38,Away
+657,Southern California,11/24/2012,513,Notre Dame,13,22,Home
+657,Southern California,12/31/2012,255,Georgia Tech,7,21,Neutral Site
+663,SMU,9/2/2012,51,Baylor,24,59,Away
+663,SMU,9/8/2012,676,Stephen F. Austin,52,0,Home
+663,SMU,9/15/2012,697,Texas A&M,3,48,Home
+663,SMU,9/29/2012,698,TCU,16,24,Home
+663,SMU,10/6/2012,704,UTEP,17,0,Away
+663,SMU,10/13/2012,718,Tulane,26,27,Away
+663,SMU,10/18/2012,288,Houston,72,42,Home
+663,SMU,10/27/2012,404,Memphis,44,13,Home
+663,SMU,11/3/2012,128,UCF,17,42,Away
+663,SMU,11/10/2012,664,Southern Miss.,34,6,Home
+663,SMU,11/17/2012,574,Rice,14,36,Away
+663,SMU,11/24/2012,719,Tulsa,35,27,Home
+663,SMU,12/24/2012,96,Fresno St.,43,10,Neutral Site
+664,Southern Miss.,9/1/2012,463,Nebraska,20,49,Away
+664,Southern Miss.,9/15/2012,196,East Carolina,14,24,Home
+664,Southern Miss.,9/22/2012,772,Western Ky.,17,42,Away
+664,Southern Miss.,9/29/2012,367,Louisville,17,21,Home
+664,Southern Miss.,10/6/2012,66,Boise St.,14,40,Home
+664,Southern Miss.,10/13/2012,128,UCF,31,38,Away
+664,Southern Miss.,10/20/2012,388,Marshall,24,59,Home
+664,Southern Miss.,10/27/2012,574,Rice,17,44,Away
+664,Southern Miss.,11/3/2012,9,UAB,19,27,Home
+664,Southern Miss.,11/10/2012,663,SMU,6,34,Away
+664,Southern Miss.,11/17/2012,704,UTEP,33,34,Home
+664,Southern Miss.,11/24/2012,404,Memphis,24,42,Away
+670,Texas St.,9/1/2012,288,Houston,30,13,Away
+670,Texas St.,9/8/2012,700,Texas Tech,10,58,Home
+670,Texas St.,9/22/2012,676,Stephen F. Austin,41,37,Home
+670,Texas St.,9/29/2012,466,Nevada,21,34,Home
+670,Texas St.,10/6/2012,473,New Mexico,14,35,Away
+670,Texas St.,10/13/2012,295,Idaho,38,7,Home
+670,Texas St.,10/27/2012,630,San Jose St.,20,31,Away
+670,Texas St.,11/3/2012,731,Utah St.,7,38,Away
+670,Texas St.,11/10/2012,366,Louisiana Tech,55,62,Home
+670,Texas St.,11/17/2012,726,Navy,10,21,Away
+670,Texas St.,11/24/2012,706,UTSA,31,38,Away
+670,Texas St.,12/1/2012,472,New Mexico St.,66,28,Home
+671,La.-Lafayette,9/1/2012,346,Lamar,40,0,Home
+671,La.-Lafayette,9/8/2012,716,Troy,37,24,Away
+671,La.-Lafayette,9/15/2012,521,Oklahoma St.,24,65,Away
+671,La.-Lafayette,9/29/2012,231,FIU,48,20,Home
+671,La.-Lafayette,10/6/2012,718,Tulane,41,13,Home
+671,La.-Lafayette,10/16/2012,497,North Texas,23,30,Away
+671,La.-Lafayette,10/23/2012,30,Arkansas St.,27,50,Home
+671,La.-Lafayette,11/3/2012,498,La.-Monroe,40,24,Away
+671,La.-Lafayette,11/10/2012,235,Florida,20,27,Away
+671,La.-Lafayette,11/17/2012,772,Western Ky.,31,27,Home
+671,La.-Lafayette,11/24/2012,646,South Ala.,52,30,Home
+671,La.-Lafayette,12/1/2012,229,Fla. Atlantic,35,21,Away
+671,La.-Lafayette,12/22/2012,196,East Carolina,43,34,Neutral Site
+674,Stanford,8/31/2012,630,San Jose St.,20,17,Home
+674,Stanford,9/8/2012,193,Duke,50,13,Home
+674,Stanford,9/15/2012,657,Southern California,21,14,Home
+674,Stanford,9/27/2012,756,Washington,13,17,Away
+674,Stanford,10/6/2012,29,Arizona,54,48,Home
+674,Stanford,10/13/2012,513,Notre Dame,13,20,Away
+674,Stanford,10/20/2012,107,California,21,3,Away
+674,Stanford,10/27/2012,754,Washington St.,24,17,Home
+674,Stanford,11/3/2012,157,Colorado,48,0,Away
+674,Stanford,11/10/2012,528,Oregon St.,27,23,Home
+674,Stanford,11/17/2012,529,Oregon,17,14,Away
+674,Stanford,11/24/2012,110,UCLA,35,17,Away
+674,Stanford,11/30/2012,110,UCLA,27,24,Home
+674,Stanford,1/1/2013,796,Wisconsin,20,14,Neutral Site
+688,Syracuse,9/1/2012,509,Northwestern,41,42,Home
+688,Syracuse,9/8/2012,657,Southern California,29,42,Neutral Site
+688,Syracuse,9/15/2012,683,Stony Brook,28,17,Home
+688,Syracuse,9/22/2012,428,Minnesota,10,17,Away
+688,Syracuse,10/5/2012,545,Pittsburgh,14,13,Home
+688,Syracuse,10/13/2012,587,Rutgers,15,23,Away
+688,Syracuse,10/19/2012,164,Connecticut,40,10,Home
+688,Syracuse,10/27/2012,651,South Fla.,37,36,Away
+688,Syracuse,11/3/2012,140,Cincinnati,24,35,Away
+688,Syracuse,11/10/2012,367,Louisville,45,26,Home
+688,Syracuse,11/17/2012,434,Missouri,31,27,Away
+688,Syracuse,11/23/2012,690,Temple,38,20,Away
+688,Syracuse,12/29/2012,768,West Virginia,38,14,Neutral Site
+690,Temple,8/31/2012,739,Villanova,41,10,Home
+690,Temple,9/8/2012,392,Maryland,27,36,Home
+690,Temple,9/22/2012,539,Penn St.,13,24,Away
+690,Temple,10/6/2012,651,South Fla.,37,28,Home
+690,Temple,10/13/2012,164,Connecticut,17,14,Away
+690,Temple,10/20/2012,587,Rutgers,10,35,Home
+690,Temple,10/27/2012,545,Pittsburgh,17,47,Away
+690,Temple,11/3/2012,367,Louisville,17,45,Away
+690,Temple,11/10/2012,140,Cincinnati,10,34,Home
+690,Temple,11/17/2012,725,Army,63,32,Away
+690,Temple,11/23/2012,688,Syracuse,20,38,Home
+694,Tennessee,8/31/2012,490,North Carolina St.,35,21,Neutral Site
+694,Tennessee,9/8/2012,254,Georgia St.,51,13,Home
+694,Tennessee,9/15/2012,235,Florida,20,37,Home
+694,Tennessee,9/22/2012,5,Akron,47,26,Home
+694,Tennessee,9/29/2012,257,Georgia,44,51,Away
+694,Tennessee,10/13/2012,430,Mississippi St.,31,41,Away
+694,Tennessee,10/20/2012,8,Alabama,13,44,Home
+694,Tennessee,10/27/2012,648,South Carolina,35,38,Away
+694,Tennessee,11/3/2012,716,Troy,55,48,Home
+694,Tennessee,11/10/2012,434,Missouri,48,51,Home
+694,Tennessee,11/17/2012,736,Vanderbilt,18,41,Away
+694,Tennessee,11/24/2012,334,Kentucky,37,17,Home
+697,Texas A&M,9/8/2012,235,Florida,17,20,Home
+697,Texas A&M,9/15/2012,663,SMU,48,3,Away
+697,Texas A&M,9/22/2012,647,South Carolina St.,70,14,Home
+697,Texas A&M,9/29/2012,31,Arkansas,58,10,Home
+697,Texas A&M,10/6/2012,433,Ole Miss,30,27,Away
+697,Texas A&M,10/13/2012,366,Louisiana Tech,59,57,Away
+697,Texas A&M,10/20/2012,365,LSU,19,24,Home
+697,Texas A&M,10/27/2012,37,Auburn,63,21,Away
+697,Texas A&M,11/3/2012,430,Mississippi St.,38,13,Away
+697,Texas A&M,11/10/2012,8,Alabama,29,24,Away
+697,Texas A&M,11/17/2012,624,Sam Houston St.,47,28,Home
+697,Texas A&M,11/24/2012,434,Missouri,59,29,Home
+697,Texas A&M,1/4/2013,522,Oklahoma,41,13,Neutral Site
+698,TCU,9/8/2012,261,Grambling,56,0,Home
+698,TCU,9/15/2012,328,Kansas,20,6,Away
+698,TCU,9/22/2012,746,Virginia,27,7,Home
+698,TCU,9/29/2012,663,SMU,24,16,Away
+698,TCU,10/6/2012,311,Iowa St.,23,37,Home
+698,TCU,10/13/2012,51,Baylor,49,21,Away
+698,TCU,10/20/2012,700,Texas Tech,53,56,Home
+698,TCU,10/27/2012,521,Oklahoma St.,14,36,Away
+698,TCU,11/3/2012,768,West Virginia,39,38,Away
+698,TCU,11/10/2012,327,Kansas St.,10,23,Home
+698,TCU,11/22/2012,703,Texas,20,13,Away
+698,TCU,12/1/2012,522,Oklahoma,17,24,Home
+698,TCU,12/29/2012,416,Michigan St.,16,17,Neutral Site
+700,Texas Tech,9/1/2012,508,Northwestern St.,44,6,Home
+700,Texas Tech,9/8/2012,670,Texas St.,58,10,Away
+700,Texas Tech,9/15/2012,473,New Mexico,49,14,Home
+700,Texas Tech,9/29/2012,311,Iowa St.,24,13,Away
+700,Texas Tech,10/6/2012,522,Oklahoma,20,41,Home
+700,Texas Tech,10/13/2012,768,West Virginia,49,14,Home
+700,Texas Tech,10/20/2012,698,TCU,56,53,Away
+700,Texas Tech,10/27/2012,327,Kansas St.,24,55,Away
+700,Texas Tech,11/3/2012,703,Texas,22,31,Home
+700,Texas Tech,11/10/2012,328,Kansas,41,34,Home
+700,Texas Tech,11/17/2012,521,Oklahoma St.,21,59,Away
+700,Texas Tech,11/24/2012,51,Baylor,45,52,Neutral Site
+700,Texas Tech,12/28/2012,428,Minnesota,34,31,Neutral Site
+703,Texas,9/1/2012,811,Wyoming,37,17,Home
+703,Texas,9/8/2012,473,New Mexico,45,0,Home
+703,Texas,9/15/2012,433,Ole Miss,66,31,Away
+703,Texas,9/29/2012,521,Oklahoma St.,41,36,Away
+703,Texas,10/6/2012,768,West Virginia,45,48,Home
+703,Texas,10/13/2012,522,Oklahoma,21,63,Neutral Site
+703,Texas,10/20/2012,51,Baylor,56,50,Home
+703,Texas,10/27/2012,328,Kansas,21,17,Away
+703,Texas,11/3/2012,700,Texas Tech,31,22,Away
+703,Texas,11/10/2012,311,Iowa St.,33,7,Home
+703,Texas,11/22/2012,698,TCU,13,20,Home
+703,Texas,12/1/2012,327,Kansas St.,24,42,Away
+703,Texas,12/29/2012,528,Oregon St.,31,27,Neutral Site
+704,UTEP,9/1/2012,522,Oklahoma,7,24,Home
+704,UTEP,9/8/2012,433,Ole Miss,10,28,Away
+704,UTEP,9/15/2012,472,New Mexico St.,41,28,Home
+704,UTEP,9/22/2012,796,Wisconsin,26,37,Away
+704,UTEP,9/29/2012,196,East Carolina,18,28,Away
+704,UTEP,10/6/2012,663,SMU,0,17,Home
+704,UTEP,10/11/2012,719,Tulsa,11,33,Away
+704,UTEP,10/20/2012,718,Tulane,24,20,Home
+704,UTEP,10/27/2012,288,Houston,35,45,Away
+704,UTEP,11/10/2012,128,UCF,24,31,Home
+704,UTEP,11/17/2012,664,Southern Miss.,34,33,Away
+704,UTEP,11/24/2012,574,Rice,24,33,Home
+706,UTSA,9/1/2012,646,South Ala.,33,31,Away
+706,UTSA,9/8/2012,199,Tex. A&M-Commerce,27,16,Home
+706,UTSA,9/15/2012,254,Georgia St.,38,14,Away
+706,UTSA,9/22/2012,30178,Northwestern Okla.,56,3,Home
+706,UTSA,9/29/2012,472,New Mexico St.,35,14,Away
+706,UTSA,10/13/2012,574,Rice,14,34,Away
+706,UTSA,10/20/2012,630,San Jose St.,24,52,Home
+706,UTSA,10/27/2012,731,Utah St.,17,48,Home
+706,UTSA,11/3/2012,366,Louisiana Tech,27,51,Away
+706,UTSA,11/10/2012,402,McNeese St.,31,24,Home
+706,UTSA,11/17/2012,295,Idaho,34,27,Away
+706,UTSA,11/24/2012,670,Texas St.,38,31,Home
+709,Toledo,9/1/2012,29,Arizona,17,24,Away
+709,Toledo,9/8/2012,811,Wyoming,34,31,Away
+709,Toledo,9/15/2012,71,Bowling Green,27,15,Home
+709,Toledo,9/22/2012,149,Coastal Caro.,38,28,Home
+709,Toledo,9/29/2012,774,Western Mich.,37,17,Away
+709,Toledo,10/6/2012,129,Central Mich.,50,35,Home
+709,Toledo,10/13/2012,204,Eastern Mich.,52,47,Away
+709,Toledo,10/20/2012,140,Cincinnati,29,23,Home
+709,Toledo,10/27/2012,86,Buffalo,25,20,Away
+709,Toledo,11/6/2012,47,Ball St.,27,34,Home
+709,Toledo,11/14/2012,503,Northern Ill.,24,31,Away
+709,Toledo,11/20/2012,5,Akron,35,23,Home
+709,Toledo,12/15/2012,731,Utah St.,15,41,Neutral Site
+716,Troy,9/1/2012,9,UAB,39,29,Away
+716,Troy,9/8/2012,671,La.-Lafayette,24,37,Home
+716,Troy,9/15/2012,430,Mississippi St.,24,30,Home
+716,Troy,9/22/2012,497,North Texas,14,7,Away
+716,Troy,9/29/2012,646,South Ala.,31,10,Away
+716,Troy,10/11/2012,772,Western Ky.,26,31,Home
+716,Troy,10/20/2012,231,FIU,38,37,Home
+716,Troy,10/27/2012,229,Fla. Atlantic,27,34,Away
+716,Troy,11/3/2012,694,Tennessee,48,55,Away
+716,Troy,11/10/2012,726,Navy,41,31,Home
+716,Troy,11/17/2012,30,Arkansas St.,34,41,Home
+716,Troy,11/24/2012,419,Middle Tenn.,21,24,Away
+718,Tulane,9/1/2012,587,Rutgers,12,24,Home
+718,Tulane,9/8/2012,719,Tulsa,10,45,Away
+718,Tulane,9/22/2012,433,Ole Miss,0,39,Home
+718,Tulane,9/29/2012,498,La.-Monroe,10,63,Home
+718,Tulane,10/6/2012,671,La.-Lafayette,13,41,Away
+718,Tulane,10/13/2012,663,SMU,27,26,Home
+718,Tulane,10/20/2012,704,UTEP,20,24,Away
+718,Tulane,10/27/2012,9,UAB,55,45,Home
+718,Tulane,11/3/2012,574,Rice,47,49,Home
+718,Tulane,11/10/2012,404,Memphis,23,37,Away
+718,Tulane,11/17/2012,196,East Carolina,23,28,Home
+718,Tulane,11/24/2012,288,Houston,17,40,Away
+719,Tulsa,9/1/2012,311,Iowa St.,23,38,Away
+719,Tulsa,9/8/2012,718,Tulane,45,10,Home
+719,Tulsa,9/15/2012,483,Nicholls St.,66,16,Home
+719,Tulsa,9/22/2012,96,Fresno St.,27,26,Home
+719,Tulsa,9/29/2012,9,UAB,49,42,Away
+719,Tulsa,10/6/2012,388,Marshall,45,38,Away
+719,Tulsa,10/11/2012,704,UTEP,33,11,Home
+719,Tulsa,10/20/2012,574,Rice,28,24,Home
+719,Tulsa,11/3/2012,31,Arkansas,15,19,Away
+719,Tulsa,11/10/2012,288,Houston,41,7,Away
+719,Tulsa,11/17/2012,128,UCF,23,21,Home
+719,Tulsa,11/24/2012,663,SMU,27,35,Away
+719,Tulsa,12/1/2012,128,UCF,33,27,Home
+719,Tulsa,12/31/2012,311,Iowa St.,31,17,Neutral Site
+721,Air Force,9/1/2012,294,Idaho St.,49,21,Home
+721,Air Force,9/8/2012,418,Michigan,25,31,Away
+721,Air Force,9/22/2012,465,UNLV,35,38,Away
+721,Air Force,9/29/2012,156,Colorado St.,42,21,Home
+721,Air Force,10/6/2012,726,Navy,21,28,Home
+721,Air Force,10/13/2012,811,Wyoming,28,27,Away
+721,Air Force,10/20/2012,473,New Mexico,28,23,Home
+721,Air Force,10/26/2012,466,Nevada,48,31,Home
+721,Air Force,11/3/2012,725,Army,21,41,Away
+721,Air Force,11/10/2012,626,San Diego St.,9,28,Away
+721,Air Force,11/16/2012,277,Hawaii,21,7,Home
+721,Air Force,11/24/2012,96,Fresno St.,15,48,Away
+721,Air Force,12/29/2012,574,Rice,14,33,Neutral Site
+725,Army,9/8/2012,626,San Diego St.,7,42,Away
+725,Army,9/15/2012,503,Northern Ill.,40,41,Home
+725,Army,9/22/2012,749,Wake Forest,37,49,Away
+725,Army,9/29/2012,683,Stony Brook,3,23,Home
+725,Army,10/6/2012,67,Boston College,34,31,Home
+725,Army,10/13/2012,331,Kent St.,17,31,Home
+725,Army,10/20/2012,204,Eastern Mich.,38,48,Away
+725,Army,10/27/2012,47,Ball St.,22,30,Home
+725,Army,11/3/2012,721,Air Force,41,21,Home
+725,Army,11/10/2012,587,Rutgers,7,28,Away
+725,Army,11/17/2012,690,Temple,32,63,Home
+725,Army,12/8/2012,726,Navy,13,17,Neutral Site
+726,Navy,9/1/2012,513,Notre Dame,10,50,Neutral Site
+726,Navy,9/15/2012,539,Penn St.,7,34,Away
+726,Navy,9/22/2012,741,VMI,41,3,Home
+726,Navy,9/29/2012,630,San Jose St.,0,12,Home
+726,Navy,10/6/2012,721,Air Force,28,21,Away
+726,Navy,10/12/2012,129,Central Mich.,31,13,Away
+726,Navy,10/20/2012,306,Indiana,31,30,Home
+726,Navy,10/27/2012,196,East Carolina,56,28,Away
+726,Navy,11/3/2012,229,Fla. Atlantic,24,17,Home
+726,Navy,11/10/2012,716,Troy,31,41,Away
+726,Navy,11/17/2012,670,Texas St.,21,10,Home
+726,Navy,12/8/2012,725,Army,17,13,Neutral Site
+726,Navy,12/29/2012,28,Arizona St.,28,62,Neutral Site
+731,Utah St.,8/30/2012,667,Southern Utah,34,3,Home
+731,Utah St.,9/7/2012,732,Utah,27,20,Home
+731,Utah St.,9/15/2012,796,Wisconsin,14,16,Away
+731,Utah St.,9/22/2012,156,Colorado St.,31,19,Away
+731,Utah St.,9/29/2012,465,UNLV,35,13,Home
+731,Utah St.,10/5/2012,77,BYU,3,6,Away
+731,Utah St.,10/13/2012,630,San Jose St.,49,27,Away
+731,Utah St.,10/20/2012,472,New Mexico St.,41,7,Home
+731,Utah St.,10/27/2012,706,UTSA,48,17,Away
+731,Utah St.,11/3/2012,670,Texas St.,38,7,Home
+731,Utah St.,11/17/2012,366,Louisiana Tech,48,41,Away
+731,Utah St.,11/24/2012,295,Idaho,45,9,Home
+731,Utah St.,12/15/2012,709,Toledo,41,15,Neutral Site
+732,Utah,8/30/2012,502,Northern Colo.,41,0,Home
+732,Utah,9/7/2012,731,Utah St.,20,27,Away
+732,Utah,9/15/2012,77,BYU,24,21,Home
+732,Utah,9/22/2012,28,Arizona St.,7,37,Away
+732,Utah,10/4/2012,657,Southern California,28,38,Home
+732,Utah,10/13/2012,110,UCLA,14,21,Away
+732,Utah,10/20/2012,528,Oregon St.,7,21,Away
+732,Utah,10/27/2012,107,California,49,27,Home
+732,Utah,11/3/2012,754,Washington St.,49,6,Home
+732,Utah,11/10/2012,756,Washington,15,34,Away
+732,Utah,11/17/2012,29,Arizona,24,34,Home
+732,Utah,11/23/2012,157,Colorado,42,35,Away
+736,Vanderbilt,8/30/2012,648,South Carolina,13,17,Home
+736,Vanderbilt,9/8/2012,509,Northwestern,13,23,Away
+736,Vanderbilt,9/15/2012,1320,Presbyterian,58,0,Home
+736,Vanderbilt,9/22/2012,257,Georgia,3,48,Away
+736,Vanderbilt,10/6/2012,434,Missouri,19,15,Away
+736,Vanderbilt,10/13/2012,235,Florida,17,31,Home
+736,Vanderbilt,10/20/2012,37,Auburn,17,13,Home
+736,Vanderbilt,10/27/2012,400,Massachusetts,49,7,Home
+736,Vanderbilt,11/3/2012,334,Kentucky,40,0,Away
+736,Vanderbilt,11/10/2012,433,Ole Miss,27,26,Away
+736,Vanderbilt,11/17/2012,694,Tennessee,41,18,Home
+736,Vanderbilt,11/24/2012,749,Wake Forest,55,21,Away
+736,Vanderbilt,12/31/2012,490,North Carolina St.,38,24,Neutral Site
+742,Virginia Tech,9/3/2012,255,Georgia Tech,20,17,Home
+742,Virginia Tech,9/8/2012,43,Austin Peay,42,7,Home
+742,Virginia Tech,9/15/2012,545,Pittsburgh,17,35,Away
+742,Virginia Tech,9/22/2012,71,Bowling Green,37,0,Home
+742,Virginia Tech,9/29/2012,140,Cincinnati,24,27,Neutral Site
+742,Virginia Tech,10/6/2012,457,North Carolina,34,48,Away
+742,Virginia Tech,10/13/2012,193,Duke,41,20,Home
+742,Virginia Tech,10/20/2012,147,Clemson,17,38,Away
+742,Virginia Tech,11/1/2012,415,Miami (FL),12,30,Away
+742,Virginia Tech,11/8/2012,234,Florida St.,22,28,Home
+742,Virginia Tech,11/17/2012,67,Boston College,30,23,Away
+742,Virginia Tech,11/24/2012,746,Virginia,17,14,Home
+742,Virginia Tech,12/28/2012,587,Rutgers,13,10,Neutral Site
+746,Virginia,9/1/2012,575,Richmond,43,19,Home
+746,Virginia,9/8/2012,539,Penn St.,17,16,Home
+746,Virginia,9/15/2012,255,Georgia Tech,20,56,Away
+746,Virginia,9/22/2012,698,TCU,7,27,Away
+746,Virginia,9/29/2012,366,Louisiana Tech,38,44,Home
+746,Virginia,10/6/2012,193,Duke,17,42,Away
+746,Virginia,10/13/2012,392,Maryland,20,27,Home
+746,Virginia,10/20/2012,749,Wake Forest,10,16,Home
+746,Virginia,11/3/2012,490,North Carolina St.,33,6,Away
+746,Virginia,11/10/2012,415,Miami (FL),41,40,Home
+746,Virginia,11/15/2012,457,North Carolina,13,37,Home
+746,Virginia,11/24/2012,742,Virginia Tech,14,17,Away
+749,Wake Forest,9/1/2012,355,Liberty,20,17,Home
+749,Wake Forest,9/8/2012,457,North Carolina,28,27,Home
+749,Wake Forest,9/15/2012,234,Florida St.,0,52,Away
+749,Wake Forest,9/22/2012,725,Army,49,37,Home
+749,Wake Forest,9/29/2012,193,Duke,27,34,Home
+749,Wake Forest,10/6/2012,392,Maryland,14,19,Away
+749,Wake Forest,10/20/2012,746,Virginia,16,10,Away
+749,Wake Forest,10/25/2012,147,Clemson,13,42,Home
+749,Wake Forest,11/3/2012,67,Boston College,28,14,Home
+749,Wake Forest,11/10/2012,490,North Carolina St.,6,37,Away
+749,Wake Forest,11/17/2012,513,Notre Dame,0,38,Away
+749,Wake Forest,11/24/2012,736,Vanderbilt,21,55,Home
+754,Washington St.,8/30/2012,77,BYU,6,30,Away
+754,Washington St.,9/8/2012,207,Eastern Wash.,24,20,Home
+754,Washington St.,9/14/2012,465,UNLV,35,27,Away
+754,Washington St.,9/22/2012,157,Colorado,34,35,Home
+754,Washington St.,9/29/2012,529,Oregon,26,51,Neutral Site
+754,Washington St.,10/6/2012,528,Oregon St.,6,19,Away
+754,Washington St.,10/13/2012,107,California,17,31,Home
+754,Washington St.,10/27/2012,674,Stanford,17,24,Away
+754,Washington St.,11/3/2012,732,Utah,6,49,Away
+754,Washington St.,11/10/2012,110,UCLA,36,44,Home
+754,Washington St.,11/17/2012,28,Arizona St.,7,46,Away
+754,Washington St.,11/23/2012,756,Washington,31,28,Home
+756,Washington,9/1/2012,626,San Diego St.,21,12,Home
+756,Washington,9/8/2012,365,LSU,3,41,Away
+756,Washington,9/15/2012,550,Portland St.,52,13,Home
+756,Washington,9/27/2012,674,Stanford,17,13,Home
+756,Washington,10/6/2012,529,Oregon,21,52,Away
+756,Washington,10/13/2012,657,Southern California,14,24,Home
+756,Washington,10/20/2012,29,Arizona,17,52,Away
+756,Washington,10/27/2012,528,Oregon St.,20,17,Home
+756,Washington,11/2/2012,107,California,21,13,Away
+756,Washington,11/10/2012,732,Utah,34,15,Home
+756,Washington,11/17/2012,157,Colorado,38,3,Away
+756,Washington,11/23/2012,754,Washington St.,28,31,Away
+756,Washington,12/22/2012,66,Boise St.,26,28,Neutral Site
+768,West Virginia,9/1/2012,388,Marshall,69,34,Home
+768,West Virginia,9/15/2012,317,James Madison,42,12,Neutral Site
+768,West Virginia,9/22/2012,392,Maryland,31,21,Home
+768,West Virginia,9/29/2012,51,Baylor,70,63,Home
+768,West Virginia,10/6/2012,703,Texas,48,45,Away
+768,West Virginia,10/13/2012,700,Texas Tech,14,49,Away
+768,West Virginia,10/20/2012,327,Kansas St.,14,55,Home
+768,West Virginia,11/3/2012,698,TCU,38,39,Home
+768,West Virginia,11/10/2012,521,Oklahoma St.,34,55,Away
+768,West Virginia,11/17/2012,522,Oklahoma,49,50,Home
+768,West Virginia,11/23/2012,311,Iowa St.,31,24,Away
+768,West Virginia,12/1/2012,328,Kansas,59,10,Home
+768,West Virginia,12/29/2012,688,Syracuse,14,38,Neutral Site
+772,Western Ky.,9/1/2012,43,Austin Peay,49,10,Home
+772,Western Ky.,9/8/2012,8,Alabama,0,35,Away
+772,Western Ky.,9/15/2012,334,Kentucky,32,31,Away
+772,Western Ky.,9/22/2012,664,Southern Miss.,42,17,Home
+772,Western Ky.,9/29/2012,30,Arkansas St.,26,13,Away
+772,Western Ky.,10/11/2012,716,Troy,31,26,Away
+772,Western Ky.,10/20/2012,498,La.-Monroe,42,43,Home
+772,Western Ky.,10/27/2012,231,FIU,14,6,Away
+772,Western Ky.,11/1/2012,419,Middle Tenn.,29,34,Home
+772,Western Ky.,11/10/2012,229,Fla. Atlantic,28,37,Home
+772,Western Ky.,11/17/2012,671,La.-Lafayette,27,31,Away
+772,Western Ky.,11/24/2012,497,North Texas,25,24,Home
+772,Western Ky.,12/26/2012,129,Central Mich.,21,24,Neutral Site
+774,Western Mich.,9/1/2012,301,Illinois,7,24,Away
+774,Western Mich.,9/8/2012,201,Eastern Ill.,52,21,Home
+774,Western Mich.,9/15/2012,428,Minnesota,23,28,Away
+774,Western Mich.,9/22/2012,164,Connecticut,30,24,Home
+774,Western Mich.,9/29/2012,709,Toledo,17,37,Home
+774,Western Mich.,10/6/2012,400,Massachusetts,52,14,Home
+774,Western Mich.,10/13/2012,47,Ball St.,24,30,Away
+774,Western Mich.,10/20/2012,331,Kent St.,24,41,Away
+774,Western Mich.,10/27/2012,503,Northern Ill.,34,48,Home
+774,Western Mich.,11/3/2012,129,Central Mich.,42,31,Away
+774,Western Mich.,11/10/2012,86,Buffalo,24,29,Away
+774,Western Mich.,11/17/2012,204,Eastern Mich.,23,29,Home
+796,Wisconsin,9/1/2012,504,UNI,26,21,Home
+796,Wisconsin,9/8/2012,528,Oregon St.,7,10,Away
+796,Wisconsin,9/15/2012,731,Utah St.,16,14,Home
+796,Wisconsin,9/22/2012,704,UTEP,37,26,Home
+796,Wisconsin,9/29/2012,463,Nebraska,27,30,Away
+796,Wisconsin,10/6/2012,301,Illinois,31,14,Home
+796,Wisconsin,10/13/2012,559,Purdue,38,14,Away
+796,Wisconsin,10/20/2012,428,Minnesota,38,13,Home
+796,Wisconsin,10/27/2012,416,Michigan St.,13,16,Home
+796,Wisconsin,11/10/2012,306,Indiana,62,14,Away
+796,Wisconsin,11/17/2012,518,Ohio St.,14,21,Home
+796,Wisconsin,11/24/2012,539,Penn St.,21,24,Away
+796,Wisconsin,12/1/2012,463,Nebraska,70,31,Neutral Site
+796,Wisconsin,1/1/2013,674,Stanford,14,20,Neutral Site
+811,Wyoming,9/1/2012,703,Texas,17,37,Away
+811,Wyoming,9/8/2012,709,Toledo,31,34,Home
+811,Wyoming,9/15/2012,90,Cal Poly,22,24,Home
+811,Wyoming,9/22/2012,295,Idaho,40,37,Away
+811,Wyoming,10/6/2012,466,Nevada,28,35,Away
+811,Wyoming,10/13/2012,721,Air Force,27,28,Home
+811,Wyoming,10/20/2012,96,Fresno St.,14,42,Away
+811,Wyoming,10/27/2012,66,Boise St.,14,45,Home
+811,Wyoming,11/3/2012,156,Colorado St.,45,31,Home
+811,Wyoming,11/10/2012,473,New Mexico,28,23,Away
+811,Wyoming,11/17/2012,465,UNLV,28,23,Away
+811,Wyoming,11/24/2012,626,San Diego St.,28,42,Home

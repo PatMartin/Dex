@@ -1,0 +1,173 @@
+<project name="Dex" default="dist" basedir=".">
+
+	<description>Dex Build File</description>
+
+	<!-- set global properties for this build -->
+	<property name="src" location="src" />
+	<property name="build" location="build" />
+	<property name="dist" location="dist/dex" />
+	<property name="bin" location="bin" />
+
+	<target name="dist" depends="Dex.jar">
+		<tstamp />
+		<mkdir dir="${dist}" />
+		<mkdir dir="${dist}/data" />
+		<mkdir dir="${dist}/lib" />
+		<mkdir dir="${dist}/lib/processing" />
+		<mkdir dir="${dist}/lib/selenium" />
+		<mkdir dir="${dist}/lib/rserve" />
+		<mkdir dir="${dist}/output" />
+		<mkdir dir="${dist}/project" />
+		<mkdir dir="${dist}/scripts" />
+		<mkdir dir="${dist}/template" />
+
+		<!--copy file="startDex.sh" todir="${dist}" />
+		<chmod perm="a+rx" file="startDex.sh" /-->
+
+		<copy file="resources/Dex.css" todir="${dist}" />
+		
+		<copy file="Dex.jar" todir="${dist}" />
+		<copy file="Dex.ico" todir="${dist}" />
+		<copy file="lib/dex-javafx.jar" todir="${dist}/lib" />
+
+		<copy todir="${dist}/lib">
+			<fileset dir="lib" includes="**.jar" />
+		</copy>
+		<copy todir="${dist}/lib/processing">
+			<fileset dir="lib/processing" includes="**.jar" />
+		</copy>
+		<copy todir="${dist}/lib/selenium">
+			<fileset dir="lib/selenium" includes="**.jar" />
+		</copy>
+		<copy todir="${dist}/lib/rserve">
+			<fileset dir="lib/rserve" includes="**.jar" />
+		</copy>
+		<copy todir="${dist}/project">
+			<fileset dir="project/dist" includes="**/*" />
+		</copy>
+		<copy todir="${dist}/template">
+			<fileset dir="template" includes="**/*" />
+		</copy>
+		
+		<copy todir="${dist}">
+			<fileset file="docs/dex.bmp" />
+		</copy>
+		
+		<copy todir="${dist}/scripts">
+			<fileset dir="scripts" includes="**/*" />
+		</copy>
+		<!-- copy file="docs/dex/Dex.html" tofile="${dist}/docs/dex/index.html" -->
+
+		<!-- DATA FILES -->
+		<copy file="data/presidents.csv" todir="${dist}/data" />
+		<copy file="data/PrimeMinisters.csv" todir="${dist}/data" />
+		<copy file="data/nutrients.csv" todir="${dist}/data" />
+		<copy file="data/gc.csv" todir="${dist}/data" />
+		<copy file="data/nodes.csv" todir="${dist}/data" />
+		<copy file="data/jstat1.log" todir="${dist}/data" />
+		<copy file="data/iris.csv" todir="${dist}/data" />
+		<copy file="data/BirthsAndDeaths.csv" todir="${dist}/data" />
+		<copy file="data/football.csv" todir="${dist}/data" />
+		<copy file="data/sales.csv" todir="${dist}/data" />
+		<copy file="data/ghettysburg_address.txt" todir="${dist}/data" />
+		<copy file="data/diffdata.csv" todir="${dist}/data" />
+		<copy file="data/bank-data.csv" todir="${dist}/data" />
+		<copy file="data/quartet.csv" todir="${dist}/data" />
+
+		<copy todir="${dist}/web">
+			<fileset dir="web" />
+		</copy>
+
+		<copy todir="${dist}/util">
+			<fileset dir="util" />
+		</copy>
+
+		<!-- Javascript dependencies -->
+		<copy todir="${dist}/javascript/c3/latest">
+			<fileset dir="javascript/c3/latest" />
+		</copy>
+		<copy todir="${dist}/javascript/d3/latest">
+			<fileset dir="javascript/d3/latest" />
+		</copy>
+		<copy todir="${dist}/javascript/d3plus/latest">
+			<fileset dir="javascript/d3plus/latest" />
+		</copy>
+		<copy todir="${dist}/javascript/d3-ext">
+			<fileset dir="javascript/d3-ext" />
+		</copy>
+		<copy todir="${dist}/javascript/dexjs/latest">
+			<fileset dir="javascript/dexjs/latest" />
+		</copy>
+		<copy todir="${dist}/javascript/jquery/latest">
+			<fileset dir="javascript/jquery/latest" />
+		</copy>
+		<copy todir="${dist}/javascript/underscore/latest">
+			<fileset dir="javascript/underscore/latest" />
+		</copy>
+		<copy todir="${dist}/javascript/p5/latest">
+			<fileset dir="javascript/p5/latest" />
+		</copy>
+		<copy todir="${dist}/javascript/dex">
+			<fileset dir="javascript/dex" />
+		</copy>
+		<copy todir="${dist}/javascript/jqueryui/latest">
+			<fileset dir="javascript/jqueryui/latest" />
+		</copy>
+		<copy todir="${dist}/javascript/touchpunch/latest">
+			<fileset dir="javascript/touchpunch/latest" />
+		</copy>
+		<copy todir="${dist}/javascript/nvd3/latest">
+			<fileset dir="javascript/nvd3/latest" />
+		</copy>
+		<copy todir="${dist}/javascript/processing/latest">
+			<fileset dir="javascript/processing/latest" />
+		</copy>
+		<copy todir="${dist}/javascript/three/latest">
+			<fileset dir="javascript/three/latest" />
+		</copy>
+		<copy todir="${dist}/javascript/vis/latest">
+			<fileset dir="javascript/vis/latest" />
+		</copy>
+		<copy todir="${dist}/javascript/vivagraph/latest">
+			<fileset dir="javascript/vivagraph/latest" />
+		</copy>
+		<copy todir="${dist}/javascript/webgl">
+			<fileset dir="javascript/webgl" />
+		</copy>
+		<copy todir="${dist}/javascript/codemirror/latest">
+			<fileset dir="javascript/codemirror/latest" />
+		</copy>
+	</target>
+
+	<path id="libraries.path">
+		<fileset dir="lib">
+			<include name="**/*.jar" />
+			<include name="selenium/*.jar" />
+		</fileset>
+		<fileset dir="resources">
+		  <include name="**/**" />
+		</fileset>
+	</path>
+
+	<target name="dex-javafx">
+		<jar destfile="lib/dex-javafx.jar" basedir="../JavaFX/bin" />
+	</target>
+
+	<target name="Dex.jar" depends="dex-javafx">
+
+		<manifestclasspath property="manifest.classpath" jarfile="Dex.jar">
+			<classpath refid="libraries.path" />
+		</manifestclasspath>
+
+		<jar destfile="Dex.jar" basedir="bin">
+			<manifest>
+				<attribute name="Main-Class" value="com.dexvis.dex.Dex" />
+				<attribute name="Class-Path" value="${manifest.classpath}" />
+			</manifest>
+		</jar>
+	</target>
+
+	<target name="clean">
+		<delete dir="${dist}" />
+	</target>
+</project>

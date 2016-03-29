@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+	    <title>Circular heat chart example</title>
+	    <link rel="stylesheet" href="css/style.css">
+	    <link rel="stylesheet" href="css/svg.css">
+		<link rel="stylesheet" href="http://yandex.st/highlightjs/7.3/styles/default.min.css">
+	</head>
+
+	<body>
+		<section>
+			<h1>Circular heat chart</h1>
+			<p>A circular heat chart displays quantitative data as an array of circular segments, coloured according to value.</p>
+			<p>This is a good chart for displaying cyclic data such as hourly energy usage over the course of a week e.g.<p>
+			<div class="chart" id="energychart"></div>
+			</p>This is implemented using <a href="http://d3js.org">D3.js</a> and is <a href="http://bost.ocks.org/mike/chart/">reusable</a>.</p>
+			<p>The code to create the above energy chart is:</p>
+			<pre><code>var chart = circularHeatChart()
+    .innerRadius(20)
+    .radialLabels(["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"])
+    .segmentLabels(["Midnight", "1am", "2am", "3am", "4am", "5am", "6am", "7am", "8am", "9am", "10am", "11am",
+    "Midday", "1pm", "2pm", "3pm", "4pm", "5pm", "6pm", "7pm", "8pm", "9pm", "10pm", "11pm"]);
+
+var energyData = [ 0.176042, 0.096146, 0.076414, ..more data.. , 0.192478, 0.134997, 0.152271 ];
+
+d3.select('#energychart')
+    .selectAll('svg')
+    .data([energyData])
+    .enter()
+    .append('svg')
+    .call(chart);</code></pre>
+		</section>
+
+		<section>
+			<h2>Examples</h2>
+			<h3>Simple chart</h3>
+			<div id="chart1"></div>
+			<pre><code>var chart = circularHeatChart()
+	.segmentHeight(10)
+	.innerRadius(20);
+var data = [];
+for(var i=0; i<240; i++) data[i] = i;
+
+d3.select('#chart1')
+    .selectAll('svg')
+    .data([data])
+    .enter()
+    .append('svg')
+    .call(chart);</code></pre>
+			<h3>Array of charts</h3>
+			<div id="chart2"></div>
+			<pre><code>/* Create random data */
+var data = [];
+for(var i=0; i<3; i++) {
+	data[i] = [];
+	for(var j=0; j<120; j++) {
+	    data[i][j] = Math.random();
+	}
+}
+
+var chart = circularHeatChart()
+	.range(["white", "black"]);
+
+d3.select('#chart2')
+    .selectAll('svg')
+    .data(data)
+    .enter()
+    .append('svg')
+    .call(chart);</code></pre>
+    		<h3>Labels</h3>
+    		<div id="chart3"></div>
+    		<pre><code>/* Random data */
+var data = [];
+for(var i=0; i<168; i++) data[i] = Math.random();
+
+var chart = circularHeatChart()
+    .innerRadius(20)
+    .range(["white", "steelblue"])
+    .radialLabels(["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"])
+    .segmentLabels(["Midnight", "1am", "2am", "3am", "4am", "5am", "6am", "7am", "8am", "9am", "10am", "11am",
+    "Midday", "1pm", "2pm", "3pm", "4pm", "5pm", "6pm", "7pm", "8pm", "9pm", "10pm", "11pm"]);
+
+d3.select('#chart3')
+    .selectAll('svg')
+    .data([data])
+    .enter()
+    .append('svg')
+    .call(chart);</code></pre>
+			<h3>Events (try hovering over chart)</h3>
+			<div id="chart4"></div>
+			<div id="info"></div>
+            <pre><code>/* Define an array of objects */
+var data = [];
+for(var i=0; i<240; i++) data[i] = {title: "Segment "+i, value: Math.round(Math.random()*100)};
+
+/* Define an accessor function */
+chart.accessor(function(d) {return d.value;})
+
+d3.select('#chart4')
+    .selectAll('svg')
+    .data([data])
+    .enter()
+    .append('svg')
+    .call(chart);
+
+/* Add a mouseover event */
+d3.selectAll("#chart4 path").on('mouseover', function() {
+    var d = d3.select(this).data()[0];
+    console.log(d.title + ' has value ' + d.value);
+});</code></pre>
+		</section>
+
+		<footer>
+			<p>Built with <a href="http://d3js.org">D3</a>. Chart development by <a href="http://prcweb.co.uk">Peter Cook</a>.</p>
+		</footer>
+
+		<script src="http://d3js.org/d3.v3.min.js"></script>
+		<script src="js/circularHeatChart.js"></script>
+		<script src="js/example.js"></script>
+		<script src="http://yandex.st/highlightjs/7.3/highlight.min.js"></script>
+		<script>hljs.initHighlightingOnLoad();</script>
+	</body>
+</html>

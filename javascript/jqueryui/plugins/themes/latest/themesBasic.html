@@ -1,0 +1,43 @@
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+<title>jQuery Themes Basics</title>
+<link rel="stylesheet" type="text/css" href="jquery.themes.css">
+<style type="text/css">
+fieldset { clear: both; font-size: 75%; }
+legend { font-weight: bold; }
+#label { float: left; margin: 0px 20px 20px 0px; }
+</style>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.23/jquery-ui.min.js"></script>
+<script type="text/javascript" src="jquery.themes.js"></script>
+<script type="text/javascript">
+$.themes.setDefaults({cookieExpiry: 7,
+	themeBase: 'http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.23/themes/',
+	icons: 'themes.gif', previews: 'themes-preview.gif'});
+
+$(function() {
+	$('#themeSelection').themes();
+	$('#date').datepicker();
+});
+</script>
+</head>
+<body>
+<h1>jQuery Themes Basics</h1>
+<p>This page demonstrates the very basics of the
+	<a href="http://keith-wood.name/themes.html">jQuery Themes plugin</a>.
+	It contains the minimum requirements for using the plugin and
+	can be used as the basis for your own experimentation. For more detail see the
+	<a href="http://keith-wood.name/themesRef.html">documentation reference</a> page.</p>
+<p>The page shows a sample <a href="http://jqueryui.com">jQuery UI</a> component
+	and allows you to set the CSS theme to be used from amongst the
+	<a href="http://jqueryui.com/themeroller/">jQuery ThemeRoller</a> examples.</p>
+<p><span id="label">Select your new theme:</span> <span id="themeSelection"></span></p>
+<fieldset>
+	<legend>jQuery UI sample</legend>
+	<h2 class="demoHeaders">Datepicker</h2>
+	<div id="date"></div>
+</fieldset>
+</body>
+</html>

@@ -1,0 +1,8 @@
+/* SVG styling */
+path {
+	stroke: #777;
+}
+
+#chart3 .labels {
+	fill: #555;
+}

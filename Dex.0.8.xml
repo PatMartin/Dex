@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch4jConfig>
+  <dontWrapJar>false</dontWrapJar>
+  <headerType>gui</headerType>
+  <jar>C:\dex2ws\Dex\dist\dex\Dex.jar</jar>
+  <outfile>C:\dex2ws\Dex\dist\dex\Dex.exe</outfile>
+  <errTitle></errTitle>
+  <cmdLine></cmdLine>
+  <chdir>.</chdir>
+  <priority>normal</priority>
+  <downloadUrl>http://java.com/download</downloadUrl>
+  <supportUrl></supportUrl>
+  <stayAlive>true</stayAlive>
+  <restartOnCrash>false</restartOnCrash>
+  <manifest></manifest>
+  <icon>C:\dex2ws\Dex\Dex.ico</icon>
+  <classPath>
+    <mainClass>com.dexvis.dex.Dex</mainClass>
+    <cp>%CLASSPATH%</cp>
+    <cp>Dex.jar</cp>
+    <cp>lib/antlr4.jar</cp>
+    <cp>lib/guava-17.0.jar</cp>
+    <cp>lib/jdom-2.0.5.jar</cp>
+    <cp>lib/Prefuse.jar</cp>
+    <cp>lib/bcel-5.2.jar</cp>
+    <cp>lib/commons-io-2.4.jar</cp>
+    <cp>lib/commons-lang3-3.3.2.jar</cp>
+    <cp>lib/selenium/selenium-server-standalone-2.42.2.jar</cp>
+    <cp>lib/jython-2.5.3.jar</cp>
+    <cp>lib/rserve/REngine.1.8.jar</cp>
+    <cp>lib/rserve/RserveEngine.1.8.jar</cp>
+    <cp>lib/xstream-1.4.7.jar</cp>
+    <cp>lib/opencsv-2.3.jar</cp>
+    <cp>lib/commons-math3-3.0.jar</cp>
+    <cp>lib/hsqldb.jar</cp>
+    <cp>lib/controlsfx-8.20.8.jar</cp>
+    <cp>lib/ojdbc6.jar</cp>
+    <cp>lib/xdb.jar</cp>
+    <cp>lib/groovy-all-2.4.3.jar</cp>
+    <cp>lib/processing/core.jar</cp>
+    <cp>lib/processing/gluegen-rt.jar</cp>
+    <cp>lib/processing/jogl-all.jar</cp>
+    <cp>lib/miglayout-javafx-5.1-20150924.220035-180.jar</cp>
+    <cp>lib/miglayout-core-5.1-20150924.220012-180.jar</cp>
+  </classPath>
+  <jre>
+    <path></path>
+    <bundledJre64Bit>false</bundledJre64Bit>
+    <bundledJreAsFallback>false</bundledJreAsFallback>
+    <minVersion>1.8.0</minVersion>
+    <maxVersion></maxVersion>
+    <jdkPreference>jreOnly</jdkPreference>
+    <runtimeBits>64/32</runtimeBits>
+    <maxHeapPercent>50</maxHeapPercent>
+  </jre>
+  <splash>
+    <file>C:\dex2ws\Dex\docs\dex.bmp</file>
+    <waitForWindow>true</waitForWindow>
+    <timeout>60</timeout>
+    <timeoutErr>true</timeoutErr>
+  </splash>
+  <versionInfo>
+    <fileVersion>0.7.0.0</fileVersion>
+    <txtFileVersion>V0.7.0.0</txtFileVersion>
+    <fileDescription>Dex</fileDescription>
+    <copyright>APL 3.0</copyright>
+    <productVersion>0.7.0.0</productVersion>
+    <txtProductVersion>V0.7.0.0</txtProductVersion>
+    <productName>Dex</productName>
+    <companyName>JavaInc</companyName>
+    <internalName>JavaInc</internalName>
+    <originalFilename>Dex.exe</originalFilename>
+  </versionInfo>
+  <messages>
+    <startupErr>An error occurred while starting the application.</startupErr>
+    <bundledJreErr>This application was configured to use a bundled Java Runtime Environment but the runtime is missing or corrupted.</bundledJreErr>
+    <jreVersionErr>This application requires a Java Runtime Environment</jreVersionErr>
+    <launcherErr>The registry refers to a nonexistent Java Runtime Environment installation or the runtime is corrupted.</launcherErr>
+    <instanceAlreadyExistsMsg>An application instance is already running.</instanceAlreadyExistsMsg>
+  </messages>
+</launch4jConfig>
