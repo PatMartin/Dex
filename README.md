@@ -28,3 +28,7 @@ There are 2 main ways to install Dex.
 
 > cd Dex
 > java -jar Dex.jar
+
+# Example Visualizations
+
+![Dr Who Network](https://raw.githubusercontent.com/PatMartin/Dex/master/images/github_docs/DrWho_D3Plus_Network.png = 200x150)
