@@ -16,15 +16,15 @@ Dex : The data explorer is a data visualization tool written in Java/JavaFX capa
 There are 2 main ways to install Dex.
 
 1. [Download a stable release](http://dexvis.com/doku.php?id=Download)
-2. Follow the instructions from Git.
+2. Install via Git by following the instructions below.
 
 ## Via Git
 
 ### Download:
 
-git clone https://github.com/PatMartin/Dex.git
+> git clone https://github.com/PatMartin/Dex.git
 
 ### Run
 
-cd Dex
-java -jar Dex.jar
+> cd Dex
+> java -jar Dex.jar
