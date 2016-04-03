@@ -24,12 +24,16 @@ There are 2 main ways to install Dex.
 
 ### Download:
 
+```bash
 git clone https://github.com/PatMartin/Dex.git
+```
 
 ### Run
 
+```bash
 cd Dex
 java -jar Dex.jar
+```
 
 # Example Visualizations
 
