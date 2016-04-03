@@ -1,5 +1,6 @@
+<img src="https://raw.githubusercontent.com/PatMartin/Dex/master/images/github_docs/dexheader.png" height="250">
+
 # Dex
-<img src="https://raw.githubusercontent.com/PatMartin/Dex/master/images/github_docs/WWI_Timeline1.png" height="250">
 
 Dex : The data explorer is a data visualization tool written in Java/JavaFX capable of powerful ETL and data visualization.
 
