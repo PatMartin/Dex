@@ -1,4 +1,4 @@
-<img src="https://raw.githubusercontent.com/PatMartin/Dex/master/images/github_docs/dexheader.png" height="250">
+<img src="https://raw.githubusercontent.com/PatMartin/Dex/master/images/github_docs/dexheader.png">
 
 # Dex
 
