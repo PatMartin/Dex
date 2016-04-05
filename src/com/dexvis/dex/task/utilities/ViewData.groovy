@@ -106,7 +106,7 @@ class ViewData extends DexTask {
     }
 
     tableView.setItems(data)
-
+    
     return state
   }
 

@@ -3,6 +3,8 @@ package com.dexvis.javafx.scene.control;
 import java.util.List;
 import java.util.Optional;
 
+import javafx.beans.value.ObservableValue;
+
 import org.controlsfx.control.PropertySheet.Item;
 import org.controlsfx.property.editor.PropertyEditor;
 import org.simpleframework.xml.Element;
@@ -148,5 +150,12 @@ public class DexTaskProperty implements Item
     {
       return Item.super.getPropertyEditorClass();
     }
+  }
+
+  @Override
+  public Optional<ObservableValue<? extends Object>> getObservableValue()
+  {
+    // TODO Auto-generated method stub
+    return null;
   }
 }

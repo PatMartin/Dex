@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="resources"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/JavaFX"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/TMI"/>
+	<classpathentry exported="true" kind="con" path="GROOVY_SUPPORT"/>
+	<classpathentry exported="true" kind="con" path="GROOVY_DSL_SUPPORT"/>
+	<classpathentry kind="lib" path="lib/antlr4.jar"/>
+	<classpathentry kind="lib" path="lib/simple-xml-2.7.1.jar"/>
+	<classpathentry kind="lib" path="lib/guava-17.0.jar"/>
+	<classpathentry kind="lib" path="lib/jdom-2.0.5.jar"/>
+	<classpathentry kind="lib" path="lib/Prefuse.jar"/>
+	<classpathentry kind="lib" path="lib/bcel-5.2.jar"/>
+	<classpathentry kind="lib" path="lib/commons-io-2.4.jar"/>
+	<classpathentry kind="lib" path="lib/commons-lang3-3.3.2.jar"/>
+	<classpathentry kind="lib" path="lib/selenium/selenium-server-standalone-2.42.2.jar"/>
+	<classpathentry kind="lib" path="lib/jython-2.5.3.jar"/>
+	<classpathentry kind="lib" path="lib/rserve/REngine.1.8.jar"/>
+	<classpathentry kind="lib" path="lib/rserve/RserveEngine.1.8.jar"/>
+	<classpathentry kind="lib" path="lib/xstream-1.4.7.jar"/>
+	<classpathentry kind="lib" path="lib/opencsv-2.3.jar"/>
+	<classpathentry kind="lib" path="lib/commons-math3-3.0.jar"/>
+	<classpathentry kind="lib" path="lib/hsqldb.jar"/>
+	<classpathentry kind="lib" path="lib/ojdbc6.jar"/>
+	<classpathentry kind="lib" path="lib/xdb.jar"/>
+	<classpathentry kind="lib" path="lib/groovy-all-2.4.3.jar"/>
+	<classpathentry kind="lib" path="lib/processing/core.jar"/>
+	<classpathentry kind="lib" path="lib/processing/gluegen-rt.jar"/>
+	<classpathentry kind="lib" path="lib/processing/jogl-all.jar"/>
+	<classpathentry kind="lib" path="lib/aquafx-0.1.jar"/>
+	<classpathentry kind="lib" path="lib/plantuml.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="lib/miglayout-javafx-5.1-20150924.220035-180.jar"/>
+	<classpathentry kind="lib" path="lib/miglayout-core-5.1-20150924.220012-180.jar"/>
+	<classpathentry kind="lib" path="lib/controlsfx-8.40.10.jar"/>
+	<classpathentry kind="lib" path="lib/sqlite-jdbc-3.8.11.2.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

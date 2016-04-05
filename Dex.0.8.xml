@@ -8,8 +8,8 @@
   <cmdLine></cmdLine>
   <chdir>.</chdir>
   <priority>normal</priority>
-  <downloadUrl>http://java.com/download</downloadUrl>
-  <supportUrl></supportUrl>
+  <downloadUrl>http://www.oracle.com/technetwork/java/javase/downloads/index.html</downloadUrl>
+  <supportUrl>http://www.oracle.com/us/support/index.html</supportUrl>
   <stayAlive>true</stayAlive>
   <restartOnCrash>false</restartOnCrash>
   <manifest></manifest>
@@ -33,7 +33,7 @@
     <cp>lib/opencsv-2.3.jar</cp>
     <cp>lib/commons-math3-3.0.jar</cp>
     <cp>lib/hsqldb.jar</cp>
-    <cp>lib/controlsfx-8.20.8.jar</cp>
+    <cp>lib/controlsfx-8.20.10.jar</cp>
     <cp>lib/ojdbc6.jar</cp>
     <cp>lib/xdb.jar</cp>
     <cp>lib/groovy-all-2.4.3.jar</cp>
@@ -63,12 +63,12 @@
     <fileVersion>0.7.0.0</fileVersion>
     <txtFileVersion>V0.7.0.0</txtFileVersion>
     <fileDescription>Dex</fileDescription>
-    <copyright>APL 3.0</copyright>
-    <productVersion>0.7.0.0</productVersion>
-    <txtProductVersion>V0.7.0.0</txtProductVersion>
+    <copyright>APL 2.0</copyright>
+    <productVersion>0.8.0.8</productVersion>
+    <txtProductVersion>V0.8.0.8</txtProductVersion>
     <productName>Dex</productName>
-    <companyName>JavaInc</companyName>
-    <internalName>JavaInc</internalName>
+    <companyName>DexVis</companyName>
+    <internalName>DexVis</internalName>
     <originalFilename>Dex.exe</originalFilename>
   </versionInfo>
   <messages>

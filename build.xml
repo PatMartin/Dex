@@ -107,9 +107,6 @@
 		<copy todir="${dist}/javascript/p5/latest">
 			<fileset dir="javascript/p5/latest" />
 		</copy>
-		<copy todir="${dist}/javascript/dex">
-			<fileset dir="javascript/dex" />
-		</copy>
 		<copy todir="${dist}/javascript/jqueryui/latest">
 			<fileset dir="javascript/jqueryui/latest" />
 		</copy>

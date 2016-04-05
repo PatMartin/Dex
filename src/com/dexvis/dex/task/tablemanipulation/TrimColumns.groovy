@@ -28,6 +28,7 @@ class TrimColumns extends DexTask
   {
     super("Table Manipulation", "Trim Columns",
       "table_manipulation/TrimColumns.html")
+    getMetaData().setTaskExecutionUpdatesUI(false)
   }
 
   public DexTaskState execute(DexTaskState state) throws DexException
