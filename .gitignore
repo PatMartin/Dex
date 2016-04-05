@@ -7,3 +7,7 @@ docs.old
 textures
 .lock
 .project
+bin
+src/com/dexvis/dex/broken
+src/com/dexvis/dex/deprecated
+scripts/expect
