@@ -83,9 +83,6 @@ list-style-type: none;
   println new File("javascript/dygraphs/latest/dygraph.min.js").text
   
   println new File("javascript/dexjs/latest/dex.js").text
-  println new File("javascript/dexjs/latest/charts/dygraphs/LineChart.js").text
-  println new File("javascript/dexjs/latest/ui/jqueryui/ConfigurationBox.js").text
-  println new File("javascript/dexjs/latest/ui/jqueryui/Selectable.js").text
 %>
 </script>
 

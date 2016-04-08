@@ -18,8 +18,7 @@
 <%
   println new File("javascript/d3/latest/d3.min.js").text
   println new File("javascript/d3/latest/topojson.min.js").text
-  println new File("C:/WS/DexCharts/dex.js").text
-  println new File("C:/WS/DexCharts/js/dex/component/d3/map/USStateMap.js").text
+  println new File("javascript/dexjs/latest/dex.maps.js").text
 %>
 </script>
 <script>

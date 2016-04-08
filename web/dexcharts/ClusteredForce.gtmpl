@@ -40,9 +40,7 @@
   println new File("javascript/jqueryui/latest/jquery-ui.min.js").text
   println new File("javascript/underscore/latest/underscore-min.js").text
   println new File("javascript/d3/latest/d3.min.js").text
-  println new File("C:/WS/dexjs/build/js/dex.js").text
-  println new File("C:/WS/dexjs/src/charts/d3/HorizontalLegend.js").text
-  println new File("C:/WS/dexjs/src/charts/d3/ClusteredForce.js").text
+  println new File("javascript/dexjs/latest/dex.js").text
 %>
 </script>
   <body>

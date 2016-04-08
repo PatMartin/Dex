@@ -19,8 +19,7 @@
 <script src="http://d3js.org/d3.v3.js"></script>
 <script>
 <%
-  println new File("C:/AWS/DexChartsWS/DexCharts/dex.js").text
-  println new File("C:/AWS/DexChartsWS/DexCharts/js/dex/component/d3/Sankey.js").text
+  println new File("javascript/dexjs/latest/dex.js").text
 %>
 
 <%

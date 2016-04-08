@@ -20,7 +20,6 @@
   println new File("javascript/underscore/latest/underscore-min.js").text
   println new File("javascript/d3/latest/d3.min.js").text
   println new File("javascript/dexjs/latest/dex.js").text
-  println new File("javascript/dexjs/latest/charts/d3/Dendrogram.js").text
 %>
 </script>
   <body>
@@ -68,9 +67,9 @@ function save(location, config) {
 }
 
 var dendrogram = new dex.charts.d3.Dendrogram({
-  'parent'      : "#ChartArea",
-  'csv'         : csv,
-  'root.name'   : csv.header[0]
+  'parent'         : "#ChartArea",
+  'csv'            : csv,
+  'root.name'      : csv.header[0]
 });
 
 dendrogram.render();

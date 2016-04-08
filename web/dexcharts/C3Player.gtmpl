@@ -53,8 +53,6 @@
   println new File("javascript/d3/latest/d3.min.js").text
   println new File("javascript/dexjs/latest/dex.js").text
   println new File("javascript/c3/latest/c3.min.js").text
-  println new File("javascript/dexjs/latest/ui/jqueryui/Player.js").text
-  println new File("javascript/dexjs/latest/charts/c3/LineChart.js").text
 %>
 </script>
 <body>

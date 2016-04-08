@@ -85,13 +85,8 @@ path.link {
 <script>
 <%
   println new File("javascript/d3/latest/d3.min.js").text
-  println new File("C:/AWS/DexChartsWS/DexCharts/dex.js").text
-  println new File("C:/AWS/DexChartsWS/DexCharts/js/dex/component/d3/ParallelCoordinates.js").text
-  println new File("C:/AWS/DexChartsWS/DexCharts/js/dex/component/d3/Dendrogram.js").text
+  println new File("javascript/dexjs/latest/dex.js").text
 %>
-</script>
-
-<script>
 
 <%
   def headerStr = "[" + header.collect { return "\"$it\"" }.join(',') + "]"

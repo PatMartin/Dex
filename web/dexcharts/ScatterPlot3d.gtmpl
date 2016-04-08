@@ -26,7 +26,6 @@
 <script>
 <%
   println new File("javascript/dexjs/latest/dex.js").text
-  println new File("javascript/dexjs/latest/charts/threejs/ScatterPlot.js").text
 %>
 </script>
 

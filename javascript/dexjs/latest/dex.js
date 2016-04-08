@@ -1,200 +1,5 @@
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.dex = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 /**
- *
- * The main dexjs module.
- *
- * @module dex
- * @requires d3
- * @requires jquery
- * @requires jquery-ui
- * @requires underscore
- *
- */
-var dex = {};
-
-//require("d3");
-//$ = require("jquery");
-//require("jquery-ui");
-//_ = require("underscore");
-
-/**
- *
- * The version of dexjs.
- *
- * @name version
- * @type {string}
- *
- */
-dex.version = "0.7";
-
-/**
- * This routine will return an array [ start, ..., start + len ] using an increment of 1.
- *
- * @param {number} start - The starting index.
- * @param {number} len - The number of integers to generate.
- * @example {@lang javascript}
- * // returns [ 0, 1, 2 ]
- * range(0, 3)
- *
- * @returns {Array} An array consisting of elements [ start, ..., start + len ].
- *
- */
-dex.range = function (start, len) {
-  return _.range(start, start + len);
-};
-
-/**
- *
- * This routine is simply a convenience function as it
- * simply wraps underscore's implementation of a shallow
- * copy.  This method will create a shallow-copied clone
- * of the provided plain object. Any nested objects or
- * arrays will be copied by reference, not duplicated.
- *
- * @param obj
- * @returns {*}
- */
-dex.copy = function(obj) {
-  return _.copy(obj);
-};
-
-/**
- *
- * A module for dealing with arrays.
- *
- * @name array
- * @type {module:array}
- *
- */
-dex.array = require('./array/array');
-
-/**
- *
- * A module for configuring things.
- *
- * @name config
- * @type {module:config}
- *
- */
-dex.config = require("./config/config");
-
-/**
- *
- * The pub/sub bus used by dex in order to publish and subscribe to events.
- *
- * @name bus
- * @type {PubSub}
- * @see https://github.com/federico-lox/pubsub.js
- *
- */
-dex.bus = require("../lib/pubsub");
-
-/**
- *
- * A module for logging to the console.
- *
- * @name console
- * @type {module:console}
- *
- */
-dex.console = require("./console/console");
-
-/**
- * A module for dealing with colors.
- *
- * @name color
- * @type {module:color}
- *
- */
-dex.color = require("./color/color");
-
-/**
- *
- * A charting module.
- *
- * @name charts
- * @type {module:charts}
- *
- */
-dex.charts = {'d3' : {'map' : {}},
-  'c3'   : {},
-  'dygraphs' : {},
-  'd3plus'   : {},
-  'google' : {},
-  'handlebars' : {},
-  'threejs' : {}};
-
-/**
- *
- * A charting module.
- *
- * @name charts
- * @type {module:charts}
- *
- */
-dex.ui = {'jqueryui' : {}};
-
-/**
- *
- * A module for handling CSV data structures.
- *
- * @name csv
- * @type {module:csv}
- *
- */
-dex.csv = require("./csv/csv");
-
-/**
- *
- * A module providing utilities for data generation.
- *
- * @name datagen
- * @type {module:datagen}
- *
- */
-dex.datagen = require("./datagen/datagen");
-
-/**
- *
- * A module for dealing with JSON data.
- *
- * @name json
- * @type {module:json}
- *
- */
-dex.json = require("./json/json");
-
-/**
- * A module for dealing with matrices.
- *
- * @name matrix
- * @type {module:matrix}
- *
- */
-dex.matrix = require("./matrix/matrix");
-
-/**
- * A module for dealing with javascript objects.
- *
- * @name object
- * @type {module:object}
- *
- */
-dex.object = require("./object/object");
-
-/**
- *
- * A module for dealing dex components.
- *
- * @name component
- * @type {module:component}
- *
- */
-dex.component = require("./component/component");
-
-module.exports = dex;
-},{"../lib/pubsub":2,"./array/array":3,"./color/color":4,"./component/component":5,"./config/config":6,"./console/console":7,"./csv/csv":8,"./datagen/datagen":9,"./json/json":10,"./matrix/matrix":11,"./object/object":12}],2:[function(require,module,exports){
-/**
  * pubsub.js
  *
  * A tiny, optimized, tested, standalone and robust
@@ -364,12 +169,14 @@ module.exports = dex;
     context.PubSub = init();
   }
 }(this));
-},{}],3:[function(require,module,exports){
+},{}],2:[function(require,module,exports){
 /**
  *
  * This module provides routines for dealing with arrays.
  *
- * @module array
+ * @module dex/array
+ * @name array
+ * @memberOf dex
  *
  */
 
@@ -578,12 +385,10499 @@ module.exports.copy = function (array) {
     // Deep copy:
     //return $.extend(true, {}, array);
 };
+},{}],3:[function(require,module,exports){
+/**
+ *
+ * @name AreaChart
+ * @constructor
+ * @classdesc This class constructs a c3 area chart.
+ * @memberOf dex.charts.c3
+ * @implements {dex/component}
+ *
+ * @example {@lang javascript}
+ * var areachart = new dex.charts.c3.AreaChart({
+ *   'parent' : "#AreaChart",
+ *   'id'     : "AreaChart"
+ *   'csv'    : { header : [ "X", "Y", "Z" ],
+ *                data   : [[ 1, 2, 3 ], [4, 5, 6], [7, 8, 9]]}
+ * });
+ *
+ * @param {object} userConfig - A user supplied configuration object which will override the defaults.
+ * @param {string} userConfig.parent - The parent node to which this Axis will be attached.  Ex: #MyParent
+ * will attach to a node with an id = "MyParent".
+ * @param {string} [userConfig.id=Axis] - The id of this axis.
+ * @param {string} [userConfig.class=Axis] - The class of this axis.
+ * @param {csv} userConfig.csv - The user's CSV data.
+ *
+ *  @inherit module:dex/component
+ *
+ */
+var areachart = function (userConfig) {
+    var chart;
+
+    var defaults =
+    {
+        // The parent container of this chart.
+        'parent': '#AreaChart',
+        // Set these when you need to CSS style components independently.
+        'id': 'AreaChart',
+        'class': 'AreaChart',
+        'resizable': true,
+        'csv': {
+            'header': [],
+            'data': []
+        },
+        'linktype' : 'area-spline',
+        'width': "100%",
+        'height': "100%",
+        'transform': "translate(0 0)",
+    };
+
+    var chart = new dex.component(userConfig, defaults);
+
+    chart.render = function render() {
+        window.onresize = this.resize;
+        chart.resize();
+    };
+
+    chart.resize = function resize() {
+        if (chart.config.resizable) {
+            var width = d3.select(chart.config.parent).property("clientWidth");
+            var height = d3.select(chart.config.parent).property("clientHeight");
+            dex.console.log(chart.config.id + ": resize(" + width + "," + height + ")");
+            chart.attr("width", width).attr("height", height).update();
+        }
+        else {
+            chart.update();
+        }
+    };
+
+    chart.update = function () {
+        var chart = this;
+        var config = chart.config;
+        var csv = config.csv;
+
+        var gtypes = dex.csv.guessTypes(csv);
+        var ncsv = dex.csv.numericSubset(csv);
+        var columns = dex.csv.transpose(ncsv);
+
+        for (var ci = 0; ci < columns.header.length; ci++) {
+            columns.data[ci].unshift(columns.header[ci]);
+        }
+
+        var types = {};
+        dex.range(1, ncsv.header.length)
+            .map(function(hi) { types[ncsv.header[hi-1]] = config.linktype; });
+
+        var c3config = {
+            'bindto' : config.parent,
+            'data': {
+                'columns': columns.data,
+                'types': types,
+                color : d3.scale.category20()
+            },
+            subchart: {
+                show: true
+            },
+            zoom: {
+                enabled: true
+            },
+            legend: {
+                position : 'right'
+            }
+        };
+
+        // Set categorical axis if first column is a string.
+        if (gtypes[0] == "string")
+        {
+            c3config['axis'] = { 'x' : {
+                'type' : 'category',
+                'label' : { 'text' : csv.header[0],
+                'position' : 'outer-center' },
+                'categories': dex.csv.transpose(dex.csv.columnSlice(csv, [0])).data[0]
+            }};
+        }
+
+        var chart = c3.generate(c3config);
+    };
+
+    $(document).ready(function () {
+        // Make the entire chart draggable.
+        //$(chart.config.parent).draggable();
+    });
+
+    return chart;
+};
+
+module.exports = areachart;
+
 },{}],4:[function(require,module,exports){
+/**
+ *
+ * @constructor
+ * @name BarChart
+ * @classdesc This class constructs a c3 bar chart.
+ * @memberOf dex.charts.c3
+ * @implements {dex/component}
+ *
+ * @example {@lang javascript}
+ * var areachart = dex.charts.c3.BarChart({
+ *   'parent' : "#AreaChart",
+ *   'id'     : "AreaChart"
+ *   'csv'    : { header : [ "X", "Y", "Z" ],
+ *                data   : [[ 1, 2, 3 ], [4, 5, 6], [7, 8, 9]]}
+ * });
+ *
+ * @param {object} userConfig - A user supplied configuration object which will override the defaults.
+ * @param {string} userConfig.parent - The parent node to which this Axis will be attached.  Ex: #MyParent
+ * will attach to a node with an id = "MyParent".
+ * @param {string} [userConfig.id=Axis] - The id of this axis.
+ * @param {string} [userConfig.class=Axis] - The class of this axis.
+ * @param {csv} userConfig.csv - The user's CSV data.
+ *
+ * @inherit module:dex/component
+ *
+ */
+var barchart = function (userConfig) {
+    var chart;
+
+    var defaults =
+    {
+        // The parent container of this chart.
+        'parent': '#BarChart',
+        // Set these when you need to CSS style components independently.
+        'id': 'BarChart',
+        'class': 'BarChart',
+        'resizable': true,
+        'csv': {
+            'header': [],
+            'data': []
+        },
+        'width': "100%",
+        'height': "100%",
+        'transform': "translate(0 0)",
+    };
+
+    var chart = new dex.component(userConfig, defaults);
+
+    chart.render = function render() {
+        window.onresize = this.resize;
+        chart.resize();
+    };
+
+    chart.resize = function resize() {
+        if (chart.config.resizable) {
+            var width = d3.select(chart.config.parent).property("clientWidth");
+            var height = d3.select(chart.config.parent).property("clientHeight");
+            dex.console.log(chart.config.id + ": resize(" + width + "," + height + ")");
+            chart.attr("width", width).attr("height", height).update();
+        }
+        else {
+            chart.update();
+        }
+    };
+
+    chart.update = function () {
+        var chart = this;
+        var config = chart.config;
+        var csv = config.csv;
+
+        var gtypes = dex.csv.guessTypes(csv);
+        var ncsv = dex.csv.numericSubset(csv);
+        var columns = dex.csv.transpose(ncsv);
+
+        for (var ci = 0; ci < columns.header.length; ci++) {
+            columns.data[ci].unshift(columns.header[ci]);
+        }
+
+        var c3config = {
+            'bindto' : config.parent,
+            'data': {
+                'columns': columns.data,
+                'type': 'bar',
+                color : d3.scale.category20()
+            },
+            'bar': {'width': { 'ratio': 0.9 }},
+            subchart: {
+                show: true
+            },
+            zoom: {
+                enabled: true
+            },
+            legend: {
+                position : 'right'
+            }
+        };
+
+        // Set categorical axis if first column is a string.
+        if (gtypes[0] == "string")
+        {
+            c3config['axis'] = { 'x' : {
+                'type' : 'category',
+                'label' : { 'text' : csv.header[0],
+                'position' : 'outer-center' },
+                'categories': dex.csv.transpose(dex.csv.columnSlice(csv, [0])).data[0]
+            }};
+        }
+
+        var chart = c3.generate(c3config);
+    };
+
+    $(document).ready(function () {
+        // Make the entire chart draggable.
+        //$(chart.config.parent).draggable();
+    });
+
+    return chart;
+};
+
+module.exports = barchart;
+},{}],5:[function(require,module,exports){
+/**
+ *
+ * @name LineChart
+ * @constructor
+ * @classdesc This class constructs a c3 line chart.
+ * @memberOf dex.charts.c3
+ * @implements {dex/component}
+ *
+ * @example {@lang javascript}
+ * var areachart = new dex.charts.c3.AreaChart({
+ *   'parent' : "#AreaChart",
+ *   'id'     : "AreaChart"
+ *   'csv'    : { header : [ "X", "Y", "Z" ],
+ *                data   : [[ 1, 2, 3 ], [4, 5, 6], [7, 8, 9]]}
+ * });
+ *
+ * @param {object} userConfig - A user supplied configuration object which will override the defaults.
+ * @param {string} userConfig.parent - The parent node to which this Axis will be attached.  Ex: #MyParent
+ * will attach to a node with an id = "MyParent".
+ * @param {string} [userConfig.id=Axis] - The id of this axis.
+ * @param {string} [userConfig.class=Axis] - The class of this axis.
+ * @param {csv} userConfig.csv - The user's CSV data.
+ *
+ * @inherit module:dex/component
+ *
+ */
+
+var linechart = function (userConfig) {
+    var chart;
+
+    var defaults =
+    {
+        // The parent container of this chart.
+        'parent': '#LineChart',
+        // Set these when you need to CSS style components independently.
+        'id': 'LineChart',
+        'class': 'LineChart',
+        'resizable': true,
+        'csv': {
+            'header': [],
+            'data': []
+        },
+        'linktype' : 'area',
+        'width': "100%",
+        'height': "100%"
+    };
+
+    var chart = new dex.component(userConfig, defaults);
+    var internalChart;
+    var selectedColumns = [];
+
+    chart.render = function render() {
+
+        //var chart = this;
+        var config = chart.config;
+        var csv = config.csv;
+        window.onresize = this.render;
+
+        if (chart.config.resizable) {
+            var width = d3.select(chart.config.parent).property("clientWidth");
+            var height = d3.select(chart.config.parent).property("clientHeight");
+            dex.console.log(chart.config.id + ": resize(" + width + "," + height + ")");
+            chart.attr("width", width).attr("height", height);
+        }
+        d3.select(config.parent).selectAll("*").remove();
+        var gtypes = dex.csv.guessTypes(csv);
+        selectedColumns = dex.csv.getNumericIndices(csv);
+        if (gtypes[0] == "string")
+        {
+            selectedColumns.unshift(0);
+        }
+        var ncsv = dex.csv.columnSlice(csv, selectedColumns);
+
+        var columns = dex.csv.transpose(ncsv);
+
+        for (var ci = 0; ci < columns.header.length; ci++) {
+            columns.data[ci].unshift(columns.header[ci]);
+        }
+
+        var types = {};
+        dex.range(1, ncsv.header.length)
+          .map(function(hi) { types[ncsv.header[hi-1]] = config.linktype; });
+
+        var c3config = {
+            'bindto' : config.parent,
+            'data': {
+                'x' : columns.header[0],
+                'columns' : columns.data,
+                'types' : types
+            },
+            subchart: {
+                show: true
+            },
+            zoom: {
+                enabled: true
+            },
+            legend: {
+                position : 'right'
+            },
+            groups: config.groups
+        };
+
+        if (gtypes[0] == "string")
+        {
+            c3config["axis"] = {
+                "x": {
+                    "type": "category",
+                    "categories": [].concat.apply([],
+                      dex.matrix.uniques(dex.matrix.slice(csv.data, [0]))).sort()
+                }
+            }
+        }
+
+        //dex.console.log("CATEGORIES", c3config);
+        internalChart = c3.generate(c3config);
+    };
+
+    chart.update = function () {
+        var chart = this;
+        var config = chart.config;
+        var csv = config.csv;
+
+        var gtypes = dex.csv.guessTypes(csv);
+
+        var ncsv = dex.csv.columnSlice(csv, selectedColumns);
+        var columns = dex.csv.transpose(ncsv);
+
+        for (var ci = 0; ci < columns.header.length; ci++) {
+            columns.data[ci].unshift(columns.header[ci]);
+        }
+
+        var types = {};
+        dex.range(1, ncsv.header.length)
+          .map(function(hi) { types[ncsv.header[hi-1]] = config.linktype; });
+
+        var c3config = {
+            'columns' : columns.data
+        };
+
+        //internalChart.groups(config.groups);
+        internalChart.load(c3config);
+    };
+
+    $(document).ready(function () {
+        // Make the entire chart draggable.
+        //$(chart.config.parent).draggable();
+    });
+
+    return chart;
+};
+
+module.exports = linechart;
+},{}],6:[function(require,module,exports){
+/**
+ *
+ * @constructor
+ * @name StackedAreaChart
+ * @classdesc This class constructs a c3 stacked area chart.
+ * @memberOf dex.charts.c3
+ * @implements {dex/component}
+ *
+ * @example {@lang javascript}
+ * var areachart = dex.charts.c3.BarChart({
+ *   'parent' : "#AreaChart",
+ *   'id'     : "AreaChart"
+ *   'csv'    : { header : [ "X", "Y", "Z" ],
+ *                data   : [[ 1, 2, 3 ], [4, 5, 6], [7, 8, 9]]}
+ * });
+ *
+ * @param {object} userConfig - A user supplied configuration object which will override the defaults.
+ * @param {string} userConfig.parent - The parent node to which this Axis will be attached.  Ex: #MyParent
+ * will attach to a node with an id = "MyParent".
+ * @param {string} [userConfig.id=Axis] - The id of this axis.
+ * @param {string} [userConfig.class=Axis] - The class of this axis.
+ * @param {csv} userConfig.csv - The user's CSV data.
+ *
+ * @inherit module:dex/component
+ *
+ */
+var stackedareachart = function (userConfig) {
+    var chart;
+
+    var defaults =
+    {
+        // The parent container of this chart.
+        'parent': '#AreaChart',
+        // Set these when you need to CSS style components independently.
+        'id': 'AreaChart',
+        'class': 'AreaChart',
+        'resizable': true,
+        'csv': {
+            'header': [],
+            'data': []
+        },
+        'width': "100%",
+        'height': "100%",
+        'transform': "translate(0 0)",
+    };
+
+    var chart = new dex.component(userConfig, defaults);
+
+    chart.render = function render() {
+        window.onresize = this.resize;
+        chart.resize();
+    };
+
+    chart.resize = function resize() {
+        if (chart.config.resizable) {
+            var width = d3.select(chart.config.parent).property("clientWidth");
+            var height = d3.select(chart.config.parent).property("clientHeight");
+            dex.console.log(chart.config.id + ": resize(" + width + "," + height + ")");
+            chart.attr("width", width).attr("height", height).update();
+        }
+        else {
+            chart.update();
+        }
+    };
+
+    chart.update = function () {
+        var chart = this;
+        var config = chart.config;
+        var csv = config.csv;
+
+        var gtypes = dex.csv.guessTypes(csv);
+        var ncsv = dex.csv.numericSubset(csv);
+        var columns = dex.csv.transpose(ncsv);
+
+        for (var ci = 0; ci < columns.header.length; ci++) {
+            columns.data[ci].unshift(columns.header[ci]);
+        }
+
+        var types = {};
+        dex.range(1, ncsv.header.length)
+            .map(function(hi) { types[ncsv.header[hi-1]] = 'area-spline'; });
+
+        var c3config = {
+            'bindto' : config.parent,
+            'data': {
+                'columns': columns.data,
+                'types': types,
+                'groups' : [ columns.header ],
+                color : d3.scale.category20()
+            },
+            subchart: {
+                show: true
+            },
+            zoom: {
+                enabled: true
+            },
+            legend: {
+                position : 'right'
+            }
+        };
+
+        // Set categorical axis if first column is a string.
+        if (gtypes[0] == "string")
+        {
+            c3config['axis'] = { 'x' : {
+                'type' : 'category',
+                'label' : { 'text' : csv.header[0],
+                'position' : 'outer-center' },
+                'categories': dex.csv.transpose(dex.csv.columnSlice(csv, [0])).data[0]
+            }};
+        }
+
+        var chart = c3.generate(c3config);
+    };
+
+    $(document).ready(function () {
+        // Make the entire chart draggable.
+        //$(chart.config.parent).draggable();
+    });
+
+    return chart;
+};
+
+module.exports = stackedareachart;
+},{}],7:[function(require,module,exports){
+/**
+ *
+ * @constructor
+ * @name StackedBarChart
+ * @classdesc This class constructs a c3 stacked bar chart.
+ * @memberOf dex.charts.c3
+ * @implements {dex/component}
+ *
+ * @example {@lang javascript}
+ * var areachart = dex.charts.c3.BarChart({
+ *   'parent' : "#AreaChart",
+ *   'id'     : "AreaChart"
+ *   'csv'    : { header : [ "X", "Y", "Z" ],
+ *                data   : [[ 1, 2, 3 ], [4, 5, 6], [7, 8, 9]]}
+ * });
+ *
+ * @param {object} userConfig - A user supplied configuration object which will override the defaults.
+ * @param {string} userConfig.parent - The parent node to which this Axis will be attached.  Ex: #MyParent
+ * will attach to a node with an id = "MyParent".
+ * @param {string} [userConfig.id=Axis] - The id of this axis.
+ * @param {string} [userConfig.class=Axis] - The class of this axis.
+ * @param {csv} userConfig.csv - The user's CSV data.
+ *
+ * @inherit module:dex/component
+ *
+ */
+var stackedbarchart = function (userConfig) {
+    var chart;
+
+    var defaults =
+    {
+        // The parent container of this chart.
+        'parent': '#BarChart',
+        // Set these when you need to CSS style components independently.
+        'id': 'BarChart',
+        'class': 'BarChart',
+        'resizable': true,
+        'csv': {
+            'header': [],
+            'data': []
+        },
+        'width': "100%",
+        'height': "100%",
+        'transform': "translate(0 0)",
+    };
+
+    var chart = new dex.component(userConfig, defaults);
+
+    chart.render = function render() {
+        window.onresize = this.resize;
+        chart.resize();
+    };
+
+    chart.resize = function resize() {
+        if (chart.config.resizable) {
+            var width = d3.select(chart.config.parent).property("clientWidth");
+            var height = d3.select(chart.config.parent).property("clientHeight");
+            dex.console.log(chart.config.id + ": resize(" + width + "," + height + ")");
+            chart.attr("width", width).attr("height", height).update();
+        }
+        else {
+            chart.update();
+        }
+    };
+
+    chart.update = function () {
+        var chart = this;
+        var config = chart.config;
+        var csv = config.csv;
+
+        var gtypes = dex.csv.guessTypes(csv);
+        var ncsv = dex.csv.numericSubset(csv);
+        var columns = dex.csv.transpose(ncsv);
+
+        for (var ci = 0; ci < columns.header.length; ci++) {
+            columns.data[ci].unshift(columns.header[ci]);
+        }
+
+        var c3config = {
+            'bindto' : config.parent,
+            'data': {
+                'columns': columns.data,
+                'type': 'bar',
+                color : d3.scale.category20(),
+                'groups' : [ columns.header ]
+            },
+            'bar': {'width': { 'ratio': 0.9 }},
+            subchart: {
+                show: true
+            },
+            zoom: {
+                enabled: true
+            },
+            legend: {
+                position : 'right'
+            }
+        };
+
+        // Set categorical axis if first column is a string.
+        if (gtypes[0] == "string")
+        {
+            c3config['axis'] = { 'x' : {
+                'type' : 'category',
+                'label' : { 'text' : csv.header[0],
+                'position' : 'outer-center' },
+                'categories': dex.csv.transpose(dex.csv.columnSlice(csv, [0])).data[0]
+            }};
+        }
+
+        var chart = c3.generate(c3config);
+    };
+
+    $(document).ready(function () {
+        // Make the entire chart draggable.
+        //$(chart.config.parent).draggable();
+    });
+
+    return chart;
+}
+
+module.exports = stackedbarchart;
+},{}],8:[function(require,module,exports){
+/**
+ *
+ * This module provides C3 based visualization components.
+ *
+ * @module dex/charts/c3
+ * @name c3
+ * @memberOf dex.charts
+ *
+ */
+var c3 = {};
+
+c3.AreaChart = require("./AreaChart");
+c3.BarChart = require("./BarChart");
+c3.LineChart = require("./LineChart");
+c3.StackedAreaChart = require("./StackedAreaChart");
+c3.StackedBarChart = require("./StackedBarChart");
+
+module.exports = c3;
+},{"./AreaChart":3,"./BarChart":4,"./LineChart":5,"./StackedAreaChart":6,"./StackedBarChart":7}],9:[function(require,module,exports){
+/**
+ *
+ * This module provides visualization components for charting
+ * out of a diverse set of base implementations ranging from
+ * D3 to three.js and WebGL.
+ *
+ * @module dex/charts
+ * @name charts
+ * @memberOf dex
+ *
+ */
+var charts = {};
+
+charts.c3 = require("./c3/c3");
+charts.d3 = require("./d3/d3");
+charts.d3plus = require("./d3plus/d3plus");
+charts.dygraphs = require("./dygraphs/dygraphs");
+charts.google = require("./google/google");
+charts.threejs= require("./threejs/threejs");
+
+module.exports = charts;
+},{"./c3/c3":8,"./d3/d3":36,"./d3plus/d3plus":38,"./dygraphs/dygraphs":40,"./google/google":46,"./threejs/threejs":48}],10:[function(require,module,exports){
+/**
+ *
+ * @constructor
+ * @name Axis
+ * @classdesc This class constructs a d3 Axis.
+ * @memberOf dex.charts.d3
+ * @implements {dex/component}
+ *
+ * @example {@lang javascript}
+ * var axis = dex.charts.d3.Axis({
+ *   'parent' : "#MyAxisContainer",
+ *   'id'     : "MyAxisId"
+ *   'csv'    : { header : [ "X", "Y", "Z" ],
+ *                data   : [[ 1, 2, 3 ], [4, 5, 6], [7, 8, 9]]}
+ * });
+ * @param {object} userConfig - A user supplied configuration object which will override the defaults.
+ * @param {string} userConfig.parent - The parent node to which this Axis will be attached.  Ex: #MyParent
+ * will attach to a node with an id = "MyParent".
+ * @param {string} [userConfig.id=Axis] - The id of this axis.
+ * @param {string} [userConfig.class=Axis] - The class of this axis.
+ * @param {csv} userConfig.csv - The user's CSV data.
+ * @param {margin} userConfig.margin - The margin data.
+ * @param {integer} [userConfig.margin.left=25] - The number of pixels to allocate to the left margin.
+ * @param {integer} [userConfig.margin.right=25] - The number of pixels to allocate to the right margin.
+ * @param {integer} [userConfig.margin.top=0] - The number of pixels to allocate the top margin.
+ * @param {integer} [userConfig.margin.bottom=0] - The number of pixels to allocate the bottom margin.
+ * @param {string}  [userConfig.transform=translate(0,2)] - A SVG transform string.  More information can be found
+ * in the {@link http://www.w3.org/TR/SVG/coords.html#TransformAttribute|W3C SVG 1.1 Specification}.
+ * @param {integer} [userConfig.column=0] The column within the supplied CSV to use to generate the Axis.
+ * @param {d3axis_spec} [userConfig.axis] - A D3 axis specification.
+ * @param {d3text} [userConfig.title] - A D3 text specification for the title of this axis.
+ *
+ * @inherit module:component
+ *
+ */
+var axis = function (userConfig) {
+  var defaults =
+  {
+    // The parent container of this chart.
+    'parent'            : null,
+    // Set these when you need to CSS style components independently.
+    'id'                : 'Axis',
+    'class'             : 'Axis',
+    // Our data...
+    'csv'               : {
+      'header' : ["X", "Y"],
+      'data'   : [
+        [0, 0],
+        [1, 1],
+        [2, 4],
+        [3, 9],
+        [4, 16]
+      ]
+    },
+    'margin'            : {
+      'left'   : 25,
+      'right'  : 25,
+      'top'    : 0,
+      'bottom' : 0
+    },
+    // Something is slightly off, why must I do this y offset?
+    'transform'         : 'translate(0,2)',
+    'column'            : 0,
+    'axis'              : dex.config.axis({
+      'type'     : 'linear',
+      'orient'   : 'bottom',
+      'scale'    : dex.config.scale({'type' : 'linear'}),
+      'ticks'    : 5,
+      'tickSize' : 10,
+      'tickLine' : dex.config.line({
+        'stroke' : dex.config.stroke({'color' : 'black', 'width' : 2}),
+        'fill'   : dex.config.fill({'fillColor' : 'none'})
+      }),
+      'path'     : dex.config.path({
+        'fill'   : dex.config.fill({'fillColor' : 'none'}),
+        'stroke' : dex.config.stroke({'color' : 'black', 'width' : 2})
+      })
+    }),
+    'title.text'        : 'axis',
+    'title.anchor'      : 'middle',
+    'title.color'       : 'red',
+    'title.y'           : -8,
+    'title.font.weight' : 'italic',
+    'title.transform'   : function (d, i) {
+      return 'translate(' + (chart.config.width / 2) +
+        ',' + (chart.config.height - chart.config.margin.bottom) + ')';
+    }
+  };
+
+  console.log("Creating axis...");
+  console.dir(userConfig);
+  var chart = new dex.component(userConfig, defaults);
+  console.dir(chart);
+  /**
+   *
+   * Render the axis.
+   *
+   */
+  chart.render = function render() {
+    window.onresize = this.resize;
+    chart.resize();
+  };
+
+  /**
+   *
+   * Resize the axis.
+   *
+   */
+  chart.resize = function resize() {
+    var width = d3.select(chart.config.parent).property("clientWidth");
+    var height = d3.select(chart.config.parent).property("clientHeight");
+    chart.attr("width", width).attr("height", height).update();
+  };
+
+  /**
+   *
+   * Something has changed, update the axis.
+   *
+   */
+  chart.update = function update() {
+    var chart = this;
+    var config = chart.config;
+    var axis = d3.svg.axis();
+
+    dex.console.trace("axis.update()", config);
+
+    // Create an axis based upon our dimensions and margins.  Regenerated every
+    // time because of resize events.
+    config.axis.scale.range = [config.margin.left, config.width - config.margin.right];
+    config.axis.scale.domain = dex.matrix.extent(config.csv.data, [config.column - 1]);
+    console.log(config.id + ":" + config.width + "x" + config.height + ", domain: " +
+    config.axis.scale.domain + ", range: " + config.axis.scale.range);
+    var axisScale = dex.config.createScale(config.axis.scale);
+    dex.console.log(config.axis.scale);
+
+    dex.config.configureAxis(axis, config.axis)
+      .scale(axisScale);
+
+    // Remove the old chart, ideally, we would prefer to update in place, but
+    // too many issues to conquer before I get to that.  However, reproducing
+    // visuals from scratch at each update does severely limit efficiency.
+    d3.selectAll("#" + chart.config.id).remove();
+
+    var chartContainer = d3.select(config.parent)
+      .append("g")
+      .attr("class", config["class"])
+      .attr("id", config["id"])
+      .attr("transform", config.transform)
+      .call(axis);
+
+    // Axis path is drawn like this:
+    // <path class="domain" d="M25,10V0H884V10" style="..."></path>
+    //
+    // Decomposing the value for the "d" attribute:
+    //
+    // M25,10 > Move pen to location (x,y) = (25,10)
+    // V0     > Draw a line to (25, 0) > Draws the left tick.
+    // H884   > Draw a line from (25,0) to (884, 0) > Draws axis line.
+    // V10    > Draw a line from (884, 0) to (884, 10)
+    //
+    // This pen has styling options applied.
+
+    chartContainer.select('path')
+      .call(dex.config.configurePath, config.axis.path);
+
+    var lines = chartContainer
+      .selectAll('.tick line')
+      .call(dex.config.configureLine, config.axis.tickLine);
+
+    chartContainer.append("text")
+      .call(dex.config.configureText, dex.config.text(config.title));
+  };
+
+  return chart;
+};
+
+module.exports = axis;
+},{}],11:[function(require,module,exports){
+/**
+ *
+ * @constructor
+ * @classdesc This class constructs a d3 Axis.
+ * @memberOf dex
+ *
+ * @example {@lang javascript}
+ * var myAxis = new dex.charts.d3.Axis({
+ *   'parent' : "#MyAxisContainer",
+ *   'id'     : "MyAxisId"
+ *   'csv'    : { header : [ "X", "Y", "Z" ],
+ *                data   : [[ 1, 2, 3 ], [4, 5, 6], [7, 8, 9]]}
+ * });
+ * @param {object} userConfig - A user supplied configuration object which will override the defaults.
+ * @param {string} userConfig.parent - The parent node to which this Axis will be attached.  Ex: #MyParent
+ * will attach to a node with an id = "MyParent".
+ * @param {string} [userConfig.id=Axis] - The id of this axis.
+ * @param {string} [userConfig.class=Axis] - The class of this axis.
+ * @param {csv} userConfig.csv - The user's CSV data.
+ * @param {margin} userConfig.margin - The margin data.
+ * @param {integer} [userConfig.margin.left=25] - The number of pixels to allocate to the left margin.
+ * @param {integer} [userConfig.margin.right=25] - The number of pixels to allocate to the right margin.
+ * @param {integer} [userConfig.margin.top=0] - The number of pixels to allocate the top margin.
+ * @param {integer} [userConfig.margin.bottom=0] - The number of pixels to allocate the bottom margin.
+ * @param {string}  [userConfig.transform=translate(0,2)] - A SVG transform string.  More information can be found
+ * in the {@link http://www.w3.org/TR/SVG/coords.html#TransformAttribute|W3C SVG 1.1 Specification}.
+ * @param {integer} [userConfig.column=0] The column within the supplied CSV to use to generate the Axis.
+ * @param {d3axis_spec} [userConfig.axis] - A D3 axis specification.
+ * @param {d3text_spec} [userConfig.title] - A D3 text specification for the title of this axis.
+ *
+ */
+var barchart = function (userConfig) {
+  var config;
+
+  var defaults =
+  {
+    // The parent container of this chart.
+    'parent'     : null,
+    // Set these when you need to CSS style components independently.
+    'id'         : 'BarChart',
+    'class'      : 'BarChart',
+    'resizeable' : true,
+    // Our data...
+    'csv'        : {
+      // Give folks without data something to look at anyhow.
+      'header' : ["X", "Y"],
+      'data'   : [
+        [0, 0],
+        [1, 1],
+        [2, 4],
+        [3, 9],
+        [4, 16]
+      ]
+    },
+    'ymin'       : 0,
+    'xmin'       : 0,
+    'xaxis'      : dex.config.axis({
+      'type'   : 'linear',
+      'orient' : 'bottom',
+      'label'  : dex.config.text()
+    }),
+    'yaxis'      : dex.config.axis({
+      'type'   : 'linear',
+      'orient' : 'left',
+      'label'  : dex.config.text()
+    }),
+    // width and height of our bar chart.
+    'width'      : "100%",
+    'height'     : "100%",
+    // The x an y indexes to chart.
+    'xi'         : 0,
+    'yi'         : [1],
+    'transform'  : 'translate(100 100)',
+    'color'      : d3.scale.category20(),
+    'bars'       : {
+      'mouseover' : dex.config.rectangle({
+        'stroke' : {'width' : 2, 'color' : "red"},
+        'color'  : function (d) {
+          return config.color(d[3]);
+        }
+      }),
+      'mouseout'  : dex.config.rectangle({
+          'color' : function (d) {
+            return config.color(d[3]);
+          }
+        }
+      )
+    }
+  };
+
+  // Things defined in terms of the defaults:
+  var chart = new dex.component(userConfig, defaults);
+  var config = chart.config;
+
+  // Replace the scale configuration with a real scale.
+  var xscale = dex.config.createScale(dex.config.scale(config.xaxis.scale));
+  config.xaxis.scale = xscale;
+  // Replace the scale configuration with a real scale.
+  var yscale = dex.config.createScale(dex.config.scale(config.yaxis.scale));
+  config.yaxis.scale = yscale;
+
+  config.bars.mouseover.height = config.bars.mouseout.height =
+    function (d) {
+      return config.height - yscale(d[1]);
+    };
+
+  config.bars.mouseout.width = config.bars.mouseover.width =
+    xscale(config.csv.data[1][config.xi]) - xscale(config.csv.data[0][config.xi]);
+
+  config.bars.mouseout.x = config.bars.mouseover.x = function (d) {
+    return xscale(d[0])
+  };
+
+  config.bars.mouseout.y = config.bars.mouseover.y = function (d) {
+    return yscale(d[1])
+  };
+
+  var data = config.csv.data;
+
+  // Translate all of the y data columns to numerics.
+  data.forEach(function (d) {
+    config.yi.forEach(function (c) {
+      d[c] = +d[c];
+    });
+  });
+
+  var yextent = dex.matrix.extent(data, config.yi);
+
+  if (config.ymin != null) {
+    yextent[0] = config.ymin;
+  }
+  if (config.ymax != null) {
+    yextent[1] = config.ymax;
+  }
+
+  config.yaxis.scale.domain(yextent);
+
+  chart.render = function render() {
+    window.onresize = this.resize;
+    chart.resize();
+  };
+
+  chart.resize = function resize() {
+    if (config.resizeable) {
+      var width = d3.select(config.parent).property("clientWidth");
+      var height = d3.select(config.parent).property("clientHeight");
+      chart.attr("width", width).attr("height", height).update();
+    }
+    else {
+      chart.update();
+    }
+  };
+
+  chart.update = function update() {
+
+    d3.selectAll("#" + config.id).remove();
+
+    var xaxis = dex.config.createAxis(config.xaxis);
+
+    var yaxis = dex.config.createAxis(config.yaxis);
+    //dex.config.configureAxis(yaxis, config.yaxis);
+
+    var chartContainer = d3.select(config.parent).append("g")
+      .attr("id", config["id"])
+      .attr("class", config["class"])
+      .attr("transform", config.transform);
+
+    // X Axis
+    chartContainer.append("g")
+      .attr("class", "xaxis")
+      .attr("transform", "translate(0," + config.height + ")")
+      .call(xaxis);
+
+    // Add the label
+    chartContainer.select(".xaxis").append("text")
+      .call(dex.config.configureText, config.xaxis.label);
+
+    // Y Axis
+    chartContainer.append("g")
+      .attr("class", "yaxis")
+      .call(yaxis);
+
+    chartContainer.select(".yaxis").append("text")
+      .call(dex.config.configureText, config.yaxis.label);
+
+    var barData = dex.matrix.combine(
+      dex.matrix.slice(data, [config.xi]),
+      dex.matrix.slice(data, config.yi)
+    );
+
+    //dex.console.log("CSV DATA", csv);
+    //dex.console.log("BAR DATA", barData);
+    chartContainer.selectAll(".bar")
+      .data(barData)
+      .enter().append("rect")
+      .call(dex.config.configureRectangle, config.bars.mouseout)
+      .on("mouseover", function () {
+        d3.select(this).call(dex.config.configureRectangle, config.bars.mouseover);
+      })
+      .on("mouseout", function () {
+        d3.select(this).call(dex.config.configureRectangle, config.bars.mouseout);
+      });
+  };
+
+  $(document).ready(function () {
+    // Make the entire chart draggable.
+    //$(chart.config.parent).draggable();
+  });
+
+  return chart;
+};
+
+module.exports = barchart;
+},{}],12:[function(require,module,exports){
+var chord = function (userConfig) {
+  var chart;
+
+  var defaults =
+  {
+    // The parent container of this chart.
+    'parent'       : '#ChordDiagram',
+    // Set these when you need to CSS style components independently.
+    'id'           : 'Chord',
+    'class'        : 'Chord',
+    'resizable'   : true,
+    // Our data...
+    'csv'          : {
+      // Give folks without data something to look at anyhow.
+      'header' : ["X", "Y", "Z"],
+      'data'   : [
+        [0, 0, 0],
+        [1, 1, 1],
+        [2, 2, 2]
+      ]
+    },
+    'width'        : "100%",
+    'height'       : "100%",
+    'transform'    : "translate(0 0)",
+    'padding'      : 0.05,
+    'nodes'        : {
+      'mouseout'  : dex.config.link(
+        {
+          'stroke.color'     : "black",
+          //'stroke.dasharray': '5 5',
+          'stroke.width'     : 1,
+          'fill.fillColor'   : function (d, i) {
+            //dex.console.log("COLORD", d);
+            return (chart.config.color(d.index));
+          },
+          'fill.fillOpacity' : 0.5,
+          'fill.fill'        : 'none',
+          'd'                : d3.svg.arc(),
+          'transform'        : ''
+        }),
+      'mouseover' : dex.config.link(
+        {
+          'stroke.color'     : "red",
+          //'stroke.dasharray': '5 5',
+          'stroke.width'     : 1,
+          'fill.fillColor'   : function (d, i) {
+            //dex.console.log("COLORD", d);
+            return (chart.config.color(d.index));
+          },
+          'fill.fillOpacity' : 1,
+          'fill.fill'        : 'none',
+          'd'                : d3.svg.arc(),
+          'transform'        : ''
+        })
+    },
+    'links'        : {
+      'mouseout'  : dex.config.link(
+        {
+          'stroke.color'     : "grey",
+          'stroke.dasharray' : '',
+          'stroke.width'     : 0,
+          'fill.fillColor'   : function (d, i) {
+            return (chart.config.color(d.target.index));
+          },
+          'fill.fillOpacity' : 0.5,
+          'fill.fill'        : 'none',
+          'd'                : d3.svg.chord(),
+          'transform'        : ''
+        }),
+      'mouseover' : dex.config.link(
+        {
+          'stroke.color'     : "red",
+          'stroke.dasharray' : '',
+          'stroke.width'     : 0,
+          'fill.fillColor'   : function (d, i) {
+            return (chart.config.color(d.target.index));
+          },
+          'transform'        : "",
+          'fill.fillOpacity' : 1,
+          'fill.fill'        : 'none',
+          'd'                : d3.svg.chord()
+        })
+    },
+//                .style("fill", function (d) {
+//        return chart.config.color(d.index);
+//      })
+    'color'        : d3.scale.category20(),
+    'innerRadius'  : 130,
+    'outerRadius'  : 200,
+    'tick.start.x' : 1,
+    'tick.start.y' : 0,
+    'tick.end.x'   : 5,
+    'tick.end.y'   : 0,
+    'tick.padding' : 10,
+    'tick.stroke'  : dex.config.stroke(
+      {
+        'width' : 2,
+        'color' : 'black'
+        //'dasharray' : '1 2'
+      }),
+    'title'        : dex.config.text(),
+    'label'        : dex.config.text()
+  };
+
+  var chart = new dex.component(userConfig, defaults);
+
+  chart.render = function render() {
+    window.onresize = this.resize;
+    chart.resize();
+  };
+
+  chart.resize = function resize() {
+    if (chart.config.resizable) {
+      var width = d3.select(chart.config.parent).property("clientWidth");
+      var height = d3.select(chart.config.parent).property("clientHeight");
+      dex.console.log(chart.config.id + ": resize(" + width + "," + height + ")");
+      chart.attr("width", width).attr("height", height).update();
+    }
+    else {
+      chart.update();
+    }
+  };
+
+  chart.update = function () {
+    var chart = this;
+    var config = chart.config;
+    var csv = config.csv;
+
+    d3.selectAll("#" + config.id).remove();
+
+    var minDimension = Math.min(config.width, config.height);
+    var outer = Math.min(config.width, config.height) / 3;
+
+    var inner = Math.max(outer - 20, 10);
+    config.innerRadius = inner;
+    config.outerRadius = outer;
+
+    // Calculated attributes.
+    config.nodes.mouseover.d.innerRadius(config.innerRadius).outerRadius(config.outerRadius + 2);
+    config.nodes.mouseout.d.innerRadius(config.innerRadius).outerRadius(config.outerRadius);
+    config.links.mouseover.d.radius(config.innerRadius);
+    config.links.mouseout.d.radius(config.innerRadius);
+
+    chart.attr("transform", "translate(" + (config.width / 2) + "," + (config.height / 2) + ")");
+
+    //console.log("LONGEST: " + longest + ", FONT-SIZE: " + config.label.font.size + ", INNER: " + inner + ", OUTER: " + outer);
+    if (config.debug) {
+      console.log("===== Chord#" + config.id + "." + config.class +
+      " Configuration =====");
+      console.dir(config);
+    }
+
+    var chartContainer = d3.select(config.parent)
+      .append("g")
+      .attr("class", config["id"])
+      .attr("id", config["id"])
+      .attr("transform", config.transform);
+
+    chordData = dex.csv.getConnectionMatrix(csv);
+    //dex.console.log("Connection Matrix:", chordData);
+    //dex.console.log("CSV", csv);
+    var chord = d3.layout.chord()
+      .padding(config.padding)
+      .sortSubgroups(d3.descending)
+      .matrix(chordData.connections);
+
+    //dex.console.log("LINKS", config.links);
+
+    chartContainer.append("g")
+      .selectAll("path")
+      .data(chord.groups)
+      .enter().append("path")
+      .attr("id", "fillpath")
+      .call(dex.config.configureLink, config.nodes.mouseout)
+      .on("mouseover", function (activeChord) {
+        d3.select(this).call(dex.config.configureLink, config.nodes.mouseover);
+        //dex.console.log("F", activeChord);
+        d3.selectAll("g.chord path")
+          .filter(function (d) {
+            //return false;
+            //dex.console.log("ACTIVE D", d);
+            return d.source.index == activeChord.index || d.target.index == activeChord.index;
+          })
+          //.call("opacity", config.links.mouseover.fill.fillOpacity);
+          .call(dex.config.configureLink, config.links.mouseover);
+      })
+      .on("mouseout", function (inactiveChord) {
+        d3.select(this)
+          .call(dex.config.configureLink, config.nodes.mouseout)
+        //dex.console.log("INACTIVE", inactiveChord);
+        d3.selectAll("g.chord path")
+          .filter(function (d) {
+            //return false;
+            //dex.console.log("INACTIVE D", d);
+            return d.source.index == inactiveChord.index || d.target.index == inactiveChord.index;
+          })
+          .call(dex.config.configureLink, config.links.mouseout);
+        //.style("opacity", config.links.mouseout.fill.fillOpacity);
+      });
+
+    // REM: Used to be svg.
+    var ticks = chartContainer.append("g")
+      .attr("id", "ChordTicks")
+      .selectAll("g")
+      .data(chord.groups)
+      .enter().append("g")
+      .selectAll("g")
+      .data(groupTicks)
+      .enter().append("g")
+      .attr("transform", function (d) {
+        //console.dir(d);
+        // Probably a bad idea, but getting parent angle data from parent.
+        var startAngle = this.parentNode.__data__.startAngle;
+        var endAngle = this.parentNode.__data__.endAngle;
+        var midAngle = startAngle + (endAngle - startAngle) / 2.0;
+        return "rotate(" + (midAngle * 180 / Math.PI - 90) + ")"
+          + "translate(" + config.outerRadius + ",0)";
+        //return "translate(" + config.xoffset + "," + config.yoffset + ")rotate(" + (midAngle * 180 / Math.PI - 90) + ")"
+        //    + "translate(" + config.outerRadius + ",0)";
+        //return "translate(" + config.xoffset + "," + config.yoffset + ")rotate(" + (d.angle * 180 / Math.PI - 90) + ")"
+        //    + "translate(" + config.outerRadius + ",0)";
+      });
+
+    ticks.append("line")
+      .call(dex.config.configureLine, config.tick);
+    //.attr("x1", 1)
+    //.attr("y1", 0)
+    //.attr("x2", config.tickLength)
+    //.attr("y2", 0)
+    //.attr("stroke-width", config.strokeWidth)
+    //.style("stroke", "#000");
+
+    ticks.append("text")
+      .attr("x", config.tick.padding + (config.tick.padding / 4))
+      .attr("dy", ".35em")
+      .attr("font-size", config.label.font.size)
+      .attr("text-anchor", function (d) {
+        return d.angle > Math.PI ? "end" : null;
+      })
+      .attr("transform", function (d) {
+        return d.angle > Math.PI ? "rotate(180)translate(-" +
+        ((config.tick.padding * 2) + (config.tick.padding / 2)) + ")" : null;
+      })
+      .text(function (d) {
+        return d.label;
+      });
+
+    chartContainer.append("g")
+      .attr("class", "chord")
+      .selectAll("path")
+      .data(chord.chords)
+      .enter().append("path")
+      .call(dex.config.configureLink, config.links.mouseout)
+      .on("mouseover", function () {
+        d3.select(this)
+          .call(dex.config.configureLink, config.links.mouseover);
+      })
+      .on("mouseout", function () {
+        d3.select(this)
+          .call(dex.config.configureLink, config.links.mouseout);
+      });
+
+    var chartTitle = chartContainer.append("text").call(dex.config.configureText, config.title,
+      config.title.text);
+
+    /** Returns an array of tick angles and labels, given a group. */
+    function groupTicks(d) {
+      var k = (d.endAngle - d.startAngle) / d.value;
+      return d3.range(0, d.value, 1000).map(function (v, i) {
+        return {
+          angle : v * k + d.startAngle,
+          //label: i % 5 ? null : v / 1000 + "k"
+          label : chordData.header[d.index]
+        };
+      });
+    }
+  };
+
+  $(document).ready(function () {
+    // Make the entire chart draggable.
+    //$(chart.config.parent).draggable();
+  });
+
+  return chart;
+}
+
+module.exports = chord;
+},{}],13:[function(require,module,exports){
+var clusteredforce = function (userConfig) {
+
+  var defaults =
+  {
+    'parent'         : null,
+    'id'             : "ClusteredForce",
+    'class'          : "ClusteredForce",
+    'height'         : "100%",
+    'width'          : "100%",
+    'csv'            : {
+      'header' : ["X", "Y"],
+      'data'   : [
+        [0, 0],
+        [1, 1],
+        [2, 4],
+        [3, 9],
+        [4, 16]
+      ]
+    },
+    'xi'             : 0,
+    'yi'             : 2,
+    'transform'      : '',
+    'color'          : d3.scale.category20(),
+    'padding'        : 10,
+    // TODO: Add normalization function.
+    'sizingFunction' : function () {
+      return d3.scale.linear()
+    },
+    'minRadius'      : 1,
+    'maxRadius'      : 20,
+    'gravity'        : 10,
+    'charge'         : -100,
+    'scaleColumns'   : true,
+    'circle'         : dex.config.circle({
+      'r'         : function (d) {
+        return (dex.object.isNumeric(d.radius) ? d.radius : 1);
+      },
+      'fill'      : dex.config.fill({
+        'fillColor' : function (d) {
+          return d.color;
+        }
+      }),
+      'stroke'    : dex.config.stroke(),
+      'tooltip'   : function (d) {
+        return d.text;
+      },
+      'transform' : ''
+    })
+  };
+
+  var chart = new dex.component(userConfig, defaults);
+
+  chart.render = function () {
+    window.onresize = this.resize;
+    chart.resize();
+  };
+
+  chart.resize = function () {
+    d3.selectAll("#" + chart.config.id).remove();
+    var width = d3.select(chart.config.parent).property("clientWidth");
+    var height = d3.select(chart.config.parent).property("clientHeight");
+    chart.attr("width", width).attr("height", height).update();
+  };
+
+  chart.update = function () {
+    var config = chart.config;
+
+    var csv = config.csv;
+    var ri, ci, hi;
+
+    var numericHeaders = dex.csv.getNumericColumnNames(csv);
+    var numericIndices = dex.csv.getNumericIndices(csv);
+
+    var i;
+
+    var m = numericHeaders.length,
+      radius = d3.scale.sqrt().range([0, 12]);
+
+    var n = (dex.length - 1) * numericHeaders.length;
+
+    var minValue, maxValue;
+
+    if (!config.scaleColumns) {
+      minValue = dex.matrix.min(csv.data, numericIndices[0]);
+      maxValue = dex.matrix.max(csv.data, numericIndices[0]);
+      for (i = 0; i < numericIndices.length; i++) {
+        minValue = Math.min(minValue, dex.matrix.min(csv.data, numericIndices[i]));
+        maxValue = Math.max(maxValue, dex.matric.max(csv.data, numericIndices[i]));
+      }
+    }
+
+    var nodes = [];
+
+    function scaleNodes(minRadius, maxRadius) {
+      var numericScales = [];
+
+      for (i = 0; i < numericIndices.length; i++) {
+        if (config.scaleColumns) {
+          minValue = dex.matrix.min(csv.data, numericIndices[i]);
+          maxValue = dex.matrix.max(csv.data, numericIndices[i]);
+        }
+
+        //console.log("I: " + i + ", MIN: " + minValue + ", MAX: " + maxValue);
+
+        numericScales.push(config.sizingFunction()
+          .domain([minValue, maxValue]).range([config.minRadius, config.maxRadius]));
+      }
+
+      if (nodes.length == 0) {
+        nodes = new Array((csv.data.length - 1) * numericIndices.length);
+      }
+
+      for (ri = 0; ri < csv.data.length; ri++) {
+        dex.console.debug("RI:", ri, csv.data[ri]);
+        for (ci = 0; ci < numericIndices.length; ci++) {
+          var label = "<table border='1'>";
+          for (hi = 0; hi < csv.data[ri].length; hi++) {
+            if (hi == numericIndices[ci]) {
+              label += "<tr><td><b>" + csv.data[0][hi] + "</b></td><td><b>" + csv.data[ri][hi] + "</b></td></tr>";
+            }
+            else {
+              label += "<tr><td>" + csv.data[0][hi] + "</td><td>" + csv.data[ri][hi] + "</td></tr>";
+            }
+          }
+          label += "</table>";
+
+          nodes[(ri) * numericIndices.length + ci] =
+          {
+            radius : numericScales[ci](csv.data[ri][numericIndices[ci]]),
+            //radius: radius(0.1),
+            color  : config.color(ci),
+            text   : label
+          };
+        }
+      }
+    }
+
+    scaleNodes(config.minRadius, config.maxRadius);
+
+    force = d3.layout.force()
+      .nodes(nodes)
+      .size([config.width, config.height])
+      .gravity(config.gravity / 100.0)
+      .charge(config.charge / 100.0)
+      .on("tick", tick)
+      .start();
+
+    var chartContainer = d3.select(config.parent).append("g")
+      .attr("id", config["id"])
+      .attr("class", config["class"])
+      .attr("transform", config.transform);
+
+    var circle = chartContainer.selectAll("circle")
+      .data(nodes)
+      .enter().append("circle")
+      .call(dex.config.configureCircle, config.circle)
+      .call(force.drag);
+
+    circle.append("text")
+      .text(config.circle.tooltip);
+
+    function tick(e) {
+      circle
+        .each(cluster(10 * e.alpha * e.alpha))
+        .each(collide(.5))
+        .attr("radius", function (d) {
+          return (dex.object.isNumeric(d.radius) ? d.radius : 1);
+        })
+        .attr("cx", function (d) {
+          return (dex.object.isNumeric(d.x) ? d.x : 0);
+        })
+        .attr("cy", function (d) {
+          return (dex.object.isNumeric(d.y) ? d.y : 0);
+        });
+    }
+
+    // Move d to be adjacent to the cluster node.
+    function cluster(alpha) {
+      var max = {};
+
+      // Find the largest node for each cluster.
+      nodes.forEach(function (d) {
+        if (!(d.color in max) || (d.radius > max[d.color].radius)) {
+          max[d.color] = d;
+        }
+      });
+
+      return function (d) {
+        var node = max[d.color],
+          l,
+          r,
+          x,
+          y,
+          i = -1;
+
+        if (node == d) return;
+
+        x = d.x - node.x;
+        y = d.y - node.y;
+        l = Math.sqrt(x * x + y * y);
+        r = d.radius + node.radius;
+        if (l != r) {
+          l = (l - r) / l * alpha;
+          d.x -= x *= l;
+          d.y -= y *= l;
+          node.x += x;
+          node.y += y;
+        }
+      };
+    }
+
+    // Resolves collisions between d and all other circles.
+    function collide(alpha) {
+      var quadtree = d3.geom.quadtree(nodes);
+      return function (d) {
+        var r = d.radius + radius.domain()[1] + config.padding,
+          nx1 = d.x - r,
+          nx2 = d.x + r,
+          ny1 = d.y - r,
+          ny2 = d.y + r;
+        quadtree.visit(function (quad, x1, y1, x2, y2) {
+          if (quad.point && (quad.point !== d)) {
+            var x = d.x - quad.point.x,
+              y = d.y - quad.point.y,
+              l = Math.sqrt(x * x + y * y),
+              r = d.radius + quad.point.radius + (d.color !== quad.point.color) * config.padding;
+            if (l < r) {
+              l = (l - r) / l * alpha;
+              d.x -= x *= l;
+              d.y -= y *= l;
+              quad.point.x += x;
+              quad.point.y += y;
+            }
+          }
+          return x1 > nx2
+            || x2 < nx1
+            || y1 > ny2
+            || y2 < ny1;
+        });
+      };
+    }
+  };
+
+  $(document).ready(function () {
+    $(chart.config.parent).tooltip({
+      items    : "circle",
+      content  : function () {
+        return $(this).find("text").text();
+      },
+      track    : true
+    });
+
+    // Make the entire chart draggable.
+    //$(chart.config.parent).draggable();
+  });
+
+  return chart;
+};
+
+module.exports = clusteredforce;
+},{}],14:[function(require,module,exports){
+var dendrogram = function Dendrogram(userConfig) {
+  var defaults =
+  {
+    // The parent container of this chart.
+    'parent'      : null,
+    // Set these  when you need to CSS style components independently.
+    'id'          : 'Dendrogram',
+    'class'       : 'Dendrogram',
+    'resizable'   : true,
+    'connectType' : 'elbow',
+    // Our data...
+    'csv'        : {
+      // Give folks without data something to look at anyhow.
+      'header' : ["X", "Y"],
+      'data'   : [
+        [0, 0],
+        [1, 1],
+        [2, 4],
+        [3, 9],
+        [4, 16]
+      ]
+    },
+    // width and height of our chart.
+    'width'      : "100%",
+    'height'     : "100%",
+    'connection' : {
+      'length' : 180,
+      'style'  : {
+        'stroke' : dex.config.stroke()
+      }
+    },
+    'transform'  : 'translate(20,0)',
+    'root'       : {
+      'name'     : "ROOT",
+      'category' : "ROOT"
+    },
+    'color'      : d3.scale.category20(),
+    'node'       : {
+      'expanded'  : {
+        'label'  : dex.config.text({
+          'x'              : 8,
+          'y'              : 4,
+          'font.weight'    : 'bold',
+          'fill.fillColor' : 'black',
+          'text'           : function (d) {
+            return (d.name) ? d.name : d.category;
+          }
+        }),
+        'circle' : dex.config.circle({
+          'r'    : 4,
+          'fill' : {
+            'fillColor' : 'steelblue'
+          }
+        })
+      },
+      'collapsed' : {
+        'label'  : dex.config.text({
+          'x'           : 8,
+          'y'           : 4,
+          'font.weight' : 'bold',
+          'text'        : function (d) {
+            return (d.name) ? d.name : d.category;
+          }
+        }),
+        'circle' : dex.config.circle({
+          'r'    : 5,
+          'fill' : {
+            'fillColor'   : 'green',
+            'fillOpacity' : .8
+          }
+        })
+      }
+    },
+    'link'       : dex.config.link({
+      'fill'   : {
+        'fillColor' : 'none'
+      },
+      'stroke' : dex.config.stroke({
+        'color'     : 'green',
+        'width'     : 1,
+        'opacity'   : .3,
+        'dasharray' : "5 5"
+      })
+    })
+  };
+
+  var chart = new dex.component(userConfig, defaults);
+
+  chart.render = function render() {
+    var chart = this;
+    window.onresize = chart.resize;
+    chart.resize();
+  };
+
+  chart.resize = function resize() {
+    dex.console.log("PARENT: '" + chart.config.parent + "'");
+    if (chart.config.resizable) {
+      var width = $("" + chart.config.parent).width();
+      var height = $("" + chart.config.parent).height();
+      dex.console.log("RESIZE: " + width + "x" + height);
+      chart.attr("width", width)
+        .attr("height", height)
+        //.attr("connection.length", width / chart.config.csv.header.length -
+        //  ((chart.config.csv.header.length) * chart.config.node.expanded.label.font.size))
+        //.attr("connection.length", 200)
+        .update();
+    }
+    else
+    {
+      chart.update();
+    }
+  };
+
+  chart.update = function update() {
+    var chart = this;
+    var config = chart.config;
+
+    var csv = config.csv;
+    var json;
+
+    d3.selectAll("#" + chart.config.id).remove();
+
+    if (config.debug) {
+      console.log("===== Dendrogram Configuration =====");
+      console.dir(config);
+    }
+
+    var i = 0, root;
+
+    var tree = d3.layout.tree()
+        .size([config.height, config.width]);
+
+    var connectionType;
+
+    if (config.connectionType == "elbow")
+    {
+      connectionType = function elbow(d, i) {
+        return "M" + d.source.y + "," + d.source.x
+          + "V" + d.target.x + "H" + d.target.y;
+      }
+    }
+    else {
+      connectionType = d3.svg.diagonal()
+        .projection(function (d) {
+          return [d.y, d.x];
+        });
+    }
+
+    var chartContainer = d3.select(config.parent)
+        .append("g")
+        .attr("id", config["id"])
+        .attr("class", config["class"])
+        .attr("transform", config.transform);
+
+    var gradient = chartContainer.append("defs")
+      .append("linearGradient")
+      .attr("id", "gradient")
+      .attr("x1", "0%")
+      .attr("y1", "0%")
+      .attr("x2", "100%")
+      .attr("y2", "100%")
+      .attr("spreadMethod", "pad");
+
+    gradient.append("stop")
+      .attr("offset", "0%")
+      .attr("stop-color", "#0c0")
+      .attr("stop-opacity", 1);
+
+    gradient.append("stop")
+      .attr("offset", "100%")
+      .attr("stop-color", "#c00")
+      .attr("stop-opacity", 1);
+
+    json =
+    {
+      "name"     : config.root.name,
+      "category" : config.root.category,
+      "children" : dex.csv.toHierarchicalJson(csv)
+    };
+
+    root = json;
+    root.x0 = config.height / 2;
+    root.y0 = 0;
+
+    function toggleAll(d) {
+      if (d.children) {
+        d.children.forEach(toggleAll);
+        toggle(d);
+      }
+      else if (d.kids) {
+        d.kids.forEach(toggleAll);
+        toggle(d);
+      }
+    }
+
+    // Initialize the display to show a few nodes.
+    //root.kids.forEach(toggleAll);
+
+    chart.root = json;
+    update(chart.root);
+
+    function update(source) {
+      var duration = d3.event && d3.event.altKey ? 5000 : 500;
+      var depthY = new Array();
+
+      // Compute the new tree layout.
+      var nodes = tree.nodes(root).reverse();
+
+      // Allow manually set lengths to be used instead of fixed length connectors
+      var fixedLength = true;
+      if (String(config.connection.length).indexOf(",") > -1)
+      {
+        fixedLength = false;
+        depthY = String(config.connection.length).split(",")
+      }
+
+      // Set y offsets based on single fixed length or manual settings
+      nodes.forEach(function (d) {
+        if (fixedLength)
+        {
+          d.y = d.depth * config.connection.length;
+        }
+        else
+        {
+          d.y = +depthY[d.depth];
+        }
+      });
+
+      // Update the nodes…
+      var node = chartContainer.selectAll("g.node")
+          .data(nodes, function (d) {
+            return d.id || (d.id = ++i);
+          });
+
+      // Enter any new nodes at the parent's previous position.
+      var nodeEnter = node.enter().append("svg:g")
+          .attr("class", "node")
+          .attr("transform", function (d) {
+            return "translate(" + source.y0 + "," + source.x0 + ")";
+          })
+          .on("click", function (d) {
+            toggle(d);
+            update(d);
+          });
+
+      // Come back here...
+      nodeEnter.append("svg:circle")
+          .each(function (d) {
+            //dex.console.log("CALLING", this, d, i);
+            var nodeConfig = (d._children) ?
+                config.node.collapsed.circle : config.node.expanded.circle;
+            d3.select(this).call(dex.config.configureCircle, nodeConfig);
+          })
+          .attr("r", 1e-6);
+
+      // Add text nodes configured like we want them.
+      nodeEnter.append("text")
+          .each(function (d) {
+            var nodeConfig = (d._children) ?
+                config.node.collapsed.label : config.node.expanded.label;
+            d3.select(this).call(dex.config.configureText, nodeConfig);
+          })
+        //.text(function(d) { return (d.name) ? d.name : d.category;})
+          .style("fill-opacity", 1e-6);
+
+      // Transition nodes to their new position.
+      var nodeUpdate = node.transition()
+          .duration(duration)
+          .attr("transform", function (d) {
+            return "translate(" + d.y + "," + d.x + ")";
+          });
+
+      nodeUpdate.selectAll("circle")
+          .each(
+          function (d) {
+            var nodeConfig = (d._children) ?
+                config.node.collapsed.circle : config.node.expanded.circle;
+            d3.select(this).transition().call(dex.config.configureCircle, nodeConfig);
+          });
+
+      nodeUpdate.select("text")
+          .each(
+          function (d) {
+            var nodeConfig = (d._children) ?
+                config.node.collapsed.label : config.node.expanded.label;
+            d3.select(this).call(dex.config.configureText, nodeConfig);
+          })
+          .style("fill-opacity", 1);
+
+      // Transition exiting nodes to the parent's new position.
+      var nodeExit = node.exit().transition()
+          .duration(duration)
+          .attr("transform", function (d) {
+            return "translate(" + (source.y) + "," + (source.x) + ")";
+          })
+          .remove();
+
+      nodeExit.select("circle")
+          .attr("r", 1e-6);
+
+      nodeExit.select("text")
+          .style("fill-opacity", 1e-6);
+
+      // Update the links…
+      var link = chartContainer.selectAll("path.link")
+          .data(tree.links(nodes), function (d) {
+            return d.target.id;
+          });
+
+      // Enter any new links at the parent's previous position.
+      link.enter().insert("svg:path", "g")
+          .attr("class", "link")
+          .call(dex.config.configureLink, config.link)
+        //.style("fill", config.link.fill)
+        //.style("fill-opacity", config.link.fillOpacity)
+          .attr("d", function (d) {
+            var o = {x : source.x0, y : source.y0};
+            return connectionType({source : o, target : o});
+          })
+          .transition()
+          .duration(duration)
+          .attr("d", connectionType)
+        ;
+
+      // Transition links to their new position.
+      link.transition()
+          .duration(duration)
+          .attr("d", connectionType);
+
+      // Transition exiting nodes to the parent's new position.
+      link.exit().transition()
+          .duration(duration)
+          .attr("d", function (d) {
+            var o = {x : source.x, y : source.y};
+            return connectionType({source : o, target : o});
+          })
+          .remove();
+
+      // Stash the old positions for transition.
+      nodes.forEach(function (d) {
+        d.x0 = d.x;
+        d.y0 = d.y;
+      });
+    }
+
+    // Toggle children.
+    function toggle(d) {
+      if (d.children) {
+        d._children = d.children;
+        d.children = null;
+      }
+      else {
+        d.children = d._children;
+        d._children = null;
+      }
+    }
+  };
+
+  $(document).ready(function () {
+    // Make the entire chart draggable.
+    $(chart.config.parent).draggable();
+  });
+
+  return chart;
+};
+
+module.exports = dendrogram;
+},{}],15:[function(require,module,exports){
+var force = function (userConfig) {
+  var chart;
+
+  var defaults =
+  {
+    // The parent container of this chart.
+    'parent'       : '#Force',
+    // Set these when you need to CSS style components independently.
+    'id'           : 'Force',
+    'class'        : 'Force',
+    'resizable'   : true,
+    // Our data...
+    'csv'          : {
+      // Give folks without data something to look at anyhow.
+      'header' : ["X", "Y", "Z"],
+      'data'   : [
+        [0, 0, 0],
+        [1, 1, 1],
+        [2, 2, 2]
+      ]
+    },
+    'width'        : "100%",
+    'height'       : "100%",
+    'transform'    : "translate(0 0)",
+    'label'        : dex.config.text({
+      'x'              : 8,
+      'y'              : 4,
+      'font.size' : 26,
+      'font.weight'    : 'bold',
+      'fill.fillColor' : 'black'
+    }),
+    'link'         : dex.config.link({
+        'stroke.color'     : "grey",
+        'stroke.dasharray' : '2 2',
+        'stroke.width'     :.5,
+        'fill.fillOpacity' : 0.1,
+        'transform'        : ''
+      }),
+    'linkDistance' : 60,
+    'charge' : -300,
+  };
+
+  var chart = new dex.component(userConfig, defaults);
+
+  chart.render = function render() {
+    window.onresize = this.resize;
+    chart.resize();
+  };
+
+  chart.resize = function resize() {
+    if (chart.config.resizable) {
+      var width = d3.select(chart.config.parent).property("clientWidth");
+      var height = d3.select(chart.config.parent).property("clientHeight");
+      dex.console.log(chart.config.id + ": resize(" + width + "," + height + ")");
+      chart.attr("width", width).attr("height", height).update();
+    }
+    else {
+      chart.update();
+    }
+  };
+
+  chart.update = function () {
+    var chart = this;
+    var config = chart.config;
+    var csv = config.csv;
+
+    d3.selectAll("#" + config.id).remove();
+
+    var links = [];
+
+    for (var ci=1; ci<csv.header.length; ci++)
+    {
+      for (var ri=0; ri<csv.data.length; ri++)
+      {
+        links.push({ 'source' : csv.data[ri][ci-1], 'target' : csv.data[ri][ci], 'group' : csv.header[ci] });
+      }
+    }
+    var fill = d3.scale.category20();
+    var nodes = {};
+
+    links.forEach(function(link) {
+      link.source = nodes[link.source] || (nodes[link.source] = {name: link.source, 'group' : link.group});
+      link.target = nodes[link.target] || (nodes[link.target] = {name: link.target, 'group' : link.group});
+    });
+
+    var width = config.width,
+      height = config.height;
+
+    var force = d3.layout.force()
+      .nodes(d3.values(nodes))
+      .links(links)
+      .size([width, height])
+      .linkDistance(config.linkDistance)
+      .charge(config.charge)
+      .on("tick", tick)
+      .start();
+
+    var chartContainer = d3.select(config.parent)
+      .append("g")
+      .attr("class", config["id"])
+      .attr("id", config["id"])
+      .attr("transform", config.transform);
+
+    var link = chartContainer.selectAll(".link")
+      .data(force.links())
+      .enter().append("line")
+      .attr("class", "link")
+      .call(dex.config.configureLink, config.link);
+
+    var node = chartContainer.selectAll(".node")
+      .data(force.nodes())
+      .enter().append("g")
+      .attr("class", "node")
+      .on("mouseover", mouseover)
+      .on("mouseout", mouseout)
+      .call(force.drag);
+
+    node.append("circle")
+      .attr("r", 8)
+      .style("fill", function(d) { return fill(d.group); });
+
+    node.append("text")
+      .attr("x", 12)
+      .attr("dy", ".35em")
+      .text(function(d) { return d.name; })
+      .call(dex.config.configureText, config.label);
+
+    function tick() {
+      link
+        .attr("x1", function(d) { return d.source.x; })
+        .attr("y1", function(d) { return d.source.y; })
+        .attr("x2", function(d) { return d.target.x; })
+        .attr("y2", function(d) { return d.target.y; });
+
+      node
+        .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+    }
+
+    function mouseover() {
+      d3.select(this).select("circle").transition()
+        .duration(750)
+        .attr("r", 16);
+    }
+
+    function mouseout() {
+      d3.select(this).select("circle").transition()
+        .duration(750)
+        .attr("r", 8);
+    }
+
+  };
+
+  $(document).ready(function () {
+    // Make the entire chart draggable.
+    //$(chart.config.parent).draggable();
+  });
+
+  return chart;
+};
+
+module.exports = force;
+
+},{}],16:[function(require,module,exports){
+var heatmap = function(userConfig) {
+  var defaults =
+  {
+    // The parent container of this chart.
+    'parent'    : null,
+    // Set these when you need to CSS style components independently.
+    'id'        : 'HeatMap',
+    'class'     : 'HeatMap',
+    // Our data...
+    'csv'       : {
+      // Give folks without data something to look at anyhow.
+      'header' : [ "X", "Y" ],
+      'data'   : [
+        [0, 0],
+        [1, 1],
+        [2, 4],
+        [3, 9],
+        [4, 16]
+      ]
+    },
+    // width and height of our bar chart.
+    'width'     : 600,
+    'height'    : 400,
+    // The x an y indexes to chart.
+    'xi'        : 0,
+    'yi'        : 1,
+    'hi'        : 2,
+    'transform' : function(d, i) { return 'translate(180 20)'; },
+    'heat'      : {
+      'color' : d3.scale.category20(),
+      'scale' : d3.scale.linear().range(["white", "red"])
+    },
+    'xaxis'     : dex.config.axis({
+        'orient' : 'bottom',
+        'label' : dex.config.text() }
+    ),
+    'yaxis'     : dex.config.axis({
+      'orient' : 'left',
+      'label' : dex.config.text()
+    }),
+    'rect'      : dex.config.rectangle({
+      //'transform' : 'skewX(45)'
+    })
+  };
+
+  var chart = new dex.component(userConfig, defaults);
+  var config = chart.config;
+
+  // Replace the scale configuration with a real scale.
+  var xscale = dex.config.createScale(dex.config.scale(chart.config.xaxis.scale));
+  chart.config.xaxis.scale = xscale;
+  // Replace the scale configuration with a real scale.
+  var yscale = dex.config.createScale(dex.config.scale(chart.config.yaxis.scale));
+  chart.config.yaxis.scale = yscale;
+
+  chart.render = function () {
+    window.onresize = this.resize;
+    chart.resize();
+  };
+
+  chart.resize = function () {
+    var width = d3.select(chart.config.parent).property("clientWidth");
+    var height = d3.select(chart.config.parent).property("clientHeight");
+    chart.attr("width", width).attr("height", height).update();
+  };
+
+  chart.update = function () {
+    var chart = this;
+    var config = chart.config;
+
+    var csv = config.csv;
+
+    d3.selectAll("#" + chart.config.id).remove();
+
+    if (config.debug) {
+      console.log("===== HeatMap Configuration =====");
+      console.dir(config);
+    }
+
+    var chartContainer = d3.select(config.parent).append("g")
+      .attr("id", config["id"])
+      .attr("class", config["class"])
+      .attr("transform", dex.config.optionValue(config.transform));
+
+    var x = config.xaxis.scale.range([0, config.width]),
+      y = config.yaxis.scale.range([config.height, 0]);
+    heat = config.heat.scale;
+
+    // The size of the json in the CSV data file.
+    // This could be inferred from the data if it weren't sparse.
+    var xStep = 864e5, yStep = 100;
+
+    //var json = dex.csv.toJson(csv);
+    var data = csv.data;
+
+    // Coerce the CSV data to the appropriate types.
+    data.forEach(function (d) {
+      d[config.x] = +d[config.xi];
+      d[config.yi] = +d[config.yi];
+      d[config.hi] = +d[config.hi];
+    });
+
+    // Compute the scale domains.
+    x.domain(d3.extent(data, function (d) {
+      return d[config.xi];
+    }));
+    y.domain(d3.extent(data, function (d) {
+      return d[config.yi];
+    }));
+    heat.domain(d3.extent(data, function (d) {
+      return d[config.hi];
+    }));
+
+    // Extend the x- and y-domain to fit the last bucket.
+    // For example, the y-bucket 3200 corresponds to values [3200, 3300].
+    x.domain([x.domain()[0], +x.domain()[1] + xStep]);
+    y.domain([y.domain()[0], y.domain()[1] + yStep]);
+
+    // Display the tiles for each non-zero bucket.
+    // See http://bl.ocks.org/3074470 for an alternative implementation.
+    var rect = chartContainer.selectAll(".tile")
+      .data(data)
+      .enter().append("rect")
+      .attr("class", "tile")
+      .call(dex.config.configureRectangle, config.rect)
+      .attr("x", function (d) {
+        return x(d[config.xi]);
+      })
+      .attr("y", function (d) {
+        return y(d[config.yi] + yStep);
+      })
+      .attr("width", x(xStep) - x(0))
+      .attr("height", y(0) - y(yStep))
+      .style("fill", function (d) {
+        return heat(d[config.hi]);
+      })
+      .on("mouseover", function (d) {
+        if (config.event && config.event.mouseover) {
+          config.event.mouseover(d);
+        }
+        else {
+          //dex.console.log("on.mouseover", d);
+        }
+      });
+
+    var xaxis = d3.svg.axis();
+    dex.config.configureAxis(xaxis, config.xaxis);
+//      .scale(x);
+
+    var yaxis = d3.svg.axis();
+    dex.config.configureAxis(yaxis, config.yaxis);
+//      .scale(y);
+
+    // Add an x-axis with label.
+    chartContainer.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + config.height + ")")
+      .call(xaxis)
+      .append("text")
+      .attr("class", "label")
+      .call(dex.config.configureText, config.xaxis.label);
+
+    // Add a y-axis with label.
+    chartContainer.append("g")
+      .attr("class", "y axis")
+      .call(yaxis)
+      .append("text")
+      .attr("class", "label")
+      .call(dex.config.configureText, config.yaxis.label);
+  };
+
+  $(document).ready(function () {
+    // Make the entire chart draggable.
+    $(chart.config.parent).draggable();
+  });
+
+  return chart;
+};
+
+module.exports = heatmap;
+
+},{}],17:[function(require,module,exports){
+var horizonchart = function (userConfig) {
+
+  var defaults =
+  {
+    // The parent container of this chart.
+    'parent'      : '#HorizonChartArea',
+    // Set these when you need to CSS style components independently.
+    'id'          : 'HorizonChart',
+    'class'       : 'DexComponent',
+    // Our data...
+    'csv'         : {
+      // Give folks without data something to look at anyhow.
+      'header' : ["X", "Y", "Z"],
+      'data'   : [
+        [0, 0, 0],
+        [1, 1, 1],
+        [2, 2, 2]
+      ]
+    },
+    'margin'      : {
+      'top'    : 2,
+      'bottom' : 0,
+      'left'   : 1,
+      'right'  : 1
+    },
+    'interpolate' : "basis",
+    'numBands'    : 4,
+    //'mode' : "offset",
+    'mode'        : "mirror",
+    'bandColors'  : ["#08519c", "#bdd7e7", "#bae4b3", "#006d2c"],
+    //'bandColors': ["#0000ff", "#00ff00", "#ffff00", "#ff0000"],
+    //'bandColors': ["#08519c","#3182bd","#6baed6","#bdd7e7"],
+    //'bandColors': ["#08519c","#3182bd","#6baed6","#bdd7e7","#bae4b3","#74c476","#31a354","#006d2c"],
+    //'bandColors': ["#B0E5FB", "#63AFD5", "#337BB1", "#175389"],
+    'width'       : "100%",
+    'height'      : "100%",
+    'transform'   : "translate(0 0)"
+  };
+
+  var chart = new dex.component(userConfig, defaults);
+  var config = chart.config;
+
+  chart.render = function () {
+    window.onresize = this.resize;
+    chart.resize();
+  };
+
+  chart.resize = function () {
+    d3.selectAll("#" + chart.config.id).remove();
+    var width = d3.select(chart.config.parent).property("clientWidth");
+    var height = d3.select(chart.config.parent).property("clientHeight");
+    chart.attr("width", width).attr("height", height).update();
+  };
+
+  chart.update = function () {
+    var chart = this;
+    var config = chart.config;
+    var csv = config.csv;
+    var ncsv = dex.csv.numericSubset(csv);
+
+    var ri, ci;
+
+    var numCharts = ncsv.header.length - 1;
+
+    var chartHeight = (config.height - ((config.margin.top + config.margin.bottom) * numCharts)) / numCharts;
+
+    for (ci = 1; ci < ncsv.header.length; ci++) {
+
+      var svg = d3.select(config.parent)
+        .append("g")
+        .attr('id', config["id"])
+        .attr('class', config["class"])
+        .attr("width", config.width)
+        .attr("height", chartHeight)
+        .attr("transform", "translate(" + config.margin.left + ", " +
+        (chartHeight * (ci - 1) + (config.margin.top * ci) + (config.margin.bottom * (ci - 1))) + ")");
+
+      var hchart = d3.horizon(config)
+        .width(config.width)
+        .height(chartHeight)
+        .bands(config.numBands)
+        .mode(config.mode)
+        .interpolate(config.interpolate);
+
+      // Reads into a map with key=columnName, value=[ columnRowValues, ... ]
+      var seriesData = dex.csv.columnSlice(dex.csv.copy(ncsv), [0, ci]);
+
+      // Offset so that positive is above-average and negative is below-average.
+      var mean = seriesData.data.reduce(
+          function (prev, cur) {
+            return prev + cur[1];
+          }, 0) / seriesData.data.length;
+
+      data = seriesData.data.map(function (row) {
+        return [row[0], row[1] - mean];
+      });
+
+      // Render the chart.
+      svg.data([data]).call(hchart);
+    }
+  };
+
+  $(document).ready(function () {
+    // Make the entire chart draggable.
+    $(chart.config.parent).draggable();
+  });
+
+  return chart;
+};
+
+// Implementation of horizon.js
+(function () {
+  d3.horizon = function (config) {
+    var bands = 1, // between 1 and 5, typically
+      mode = "offset", // or mirror
+      interpolate = "linear", // or basis, monotone, step-before, etc.
+      x = d3_horizonX,
+      y = d3_horizonY,
+      w = 960,
+      h = 40,
+      duration = 0;
+
+    //var color = d3.scale.linear()
+    //  .domain([-1, 0, 0, 1])
+    //  .range(["#08519c", "#bdd7e7", "#bae4b3", "#006d2c"]);
+
+    var color = d3.scale.linear()
+      .domain([-1, 0, 0, 1])
+      .range(config.bandColors);
+
+    // For each small multiple…
+    function horizon(g) {
+      g.each(function (d, i) {
+        var g = d3.select(this),
+          n = 2 * bands + 1,
+          xMin = Infinity,
+          xMax = -Infinity,
+          yMax = -Infinity,
+          x0, // old x-scale
+          y0, // old y-scale
+          id; // unique id for paths
+
+        // Compute x- and y-values along with extents.
+        var data = d.map(function (d, i) {
+          var xv = x.call(this, d, i),
+            yv = y.call(this, d, i);
+          if (xv < xMin) xMin = xv;
+          if (xv > xMax) xMax = xv;
+          if (-yv > yMax) yMax = -yv;
+          if (yv > yMax) yMax = yv;
+          return [xv, yv];
+        });
+
+        // Compute the new x- and y-scales, and transform.
+        var x1 = d3.scale.linear().domain([xMin, xMax]).range([0, w]),
+          y1 = d3.scale.linear().domain([0, yMax]).range([0, h * bands]),
+          t1 = d3_horizonTransform(bands, h, mode);
+
+        // Retrieve the old scales, if this is an update.
+        if (this.__chart__) {
+          x0 = this.__chart__.x;
+          y0 = this.__chart__.y;
+          t0 = this.__chart__.t;
+          id = this.__chart__.id;
+        } else {
+          x0 = x1.copy();
+          y0 = y1.copy();
+          t0 = t1;
+          id = ++d3_horizonId;
+        }
+
+        // We'll use a defs to store the area path and the clip path.
+        var defs = g.selectAll("defs")
+          .data([null]);
+
+        // The clip path is a simple rect.
+        defs.enter().append("defs").append("clipPath")
+          .attr("id", "d3_horizon_clip" + id)
+          .append("rect")
+          .attr("width", w)
+          .attr("height", h);
+
+        defs.select("rect").transition()
+          .duration(duration)
+          .attr("width", w)
+          .attr("height", h);
+
+        // We'll use a container to clip all horizon layers at once.
+        g.selectAll("g")
+          .data([null])
+          .enter().append("g")
+          .attr("clip-path", "url(#d3_horizon_clip" + id + ")");
+
+        // Instantiate each copy of the path with different transforms.
+        var path = g.select("g").selectAll("path")
+          .data(d3.range(-1, -bands - 1, -1).concat(d3.range(1, bands + 1)), Number);
+
+        var d0 = d3_horizonArea
+          .interpolate(interpolate)
+          .x(function (d) {
+            return x0(d[0]);
+          })
+          .y0(h * bands)
+          .y1(function (d) {
+            return h * bands - y0(d[1]);
+          })
+        (data);
+
+        var d1 = d3_horizonArea
+          .x(function (d) {
+            return x1(d[0]);
+          })
+          .y1(function (d) {
+            return h * bands - y1(d[1]);
+          })
+        (data);
+
+        path.enter().append("path")
+          .style("fill", color)
+          .attr("transform", t0)
+          .attr("d", d0);
+
+        path.transition()
+          .duration(duration)
+          .style("fill", color)
+          .attr("transform", t1)
+          .attr("d", d1);
+
+        path.exit().transition()
+          .duration(duration)
+          .attr("transform", t1)
+          .attr("d", d1)
+          .remove();
+
+        // Stash the new scales.
+        this.__chart__ = {x : x1, y : y1, t : t1, id : id};
+      });
+      d3.timer.flush();
+    }
+
+    horizon.duration = function (x) {
+      if (!arguments.length) return duration;
+      duration = +x;
+      return horizon;
+    };
+
+    horizon.bands = function (x) {
+      if (!arguments.length) return bands;
+      bands = +x;
+      color.domain([-bands, 0, 0, bands]);
+      return horizon;
+    };
+
+    horizon.mode = function (x) {
+      if (!arguments.length) return mode;
+      mode = x + "";
+      return horizon;
+    };
+
+    horizon.colors = function (x) {
+      if (!arguments.length) return color.range();
+      color.range(x);
+      return horizon;
+    };
+
+    horizon.interpolate = function (x) {
+      if (!arguments.length) return interpolate;
+      interpolate = x + "";
+      return horizon;
+    };
+
+    horizon.x = function (z) {
+      if (!arguments.length) return x;
+      x = z;
+      return horizon;
+    };
+
+    horizon.y = function (z) {
+      if (!arguments.length) return y;
+      y = z;
+      return horizon;
+    };
+
+    horizon.width = function (x) {
+      if (!arguments.length) return w;
+      w = +x;
+      return horizon;
+    };
+
+    horizon.height = function (x) {
+      if (!arguments.length) return h;
+      h = +x;
+      return horizon;
+    };
+
+    return horizon;
+  };
+
+  var d3_horizonArea = d3.svg.area(),
+    d3_horizonId = 0;
+
+  function d3_horizonX(d) {
+    return d[0];
+  }
+
+  function d3_horizonY(d) {
+    return d[1];
+  }
+
+  function d3_horizonTransform(bands, h, mode) {
+    return mode == "offset"
+      ? function (d) {
+      return "translate(0," + (d + (d < 0) - bands) * h + ")";
+    }
+      : function (d) {
+      return (d < 0 ? "scale(1,-1)" : "") + "translate(0," + (d - bands) * h + ")";
+    };
+  }
+})();
+
+module.exports = horizonchart;
+},{}],18:[function(require,module,exports){
+var horizontallegend = function (userConfig) {
+  var defaults = {
+    'parent'     : null,
+    'labels'     : ["A", "B", "C"],
+    'id'         : "HorizontalLegend",
+    'class'      : "HorizontalLegend",
+    'transform'  : 'translate(20,20)',
+    'tickLength' : 25,
+    'color'      : d3.scale.category20c(),
+    'caption'    : dex.config.text({
+      'text'   : "Legend",
+      'x'      : 0,
+      'y'      : -6,
+      'anchor' : 'start',
+      'font'   : dex.config.font({'size' : 14, 'weight' : 'bold'}),
+      'fill'   : dex.config.fill({'fillColor' : 'black'})
+    }),
+    'axis'       : dex.config.axis({
+      'tickSize'    : 25,
+      'tickPadding' : 10,
+      'orient'      : 'bottom',
+      'tickFormat'  : function (d) {
+        return d;
+      },
+      'tickLine'    : dex.config.line({
+        'stroke' : dex.config.stroke({'color' : 'grey', 'width' : 1}),
+        'fill'   : dex.config.fill({'fillColor' : 'none'})
+      }),
+      'path'        : dex.config.path({
+        'fill'   : dex.config.fill({'fillColor' : 'none'}),
+        'stroke' : dex.config.stroke({'color' : 'grey', 'width' : 1})
+      })
+    }),
+    'cell'       : dex.config.rectangle({
+        'stroke' : dex.config.stroke(),
+        'color'  : d3.scale.category10(),
+        'height' : 20,
+        'width'  : 30
+      }
+    )
+  };
+
+  //config = dex.object.overlay(dex.config.expand(userConfig), dex.config.expand(defaults));
+  var chart = new dex.component(userConfig, defaults);
+  var config = chart.config;
+
+  chart.render = function () {
+    this.update();
+  };
+
+  chart.update = function () {
+    var chart = this;
+    var config = chart.config;
+    dex.console.log("HorizontalLegend config:", config);
+    // Create our x scale
+    var x = d3.scale.ordinal()
+      .domain(config.labels)
+      .range(d3.range(config.labels.length).map(function (i) {
+        return i * config.cell.width;
+      }));
+
+    // Create the x axis.
+    var xAxis = dex.config.createAxis(config.axis)
+      .scale(x)
+      .tickValues(config.labels);
+
+    // Append a graphics node to the supplied svg node.
+    var chartContainer = d3.select(config.parent).append("g")
+      .attr("class", config["class"])
+      .attr("id", config["id"])
+      .attr("transform", config.transform);
+
+    // Draw a colored rectangle for each ordinal range.
+    chartContainer.selectAll("rect")
+      .data(config.labels)
+      .enter().append("rect")
+      //.attr("height", config.cellHeight)
+      .call(dex.config.configureRectangle, config.cell)
+      .attr("x", function (d, i) {
+        return x(i);
+      });
+
+    // Add the caption.
+    chartContainer.call(xAxis).append("text")
+      //.attr("class", "caption")
+      .call(dex.config.configureText, config.caption);
+    //.attr("y", config.captionYOffset)
+    //.attr("x", config.captionXOffset)
+    //.text("GEEZE");
+    //.style("font-size", config.captionFontSize);
+
+    chartContainer.select('path')
+      .call(dex.config.configurePath, config.axis.path);
+
+    chartContainer.selectAll(".tick line")
+      .call(dex.config.configureLine, config.axis.tickLine);
+  };
+
+  $(document).ready(function () {
+    // Make the entire chart draggable.
+    $(chart.config.parent).draggable();
+  });
+
+  return chart;
+};
+
+module.exports = horizontallegend;
+},{}],19:[function(require,module,exports){
+var linechart = function (userConfig) {
+  var defaults =
+  {
+    'parent'      : null,
+    'id'          : "LineChart",
+    "class"       : "LineChart",
+    'csv'         : {
+      'header' : ["X", "Y"],
+      'data'   : [
+        [0, 0],
+        [1, 1],
+        [2, 4],
+        [3, 9],
+        [4, 16]
+      ]
+    },
+    'width'       : 600,
+    'height'      : 400,
+    'xi'          : 0,
+    'yi'          : [1],
+    'transform'   : '',
+    'pointColors' : d3.scale.category20(),
+    'pointLabel'  : dex.config.text(),
+    'lineColors'  : d3.scale.category20(),
+    'xaxis'       : dex.config.axis({
+      'type'      : 'linear',
+      'orient'    : 'bottom',
+      'axisLabel' : dex.config.text(),
+      'tickLabel' : dex.config.text({
+        'dy' : 25
+      }),
+      'tickLine'  : dex.config.line({
+        'stroke.color' : 'red',
+        'stroke.width' : 2
+
+      })
+    }),
+    'yaxis'       : dex.config.axis({
+      'type'      : 'linear',
+      'orient'    : 'left',
+      'axisLabel' : dex.config.text(),
+      'tickLabel' : dex.config.text({
+        'dy' : 6,
+        'dx' : -10
+      }),
+      'tickLine'  : dex.config.line({
+        'stroke.color' : 'red',
+        'stroke.width' : 2
+        //'start.x' : 0, 'start.y' : 0, 'end.x' : 500, 'end.y' : 500
+      })
+    })
+  };
+
+  var chart = new dex.component(userConfig, defaults);
+  var config = chart.config;
+
+  chart.render = function () {
+    this.update();
+  };
+
+  chart.update = function () {
+    var chart = this;
+    var csv = config.csv;
+    var i;
+
+    var cfg = dex.config.expandAndOverlay(userConfig, defaults);
+    // Replace the scale configuration with a real scale.
+    var xscale = dex.config.createScale(dex.config.scale(cfg.xaxis.scale));
+    chart.config.xaxis.scale = xscale;
+    // Replace the scale configuration with a real scale.
+    var yscale = dex.config.createScale(dex.config.scale(cfg.yaxis.scale));
+    chart.config.yaxis.scale = yscale;
+
+    //dex.console.log("CSV", csv);
+
+    // TODO: Takes away user configurability.  Figure out a balance.
+    xscale.domain(d3.extent(config.csv.data, function (d) {
+      return +d[config.xi];
+    })).range([0, config.width])
+    yscale.range([config.height, 0]);
+
+    var xaxis = d3.svg.axis();
+    dex.config.configureAxis(xaxis, config.xaxis);
+
+    var yaxis = d3.svg.axis();
+    dex.config.configureAxis(yaxis, config.yaxis);
+//    var x = config.xaxis.scale()
+//      .domain(d3.extent(csv.data, function(d) { return +d[config.xi]; }))
+//      .range([0, config.width]);
+
+    // Use a linear scale for x, map the value range to the pixel range.
+    //var x = config.xaxis.scale().range([0, config.width]);
+    //x.domain(d3.extent(csv.data, function(d) { return +d[config.xi]; }));
+
+    // Use a linear scale for y, map the value range to the pixel range.
+    //var y = config.yaxis.scale
+    //  .domain(d3.extent(
+    //    dex.matrix.flatten(dex.matrix.slice(csv.data, config.yi))))
+    //  .range([config.height, 0]);
+    var y = yaxis.scale()
+      .domain(d3.extent(
+        dex.matrix.flatten(dex.matrix.slice(csv.data, config.yi))))
+      .range([config.height, 0]);
+
+    // I hate this kind of stuff, but it's necessary to share
+    // with mouseOver function.  There's probably a better way to do
+    // it but I don't feel like blowing a couple hours figuring it out.
+    chart.xaxis = xaxis;
+    chart.yaxis = yaxis;
+
+    var lines = [];
+
+    for (i = 0; i < config.yi.length; i++) {
+      // Define a function to draw the line.
+      var line = d3.svg.line()
+        .x(function (d) {
+          return xaxis.scale()(+d[config.xi]);
+        })
+        .y(function (d) {
+          return yaxis.scale()(+d[config.yi[i]]);
+        });
+      lines.push(line);
+    }
+
+    // Append a graphics node to the parent, all drawing will be relative
+    // to the supplied offsets.  This encapsulating transform simplifies
+    // the offsets within the child nodes.
+    d3.selectAll('#' + config['id']).remove();
+    var chartContainer = d3.select(config.parent).append("g")
+      .attr("id", config["id"])
+      .attr("class", config["class"])
+      .attr("transform", config.transform);
+
+    // Add an x-axis with label.
+    var xaxisG = chartContainer.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + config.height + ")")
+      .call(xaxis);
+
+    // Add a y-axis.
+    var yaxisG = chartContainer.append("g")
+      .attr("class", "y axis")
+      .call(yaxis);
+
+    // Add the custom tick labels.
+    chartContainer.selectAll(".y.axis text")
+      .call(dex.config.configureText, config.yaxis.tickLabel);
+    chartContainer.selectAll(".x.axis text")
+      .call(dex.config.configureText, config.xaxis.tickLabel);
+
+    //
+    chartContainer.selectAll(".y.axis line")
+      .call(dex.config.configureLine, config.yaxis.tickLine);
+    chartContainer.selectAll(".x.axis line")
+      .call(dex.config.configureLine, config.xaxis.tickLine);
+
+    // Add the custom axis labels.
+    chartContainer.selectAll(".y.axis").append("text")
+      .call(dex.config.configureText, config.yaxis.axisLabel);
+    chartContainer.selectAll(".x.axis").append("text")
+      .call(dex.config.configureText, config.xaxis.axisLabel);
+
+    // Add the Y Axis Label
+    yaxisG.append("text")
+      .attr("class", "label")
+      .call(dex.config.configureText, config.yaxis.tickLabel)
+    //.text(dex.array.slice(csv.header, config.yi).join(" "));
+
+    xaxisG.append("text")
+      .attr("class", "label")
+      .call(dex.config.configureText, config.xaxis.tickLabel)
+      .text(config.xaxis.tickLabel.text);
+    //.text(dex.array.slice(csv.header, config.xaxis.label.text).join(" "));
+
+    // Draw each of the lines.
+    for (i = 0; i < lines.length; i++) {
+      chartContainer.append("path")
+        .datum(csv.data)
+        .attr("class", "line")
+        .attr("d", lines[i])
+        .style("stroke", config.lineColors(i));
+    }
+
+    // We handle mouseover with transparent rectangles.  This will calculate
+    // the width of each rectangle.
+    var rectalWidth = (csv.data.length > 1) ?
+    xaxis.scale()(csv.data[1][config.xi]) - xaxis.scale()(csv.data[0][config.xi]) : 0;
+
+    // Add the transparent rectangles for our mouseover events.
+    chartContainer.selectAll("rect")
+      .data(csv.data.map(function (d) {
+        return d;
+      }))
+      .enter().append("rect")
+      .attr("class", "overlay")
+      .attr("transform", function (d, i) {
+        return "translate(" + xaxis.scale()(d[config.xi]) + ",0)";
+      })
+      .attr("opacity", 0.0)
+      .attr("width", rectalWidth)
+      .attr("height", config.height)
+      .on("mouseover", function (d) {
+        var chartEvent =
+        {
+          type : "mouseover",
+          data : d
+        };
+        chart.mouseOverHandler(chartEvent);
+        chart.publish(chartEvent);
+      });
+  };
+
+  // REM: Fix this event handler.
+  chart.mouseOverHandler = function (chartEvent) {
+    var i;
+
+    var xaxis = chart.xaxis;
+    var yaxis = chart.yaxis;
+
+    var config = chart.config;
+
+    if (!config) {
+      return;
+    }
+
+    //console.log("CHART CONFIG:");
+    //console.dir(config);
+
+    //console.log("CHART EVENT:");
+    //console.dir(chartEvent);
+    var chartContainer = d3.select("#" + config.id);
+
+    //console.log(chart.config["id"]);
+    //console.log("CHART CONTAINER:");
+    //console.dir(chartContainer);
+    //console.log("Chart Container: " + typeof chart);
+    //console.dir(chart);
+    // Remove any old circles.
+    chartContainer.selectAll("circle").remove();
+    chartContainer.selectAll("#circleLabel").remove();
+
+    // Draw a small red circle over the mouseover point.
+    for (i = 0; i < config.yi.length; i++) {
+      //console.log("I: " + i);
+      var circle = chartContainer.append("circle")
+        .attr("fill", config.pointColors(i))
+        .attr("r", 4)
+        .attr("cx", xaxis.scale()(chartEvent.data[config.xi]))
+        .attr("cy", yaxis.scale()(chartEvent.data[config.yi[i]]));
+
+      chartContainer.append("text")
+        .attr("id", "circleLabel")
+        .call(dex.config.configureText, config.pointLabel)
+        .attr("x", xaxis.scale()(chartEvent.data[config.xi]))
+        .attr("y", yaxis.scale()(chartEvent.data[config.yi[i]]) - 10)
+        //.attr("dy", ".35m")
+        //.style("font-size", 14)
+        //.attr("text-anchor", "top")
+        //.attr("fill", "black")
+        .text(function (d) {
+          if (typeof config.pointLabel === 'undefined' ||
+            typeof config.pointLabel.format === 'undefined') {
+            return chartEvent.data[config.yi[i]];
+          }
+          else {
+            return config.pointLabel.format(chartEvent.data[config.yi[i]]);
+          }
+        });
+    }
+  };
+
+  $(document).ready(function () {
+    // Make the entire chart draggable.
+    //$(chart.config.parent).draggable();
+  });
+
+  return chart;
+};
+
+module.exports = linechart;
+},{}],20:[function(require,module,exports){
+var motionbarchart = function (userConfig) {
+  var defaultColor = d3.scale.category10();
+
+  var csv = {
+    'header' : ['name', 'color', 'time', 'x', 'y', 'size'],
+    'data'   : []
+  }
+
+  var i = 0;
+  for (var time = 1800; time < 1810; time += 1) {
+    for (var color = 1; color < 4; color++) {
+      csv.data.push(["name-" + color, color, time,
+                     i * color, i * i * color, i * i * i * color]);
+    }
+    i += 1;
+  }
+
+  var color = d3.scale.category20c();
+
+  var defaults =
+  {
+    // The parent container of this chart.
+    'parent' : null,
+    // Set these when you need to CSS style components independently.
+    'id'     : 'MotionBarhart',
+    'class'  : 'MotionBarChart',
+    // Our data...
+    'csv'    : csv,
+
+    // Tells us which columns represent what.
+    'index'  : {
+      'name'  : 0,
+      'color' : 0,
+      'time'  : 1,
+      'y'     : 2
+    },
+    // Chart dimensions.
+    'width'  : 600,
+    'height' : 400,
+    'margin' : {
+      top    : 20,
+      right  : 100,
+      bottom : 100,
+      left   : 100
+    },
+
+    'bar' : dex.config.rectangle({
+        'color'        : function (d, i) {
+          return color(i);
+        },
+        'stroke.width' : 1,
+        'stroke.color' : 'black',
+        'events'       : {
+          'mouseover' : function () {
+            d3.select(this)
+              .style("stroke", 'red')
+              .style("stroke-width", 2);
+          },
+          'mouseout'  : function () {
+            d3.select(this)
+              .style("stroke", chart.config.bar.stroke.color)
+              .style("stroke-width", chart.config.bar.stroke.width);
+          }
+        }
+      }
+    ),
+
+    // Main label configuration
+    'label.font.size'        : 64,
+    'label.fill.fillColor'   : 'steelblue',
+    'label.fill.fillOpacity' : 0.4,
+    'label.y'                : function (d) {
+      return 0;
+    },
+    'label.x'                : function (d) {
+      return chart.config.width * .5;
+    },
+
+    'transform' : 'translate(0,0)',
+    'duration'  : 10000,
+
+    'xaxis' : dex.config.axis({
+      'scale.type'                : 'linear',
+      'orient'                    : 'bottom',
+      'label'                     : dex.config.text({
+        'x'      : function (d) {
+          return (chart.config.width - chart.config.margin.right) / 2;
+        },
+        'y'      : function (d) {
+          return chart.config.height - chart.config.margin.bottom + 20;
+        },
+        'anchor' : 'end'
+      }),
+      'tick.stroke.color'         : 'black',
+      'tick.stroke.width'         : 1,
+      'tick.fill.fillColor'       : 'none',
+      'axisLine.stroke.color'     : 'black',
+      'axisLine.stroke.width'     : 1,
+      'axisLine.stroke.dasharray' : "10 10",
+      'axisLine.fill.fillColor'   : 'none'
+    }),
+    'yaxis' : dex.config.axis({
+      'scale.type'                : 'linear',
+      'orient'                    : 'left',
+      'label'                     : dex.config.text({
+        'x'         : function (d) {
+          //return chart.config.width - chart.config.margin.right;
+          //return chart.config.margin.top;
+          return 0;
+        },
+        'y'         : function (d) {
+          //return chart.config.height - chart.config.margin.top
+          //  - chart.config.margin.bottom - chart.config.xaxis.label.font.size;
+          //return -chart.config.margin.left/2;
+          return 10;
+        },
+        'anchor'    : 'end',
+        'dy'        : '.75em',
+        'transform' : 'rotate(-90)'
+      }),
+      'tick.stroke.width'         : 1,
+      'tick.fill.fillColor'       : 'none',
+      'axisLine.stroke.color'     : 'black',
+      'axisLine.stroke.width'     : 1,
+      'axisLine.stroke.dasharray' : "10 10",
+      'axisLine.fill.fillColor'   : 'none'
+    })
+  };
+
+  var chart = new dex.component(userConfig, defaults);
+  var config = chart.config;
+
+  chart.render = function render() {
+    window.onresize = this.resize;
+    this.resize();
+  };
+
+  chart.resize = function resize() {
+    var width = d3.select(chart.config.parent).property("clientWidth");
+    var height = d3.select(chart.config.parent).property("clientHeight");
+    chart
+      .attr("width", width)
+      .attr("height", height)
+      .update();
+  };
+
+  chart.update = function update() {
+    // If we need to call super:
+    //DexComponent.prototype.update.call(this);
+    var chart = this.chart;
+    var config = this.config;
+    var csv = config.csv;
+
+    d3.selectAll('#' + config.id).remove();
+
+    var keyMap = {};
+
+    csv.data.forEach(function (row) {
+      var curName = row[config.index.name];
+      var curColor = row[config.index.color];
+      var curTime = row[config.index.time];
+      var curY = row[config.index.y];
+      var curSize = +row[config.index.size];
+
+      if (!keyMap[curName]) {
+        keyMap[curName] = {
+          'name'  : curName,
+          'color' : curColor,
+          'time'  : curTime,
+          'y'     : [[curTime, curY]],
+          'size'  : [[curTime, curSize]]
+        };
+      }
+      else {
+        keyMap[curName].y.push([curTime, curY]);
+        keyMap[curName].size.push([curTime, curSize]);
+      }
+    });
+
+    var uniques = dex.matrix.uniques(csv.data);
+
+    var timeExtents = dex.matrix.extent(csv.data, [config.index.time]);
+    //var xExtents = [0, uniques[config.index.name].length-1];
+    var yExtents = dex.matrix.extent(csv.data, [config.index.y]);
+
+    dex.console.log("EXTENTS: Y", yExtents, "UNIQUES", uniques[config.index.name]);
+
+    var width = config.width - config.margin.right;
+    var height = config.height - config.margin.top - config.margin.bottom;
+
+    // Various scales. These domains make assumptions of data, naturally.
+    var xScale = d3.scale.ordinal()
+      .domain(uniques[config.index.name])
+      .rangePoints([0, width]);
+
+    //  d3.scale.linear().domain(xExtents).range([0, width - 60]);
+    var yScale = dex.config.createScale(config.yaxis.scale)
+      .domain([0, yExtents[1]]).range([height, 0]);
+
+    // The x & y axes.
+    var xAxis = dex.config.createAxis(config.xaxis)
+      .scale(xScale);
+
+    var yAxis = dex.config.createAxis(config.yaxis)
+      .scale(yScale);
+
+    var svg = d3.select(config.parent)
+      .append("g")
+      .attr("id", config["id"])
+      .attr("class", config["class"])
+      .attr("transform", config.transform);
+
+    // Add the x-axis.
+    svg.append("g")
+      .attr("class", "xaxis")
+      .attr("transform", "translate(0," + height + ")")
+      .call(xAxis);
+
+    // Add the y-axis.
+    svg.append("g")
+      .attr("class", "yaxis")
+      .call(yAxis);
+
+    var xticks = svg.selectAll(".xaxis .tick");
+
+    var xtickLines = xticks.selectAll("line")
+      .call(dex.config.configureStroke, config.xaxis.tick.stroke)
+      .call(dex.config.configureFill, config.xaxis.tick.fill);
+
+    var yticks = svg.selectAll(".yaxis .tick");
+
+    var yTickLines = yticks.selectAll("line")
+      .call(dex.config.configureStroke, config.yaxis.tick.stroke)
+      .call(dex.config.configureFill, config.yaxis.tick.fill);
+
+    svg.selectAll(".xaxis path")
+      .call(dex.config.configureStroke, config.xaxis.axisLine.stroke)
+      .call(dex.config.configureFill, config.xaxis.axisLine.fill);
+
+    svg.selectAll(".yaxis path")
+      .call(dex.config.configureStroke, config.yaxis.axisLine.stroke)
+      .call(dex.config.configureFill, config.yaxis.axisLine.fill);
+
+    var xTickLabels = xticks.selectAll("text")
+      .style("text-anchor", "start");
+
+    // Add an x-axis label.
+    svg.append("text")
+      .attr("class", "xLabel")
+      .call(dex.config.configureText, config.xaxis.label)
+      .text(config.csv.header[config.index.name]);
+
+    // Add a y-axis label.
+    svg.append("text")
+      .attr("class", "yLabel")
+      .call(dex.config.configureText, config.yaxis.label)
+      .text(config.csv.header[config.index.y]);
+
+    // Add the year label; the value is set on transition.
+    var label = svg.append("text")
+      .attr("class", "timeLabel")
+      .attr("text-anchor", "end")
+      .call(dex.config.configureText, config.label)
+      .text(timeExtents[0]);
+
+    // Load the data.
+    //d3.json("nations.json", function (nations) {
+
+    // A bisector since many nation's data is sparsely-defined.
+    var bisect = d3.bisector(function (d) {
+      return d[0];
+    });
+
+    // Add a dot per nation. Initialize the data at min year value, and set the colors.
+    var bars = svg.append("g")
+      .attr("class", "bars")
+      .selectAll(".bar")
+      .data(interpolateData(timeExtents[0]))
+      .enter().append("rect")
+      .attr("class", "bar")
+      .call(dex.config.configureRectangle, config.bar)
+      .call(position);
+    //.sort(order);
+
+    // Add a title.
+    bars
+      .append("tooltip-content")
+      .text(function (d, i) {
+        //dex.console.log("DTITLE", d);
+        return "<table>" +
+          "<tr><td>Name:</td><td>" + d.name + "</td></tr>" +
+          "<tr><td>Category:</td><td>" + d.color + "</td></tr>" +
+          "</table>";
+      });
+
+    // Add an overlay for the year label.
+    var box = label.node().getBBox();
+
+    var overlay = svg.append("rect")
+      .attr("class", "overlay")
+      .attr("x", box.x)
+      .attr("y", box.y)
+      .attr("width", box.width)
+      .attr("height", box.height)
+      .attr("fill", "none")
+      .style("pointer-events", "all")
+      .style("cursor", "ew-resize")
+      .on("mouseover", enableInteraction);
+
+    // Start a transition that interpolates the data based on year.
+    svg.transition()
+      .duration(config.duration)
+      .ease("linear")
+      .tween("year", tweenYear)
+      .each("end", enableInteraction);
+
+    // Positions the dots based on data.
+    function position(bar) {
+      var barWidth = Math.floor((config.width - config.margin.left - config.margin.right) / bar.size());
+
+      bar
+        .attr("x", function (d, i) {
+          return xScale(d.name);
+        })
+        .attr("y", function (d) {
+          return yScale(d.y);
+        })
+        .attr("width", function (d) {
+          return barWidth;
+        })
+        .attr("height", function (d) {
+          return yScale(0) - yScale(d.y);
+        });
+    }
+
+    // Defines a sort order so that the smallest dots are drawn on top.
+    //function order(a, b) {
+    //  return b.y - a.y;
+    // }
+
+    // After the transition finishes, you can mouseover to change the year.
+    function enableInteraction() {
+      //dex.console.log("ENABLING INTERACTION");
+      var yearScale = d3.scale.linear()
+        .domain(timeExtents)
+        .range([box.x + 10, box.x + box.width - 10])
+        .clamp(true);
+
+      // Cancel the current transition, if any.
+      svg.transition().duration(0);
+
+      overlay
+        .on("mouseover", mouseover)
+        .on("mouseout", mouseout)
+        .on("mousemove", mousemove)
+        .on("touchmove", mousemove);
+
+      function mouseover() {
+        label.classed("active", true);
+      }
+
+      function mouseout() {
+        label.classed("active", false);
+      }
+
+      function mousemove() {
+        displayYear(yearScale.invert(d3.mouse(this)[0]));
+      }
+    }
+
+    // Tweens the entire chart by first tweening the year, and then the data.
+    // For the interpolated data, the dots and label are redrawn.
+    function tweenYear() {
+      var year = d3.interpolateNumber(timeExtents[0], timeExtents[1]);
+      return function (t) {
+        displayYear(year(t));
+      };
+    }
+
+    // Updates the display to show the specified year.
+    function displayYear(year) {
+      //dex.console.log("key='" + key + "', interpolateData(" + year + ")=",
+      //  interpolateData(year));
+      bars.data(interpolateData(year), function (d) {
+        return d.name;
+      }).call(position);//.sort(order);
+      label.text(Math.round(year));
+    }
+
+    // Interpolates the dataset for the given (fractional) year.
+    function interpolateData(year) {
+      var timeData = [];
+
+      //
+      for (var name in keyMap) {
+        if (keyMap.hasOwnProperty(name)) {
+          var entry = keyMap[name];
+
+          //dex.console.log("ENTRY-DATA", entry);
+          timeData.push({
+            time  : year,
+            name  : entry.name,
+            color : entry.color,
+            y     : interpolateValues(entry.y, year),
+            size  : interpolateValues(entry.size, year)
+          });
+        }
+      }
+      //dex.console.log("interpolateData(" + year + ")=", timeData);
+      return timeData;
+    }
+
+    // Finds (and possibly interpolates) the value for the specified year.
+    function interpolateValues(values, year) {
+      //dex.console.log("VALUES", values);
+      var i = bisect.left(values, year, 0, values.length - 1),
+        a = values[i];
+      if (i > 0) {
+        var b = values[i - 1],
+          t = (year - a[0]) / (b[0] - a[0]);
+        return a[1] * (1 - t) + b[1] * t;
+      }
+      return a[1];
+    }
+  };
+
+  $(document).ready(function () {
+
+    // Add tooltips
+    $(chart.config.parent).tooltip({
+      items   : "rect",
+      content : function () {
+        return $(this).find("tooltip-content").text();
+      },
+      track   : true
+    });
+
+    // Make the entire chart draggable.
+    $(chart.config.parent).draggable();
+    $(chart.config.parent).find("rect").draggable();
+  });
+
+  return chart;
+};
+
+module.exports = motionbarchart;
+},{}],21:[function(require,module,exports){
+var motionchart = function (userConfig) {
+  var defaultColor = d3.scale.category10();
+
+  var csv = {
+    'header' : ['name', 'color', 'time', 'x', 'y', 'size'],
+    'data'   : []
+  }
+
+  var i = 0;
+  for (var time = 1800; time < 1810; time += 1) {
+    for (var color = 1; color < 4; color++) {
+      csv.data.push(["name-" + color, color, time,
+                     i * color, i * i * color, i * i * i * color]);
+    }
+    i += 1;
+  }
+
+  var defaults =
+  {
+    // The parent container of this chart.
+    'parent' : null,
+    // Set these when you need to CSS style components independently.
+    'id'     : 'MotionChart',
+    'class'  : 'MotionChart',
+    // Our data...
+    'csv'    : csv,
+
+    // Tells us which columns represent what.
+    'index'  : {
+      'name'  : 0,
+      'time'  : 1,
+      'x'     : 2,
+      'y'     : 3,
+      'color' : 4,
+      'size'  : 5
+    },
+    // Chart dimensions.
+    'width'  : 600,
+    'height' : 400,
+    'margin' : {top : 50, right : 50, bottom : 50, left : 100},
+
+    // Configuration for drawing the data-circles.
+    'circle' : dex.config.circle({
+      'colorscale'       : d3.scale.category10(),
+      //'stroke.dasharray' : "1 1",
+      'stroke.width'     : 1,
+      'stroke.color'     : 'black',
+      'fill.fillColor'   : function (d) {
+        //dex.console.log("color(", d, ")=");
+        return chart.config.circle.colorscale(d.name);
+      },
+      'fill.fillOpacity' : .4,
+      'sizeScale.type'   : 'linear',
+      'events'           : {
+        'mouseover' : function () {
+          d3.select(this)
+            .style("stroke", 'red')
+            .style("stroke-width", 4)
+            .style("fill-opacity", 1);
+        },
+        'mouseout'  : function () {
+          d3.select(this)
+            .style("stroke", chart.config.circle.stroke.color)
+            .style("stroke-width", chart.config.circle.stroke.width)
+            .style("opacity", chart.config.circle.fill.fillOpacity);
+        }
+      }
+    }),
+
+    // Main label configuration
+    'label.font.size'        : 128,
+    'label.fill.fillColor'   : 'steelblue',
+    'label.fill.fillOpacity' : 0.4,
+    'label.y'                : function (d) {
+      return chart.config.height * .5;
+    },
+    'label.x'                : function (d) {
+      return chart.config.width * .8;
+    },
+
+    'transform' : 'translate(0,0)',
+    'duration'  : 10000,
+
+    'xaxis' : dex.config.axis({
+      'scale.type'              : 'linear',
+      'orient'                  : 'bottom',
+      'label'                   : dex.config.text({
+        'x'      : function (d) {
+          //dex.console.log("X=" + (chart.config.width - chart.config.margin.right));
+          return chart.config.width - chart.config.margin.left - chart.config.margin.right;
+        },
+        'y'      : function (d) {
+          //dex.console.log("Y=" + (chart.config.height - chart.config.margin.top
+          //- chart.config.margin.bottom - chart.config.xaxis.label.font.size));
+          return chart.config.height - chart.config.margin.top
+            - chart.config.margin.bottom - chart.config.xaxis.label.font.size;
+        },
+        'anchor' : 'end'
+      }),
+      'tick.stroke.width'       : 1,
+      'tick.fill.fillColor'     : 'none',
+      'axisLine.stroke.color'   : 'black',
+      'axisLine.stroke.width'   : 1,
+      'axisLine.fill.fillColor' : 'none'
+    }),
+    'yaxis' : dex.config.axis({
+      'scale.type'              : 'linear',
+      'orient'                  : 'left',
+      'label'                   : dex.config.text({
+        'x' : function (d) {
+          return chart.config.width - chart.config.margin.right;
+        },
+        'y' : function (d) {
+          return chart.config.height - chart.config.margin.top
+            - chart.config.margin.bottom - chart.config.xaxis.label.font.size;
+        }
+      }),
+      'tick.stroke.width'       : 1,
+      'tick.fill.fillColor'     : 'none',
+      'axisLine.stroke.color'   : 'black',
+      'axisLine.stroke.width'   : 1,
+      'axisLine.fill.fillColor' : 'none'
+    })
+  };
+
+  var chart = new dex.component(userConfig, defaults);
+  var config = chart.config;
+
+  chart.render = function render() {
+    window.onresize = this.resize;
+    this.resize();
+  };
+
+  chart.resize = function resize() {
+    var width = d3.select(chart.config.parent).property("clientWidth");
+    var height = d3.select(chart.config.parent).property("clientHeight");
+    chart
+      .attr("width", width)
+      .attr("height", height)
+      .update();
+  };
+
+  chart.update = function update() {
+    // If we need to call super:
+    //DexComponent.prototype.update.call(this);
+    var chart = this.chart;
+    var config = this.config;
+    var csv = config.csv;
+
+    d3.selectAll('#' + config.id).remove();
+
+    if (config.debug) {
+      console.log("===== Motion Chart Configuration =====");
+      console.dir(config);
+    }
+
+    var keyMap = {};
+
+    csv.data.forEach(function (row) {
+      var curName = row[config.index.name];
+      var curColor = row[config.index.color];
+      var curTime = row[config.index.time];
+      var curX = row[config.index.x];
+      var curY = row[config.index.y];
+      var curSize = +row[config.index.size];
+
+      if (!keyMap[curName]) {
+        keyMap[curName] = {
+          'name'  : curName,
+          'color' : curColor,
+          'time'  : curTime,
+          'x'     : [[curTime, curX]],
+          'y'     : [[curTime, curY]],
+          'size'  : [[curTime, curSize]]
+        };
+      }
+      else {
+        keyMap[curName].x.push([curTime, curX]);
+        keyMap[curName].y.push([curTime, curY]);
+        keyMap[curName].size.push([curTime, curSize]);
+      }
+    });
+
+    // Various accessors that specify the four dimensions of data to visualize.
+    function key(d) {
+      return d.name;
+    }
+
+    function color(d) {
+      return d.color;
+    }
+
+    function x(d) {
+      return d.x;
+    }
+
+    function y(d) {
+      return d.y;
+    }
+
+    function radius(d) {
+      return d.size;
+    }
+
+    var timeExtents = dex.matrix.extent(csv.data, [config.index.time]);
+    var xExtents = dex.matrix.extent(csv.data, [config.index.x]);
+    var yExtents = dex.matrix.extent(csv.data, [config.index.y]);
+    var sizeExtents = dex.matrix.extent(csv.data, [config.index.size]);
+
+    //dex.console.log("EXTENTS: X", xExtents, "Y", yExtents, "RADIUS", sizeExtents);
+
+    var width = config.width - config.margin.right;
+    var height = config.height - config.margin.top - config.margin.bottom;
+
+    // Various scales. These domains make assumptions of data, naturally.
+    var xScale =
+      dex.config.createScale(config.xaxis.scale)
+        .domain(xExtents).range([0, width - 60]);
+
+    //  d3.scale.linear().domain(xExtents).range([0, width - 60]);
+    var yScale = dex.config.createScale(config.yaxis.scale)
+      .domain(yExtents).range([height, 60]);
+
+    //d3.scale.linear().domain(yExtents).range([height, 60]);
+    var radiusScale = dex.config.createScale(config.circle.sizeScale)
+      .domain(sizeExtents).range([2, 50]);
+    //d3.scale.linear().domain(sizeExtents).range([2, 50]);
+
+    // The x & y axes.
+    var xAxis = dex.config.createAxis(config.xaxis)
+      .scale(xScale);
+
+    var yAxis = dex.config.createAxis(config.yaxis)
+      .scale(yScale);
+
+    var svg = d3.select(config.parent)
+      .append("g")
+      .attr("id", config["id"])
+      .attr("class", config["class"])
+      .attr("transform", config.transform);
+
+    // Add the x-axis.
+    svg.append("g")
+      .attr("class", "xaxis")
+      .attr("transform", "translate(0," + height + ")")
+      .call(xAxis);
+
+    // Add the y-axis.
+    svg.append("g")
+      .attr("class", "yaxis")
+      .call(yAxis);
+
+    var xticks = svg.selectAll(".xaxis .tick line")
+      .call(dex.config.configureStroke, config.xaxis.tick.stroke)
+      .call(dex.config.configureFill, config.xaxis.tick.fill);
+
+    var yticks = svg.selectAll(".yaxis .tick line")
+      .call(dex.config.configureStroke, config.yaxis.tick.stroke)
+      .call(dex.config.configureFill, config.yaxis.tick.fill);
+
+    svg.selectAll(".xaxis path")
+      .call(dex.config.configureStroke, config.xaxis.axisLine.stroke)
+      .call(dex.config.configureFill, config.xaxis.axisLine.fill);
+
+    svg.selectAll(".yaxis path")
+      .call(dex.config.configureStroke, config.yaxis.axisLine.stroke)
+      .call(dex.config.configureFill, config.yaxis.axisLine.fill);
+
+    // Add an x-axis label.
+    svg.append("text")
+      .attr("class", "xLabel")
+      .call(dex.config.configureText, config.xaxis.label)
+      //.attr("text-anchor", "end")
+      //.attr("x", width)
+      //.attr("y", height - 6)
+      .text(config.csv.header[config.index.x]);
+
+    // Add a y-axis label.
+    svg.append("text")
+      .attr("class", "yLabel")
+      .attr("text-anchor", "end")
+      .attr("y", 6)
+      .attr("dy", ".75em")
+      .attr("transform", "rotate(-90)")
+      .text(config.csv.header[config.index.y]);
+
+    // Add the year label; the value is set on transition.
+    var label = svg.append("text")
+      .attr("class", "timeLabel")
+      .attr("text-anchor", "end")
+      .attr("y", height - 24)
+      .attr("x", width)
+      .call(dex.config.configureText, config.label)
+      .text(timeExtents[0]);
+
+    // Load the data.
+    //d3.json("nations.json", function (nations) {
+
+    // A bisector since many nation's data is sparsely-defined.
+    var bisect = d3.bisector(function (d) {
+      return d[0];
+    });
+
+    // Add a dot per nation. Initialize the data at min year value, and set the colors.
+    var dot = svg.append("g")
+      .attr("class", "dots")
+      .selectAll(".dot")
+      .data(interpolateData(timeExtents[0]))
+      .enter().append("circle")
+      .attr("class", "dot")
+      .call(dex.config.configureCircle, config.circle)
+      .call(position)
+      .sort(order);
+
+    // Add a title.
+    dot.append("tooltip-content")
+      .text(function (d) {
+        //dex.console.log("DTITLE", d);
+        return "<table>" +
+          "<tr><td>Name:</td><td>" + d.name + "</td></tr>" +
+          "<tr><td>Category:</td><td>" + d.color + "</td></tr>" +
+          "<tr><td>Time:</td><td>" + d.time + "</td></tr>" +
+          "<tr><td>X:</td><td>" + d.x + "</td></tr>" +
+          "<tr><td>Y:</td><td>" + d.y + "</td></tr>" +
+          "<tr><td>Size:</td><td>" + d.size + "</td></tr>" +
+          "</table>";
+      });
+
+    // Add an overlay for the year label.
+    var box = label.node().getBBox();
+
+    var overlay = svg.append("rect")
+      .attr("class", "overlay")
+      .attr("x", box.x)
+      .attr("y", box.y)
+      .attr("width", box.width)
+      .attr("height", box.height)
+      .attr("fill", "none")
+      .style("pointer-events", "all")
+      .style("cursor", "ew-resize")
+      .on("mouseover", enableInteraction);
+
+    // Start a transition that interpolates the data based on year.
+    svg.transition()
+      .duration(config.duration)
+      .ease("linear")
+      .tween("year", tweenYear)
+      .each("end", enableInteraction);
+
+    // Positions the dots based on data.
+    function position(dot) {
+      dot
+        .attr("cx", function (d) {
+          //dex.console.log("d=", d, "x(d)=" + x(d),
+          //    "cx=xScale(x(d))=" + xScale(x(d)));
+          return xScale(x(d));
+        })
+        .attr("cy", function (d) {
+          //dex.console.log("d=", d, "y(d)=" + x(d),
+          //  "cy=yScale(y(d))=" + yScale(y(d)));
+          return yScale(y(d));
+        })
+        .attr("r", function (d) {
+          //dex.console.log("d=", d, "radius(d)=" + radius(d),
+          //    "r=radiusScale(radius(d))=" + radiusScale(radius(d)));
+          return radiusScale(radius(d));
+        });
+      //.each(function (d) {
+      //dex.console.log("circle.cx=" + xScale(x(d)) + ", cy=" + yScale(y(d)) +
+      //", r=" + radiusScale(radius(d)));
+      //});
+    }
+
+    // Defines a sort order so that the smallest dots are drawn on top.
+    function order(a, b) {
+      return radius(b) - radius(a);
+    }
+
+    // After the transition finishes, you can mouseover to change the year.
+    function enableInteraction() {
+      //dex.console.log("ENABLING INTERACTION");
+      var yearScale = d3.scale.linear()
+        .domain(timeExtents)
+        .range([box.x + 10, box.x + box.width - 10])
+        .clamp(true);
+
+      // Cancel the current transition, if any.
+      svg.transition().duration(0);
+
+      overlay
+        .on("mouseover", mouseover)
+        .on("mouseout", mouseout)
+        .on("mousemove", mousemove)
+        .on("touchmove", mousemove);
+
+      function mouseover() {
+        label.classed("active", true);
+      }
+
+      function mouseout() {
+        label.classed("active", false);
+      }
+
+      function mousemove() {
+        displayYear(yearScale.invert(d3.mouse(this)[0]));
+      }
+    }
+
+    // Tweens the entire chart by first tweening the year, and then the data.
+    // For the interpolated data, the dots and label are redrawn.
+    function tweenYear() {
+      var year = d3.interpolateNumber(timeExtents[0], timeExtents[1]);
+      return function (t) {
+        displayYear(year(t));
+      };
+    }
+
+    // Updates the display to show the specified year.
+    function displayYear(year) {
+      //dex.console.log("key='" + key + "', interpolateData(" + year + ")=",
+      //  interpolateData(year));
+      dot.data(interpolateData(year), key).call(position).sort(order);
+      label.text(Math.round(year));
+    }
+
+    // Interpolates the dataset for the given (fractional) year.
+    function interpolateData(year) {
+      var timeData = [];
+
+      //
+      for (var name in keyMap) {
+        if (keyMap.hasOwnProperty(name)) {
+          var entry = keyMap[name];
+
+          //dex.console.log("ENTRY-DATA", entry);
+          timeData.push({
+            time  : year,
+            name  : entry.name,
+            color : entry.color,
+            x     : interpolateValues(entry.x, year),
+            y     : interpolateValues(entry.y, year),
+            size  : interpolateValues(entry.size, year)
+          });
+        }
+      }
+      //dex.console.log("interpolateData(" + year + ")=", timeData);
+      return timeData;
+    }
+
+    // Finds (and possibly interpolates) the value for the specified year.
+    function interpolateValues(values, year) {
+      //dex.console.log("VALUES", values);
+      var i = bisect.left(values, year, 0, values.length - 1),
+        a = values[i];
+      if (i > 0) {
+        var b = values[i - 1],
+          t = (year - a[0]) / (b[0] - a[0]);
+        return a[1] * (1 - t) + b[1] * t;
+      }
+      return a[1];
+    }
+  };
+
+  $(document).ready(function () {
+
+    // Add tooltips
+    $(document).tooltip({
+      items   : "circle",
+      content : function () {
+        return $(this).find("tooltip-content").text();
+      },
+      track   : true
+    });
+
+    // Make the entire chart draggable.
+    //$(chart.config.parent).draggable();
+    //$(chart.config.parent).find("rect").draggable();
+  });
+
+  return chart;
+};
+
+module.exports = motionchart;
+},{}],22:[function(require,module,exports){
+var motioncirclechart = function (userConfig) {
+  var defaultColor = d3.scale.category10();
+
+  var csv = {
+    'header' : ['name', 'color', 'time', 'x', 'y', 'size'],
+    'data'   : []
+  }
+
+  var i = 0;
+  for (var time = 1800; time < 1810; time += 1) {
+    for (var color = 1; color < 4; color++) {
+      csv.data.push(["name-" + color, color, time,
+                     i * color, i * i * color, i * i * i * color]);
+    }
+    i += 1;
+  }
+
+  var color = d3.scale.category20c();
+
+  var defaults =
+  {
+    // The parent container of this chart.
+    'parent' : null,
+    // Set these when you need to CSS style components independently.
+    'id'     : 'MotionCircleChart',
+    'class'  : 'MotionCircleChart',
+    // Our data...
+    'csv'    : csv,
+
+    // Tells us which columns represent what.
+    'index'  : {
+      'name'  : 0,
+      'color' : 1,
+      'time'  : 2,
+      'y'     : 4
+    },
+    // Chart dimensions.
+    'width'  : 600,
+    'height' : 400,
+    'margin' : {
+      top    : 20,
+      right  : 100,
+      bottom : 100,
+      left   : 100
+    },
+
+    'circle' : dex.config.circle({
+      'fill.fillColor' : function (d, i) {
+        return color(i);
+      },
+      'stroke.width'   : 1,
+      'stroke.color'   : 'black',
+      'events'         : {
+        'mouseover' : function () {
+          d3.select(this)
+            .style("stroke", 'red')
+            .style("stroke-width", 2);
+        },
+        'mouseout'  : function () {
+          d3.select(this)
+            .style("stroke", chart.config.circle.stroke.color)
+            .style("stroke-width", chart.config.circle.stroke.width);
+        }
+      }
+    }),
+
+    // Main label configuration
+    'label.font.size'        : 64,
+    'label.fill.fillColor'   : 'steelblue',
+    'label.fill.fillOpacity' : 0.4,
+    'label.y'                : function (d) {
+      return 0;
+    },
+    'label.x'                : function (d) {
+      return chart.config.width * .5;
+    },
+
+    'transform' : 'translate(0,0)',
+    'duration'  : 10000,
+
+    'xaxis' : dex.config.axis({
+      'scale.type'                : 'linear',
+      'orient'                    : 'bottom',
+      'label'                     : dex.config.text({
+        'x'      : function (d) {
+          return (chart.config.width - chart.config.margin.right) / 2;
+        },
+        'y'      : function (d) {
+          return chart.config.height - chart.config.margin.bottom + 20;
+        },
+        'anchor' : 'end'
+      }),
+      'tick.stroke.color'         : 'black',
+      'tick.stroke.width'         : 1,
+      'tick.fill.fillColor'       : 'none',
+      'axisLine.stroke.color'     : 'black',
+      'axisLine.stroke.width'     : 1,
+      'axisLine.stroke.dasharray' : "10 10",
+      'axisLine.fill.fillColor'   : 'none'
+    }),
+    'yaxis' : dex.config.axis({
+      'scale.type'                : 'linear',
+      'orient'                    : 'left',
+      'label'                     : dex.config.text({
+        'x'         : function (d) {
+          //return chart.config.width - chart.config.margin.right;
+          //return chart.config.margin.top;
+          return 0;
+        },
+        'y'         : function (d) {
+          //return chart.config.height - chart.config.margin.top
+          //  - chart.config.margin.bottom - chart.config.xaxis.label.font.size;
+          //return -chart.config.margin.left/2;
+          return 10;
+        },
+        'anchor'    : 'end',
+        'dy'        : '.75em',
+        'transform' : 'rotate(-90)'
+      }),
+      'tick.stroke.width'         : 1,
+      'tick.fill.fillColor'       : 'none',
+      'axisLine.stroke.color'     : 'black',
+      'axisLine.stroke.width'     : 1,
+      'axisLine.stroke.dasharray' : "10 10",
+      'axisLine.fill.fillColor'   : 'none'
+    })
+  };
+
+  var chart = new dex.component(userConfig, defaults);
+  var config = chart.config;
+
+  chart.render = function render() {
+    window.onresize = this.resize;
+    this.resize();
+  };
+
+  chart.resize = function resize() {
+    var width = d3.select(chart.config.parent).property("clientWidth");
+    var height = d3.select(chart.config.parent).property("clientHeight");
+    chart
+      .attr("width", width)
+      .attr("height", height)
+      .update();
+  };
+
+  chart.update = function update() {
+    // If we need to call super:
+    //DexComponent.prototype.update.call(this);
+    var chart = this.chart;
+    var config = this.config;
+    var csv = config.csv;
+
+    d3.selectAll('#' + config.id).remove();
+
+    var keyMap = {};
+
+    csv.data.forEach(function (row) {
+      var curName = row[config.index.name];
+      var curColor = row[config.index.color];
+      var curTime = row[config.index.time];
+      var curY = row[config.index.y];
+      var curSize = +row[config.index.size];
+
+      if (!keyMap[curName]) {
+        keyMap[curName] = {
+          'name'  : curName,
+          'color' : curColor,
+          'time'  : curTime,
+          'y'     : [[curTime, curY]],
+          'size'  : [[curTime, curSize]]
+        };
+      }
+      else {
+        keyMap[curName].y.push([curTime, curY]);
+        keyMap[curName].size.push([curTime, curSize]);
+      }
+    });
+
+    var uniques = dex.matrix.uniques(csv.data);
+
+    var timeExtents = dex.matrix.extent(csv.data, [config.index.time]);
+    //var xExtents = [0, uniques[config.index.name].length-1];
+    var yExtents = dex.matrix.extent(csv.data, [config.index.y]);
+
+    dex.console.log("EXTENTS: Y", yExtents, "UNIQUES", uniques[config.index.name]);
+
+    var width = config.width - config.margin.right;
+    var height = config.height - config.margin.top - config.margin.bottom;
+
+    // Various scales. These domains make assumptions of data, naturally.
+    var xScale = d3.scale.ordinal()
+      .domain(uniques[config.index.name])
+      .rangePoints([0, width]);
+
+    //  d3.scale.linear().domain(xExtents).range([0, width - 60]);
+    var yScale = dex.config.createScale(config.yaxis.scale)
+      .domain([0, yExtents[1]]).range([height, 0]);
+
+    // The x & y axes.
+    var xAxis = dex.config.createAxis(config.xaxis)
+      .scale(xScale);
+
+    var yAxis = dex.config.createAxis(config.yaxis)
+      .scale(yScale);
+
+    var svg = d3.select(config.parent)
+      .append("g")
+      .attr("id", config["id"])
+      .attr("class", config["class"])
+      .attr("transform", config.transform);
+
+    // Add the x-axis.
+    svg.append("g")
+      .attr("class", "xaxis")
+      .attr("transform", "translate(0," + height + ")")
+      .call(xAxis);
+
+    // Add the y-axis.
+    svg.append("g")
+      .attr("class", "yaxis")
+      .call(yAxis);
+
+    var xticks = svg.selectAll(".xaxis .tick");
+
+    var xtickLines = xticks.selectAll("line")
+      .call(dex.config.configureStroke, config.xaxis.tick.stroke)
+      .call(dex.config.configureFill, config.xaxis.tick.fill);
+
+    var yticks = svg.selectAll(".yaxis .tick");
+
+    var yTickLines = yticks.selectAll("line")
+      .call(dex.config.configureStroke, config.yaxis.tick.stroke)
+      .call(dex.config.configureFill, config.yaxis.tick.fill);
+
+    svg.selectAll(".xaxis path")
+      .call(dex.config.configureStroke, config.xaxis.axisLine.stroke)
+      .call(dex.config.configureFill, config.xaxis.axisLine.fill);
+
+    svg.selectAll(".yaxis path")
+      .call(dex.config.configureStroke, config.yaxis.axisLine.stroke)
+      .call(dex.config.configureFill, config.yaxis.axisLine.fill);
+
+    var xTickLabels = xticks.selectAll("text")
+      .style("text-anchor", "start");
+
+    // Add an x-axis label.
+    svg.append("text")
+      .attr("class", "xLabel")
+      .call(dex.config.configureText, config.xaxis.label)
+      .text(config.csv.header[config.index.name]);
+
+    // Add a y-axis label.
+    svg.append("text")
+      .attr("class", "yLabel")
+      .call(dex.config.configureText, config.yaxis.label)
+      .text(config.csv.header[config.index.y]);
+
+    // Add the year label; the value is set on transition.
+    var label = svg.append("text")
+      .attr("class", "timeLabel")
+      .attr("text-anchor", "end")
+      .call(dex.config.configureText, config.label)
+      .text(timeExtents[0]);
+
+    // Load the data.
+    //d3.json("nations.json", function (nations) {
+
+    // A bisector since many nation's data is sparsely-defined.
+    var bisect = d3.bisector(function (d) {
+      return d[0];
+    });
+
+    // Add a dot per nation. Initialize the data at min year value, and set the colors.
+    var circles = svg.append("g")
+      .attr("class", "circles")
+      .selectAll(".circle")
+      .data(interpolateData(timeExtents[0]))
+      .enter().append("circle")
+      .attr("class", "circle")
+      .call(dex.config.configureCircle, config.circle)
+      .call(position);
+    //.sort(order);
+
+    // Add a title.
+    circles
+      .append("tooltip-content")
+      .text(function (d, i) {
+        //dex.console.log("DTITLE", d);
+        return "<table>" +
+          "<tr><td>Name:</td><td>" + d.name + "</td></tr>" +
+          "<tr><td>Category:</td><td>" + d.color + "</td></tr>" +
+          "</table>";
+      });
+
+    // Add an overlay for the year label.
+    var box = label.node().getBBox();
+
+    var overlay = svg.append("rect")
+      .attr("class", "overlay")
+      .attr("x", box.x)
+      .attr("y", box.y)
+      .attr("width", box.width)
+      .attr("height", box.height)
+      .attr("fill", "none")
+      .style("pointer-events", "all")
+      .style("cursor", "ew-resize")
+      .on("mouseover", enableInteraction);
+
+    // Start a transition that interpolates the data based on year.
+    svg.transition()
+      .duration(config.duration)
+      .ease("linear")
+      .tween("year", tweenYear)
+      .each("end", enableInteraction);
+
+    // Positions the dots based on data.
+    function position(circle) {
+      //var circleRadius = Math.floor((config.width - config.margin.left - config.margin.right) / circle.size());
+      //var circleRadius = chart.config.circle.r;
+      var circleRadius = 10;
+
+      circle
+        .attr("cx", function (d, i) {
+          return xScale(d.name);
+        })
+        .attr("cy", function (d) {
+          return yScale(d.y);
+        })
+        .attr("r", function (d) {
+          return 10;
+          //return circleRadius;
+        });
+    }
+
+    // Defines a sort order so that the smallest dots are drawn on top.
+    //function order(a, b) {
+    //  return b.y - a.y;
+    // }
+
+    // After the transition finishes, you can mouseover to change the year.
+    function enableInteraction() {
+      //dex.console.log("ENABLING INTERACTION");
+      var yearScale = d3.scale.linear()
+        .domain(timeExtents)
+        .range([box.x + 10, box.x + box.width - 10])
+        .clamp(true);
+
+      // Cancel the current transition, if any.
+      svg.transition().duration(0);
+
+      overlay
+        .on("mouseover", mouseover)
+        .on("mouseout", mouseout)
+        .on("mousemove", mousemove)
+        .on("touchmove", mousemove);
+
+      function mouseover() {
+        label.classed("active", true);
+      }
+
+      function mouseout() {
+        label.classed("active", false);
+      }
+
+      function mousemove() {
+        displayYear(yearScale.invert(d3.mouse(this)[0]));
+      }
+    }
+
+    // Tweens the entire chart by first tweening the year, and then the data.
+    // For the interpolated data, the dots and label are redrawn.
+    function tweenYear() {
+      var year = d3.interpolateNumber(timeExtents[0], timeExtents[1]);
+      return function (t) {
+        displayYear(year(t));
+      };
+    }
+
+    // Updates the display to show the specified year.
+    function displayYear(year) {
+      //dex.console.log("key='" + key + "', interpolateData(" + year + ")=",
+      //  interpolateData(year));
+      circles.data(interpolateData(year), function (d) {
+        return d.name;
+      }).call(position);//.sort(order);
+      label.text(Math.round(year));
+    }
+
+    // Interpolates the dataset for the given (fractional) year.
+    function interpolateData(year) {
+      var timeData = [];
+
+      //
+      for (var name in keyMap) {
+        if (keyMap.hasOwnProperty(name)) {
+          var entry = keyMap[name];
+
+          //dex.console.log("ENTRY-DATA", entry);
+          timeData.push({
+            time  : year,
+            name  : entry.name,
+            color : entry.color,
+            y     : interpolateValues(entry.y, year),
+            size  : interpolateValues(entry.size, year)
+          });
+        }
+      }
+      //dex.console.log("interpolateData(" + year + ")=", timeData);
+      return timeData;
+    }
+
+    // Finds (and possibly interpolates) the value for the specified year.
+    function interpolateValues(values, year) {
+      //dex.console.log("VALUES", values);
+      var i = bisect.left(values, year, 0, values.length - 1),
+        a = values[i];
+      if (i > 0) {
+        var b = values[i - 1],
+          t = (year - a[0]) / (b[0] - a[0]);
+        return a[1] * (1 - t) + b[1] * t;
+      }
+      return a[1];
+    }
+  };
+
+  $(document).ready(function () {
+
+    // Add tooltips
+    $(chart.config.parent).tooltip({
+      items   : "rect",
+      content : function () {
+        return $(this).find("tooltip-content").text();
+      },
+      track   : true
+    });
+
+    // Make the entire chart draggable.
+    $(chart.config.parent).draggable();
+    $(chart.config.parent).find("rect").draggable();
+  });
+
+  return chart;
+};
+
+module.exports = motioncirclechart;
+},{}],23:[function(require,module,exports){
+var motionlinechart = function (userConfig) {
+  var defaultColor = d3.scale.category10();
+
+  var csv = {
+    'header' : ['name', 'color', 'time', 'x', 'y', 'size'],
+    'data'   : []
+  }
+
+  var i = 0;
+  for (var time = 1800; time < 1810; time += 1) {
+    for (var color = 1; color < 4; color++) {
+      csv.data.push(["name-" + color, color, time,
+                     i * color, i * i * color, i * i * i * color]);
+    }
+    i += 1;
+  }
+
+  var color = d3.scale.category20c();
+
+  var defaults =
+  {
+    // The parent container of this chart.
+    'parent' : null,
+    // Set these when you need to CSS style components independently.
+    'id'     : 'MotionLineChart',
+    'class'  : 'MotionLineChart',
+    // Our data...
+    'csv'    : csv,
+
+    // Tells us which columns represent what.
+    'index'  : {
+      'name'  : 0,
+      'color' : 1,
+      'time'  : 2,
+      'y'     : 4
+    },
+    // Chart dimensions.
+    'width'  : 600,
+    'height' : 400,
+    'margin' : {
+      top    : 20,
+      right  : 100,
+      bottom : 100,
+      left   : 100
+    },
+
+    'circle'                 : dex.config.path({
+      'fill.fillColor' : function (d, i) {
+        return color(i);
+      },
+      'stroke.width'   : 1,
+      'stroke.color'   : 'black',
+      'events'         : {
+        'mouseover' : function () {
+          d3.select(this)
+            .style("stroke", 'red')
+            .style("stroke-width", 2);
+        },
+        'mouseout'  : function () {
+          d3.select(this)
+            .style("stroke", chart.config.circle.stroke.color)
+            .style("stroke-width", chart.config.circle.stroke.width);
+        }
+      }
+    }),
+    'line'                   : dex.config.line({
+      'stroke.color'   : 'black',
+      'stroke.width'   : 1,
+      'fill.fillColor' : 'none',
+      'fill.opacity'   : 0,
+      //'interpolate'    : 'linear'
+      //'interpolate'    : 'linear-closed'
+      //'interpolate'    : 'step-before'
+      //'interpolate'    : 'basis'
+      //'interpolate'    : 'basis-open'
+      //'interpolate'    : 'basis-closed'
+      //'interpolate'    : 'bundle'
+      'interpolate'    : 'cardinal'
+      //'interpolate'    : 'cardinal-open'
+      //'interpolate'    : 'cardinal-closed'
+      //'interpolate'    : 'monotone'
+    }),
+    // Main label configuration
+    'label.font.size'        : 64,
+    'label.fill.fillColor'   : 'steelblue',
+    'label.fill.fillOpacity' : 0.4,
+    'label.y'                : function (d) {
+      return 0;
+    },
+    'label.x'                : function (d) {
+      return chart.config.width * .5;
+    },
+
+    'transform' : 'translate(0,0)',
+    'duration'  : 10000,
+
+    'xaxis' : dex.config.axis({
+      'scale.type'                : 'linear',
+      'orient'                    : 'bottom',
+      'label'                     : dex.config.text({
+        'x'      : function (d) {
+          return (chart.config.width - chart.config.margin.right) / 2;
+        },
+        'y'      : function (d) {
+          return chart.config.height - chart.config.margin.bottom + 20;
+        },
+        'anchor' : 'end'
+      }),
+      'tick.stroke.color'         : 'black',
+      'tick.stroke.width'         : 1,
+      'tick.fill.fillColor'       : 'none',
+      'axisLine.stroke.color'     : 'black',
+      'axisLine.stroke.width'     : 1,
+      'axisLine.stroke.dasharray' : "10 10",
+      'axisLine.fill.fillColor'   : 'none'
+    }),
+    'yaxis' : dex.config.axis({
+      'scale.type'                : 'linear',
+      'orient'                    : 'left',
+      'label'                     : dex.config.text({
+        'x'         : function (d) {
+          //return chart.config.width - chart.config.margin.right;
+          //return chart.config.margin.top;
+          return 0;
+        },
+        'y'         : function (d) {
+          //return chart.config.height - chart.config.margin.top
+          //  - chart.config.margin.bottom - chart.config.xaxis.label.font.size;
+          //return -chart.config.margin.left/2;
+          return 10;
+        },
+        'anchor'    : 'end',
+        'dy'        : '.75em',
+        'transform' : 'rotate(-90)'
+      }),
+      'tick.stroke.width'         : 1,
+      'tick.fill.fillColor'       : 'none',
+      'axisLine.stroke.color'     : 'black',
+      'axisLine.stroke.width'     : 1,
+      'axisLine.stroke.dasharray' : "10 10",
+      'axisLine.fill.fillColor'   : 'none'
+    })
+  };
+
+  var chart = new dex.component(userConfig, defaults);
+  var config = chart.config;
+
+  chart.render = function render() {
+    window.onresize = this.resize;
+    this.resize();
+  };
+
+  chart.resize = function resize() {
+    var width = d3.select(chart.config.parent).property("clientWidth");
+    var height = d3.select(chart.config.parent).property("clientHeight");
+    chart
+      .attr("width", width)
+      .attr("height", height)
+      .update();
+  };
+
+  chart.update = function update() {
+    // If we need to call super:
+    //DexComponent.prototype.update.call(this);
+    var chart = this.chart;
+    var config = this.config;
+    var csv = config.csv;
+
+    d3.selectAll('#' + config.id).remove();
+
+    var keyMap = {};
+
+    csv.data.forEach(function (row) {
+      var curName = row[config.index.name];
+      var curColor = row[config.index.color];
+      var curTime = row[config.index.time];
+      var curY = row[config.index.y];
+      var curSize = +row[config.index.size];
+
+      if (!keyMap[curName]) {
+        keyMap[curName] = {
+          'name'  : curName,
+          'color' : curColor,
+          'time'  : curTime,
+          'y'     : [[curTime, curY]],
+          'size'  : [[curTime, curSize]]
+        };
+      }
+      else {
+        keyMap[curName].y.push([curTime, curY]);
+        keyMap[curName].size.push([curTime, curSize]);
+      }
+    });
+
+    var uniques = dex.matrix.uniques(csv.data);
+
+    var timeExtents = dex.matrix.extent(csv.data, [config.index.time]);
+    //var xExtents = [0, uniques[config.index.name].length-1];
+    var yExtents = dex.matrix.extent(csv.data, [config.index.y]);
+
+    dex.console.log("EXTENTS: Y", yExtents, "UNIQUES", uniques[config.index.name]);
+
+    var width = config.width - config.margin.right;
+    var height = config.height - config.margin.top - config.margin.bottom;
+
+    // Various scales. These domains make assumptions of data, naturally.
+    var xScale = d3.scale.ordinal()
+      .domain(uniques[config.index.name])
+      .rangePoints([0, width]);
+
+    //  d3.scale.linear().domain(xExtents).range([0, width - 60]);
+    var yScale = dex.config.createScale(config.yaxis.scale)
+      .domain([0, yExtents[1]]).range([height, 0]);
+
+    // The x & y axes.
+    var xAxis = dex.config.createAxis(config.xaxis)
+      .scale(xScale);
+
+    var yAxis = dex.config.createAxis(config.yaxis)
+      .scale(yScale);
+
+    var svg = d3.select(config.parent)
+      .append("g")
+      .attr("id", config["id"])
+      .attr("class", config["class"])
+      .attr("transform", config.transform);
+
+    // Add the x-axis.
+    svg.append("g")
+      .attr("class", "xaxis")
+      .attr("transform", "translate(0," + height + ")")
+      .call(xAxis);
+
+    // Add the y-axis.
+    svg.append("g")
+      .attr("class", "yaxis")
+      .call(yAxis);
+
+    var xticks = svg.selectAll(".xaxis .tick");
+
+    var xtickLines = xticks.selectAll("line")
+      .call(dex.config.configureStroke, config.xaxis.tick.stroke)
+      .call(dex.config.configureFill, config.xaxis.tick.fill);
+
+    var yticks = svg.selectAll(".yaxis .tick");
+
+    var yTickLines = yticks.selectAll("line")
+      .call(dex.config.configureStroke, config.yaxis.tick.stroke)
+      .call(dex.config.configureFill, config.yaxis.tick.fill);
+
+    svg.selectAll(".xaxis path")
+      .call(dex.config.configureStroke, config.xaxis.axisLine.stroke)
+      .call(dex.config.configureFill, config.xaxis.axisLine.fill);
+
+    svg.selectAll(".yaxis path")
+      .call(dex.config.configureStroke, config.yaxis.axisLine.stroke)
+      .call(dex.config.configureFill, config.yaxis.axisLine.fill);
+
+    var xTickLabels = xticks.selectAll("text")
+      .style("text-anchor", "start");
+
+    // Add an x-axis label.
+    svg.append("text")
+      .attr("class", "xLabel")
+      .call(dex.config.configureText, config.xaxis.label)
+      .text(config.csv.header[config.index.name]);
+
+    // Add a y-axis label.
+    svg.append("text")
+      .attr("class", "yLabel")
+      .call(dex.config.configureText, config.yaxis.label)
+      .text(config.csv.header[config.index.y]);
+
+    // Add the year label; the value is set on transition.
+    var label = svg.append("text")
+      .attr("class", "timeLabel")
+      .attr("text-anchor", "end")
+      .call(dex.config.configureText, config.label)
+      .text(timeExtents[0]);
+
+    // Load the data.
+    //d3.json("nations.json", function (nations) {
+
+    // A bisector since many nation's data is sparsely-defined.
+    var bisect = d3.bisector(function (d) {
+      return d[0];
+    });
+
+    var initialData = interpolateData(timeExtents[0]);
+
+    // Add a dot per nation. Initialize the data at min year value, and set the colors.
+    var circles = svg.append("g")
+      .attr("class", "circles")
+      .selectAll(".circle")
+      .data(initialData)
+      .enter().append("circle")
+      .attr("class", "circle")
+      .call(dex.config.configureCircle, config.circle)
+      .call(position);
+    //.sort(order);
+
+    dex.console.log("INITIAL DATA:", initialData);
+
+    var d3line = d3.svg.line();
+    dex.config.configureLine(d3line, config.line);
+
+    d3line
+      .x(function (d, i) {
+        return xScale(d.name);
+      })
+      .y(function (d, i) {
+        return yScale(d.y)
+      });
+
+    var line = svg.selectAll('path.dataline')
+      .data([initialData])
+      .enter()
+      .append("svg:path")
+      .attr("d", d3line);
+      //.call(dex.config.configureLine, config.line);
+
+    dex.console.log("LINE: ", line);
+
+    // Add a title.
+    circles
+      .append("tooltip-content")
+      .text(function (d, i) {
+        //dex.console.log("DTITLE", d);
+        return "<table>" +
+          "<tr><td>Name:</td><td>" + d.name + "</td></tr>" +
+          "<tr><td>Category:</td><td>" + d.color + "</td></tr>" +
+          "</table>";
+      });
+
+    // Add an overlay for the year label.
+    var box = label.node().getBBox();
+
+    var overlay = svg.append("rect")
+      .attr("class", "overlay")
+      .attr("x", box.x)
+      .attr("y", box.y)
+      .attr("width", box.width)
+      .attr("height", box.height)
+      .attr("fill", "none")
+      .style("pointer-events", "all")
+      .style("cursor", "ew-resize")
+      .on("mouseover", enableInteraction);
+
+    // Start a transition that interpolates the data based on year.
+    svg.transition()
+      .duration(config.duration)
+      .ease("linear")
+      .tween("year", tweenYear)
+      .each("end", enableInteraction);
+
+    // After the transition finishes, you can mouseover to change the year.
+    function enableInteraction() {
+      //dex.console.log("ENABLING INTERACTION");
+      var yearScale = d3.scale.linear()
+        .domain(timeExtents)
+        .range([box.x + 10, box.x + box.width - 10])
+        .clamp(true);
+
+      // Cancel the current transition, if any.
+      svg.transition().duration(0);
+
+      overlay
+        .on("mouseover", mouseover)
+        .on("mouseout", mouseout)
+        .on("mousemove", mousemove)
+        .on("touchmove", mousemove);
+
+      function mouseover() {
+        label.classed("active", true);
+      }
+
+      function mouseout() {
+        label.classed("active", false);
+      }
+
+      function mousemove() {
+        displayYear(yearScale.invert(d3.mouse(this)[0]));
+      }
+    }
+
+    // Tweens the entire chart by first tweening the year, and then the data.
+    // For the interpolated data, the dots and label are redrawn.
+    function tweenYear() {
+      var year = d3.interpolateNumber(timeExtents[0], timeExtents[1]);
+      return function (t) {
+        displayYear(year(t));
+      };
+    }
+
+    // Positions the dots based on data.
+    function position(circle) {
+      //var circleRadius = Math.floor((config.width - config.margin.left - config.margin.right) / circle.size());
+      //var circleRadius = chart.config.circle.r;
+      var circleRadius = 10;
+
+      circle
+        .attr("cx", function (d, i) {
+          return xScale(d.name);
+        })
+        .attr("cy", function (d) {
+          return yScale(d.y);
+        })
+        .attr("r", function (d) {
+          return 10;
+          //return circleRadius;
+        });
+    }
+
+    // Defines a sort order so that the smallest dots are drawn on top.
+    //function order(a, b) {
+    //  return b.y - a.y;
+    // }
+
+    // Updates the display to show the specified year.
+    function displayYear(year) {
+      //dex.console.log("key='" + key + "', interpolateData(" + year + ")=",
+      //  interpolateData(year));
+      var yearData = interpolateData(year);
+      circles.data(yearData, function (d) {
+        return d.name;
+      }).call(position);//.sort(order);
+      label.text(Math.round(year));
+
+      line.data([yearData])
+        .attr("d", d3line)
+        .call(dex.config.configurePath, config.line);
+
+//        .attr("x", function (d) {
+//          return xScale(d.name);
+//        })
+//        .attr("y", function (d) {
+//          dex.console.log("Y:" + yScale(d.y));
+//          return yScale(d.y)
+//        });
+      //.call(positionLine);
+    }
+
+    // Interpolates the dataset for the given (fractional) year.
+    function interpolateData(year) {
+      var timeData = [];
+
+      //
+      for (var name in keyMap) {
+        if (keyMap.hasOwnProperty(name)) {
+          var entry = keyMap[name];
+
+          //dex.console.log("ENTRY-DATA", entry);
+          timeData.push({
+            time  : year,
+            name  : entry.name,
+            color : entry.color,
+            y     : interpolateValues(entry.y, year),
+            size  : interpolateValues(entry.size, year)
+          });
+        }
+      }
+      //dex.console.log("interpolateData(" + year + ")=", timeData);
+      return timeData;
+    }
+
+    // Finds (and possibly interpolates) the value for the specified year.
+    function interpolateValues(values, year) {
+      //dex.console.log("VALUES", values);
+      var i = bisect.left(values, year, 0, values.length - 1),
+        a = values[i];
+      if (i > 0) {
+        var b = values[i - 1],
+          t = (year - a[0]) / (b[0] - a[0]);
+        return a[1] * (1 - t) + b[1] * t;
+      }
+      return a[1];
+    }
+  }
+  ;
+
+  $(document).ready(function () {
+
+    // Add tooltips
+    $(chart.config.parent).tooltip({
+      items   : "rect",
+      content : function () {
+        return $(this).find("tooltip-content").text();
+      },
+      track   : true
+    });
+
+    // Make the entire chart draggable.
+    $(chart.config.parent).draggable();
+    $(chart.config.parent).find("rect").draggable();
+  });
+
+  return chart;
+};
+
+module.exports = motionlinechart;
+},{}],24:[function(require,module,exports){
+var orbitallayout = function (userConfig) {
+  var chart;
+
+  var defaults =
+  {
+    // The parent container of this chart.
+    'parent': '#ChordDiagram',
+    // Set these when you need to CSS style components independently.
+    'id': 'Chord',
+    'class': 'Chord',
+    'resizable': true,
+    // Our data...
+    'csv': {
+      // Give folks without data something to look at anyhow.
+      'header': ["X", "Y", "Z"],
+      'data': [
+        [0, 0, 0],
+        [1, 1, 1],
+        [2, 2, 2]
+      ]
+    },
+    'width': "100%",
+    'height': "100%",
+    'transform': "translate(0 0)",
+    'title': dex.config.text(),
+    'label': dex.config.text(),
+    'circles': dex.config.circle(),
+    'orbits': dex.config.circle({
+      'r': 5,
+      'fill': {
+        'fillColor': 'none',
+        'fillOpacity': 1
+      },
+      'stroke': dex.config.stroke({
+        'width': 1,
+        'color': 'green',
+        'opacity': .5,
+        'dasharray': "2 2"
+      })
+    }),
+    'refreshFrequencyMs' :50,
+    'tickRadianStep' : 0.004363323129985824
+  };
+
+  var chart = new dex.component(userConfig, defaults);
+
+  chart.render = function render() {
+    window.onresize = this.resize;
+    chart.resize();
+  };
+
+  chart.resize = function resize() {
+    if (chart.config.resizable) {
+      var width = d3.select(chart.config.parent).property("clientWidth");
+      var height = d3.select(chart.config.parent).property("clientHeight");
+      dex.console.log(chart.config.id + ": resize(" + width + "," + height + ")");
+      chart.attr("width", width).attr("height", height).update();
+    }
+    else {
+      chart.update();
+    }
+  };
+
+  chart.update = function () {
+    var chart = this;
+    var config = chart.config;
+    var csv = config.csv;
+
+    d3.selectAll("#" + config.id).remove();
+    var data = dex.csv.toNestedJson(dex.csv.copy(csv));
+
+    d3.layout.orbit = function () {
+      var currentTickStep = 0;
+      var orbitNodes;
+      var orbitSize = [1, 1];
+      var nestedNodes;
+      var flattenedNodes = [];
+      var orbitDispatch = d3.dispatch('tick');
+      var tickInterval;
+      var tickRadianStep = config.tickRadianStep;
+      var orbitalRings = [];
+      var orbitDepthAdjust = function () {
+        return 2.95
+      };
+      var childrenAccessor = function (d) {
+        return d.children
+      };
+      var tickRadianFunction = function () {
+        return 1
+      };
+
+      function _orbitLayout() {
+
+        return _orbitLayout;
+      }
+
+      _orbitLayout.mode = function () {
+        //Atomic, Solar, other?
+      }
+
+      _orbitLayout.start = function () {
+        //activate animation here
+        tickInterval = setInterval(
+          function () {
+            currentTickStep++;
+            flattenedNodes.forEach(function (_node) {
+              if (_node.parent) {
+                _node.x = _node.parent.x + ( (_node.parent.ring / 2) * Math.sin(_node.angle + (currentTickStep *
+                    config.tickRadianStep * tickRadianFunction(_node))) );
+                _node.y = _node.parent.y + ( (_node.parent.ring / 2) * Math.cos(_node.angle + (currentTickStep *
+                    config.tickRadianStep * tickRadianFunction(_node))) );
+              }
+            })
+            orbitalRings.forEach(function (_ring) {
+              _ring.x = _ring.source.x;
+              _ring.y = _ring.source.y;
+            })
+            orbitDispatch.tick();
+          },
+          config.refreshFrequencyMs);
+      }
+
+      _orbitLayout.stop = function () {
+        //deactivate animation here
+        clearInterval(tickInterval);
+      }
+
+      _orbitLayout.speed = function (_degrees) {
+        if (!arguments.length) return tickRadianStep / (Math.PI / 360);
+        tickRadianStep = tickRadianStep = _degrees * (Math.PI / 360);
+        return this;
+      }
+
+      _orbitLayout.size = function (_value) {
+        if (!arguments.length) return orbitSize;
+        orbitSize = _value;
+        return this;
+        //change size here
+      }
+
+      _orbitLayout.revolution = function (_function) {
+        //change ring size reduction (make that into dynamic function)
+        if (!arguments.length) return tickRadianFunction;
+        tickRadianFunction = _function;
+        return this
+      }
+
+      _orbitLayout.orbitSize = function (_function) {
+        //change ring size reduction (make that into dynamic function)
+        if (!arguments.length) return orbitDepthAdjust;
+        orbitDepthAdjust = _function;
+        return this
+      }
+
+      _orbitLayout.orbitalRings = function () {
+        //return an array of data corresponding to orbital rings
+        if (!arguments.length) return orbitalRings;
+        return this;
+      }
+
+      _orbitLayout.nodes = function (_data) {
+        if (!arguments.length) return flattenedNodes;
+        nestedNodes = _data;
+        calculateNodes();
+        return this;
+      }
+
+      _orbitLayout.children = function (_function) {
+        if (!arguments.length) return childrenAccessor;
+
+        //Probably should use d3.functor to turn a string into an object key
+        childrenAccessor = _function;
+        return this;
+
+
+      }
+
+      d3.rebind(_orbitLayout, orbitDispatch, "on");
+
+      return _orbitLayout;
+      function calculateNodes() {
+        var _data = nestedNodes;
+        //If you have an array of elements, then create a root node (center)
+        //In the future, maybe make a binary star kind of thing?
+        if (!childrenAccessor(_data)) {
+          orbitNodes = {key: "root", values: _data}
+          childrenAccessor(orbitNodes).forEach(function (_node) {
+            _node.parent = orbitNodes;
+          })
+        }
+        //otherwise assume it is an object with a root node
+        else {
+          orbitNodes = _data;
+        }
+        orbitNodes.x = orbitSize[0] / 2;
+        orbitNodes.y = orbitSize[1] / 2;
+        orbitNodes.deltaX = function (_x) {
+          return _x
+        }
+        orbitNodes.deltaY = function (_y) {
+          return _y
+        }
+        orbitNodes.ring = orbitSize[0] / 2;
+        orbitNodes.depth = 0;
+
+        flattenedNodes.push(orbitNodes);
+
+        traverseNestedData(orbitNodes)
+
+        function traverseNestedData(_node) {
+          if (childrenAccessor(_node)) {
+            var thisPie = d3.layout.pie().value(function (d) {
+              return childrenAccessor(d) ? 4 : 1
+            });
+            var piedValues = thisPie(childrenAccessor(_node));
+
+            orbitalRings.push({source: _node, x: _node.x, y: _node.y, r: _node.ring / 2});
+
+            for (var x = 0; x < childrenAccessor(_node).length; x++) {
+
+              childrenAccessor(_node)[x].angle = ((piedValues[x].endAngle - piedValues[x].startAngle) / 2) + piedValues[x].startAngle;
+
+              childrenAccessor(_node)[x].parent = _node;
+              childrenAccessor(_node)[x].depth = _node.depth + 1;
+
+              childrenAccessor(_node)[x].x = childrenAccessor(_node)[x].parent.x + ( (childrenAccessor(_node)[x].parent.ring / 2) * Math.sin(childrenAccessor(_node)[x].angle) );
+              childrenAccessor(_node)[x].y = childrenAccessor(_node)[x].parent.y + ( (childrenAccessor(_node)[x].parent.ring / 2) * Math.cos(childrenAccessor(_node)[x].angle) );
+
+              childrenAccessor(_node)[x].deltaX = function (_x) {
+                return _x
+              }
+              childrenAccessor(_node)[x].deltaY = function (_y) {
+                return _y
+              }
+              childrenAccessor(_node)[x].ring = childrenAccessor(_node)[x].parent.ring / orbitDepthAdjust(_node);
+
+              flattenedNodes.push(childrenAccessor(_node)[x]);
+              traverseNestedData(childrenAccessor(_node)[x]);
+            }
+          }
+        }
+      }
+
+    }
+
+    //down with category20a()!!
+    colors = d3.scale.category20();
+
+    orbitScale = d3.scale.linear().domain([1, 3]).range([3.8, 1.5]).clamp(true);
+    radiusScale = d3.scale.linear().domain([0, 1, 2, 3]).range([20, 10, 3, 1]).clamp(true);
+
+    var minSize = Math.min(config.width, config.height);
+
+    orbit = d3.layout.orbit().size([minSize, minSize])
+      .children(function (d) {
+        return d.children
+      })
+      .revolution(function (d) {
+        return d.depth
+      })
+      .orbitSize(function (d) {
+        return orbitScale(d.depth)
+      })
+      .speed(.1)
+      .nodes(data);
+
+    var chartContainer = d3.select(config.parent)
+      .append("g")
+      .attr("class", config["id"])
+      .attr("id", config["id"])
+      .attr("transform", config.transform);
+
+    chartContainer.selectAll("g.node").data(orbit.nodes())
+      .enter()
+      .append("g")
+      .attr("class", "node")
+      .attr("transform", function (d) {
+        return "translate(" + d.x + "," + d.y + ")"
+      })
+      .on("mouseover", nodeOver)
+      .on("mouseout", nodeOut)
+
+    var circles = d3.selectAll("g.node")
+      .append("circle");
+
+    circles.call(dex.config.configureCircle, config.circles);
+    circles.attr("r", function (d) {
+        return radiusScale(d.depth)
+      })
+      .style("fill", function (d) {
+        return colors(d.depth)
+      });
+
+    chartContainer.selectAll("circle.orbits")
+      .data(orbit.orbitalRings())
+      .enter()
+      .insert("circle", "g")
+      .call(dex.config.configureCircle, config.orbits)
+      .attr("class", "ring")
+      .attr("r", function (d) {
+        return d.r
+      })
+      .attr("cx", function (d) {
+        return d.x
+      })
+      .attr("cy", function (d) {
+        return d.y
+      });
+
+    orbit.on("tick", function () {
+      d3.selectAll("g.node")
+        .attr("transform", function (d) {
+          return "translate(" + d.x + "," + d.y + ")"
+        });
+
+      d3.selectAll("circle.ring")
+        .attr("cx", function (d) {
+          return d.x
+        })
+        .attr("cy", function (d) {
+          return d.y
+        });
+    });
+
+    orbit.start();
+
+    function nodeOver(d) {
+      orbit.stop();
+      d3.select(this).append("text").text(d.name).style("text-anchor", "middle").attr("y", 35);
+      d3.select(this).select("circle").style("stroke", "black").style("stroke-width", 3);
+    }
+
+    function nodeOut() {
+      orbit.start();
+      //d3.selectAll("text").remove();
+      d3.selectAll("g.node > circle").style("stroke", "none").style("stroke-width", 0);
+    }
+  };
+
+  $(document).ready(function () {
+    // Make the entire chart draggable.
+    //$(chart.config.parent).draggable();
+  });
+
+  return chart;
+};
+
+module.exports = orbitallayout;
+},{}],25:[function(require,module,exports){
+var parallelcoordinates = function (userConfig) {
+  var chart;
+
+  defaults =
+  {
+    'id': "ParallelCoordinates",
+    'class': "ParallelCoordinates",
+    'parent': null,
+    'width': "100%",
+    'height': "100%",
+    'resizable': true,
+    'color': d3.scale.category20(),
+    'title': 'Parallel Coordinates',
+    'csv': {
+      'header': ["X", "Y"],
+      'data': [
+        [0, 0],
+        [1, 1],
+        [2, 4],
+        [3, 9],
+        [4, 16]
+      ]
+    },
+    'rows': 0,
+    //'transform'       : function (d) {
+    //  return 'scale(.95, .95) translate(50, 50)'
+    //},
+    'normalize': false,
+    'margin': {
+      'left': 80,
+      'right': 60,
+      'top': 60,
+      'bottom': 20
+    },
+    'axis': {
+      'orient': 'left'
+    },
+    'axis.line': dex.config.line({
+      'stroke': dex.config.stroke(
+        {
+          'color': function (d, i) {
+            return "black";
+          },
+          'width': 1
+        }),
+      'fill': {
+        'fillColor': "none",
+        'fillOpacity': 1.0
+      }
+    }),
+    'axis.label': dex.config.text({
+      'font': {
+        'size': function (d, i) {
+          var uniques = _.uniq(_.flatten(dex.matrix.slice(chart.config.csv.data, [i])));
+
+          var maxLabelLength =
+            Math.min(("" + _.max(uniques,
+              function (item) {
+                return ("" + item).length;
+              })).length, 40);
+
+          // No need to adjust margins, initial transform already did.
+          var maxFontSizeByHeight =
+            ((chart.config.height) /
+            (uniques.length ? uniques.length : 1) - 2);
+
+          var maxFontSizeByWidth =
+            (((chart.config.width) /
+            (chart.config.csv.header.length - 1)) / maxLabelLength);
+
+          //dex.console.log("AXIS-FONT-SIZE: I: " + i + ", MAX-HEIGHT: " + maxFontSizeByHeight +
+          //", MAX-WIDTH: " + maxFontSizeByWidth + ", MAX-LABEL-LENGTH: " + maxLabelLength);
+          return Math.min(Math.max(Math.min(maxFontSizeByWidth, maxFontSizeByHeight), 4), 18);
+        }
+      },
+      'anchor': function (d, i) {
+        if (i < chart.config.csv.header.length - 1) {
+          return 'end';
+        }
+        else {
+          return 'start';
+        }
+      },
+      'dx': function (d, i) {
+        return -1 * Math.max(chart.config.axis.label.font.size(d, i) / 2, 8);
+      },
+      'dy': ".35em",
+      'fill.fillColor': 'black',
+      'fill.fillOpacity': 1,
+      'events': {
+        'mouseover': function (d, i) {
+          d3.select(this)
+            .style('fill', 'red')
+            .style('fill-opacity', 1);
+        },
+        'mouseout': function (d, i) {
+          d3.select(this)
+            .style('fill', 'black')
+            .style('fill-opacity', 1);
+        }
+      }
+    }),
+    'verticalLabel': dex.config.text({
+      // If you want to stagger labels.
+      'dy': function (d, i) {
+        return (i % 2) ?
+        -chart.config.margin.top * .60 :
+        -chart.config.margin.top * .20;
+      },
+      'font.size': function (d) {
+        var maxFontSizeByHeight =
+          chart.config.margin.top * .5;
+        var maxFontSizeByWidth =
+          (chart.config.width - chart.config.margin.left - chart.config.margin.right) /
+          (chart.config.csv.header.length) / 10;
+        //dex.console.log("TITLE-FONT-SIZE: MAX-HEIGHT: " + maxFontSizeByHeight +
+        //", MAX-WIDTH: " + maxFontSizeByWidth);
+        return Math.max(Math.min(maxFontSizeByWidth, maxFontSizeByHeight), 4);
+      },
+      'anchor': 'middle',
+      'text': function (d) {
+        return d;
+      },
+      'events': {
+        'mouseover': function (d) {
+          //dex.console.log("Mouseover detected...");
+        }
+      }
+    }),
+    'selected.link': {
+      'stroke': dex.config.stroke(
+        {
+          'color': function (d, i) {
+            return chart.config.color(i);
+          },
+          'width': 2
+        }),
+      'fill': {
+        'fillColor': "none",
+        'fillOpacity': 1.0
+      },
+      'events': {
+        'mouseover': function () {
+          d3.select(this)
+            .style("stroke-width", chart.config.selected.link.stroke.width +
+              Math.max(4, (chart.config.selected.link.stroke.width / 3)))
+            .style("stroke-opacity", chart.config.selected.link.stroke.opacity);
+        },
+        'mouseout': function () {
+          d3.select(this)
+            .style("stroke-width", chart.config.selected.link.stroke.width)
+            .style("stroke-opacity", chart.config.selected.link.stroke.opacity);
+        }
+      }
+    },
+    'unselected.link': {
+      'stroke': dex.config.stroke(
+        {
+          'color': function (d, i) {
+            return chart.config.color(i);
+          },
+          'width': 1,
+          'dasharray': "10 10"
+        }),
+      'fill': {
+        'fillColor': "none",
+        'fillOpacity': 0.1
+      }
+    },
+    'brush': {
+      'width': 12,
+      'x': -6,
+      'opacity': .8,
+      'color': "steelblue",
+      'stroke': dex.config.stroke({'color': "black", 'width': 1})
+    },
+    'ui.config': {}
+  };
+
+
+  chart = new dex.component(userConfig, defaults);
+
+  chart.render = function render() {
+    var chart = this;
+    var config = chart.config;
+    var csv = config.csv;
+    d3.selectAll("#" + chart.config.id).remove();
+
+    window.onresize = this.resize;
+    chart.resize();
+
+    var chartContainer;
+    // Holds unselected paths.
+    var background;
+    // Holds selected paths.
+    var foreground;
+    // Will hold our column names.
+
+
+
+    var numericColumns =
+      dex.csv.getNumericColumnNames(csv);
+
+    var jsonData = dex.csv.toJson(csv);
+
+    var x = d3.scale.ordinal()
+      .rangePoints([0, config.width], 1);
+
+    var y = {};
+
+    var line = d3.svg.line();
+
+    var dimensions;
+    var key;
+
+    //dex.console.log("TRANSFORM:", config.transform, "HEIGHT: ", config.height, "WIDTH:", config.width);
+    chartContainer = d3.select(config.parent).append("g")
+      .attr("id", config["id"])
+      .attr("class", config["class"])
+      //.attr("width", config.width)
+      //.attr("height", config.height)
+      .attr("transform", config.transform);
+
+    // Extract the list of dimensions and create a scale for each.
+    //x.domain(dimensions = d3.keys(cars[0]).filter(function(d)
+    //{
+    //  return d != "name" && (y[d] = d3.scale.linear()
+    //    .domain(d3.extent(cars, function(p) { return +p[d]; }))
+    //    .range([height, 0]));
+    //}));
+    var allExtents = []
+
+    numericColumns.forEach(function (d) {
+      allExtents = allExtents.concat(d3.extent(jsonData, function (p) {
+        return +p[d];
+      }));
+    });
+
+    var normalizedExtent = d3.extent(allExtents);
+
+    // REM: Figure out how to switch over to consistent extents.  Snapping.
+    x.domain(dimensions = d3.keys(jsonData[0]).filter(function (d) {
+      if (d === "name") return false;
+
+      if (dex.object.contains(numericColumns, d)) {
+        var extent = d3.extent(jsonData, function (p) {
+          return +p[d];
+        });
+        if (config.normalize) {
+          extent = normalizedExtent;
+        }
+
+        y[d] = d3.scale.linear()
+          .domain(extent)
+          .range([config.height, 0]);
+        allExtents.concat(extent);
+      }
+      else {
+        y[d] = d3.scale.ordinal()
+          .domain(jsonData.map(function (p) {
+            return p[d];
+          }))
+          .rangePoints([config.height, 0]);
+      }
+
+      return true;
+    }));
+
+    // Add grey background lines for context.
+    background = chartContainer.append("g")
+      .attr("class", "background")
+      .selectAll("path")
+      .data(jsonData)
+      .enter().append("path")
+      .call(dex.config.configureLink, config.unselected.link)
+      .attr("d", path)
+      .attr("id", "fillpath");
+
+    foreground = chartContainer.append("g")
+      .attr("class", "foreground")
+      .selectAll("path")
+      .data(jsonData)
+      .enter().append("path")
+      .attr("d", path)
+      .call(dex.config.configureLink, config.selected.link);
+
+    foreground
+      .append("tooltip-content").text(function (d, i) {
+      var info = "<table border=\"1\">";
+      for (key in jsonData[i]) {
+        info += "<tr><td><b><i>" + key + "</i></b></td><td>" + jsonData[i][key] + "</td></tr>"
+      }
+      return info + "</table>";
+    });
+
+    // Returns the path for a given data point.
+    function path(d) {
+      return line(dimensions.map(function (p) {
+        return [x(p), y[p](d[p])];
+      }));
+    }
+
+    chart.update();
+  };
+
+  chart.resize = function resize() {
+    if (chart.config.resizable) {
+      var width = d3.select(chart.config.parent).property("clientWidth");
+      var height = d3.select(chart.config.parent).property("clientHeight");
+      chart
+        .attr("width", width - chart.config.margin.left - chart.config.margin.right)
+        .attr("height", height - chart.config.margin.top - chart.config.margin.bottom)
+        .attr("transform", "translate(" + chart.config.margin.left + "," +
+          chart.config.margin.top + ")");
+    }
+  };
+
+  chart.update = function update() {
+    var chart = this;
+    var config = chart.config;
+    var csv = config.csv;
+
+    var jsonData = dex.csv.toJson(csv);
+
+    var allExtents = []
+
+    var numericColumns =
+      dex.csv.getNumericColumnNames(csv);
+
+    var x = d3.scale.ordinal()
+      .rangePoints([0, config.width], 1);
+    var y = {};
+    var line = d3.svg.line();
+
+    numericColumns.forEach(function (d) {
+      allExtents = allExtents.concat(d3.extent(jsonData, function (p) {
+        return +p[d];
+      }));
+    });
+
+    var normalizedExtent = d3.extent(allExtents);
+
+    // REM: Figure out how to switch over to consistent extents.  Snapping.
+    x.domain(dimensions = d3.keys(jsonData[0]).filter(function (d) {
+      if (d === "name") return false;
+
+      if (dex.object.contains(numericColumns, d)) {
+        var extent = d3.extent(jsonData, function (p) {
+          return +p[d];
+        });
+        if (config.normalize) {
+          extent = normalizedExtent;
+        }
+
+        y[d] = d3.scale.linear()
+          .domain(extent)
+          .range([config.height, 0]);
+        allExtents.concat(extent);
+      }
+      else {
+        y[d] = d3.scale.ordinal()
+          .domain(jsonData.map(function (p) {
+            return p[d];
+          }))
+          .rangePoints([config.height, 0]);
+      }
+
+      return true;
+    }));
+
+    // Returns the path for a given data point.
+    function path(d) {
+      return line(dimensions.map(function (p) {
+        //dex.console.log("x=" + x(p));
+        return [x(p), y[p](d[p])];
+      }));
+    }
+
+    d3.select("g .foreground")
+      .selectAll("path")
+      .data(jsonData)
+      .transition(20)
+      .attr("d", path);
+
+    d3.select("g .foreground")
+      .selectAll("path")
+      .data(jsonData)
+
+    d3.select("g .foreground")
+      .selectAll("path")
+      .data(jsonData).exit()
+      .remove();
+
+    d3.selectAll("g .foreground")
+      .selectAll("path")
+      .selectAll("tooltip-content")
+      .remove();
+
+    d3.selectAll("g .foreground")
+      .selectAll("path")
+      .append("tooltip-content")
+      .text(function (d, i) {
+        var info = "<table border=\"1\">";
+        for (key in jsonData[i]) {
+          info += "<tr><td><b><i>" + key + "</i></b></td><td>" + jsonData[i][key] + "</td></tr>"
+        }
+        return info + "</table>";
+      });
+
+    d3.selectAll("g .background")
+      .selectAll("path")
+      .data(jsonData)
+      .transition(20)
+      .attr("d", path);
+
+    d3.selectAll("g .background")
+      .selectAll("path")
+      .data(jsonData)
+      .enter()
+      .append("path")
+      .call(dex.config.configureLink, config.unselected.link)
+      .attr("d", path)
+      .attr("id", "fillpath");
+
+    d3.selectAll("g .background")
+      .selectAll("path")
+      .data(jsonData)
+      .exit()
+      .remove();
+
+    chartContainer = d3.select(config.parent).append("g")
+      .attr("id", config["id"])
+      .attr("class", config["class"])
+      //.attr("width", config.width)
+      //.attr("height", config.height)
+      .attr("transform", config.transform);
+
+    var dimensions = chartContainer.selectAll(".dimension")
+      .data(dimensions)
+      .attr("class", "dimension")
+      .attr("transform", function (d) {
+        return "translate(" + x(d) + ")";
+      });
+
+    dimensions.enter()
+      .append("g")
+      .attr("class", "dimension")
+      .attr("transform", function (d) {
+        return "translate(" + x(d) + ")";
+      });
+
+    // Would be nice to transition axis too.
+    d3.selectAll("g .axis").remove();
+    d3.selectAll("g .brush").remove();
+
+    dimensions.append("g")
+     .attr("class", "axis")
+     .each(function (d, i) {
+
+     var axisScale = dex.config.createScale(dex.config.scale(config.axis.scale));
+     var axis = d3.svg.axis()
+     .scale(axisScale);
+
+     var myConfig = dex.object.clone(config.axis);
+     // If the last label, turn it to the right.
+     if (i == config.csv.header.length - 1) {
+     myConfig.orient = 'right';
+     myConfig.label.dx = function (d, i) {
+     return Math.max(chart.config.axis.label.font.size(d, i) / 2, 8);
+     }
+     }
+     // Configure and apply the axis.
+     dex.config.configureAxis(axis, myConfig, i);
+     d3.select(this).call(axis.scale(y[d]));
+
+     // Now that the axis has rendered, adjust the tick labels based on our spec.
+     var tickLabels = d3.select(this)
+     .selectAll('.tick')
+     .selectAll("text")
+     .call(dex.config.configureText, myConfig.label, i);
+     })
+     .append("text")
+     .call(dex.config.configureText, config.verticalLabel);
+
+    // Add and store a brush for each axis.
+    dimensions.append("g")
+      .attr("class", "brush")
+      .each(function (d) {
+        d3.select(this).call(y[d].brush =
+          d3.svg.brush().y(y[d])
+            .on("brush", brush)
+            .on("brushend", brushend));
+      })
+      .selectAll("rect")
+      .call(dex.config.configureRectangle, config.brush);
+
+    // Configure the axis lines:
+    //dex.console.log("DOMAIN", d3.selectAll(".domain"));
+    d3.selectAll(".domain")
+      .call(dex.config.configurePath, config.axis.line);
+
+    // Handles a brush event, toggling the display of foreground lines.
+    function brush() {
+      // Get a list of our active brushes.
+      var actives = dimensions.filter(function (p) {
+          return !y[p].brush.empty();
+        }),
+
+      // Get an array of min/max values for each brush constraint.
+        extents = actives.map(function (p) {
+          return y[p].brush.extent();
+        });
+
+      foreground.style("display", function (d) {
+        //dex.console.log("Calculating what lines to display: ", actives);
+        return actives.every(
+          // P is column name, i is an index
+          function (p, i) {
+            // Categorical
+            //console.log("P: " + p + ", I: " + i);
+            if (!dex.object.contains(numericColumns, p)) {
+              return extents[i][0] <= y[p](d[p]) && y[p](d[p]) <= extents[i][1];
+            }
+            // Numeric
+            else {
+              return extents[i][0] <= d[p] && d[p] <= extents[i][1];
+            }
+          }) ? null : "none";
+      });
+    }
+
+    // Handles a brush event, toggling the display of foreground lines.
+    function brushend() {
+      //dex.console.log("BRUSH-END: ", foreground);
+      //dex.console.log("chart: ", chart);
+      var activeData = [];
+      var i;
+
+      // WARNING:
+      //
+      // Can't find an elegant way to get back at the data so I am getting
+      // at the data in a somewhat fragile manner instead.  Mike Bostock ever
+      // changes the __data__ convention and this will break.
+      for (i = 0; i < foreground[0].length; i++) {
+        if (!(foreground[0][i]["style"]["display"] == "none")) {
+          activeData.push(foreground[0][i]['__data__']);
+        }
+      }
+
+      //dex.console.log("Selected: ", dex.json.toCsv(activeData, dimensions));
+      chart.publish({
+        "type": "select",
+        "selected": dex.json.toCsv(activeData, dimensions)});
+    }
+
+  };
+
+
+  $(document).ready(function () {
+    $(document).tooltip({
+      items: "path",
+      content: function () {
+        return $(this).find("tooltip-content").text();
+      },
+      track: true
+    });
+  });
+
+  return chart;
+};
+
+module.exports = parallelcoordinates;
+},{}],26:[function(require,module,exports){
+var piechart = function (userConfig) {
+  var chart = new dex.component(userConfig,
+    {
+      'parent'      : "#PieChart",
+      'id'          : "PieChart",
+      'class'       : "PieChart",
+      'csv'         : {
+        'header' : ["X", "Y"],
+        'data'   : [[0, 0], [1, 1], [2, 4], [3, 9], [4, 16]]
+      },
+      'xi'          : 0,
+      'yi'          : 2,
+      'xoffset'     : 200,
+      'yoffset'     : 0,
+      'colors'      : d3.scale.category20(),
+      'innerRadius' : 0,
+      'outerRadius' : 190,
+      'radius'      : 200,
+      'label'       : {
+        'fontSize'   : 16,
+        'textAnchor' : 'middle'
+      },
+      'caption'     : {
+        'text'       : '',
+        'fontSize'   : 24,
+        'textAnchor' : 'middle'
+      }
+    });
+
+  chart.render = function () {
+    window.onresize = this.resize;
+    chart.resize();
+  };
+
+  chart.resize = function () {
+    d3.selectAll("#" + chart.config.id).remove();
+    var width = d3.select(chart.config.parent).property("clientWidth");
+    var height = d3.select(chart.config.parent).property("clientHeight");
+    chart
+      .attr("width", width)
+      .attr("height", height)
+      .attr("outerRadius", Math.min(width / 2, height / 2))
+      .attr("transform", "translate(" + (width / 2) + "," + (height / 2) + ")")
+      .update();
+  };
+
+  chart.update = function () {
+    var chart = this;
+    var config = chart.config;
+    var csv = config.csv;
+
+//  var radius = Math.min(config.width, config.height) / 2;
+
+    var color = d3.scale.ordinal()
+      .range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
+
+    var arc = d3.svg.arc()
+      .outerRadius(config.outerRadius)
+      .innerRadius(config.innerRadius);
+
+    var pie = d3.layout.pie()
+      .sort(null)
+      .value(function (d) {
+        return d[config.yi];
+      });
+
+    var chartContainer = d3.select(config.parent).append("g")
+      .attr("id", config["id"])
+      .attr("class", config["class"])
+      .attr("transform", config.transform);
+
+    var data = csv.data;
+
+    // Convert all y values to numerics.
+    data.forEach(function (d) {
+      d[config.yi] = +d[config.yi];
+    });
+
+    var g = chartContainer.selectAll(".arc")
+      .data(pie(data, function (d) {
+        return d[config.yi];
+      }))
+      .enter().append("g")
+      .attr("class", function (d) {
+        return "arc";
+      });
+
+    g.append("path")
+      .attr("d", arc)
+      .style("fill", function (d, i) {
+        return config.colors(i);
+      });
+
+    g.append("text")
+      .attr("transform", function (d) {
+        return "translate(" + arc.centroid(d) + ")";
+      })
+      .attr("dy", ".35em")
+      .style("text-anchor", config.label.textAnchor)
+      .style("font-size", config.label.fontSize)
+      .text(function (d) {
+        return d.data[config.xi];
+      });
+
+    chartContainer.append("text")
+      //.attr("dy", ".35em")
+      .attr("y", -config.radius)
+      .style("font-size", config.caption.fontSize)
+      .style("text-anchor", config.caption.textAnchor)
+      .text(config.caption.text);
+  };
+
+  $(document).ready(function () {
+    // Make the entire chart draggable.
+    $(chart.config.parent).draggable();
+  });
+
+  return chart;
+};
+
+module.exports = piechart;
+},{}],27:[function(require,module,exports){
+var radarchart = function (userConfig) {
+    var chart;
+
+    var defaults =
+    {
+        // The parent container of this chart.
+        'parent': '#RadarChart',
+        // Set these when you need to CSS style components independently.
+        'id': 'RadarChart',
+        'class': 'RadarChart',
+        'resizable': true,
+        // Our data...
+        'csv': {
+            // Give folks without data something to look at anyhow.
+            'header': ["Salesman", "Q1", "Q2", "Q3", "Q4"],
+            'data': [
+                ["Bob", Math.random(), Math.random(), Math.random(), Math.random()],
+                ["Sue", Math.random(), Math.random(), Math.random(), Math.random()],
+                ["Joe", Math.random(), Math.random(), Math.random(), Math.random()],
+                ["Peg", Math.random(), Math.random(), Math.random(), Math.random()],
+                ["Pat", Math.random(), Math.random(), Math.random(), Math.random()],
+                ["Jim", Math.random(), Math.random(), Math.random(), Math.random()],
+                ["Tim", Math.random(), Math.random(), Math.random(), Math.random()],
+                ["Sam", Math.random(), Math.random(), Math.random(), Math.random()]
+            ]
+        },
+        'width': "100%",
+        'height': "100%",
+        'transform': "",
+        'margin': {top: 20, right: 20, bottom: 20, left: 20},
+        'wrapWidth': 60,
+        'levels': 5,
+        'maxValue': 0,
+        'labelFactor': 1.25,
+        'dotRadius': 4,
+        'opacityCircles': 0.1,
+        'strokeWidth': 2,
+        'roundStrokes': false,
+        'color': d3.scale.category10(),
+        'title': dex.config.text(),
+        'label': dex.config.text(),
+        'opacityArea': 0.35,
+        'radar.circle': dex.config.circle({
+            'opacity': 0.1,
+            'fill' : {
+                'fillColor': '#CDCDCD',
+                'fillOpacity' :.2
+            },
+            'stroke': {
+                'width': 1,
+                'color': 'black',
+                'opacity': .1,
+                'dasharray': "0"
+            },
+            'events': {
+                'mouseover': function () {
+                    d3.select(this)
+                        .style("stroke", 'red')
+                        .style("stroke-width", 2);
+                },
+                'mouseout': function () {
+                    d3.select(this)
+                        .style("stroke", chart.config.radar.circle.stroke.color)
+                        .style("stroke-width", chart.config.radar.circle.stroke.width);
+                }
+            }
+        })
+    };
+
+    var chart = new dex.component(userConfig, defaults);
+
+    chart.render = function render() {
+        window.onresize = this.resize;
+        chart.resize();
+    };
+
+    chart.resize = function resize() {
+        if (chart.config.resizable) {
+            var width = d3.select(chart.config.parent).property("clientWidth");
+            var height = d3.select(chart.config.parent).property("clientHeight");
+            dex.console.log(chart.config.id + ": resize(" + width + "," + height + ")");
+            chart.attr("width", width).attr("height", height).update();
+        }
+        else {
+            chart.update();
+        }
+    };
+
+    chart.update = function () {
+        var chart = this;
+        var config = chart.config;
+        var csv = config.csv;
+
+        d3.selectAll("#" + config.id).remove();
+
+        data = csv.data.map(function (row) {
+            return {
+                'key': row[0],
+                'values': row.slice(1).map(function (d, i) {
+                    return {
+                        'axis': csv.header[i + 1],
+                        'value': +d
+                    }
+                })
+            }
+        });
+
+        console.dir(data);
+
+        data = data.map(function (d) {
+            return d.values
+        })
+
+        console.dir(data);
+
+        var extents = dex.matrix.extent(csv.data, dex.range(1, csv.header.length-1));
+
+        //If the supplied maxValue is smaller than the actual one, replace by the max in the data
+        var maxValue = extents[1];
+
+        var allAxis = (data[0].map(function (i, j) {
+                return i.axis
+            })),	//Names of each axis
+            total = allAxis.length,					//The number of different axes
+            radius = Math.min(
+                (config.width - config.margin.left - config.margin.right) / 2,
+                (config.height - config.margin.top - config.margin.bottom) / 2),
+
+            //Format = d3.format('%'),			 	//Percentage formatting
+            angleSlice = Math.PI * 2 / total;			//The width in radians of each "slice"
+
+        //Scale for the radius
+        var rScale = d3.scale.linear()
+            .range([0, radius])
+            .domain([0, maxValue]);
+
+        /////////////////////////////////////////////////////////
+        //////////// Create the container SVG and g /////////////
+        /////////////////////////////////////////////////////////
+
+        //Initiate the radar chart SVG
+        var chartContainer = d3.select(config.parent).append("g")
+            .attr("id", config["id"])
+            .attr("class", config["class"])
+            //.attr("width", config.width)
+            //.attr("height", config.height)
+            .attr("transform", config.transform +
+            "translate(" + config.width / 2 + " " + config.height / 2 + ")");
+
+        /////////////////////////////////////////////////////////
+        ////////// Glow filter for some extra pizzazz ///////////
+        /////////////////////////////////////////////////////////
+
+        //Filter for the outside glow
+        var filter = chartContainer.append('defs').append('filter').attr('id', 'glow'),
+            feGaussianBlur = filter.append('feGaussianBlur').attr('stdDeviation', '2.5').attr('result', 'coloredBlur'),
+            feMerge = filter.append('feMerge'),
+            feMergeNode_1 = feMerge.append('feMergeNode').attr('in', 'coloredBlur'),
+            feMergeNode_2 = feMerge.append('feMergeNode').attr('in', 'SourceGraphic');
+
+        /////////////////////////////////////////////////////////
+        /////////////// Draw the Circular grid //////////////////
+        /////////////////////////////////////////////////////////
+
+        //Wrapper for the grid & axes
+        var axisGrid = chartContainer.append("g").attr("class", "axisWrapper");
+
+        //Draw the background circles, broken in WebView
+        axisGrid.selectAll(".levels")
+            .data(d3.range(1, (config.levels + 1)).reverse())
+            .enter()
+            .append("circle")
+            .attr("class", "gridCircle")
+            // TODO: This breaks webview.
+            //.style("filter", "url(#glow)")
+            .call(dex.config.configureCircle, config.radar.circle)
+            .attr("r", function (d, i) {
+                return radius / config.levels * d;
+            });
+
+        //Text indicating at what % each level is
+
+        axisGrid.selectAll(".axisLabel")
+            .data(d3.range(1, (config.levels + 1)).reverse())
+            .enter().append("text")
+            .attr("class", "axisLabel")
+            .attr("x", 4)
+            .attr("y", function (d) {
+                return -d * radius / config.levels;
+            })
+            .attr("dy", "0.4em")
+            .style("font-size", "10px")
+            .attr("fill", "#737373")
+            .text(function (d, i) {
+                return maxValue * d / config.levels;
+                //Format(maxValue * d / config.levels);
+            });
+
+        /////////////////////////////////////////////////////////
+        //////////////////// Draw the axes //////////////////////
+        /////////////////////////////////////////////////////////
+
+        //Create the straight lines radiating outward from the center
+        var axis = axisGrid.selectAll(".axis")
+            .data(allAxis)
+            .enter()
+            .append("g")
+            .attr("class", "axis");
+        //Append the lines
+        axis.append("line")
+            .attr("x1", 0)
+            .attr("y1", 0)
+            .attr("x2", function (d, i) {
+                return rScale(maxValue * 1.1) * Math.cos(angleSlice * i);
+            })
+            .attr("y2", function (d, i) {
+                return rScale(maxValue * 1.1) * Math.sin(angleSlice * i);
+            })
+            .attr("class", "line")
+            .style("stroke", "white")
+            .style("stroke-width", "2px");
+
+        //Append the labels at each axis
+        axis.append("text")
+            .attr("class", "legend")
+            .style("font-size", "11px")
+            .attr("text-anchor", "middle")
+            .attr("dy", "0.35em")
+            .attr("x", function (d, i) {
+                return rScale(maxValue * config.labelFactor) * Math.cos(angleSlice * i - Math.PI / 2);
+            })
+            .attr("y", function (d, i) {
+                return rScale(maxValue * config.labelFactor) * Math.sin(angleSlice * i - Math.PI / 2);
+            })
+            .text(function (d) {
+                return d
+            })
+            .call(wrap, config.wrapWidth);
+
+        /////////////////////////////////////////////////////////
+        ///////////// Draw the radar chart blobs ////////////////
+        /////////////////////////////////////////////////////////
+
+        //The radial line function
+        var radarLine = d3.svg.line.radial()
+            .interpolate("linear-closed")
+            .radius(function (d) {
+                return rScale(d.value);
+            })
+            .angle(function (d, i) {
+                return i * angleSlice;
+            });
+
+        if (config.roundStrokes) {
+            radarLine.interpolate("cardinal-closed");
+        }
+
+        //Create a wrapper for the blobs
+        var blobWrapper = chartContainer.selectAll(".radarWrapper")
+            .data(data)
+            .enter().append("g")
+            .attr("class", "radarWrapper");
+
+        //Append the backgrounds
+        blobWrapper
+            .append("path")
+            .attr("class", "radarArea")
+            .attr("d", function (d, i) {
+                return radarLine(d);
+            })
+            .style("fill", function (d, i) {
+                return config.color(i);
+            })
+            .style("fill-opacity", config.opacityArea)
+            .on('mouseover', function (d, i) {
+                //Dim all blobs
+                d3.selectAll(".radarArea")
+                    .transition().duration(200)
+                    .style("fill-opacity", 0.1);
+                //Bring back the hovered over blob
+                d3.select(this)
+                    .transition().duration(200)
+                    .style("fill-opacity", 0.7);
+            })
+            .on('mouseout', function () {
+                //Bring back all blobs
+                d3.selectAll(".radarArea")
+                    .transition().duration(200)
+                    .style("fill-opacity", config.opacityArea);
+            });
+
+        //Create the outlines
+        blobWrapper.append("path")
+            .attr("class", "radarStroke")
+            .attr("d", function (d, i) {
+                return radarLine(d);
+            })
+            .style("stroke-width", config.strokeWidth + "px")
+            .style("stroke", function (d, i) {
+                return config.color(i);
+            })
+            .style("fill", "none")
+            .style("filter", "url(#glow)");
+
+        //Append the circles
+        blobWrapper.selectAll(".radarCircle")
+            .data(function (d, i) {
+                return d;
+            })
+            .enter().append("circle")
+            .attr("class", "radarCircle")
+            .attr("r", config.dotRadius)
+            .attr("cx", function (d, i) {
+                return rScale(d.value) * Math.cos(angleSlice * i - Math.PI / 2);
+            })
+            .attr("cy", function (d, i) {
+                return rScale(d.value) * Math.sin(angleSlice * i - Math.PI / 2);
+            })
+            .style("fill", function (d, i, j) {
+                return config.color(j);
+            })
+            .style("fill-opacity", 0.8);
+
+        /////////////////////////////////////////////////////////
+        //////// Append invisible circles for tooltip ///////////
+        /////////////////////////////////////////////////////////
+
+        //Wrapper for the invisible circles on top
+        var blobCircleWrapper = chartContainer.selectAll(".radarCircleWrapper")
+            .data(data)
+            .enter().append("g")
+            .attr("class", "radarCircleWrapper");
+
+        //Append a set of invisible circles on top for the mouseover pop-up
+        blobCircleWrapper.selectAll(".radarInvisibleCircle")
+            .data(function (d, i) {
+                return d;
+            })
+            .enter().append("circle")
+            .attr("class", "radarInvisibleCircle")
+            .attr("r", config.dotRadius * 1.5)
+            .attr("cx", function (d, i) {
+                return rScale(d.value) * Math.cos(angleSlice * i - Math.PI / 2);
+            })
+            .attr("cy", function (d, i) {
+                return rScale(d.value) * Math.sin(angleSlice * i - Math.PI / 2);
+            })
+            .style("fill", "none")
+            .style("pointer-events", "all")
+            .on("mouseover", function (d, i) {
+                newX = parseFloat(d3.select(this).attr('cx')) - 10;
+                newY = parseFloat(d3.select(this).attr('cy')) - 10;
+
+                tooltip
+                    .attr('x', newX)
+                    .attr('y', newY)
+                    .text(Format(d.value))
+                    .transition().duration(200)
+                    .style('opacity', 1);
+            })
+            .on("mouseout", function () {
+                tooltip.transition().duration(200)
+                    .style("opacity", 0);
+            });
+
+        //Set up the small tooltip for when you hover over a circle
+        var tooltip = chartContainer.append("text")
+            .attr("class", "tooltip")
+            .style("opacity", 0);
+
+        /////////////////////////////////////////////////////////
+        /////////////////// Helper Function /////////////////////
+        /////////////////////////////////////////////////////////
+
+        //Taken from http://bl.ocks.org/mbostock/7555321
+        //Wraps SVG text
+        function wrap(text, width) {
+            text.each(function () {
+                var text = d3.select(this),
+                    words = text.text().split(/\s+/).reverse(),
+                    word,
+                    line = [],
+                    lineNumber = 0,
+                    lineHeight = 1.4, // ems
+                    y = text.attr("y"),
+                    x = text.attr("x"),
+                    dy = parseFloat(text.attr("dy")),
+                    tspan = text.text(null).append("tspan").attr("x", x).attr("y", y).attr("dy", dy + "em");
+
+                while (word = words.pop()) {
+                    line.push(word);
+                    tspan.text(line.join(" "));
+                    if (tspan.node().getComputedTextLength() > width) {
+                        line.pop();
+                        tspan.text(line.join(" "));
+                        line = [word];
+                        tspan = text.append("tspan").attr("x", x).attr("y", y).attr("dy", ++lineNumber * lineHeight + dy + "em").text(word);
+                    }
+                }
+            });
+        }//wrap
+    };
+
+    $(document).ready(function () {
+        // Make the entire chart draggable.
+        //$(chart.config.parent).draggable();
+    });
+
+    return chart;
+};
+
+module.exports = radarchart;
+
+},{}],28:[function(require,module,exports){
+var radialtree = function (userConfig) {
+  var chart;
+
+  var defaults =
+  {
+    // The parent container of this chart.
+    'parent'       : '#RadialTree',
+    // Set these when you need to CSS style components independently.
+    'id'           : 'RadialTree',
+    'class'        : 'RadialTree',
+    'resizable'   : true,
+    // Our data...
+    'csv'          : {
+      // Give folks without data something to look at anyhow.
+      'header' : ["X", "Y", "Z"],
+      'data'   : [
+        [0, 0, 0],
+        [1, 1, 1],
+        [2, 2, 2]
+      ]
+    },
+    'width'        : "100%",
+    'height'       : "100%",
+    'transform'    : "translate(0 0)",
+    'title'        : dex.config.text(),
+    'label'        : dex.config.text(
+      {
+        'font' : dex.config.font({
+          'family': 'sans-serif',
+          'size': 10,
+        })
+      }
+    ),
+    'connectionLength' : 80
+  };
+
+  var chart = new dex.component(userConfig, defaults);
+
+  chart.render = function render() {
+    window.onresize = this.resize;
+    chart.resize();
+  };
+
+  chart.resize = function resize() {
+    if (chart.config.resizable) {
+      var width = d3.select(chart.config.parent).property("clientWidth");
+      var height = d3.select(chart.config.parent).property("clientHeight");
+      dex.console.log(chart.config.id + ": resize(" + width + "," + height + ")");
+      chart.attr("width", width).attr("height", height).update();
+    }
+    else {
+      chart.update();
+    }
+  };
+
+  chart.update = function () {
+    var chart = this;
+    var config = chart.config;
+    var csv = config.csv;
+
+    d3.selectAll("#" + config.id).remove();
+
+    var data = dex.csv.toNestedJson(dex.csv.copy(csv));
+    dex.console.log("DATA", csv, data);
+
+    var diameter = Math.min(config.height, config.width);
+
+    var margin = {top: 20, right: 60, bottom: 20, left: 60},
+      width = diameter,
+      height = diameter;
+
+    var i = 0,
+      duration = 350,
+      root;
+
+    var tree = d3.layout.tree()
+      .size([360, diameter / 2 - 80])
+      .separation(function(a, b) { return (a.parent == b.parent ? 1 : 10) / a.depth; });
+
+    var diagonal = d3.svg.diagonal.radial()
+      .projection(function(d) { return [d.y, d.x / 180 * Math.PI]; });
+
+    var chartContainer = d3.select(config.parent).append("g")
+      .attr("class", config["id"])
+      .attr("id", config["id"])
+      .attr("transform", "translate(" + diameter / 2 + "," + diameter / 2 + ")");
+
+    root = data;
+    root.x0 = height / 2;
+    root.y0 = 0;
+
+    //root.children.forEach(collapse); // start with all children collapsed
+    update(root);
+
+    //d3.select(self.frameElement).style("height", "800px");
+
+    function update(source) {
+
+      // Compute the new tree layout.
+      var nodes = tree.nodes(root),
+        links = tree.links(nodes);
+
+      // Normalize for fixed-depth.
+      nodes.forEach(function(d) { d.y = d.depth * config.connectionLength; });
+
+      // Update the nodes…
+      var node = chartContainer.selectAll("g.node")
+        .data(nodes, function(d) { return d.id || (d.id = ++i); });
+
+      // Enter any new nodes at the parent's previous position.
+      var nodeEnter = node.enter().append("g")
+        .attr("class", "node")
+        //.attr("transform", function(d) { return "rotate(" + (d.x - 90) + ")translate(" + d.y + ")"; })
+        .on("click", click);
+
+      nodeEnter.append("circle")
+        .attr("r", 1e-6)
+        .style("fill", function(d) { return d._children ? "lightsteelblue" : "#fff"; });
+
+      nodeEnter.append("text")
+        .attr("x", 10)
+        .attr("dy", ".35em")
+        .attr("text-anchor", "start")
+        //.attr("transform", function(d) { return d.x < 180 ? "translate(0)" : "rotate(180)translate(-" + (d.name.length * 8.5)  + ")"; })
+        .text(function(d) { return d.name; })
+        .call(dex.config.configureText, config.label);
+        //.style("fill-opacity", 1e-6);
+
+      // Transition nodes to their new position.
+      var nodeUpdate = node.transition()
+        .duration(duration)
+        .attr("transform", function(d) { return "rotate(" + (d.x - 90) + ")translate(" + d.y + ")"; })
+
+      nodeUpdate.select("circle")
+        .attr("r", 4.5)
+        .style("fill", function(d) { return d._children ? "lightsteelblue" : "#fff"; });
+
+      nodeUpdate.select("text")
+        .style("fill-opacity", 1)
+        .attr("transform", function(d) { return d.x < 180 ? "translate(0)" : "rotate(180)translate(-" + (d.name.length + 50)  + ")"; });
+
+      // TODO: appropriate transform
+      var nodeExit = node.exit().transition()
+        .duration(duration)
+        //.attr("transform", function(d) { return "diagonal(" + source.y + "," + source.x + ")"; })
+        .remove();
+
+      nodeExit.select("circle")
+        .attr("r", 1e-6);
+
+      nodeExit.select("text")
+        .style("fill-opacity", 1e-6);
+
+      // Update the links…
+      var link = chartContainer.selectAll("path.link")
+        .data(links, function(d) { return d.target.id; });
+
+      // Enter any new links at the parent's previous position.
+      link.enter().insert("path", "g")
+        .attr("class", "link")
+        .attr("d", function(d) {
+          var o = {x: source.x0, y: source.y0};
+          return diagonal({source: o, target: o});
+        });
+
+      // Transition links to their new position.
+      link.transition()
+        .duration(duration)
+        .attr("d", diagonal);
+
+      // Transition exiting nodes to the parent's new position.
+      link.exit().transition()
+        .duration(duration)
+        .attr("d", function(d) {
+          var o = {x: source.x, y: source.y};
+          return diagonal({source: o, target: o});
+        })
+        .remove();
+
+      // Stash the old positions for transition.
+      nodes.forEach(function(d) {
+        d.x0 = d.x;
+        d.y0 = d.y;
+      });
+    }
+
+    // Toggle children on click.
+    function click(d) {
+      if (d.children) {
+        d._children = d.children;
+        d.children = null;
+      } else {
+        d.children = d._children;
+        d._children = null;
+      }
+
+      update(d);
+    }
+
+    // Collapse nodes
+    function collapse(d) {
+      if (d.children) {
+        d._children = d.children;
+        d._children.forEach(collapse);
+        d.children = null;
+      }
+    }
+
+  };
+
+  $(document).ready(function () {
+    // Make the entire chart draggable.
+    //$(chart.config.parent).draggable();
+  });
+
+  return chart;
+};
+
+module.exports = radialtree;
+
+
+},{}],29:[function(require,module,exports){
+var sankey = function (userConfig) {
+    var defaultColor = d3.scale.category20c();
+
+    var defaults =
+    {
+        // The parent container of this chart.
+        'parent': null,
+        // Set these when you need to CSS style components independently.
+        'id': 'Sankey',
+        'class': 'Sankey',
+        // Our data...
+        'csv': {
+            // Give folks without data something to look at anyhow.
+            'header': ["X", "Y", "WEIGHT"],
+            'data': [
+                ["A1", "A2", 1],
+                ["B1", "B2", 2],
+                ["C1", "C2", 2],
+                ["C2", "C3", 4]
+            ]
+        },
+        'relationships': null,
+        // width and height of our bar chart.
+        'width': "100%",
+        'height': "100%",
+        // The x an y indexes to chart.
+        "transform": "translate(5,0) scale(.95)",
+        'layoutIterations': 32,
+        'columnTitle': dex.config.text({
+                'fill.fillColor': 'black',
+                'x': function (d) {
+                    var center = window.innerWidth / 2;
+                    //var center = (typeof userConfig.width !== 'undefined' ?
+                    //  userConfig.width : defaults.width) / 2;
+
+                    var nodeWidth = (userConfig.mouseout && userConfig.mouseout.node &&
+                    userConfig.mouseout.node.rectangle && userConfig.mouseout.node.rectangle.width) ?
+                        userConfig.mouseout.node.rectangle.width : defaults.mouseout.node.rectangle.width;
+
+                    var nodePadding = (userConfig.mouseout && userConfig.mouseout.node &&
+                    userConfig.mouseout.node.padding) ?
+                        userConfig.mouseout.node.padding : defaults.mouseout.node.padding;
+
+                    //dex.console.log("d.x=" + d.x + ", width=" + window.innerWidth + ", nodeWidth=" + nodeWidth +
+                    //  ", nodePadding=" + nodePadding + ", center=" + center);
+                    if (+d > center) {
+                        //return +d-nodePadding-nodeWidth;
+                        return +d + nodeWidth / 2;
+                    }
+                    else {
+                        //return +d + nodeWidth + nodePadding;
+                        return +d + nodeWidth / 2;
+                    }
+                },
+                "y": 10,
+                "writingMode": "tb",
+                "glyphOrientationVertical": 0,
+                "anchor": function (d, i) {
+                    //var center = (typeof userConfig.width !== 'undefined' ?
+                    // userConfig.width : defaults.width) / 2;
+                    var center = window.innerWidth / 2;
+
+                    if (+d > center) {
+                        // End if horizontal
+                        return "start";
+                    }
+                    else {
+                        return "start";
+                    }
+                },
+                "text": function (d, i) {
+                    return d + ", i" + i;
+                }
+            }
+        ),
+        'label': dex.config.text({
+            'fill.fillColor': 'black',
+            'x': function (d) {
+                var center = window.innerWidth / 2;
+                //var center = (typeof userConfig.width !== 'undefined' ?
+                //  userConfig.width : defaults.width) / 2;
+
+                var nodeWidth = (userConfig.mouseout && userConfig.mouseout.node &&
+                userConfig.mouseout.node.rectangle &&
+                userConfig.mouseout.node.rectangle.width) ?
+                    userConfig.mouseout.node.rectangle.width : defaults.mouseout.node.rectangle.width;
+
+                var nodePadding = (userConfig.mouseout && userConfig.mouseout.node &&
+                userConfig.mouseout.node.padding) ?
+                    userConfig.mouseout.node.padding : defaults.mouseout.node.padding;
+
+                //dex.console.log("d.x=" + d.x + ", width=" + window.innerWidth + ", nodeWidth=" + nodeWidth +
+                //  ", nodePadding=" + nodePadding + ", center=" + center);
+                if (d.x > center) {
+                    return -nodePadding;
+                }
+                else {
+                    return nodeWidth + nodePadding;
+                }
+            },
+            'y': function (d) {
+                return d.dy / 2;
+            },
+            'transform': null,
+            'dy': '.35em',
+            'anchor': function (d, i) {
+                //var center = (typeof userConfig.width !== 'undefined' ?
+                // userConfig.width : defaults.width) / 2;
+                var center = window.innerWidth / 2;
+
+                if (d.x > center) {
+                    return "end";
+                }
+                else {
+                    return "start";
+                }
+            },
+            'font': {
+                'size': 14
+            },
+            'color': "black",
+            'opacity': 1,
+            'text': function (d) {
+                return d.name;
+            }
+        }),
+        //'columnLayout' : function(node, nodeMap) { return nodeMap[node.name].column },
+        'mouseout': {
+            'link': {
+                'stroke': dex.config.stroke({
+                    'opacity': .2,
+                    'color': function (d) {
+                        return defaultColor(d.category);
+                    },
+                    'width': function (d) {
+                        //return 0;
+                        return Math.max(1, d.dy);
+                    }
+                }),
+                'fill' : dex.config.fill({
+                    'fillColor': 'none',
+                    'fillOpacity': .4
+                }),
+                'curvature': 0.5
+            },
+            'node': {
+                'padding': 4,
+                'rectangle': dex.config.rectangle(
+                    {
+                        'width': 32,
+                        'color': function (d) {
+                            return defaultColor(d.name.replace(/ .*/, ""));
+                        },
+                        'height': function (d) {
+                            return d.dy;
+                        },
+                        'stroke': dex.config.stroke({
+                            'color': function (d) {
+                                return d3.rgb(d.color).darker(2);
+                            }
+                        })
+                    })
+            }
+        },
+        'mouseover': {
+            'link': {
+                'stroke': dex.config.stroke({
+                    'opacity': .8,
+                    'width': function (d) {
+                        return Math.max(1, d.dy);
+                    },
+                    'color': function (d) {
+                        return defaultColor(d.category);
+                    }
+                }),
+                'fill' : dex.config.fill({
+                    'fillColor': 'none',
+                    'fillOpacity': .8
+                }),
+            },
+            'node': {
+                'stroke': dex.config.stroke({
+                    'opacity': .8,
+                    'width': function (d) {
+                        return Math.max(1, d.dy);
+                    },
+                    'color': function (d) {
+                        return defaultColor(d.category);
+                    }
+                }),
+                'fill' : dex.config.fill({
+                    'fillColor': 'none',
+                    'fillOpacity': .8
+                })
+            }
+        },
+        'node': {
+            'padding': 4,
+            'rectangle': dex.config.rectangle(
+                {
+                    'width': 32,
+                    'color': function (d) {
+                        return defaultColor(d.name.replace(/ .*/, ""));
+                    },
+                    'height': function (d) {
+                        return d.dy;
+                    },
+                    'stroke': dex.config.stroke({
+                        'color': function (d) {
+                            return d3.rgb(d.color).darker(2);
+                        }
+                    })
+                })
+        },
+        "manualColumnLayout": false
+    };
+
+    //dex.console.log("USER-CONFIG", userConfig, "DEFAULTS:", defaults);
+    var config = dex.object.overlay(dex.config.expand(userConfig), dex.config.expand(defaults));
+
+    // If we do not have specifically defined relationship fields, then lets
+    // try to make an educated guess about what to do with them.  If the last
+    // column is numeric, we will assume that this is to be used as a weight.
+    // Otherwise, we will use a uniform weighting of 1 for each link.
+    if (!config.relationships) {
+        // If we have less than 3 columns or the last column does not contain
+        // numerics then we will create a set of relationships for each column
+        // with a standard weight of 1 and a single category of 1.
+        if (config.csv.header.length < 3 || !dex.csv.isColumnNumeric(config.csv, config.csv.header.length - 1)) {
+            config.relationships = [];
+
+            for (i = 1; i < config.csv.header.length; i++) {
+                config.relationships.push(
+                    {
+                        'source': i - 1,
+                        'target': i,
+                        'value': function (csv, ri) {
+                            return 1;
+                        },
+                        'category': function (csv, ri) {
+                            return 1;
+                        },
+                        'column': function (csv, ri, ci) {
+                            return i;
+                        }
+                    });
+            }
+        }
+        // If we fall through here, then the last column is numeric.  We will
+        // use this for our weight.
+        else {
+            config.relationships = [];
+
+            for (i = 1; i < config.csv.header.length - 1; i++) {
+                config.relationships.push(
+                    {
+                        'source': i - 1,
+                        'target': i,
+                        'value': function (csv, ri) {
+                            return csv.data[ri][csv.header.length - 1];
+                        },
+                        'category': function (csv, ri) {
+                            return 1;
+                        },
+                        'column': function (csv, ri, ci) {
+                            return i;
+                        }
+                    });
+            }
+        }
+    }
+
+    var chart = new dex.component(userConfig, config);
+
+    // TODO: Figure out how I want to do this.  Partial implementation.
+    chart.renderGui = function () {
+        dex.console.log("SETTINGS", d3.select("#settings").select("#" + chart.config.id).selectAll("#setting"));
+        d3.select("#settings").select("#" + chart.config.id).selectAll("#setting").each(function (d) {
+            dex.console.log("SETTING", d);
+        });
+    };
+
+    chart.render = function () {
+        window.onresize = this.resize;
+        this.update();
+    };
+
+    chart.resize = function () {
+        var width = window.innerWidth;
+        var height = window.innerHeight;
+
+        //dex.console.log(config.id + " RESIZING: " + width + "x" + height);
+        d3.selectAll("#" + config.id).remove();
+
+        chart.attr("width", width)
+            .attr("height", height)
+            .update();
+    };
+
+    chart.update = function () {
+        var config = chart.config;
+        //dex.console.log("UPDATING CHART....");
+        //dex.console.log("-- WIDTH : " + config.width);
+        //dex.console.log("-- HEIGHT: " + config.height);
+        var width = d3.select(config.parent).property("clientWidth");
+        var height = d3.select(config.parent).property("clientHeight");
+
+        d3.selectAll("#" + config.id).remove();
+
+        var chartContainer = d3.select(config.parent).append("g")
+            .attr("class", config["id"])
+            .attr("id", config["id"])
+            .attr("width", config.width)
+            .attr("height", config.height)
+            .attr("transform", config.transform);
+
+        var sankeyData = [];
+
+        var nodeMap = {};
+
+        for (ri = 0; ri < config.relationships.length; ri++) {
+            for (i = 0; i < config.csv.data.length; i++) {
+                var relation = [];
+                var source;
+                var target;
+
+                if (dex.object.isFunction(config.relationships[ri].source)) {
+                    source = config.relationships[ri].source(config.csv, i);
+                }
+                else {
+                    source =
+                    {
+                        'nodeName': config.csv.data[i][config.relationships[ri].source],
+                        'name': config.csv.data[i][config.relationships[ri].source],
+                        'column': (config.relationships[ri].column) ?
+                            config.relationships[ri].column(csv, i, config.relationships[ri].source) :
+                            config.relationships[ri].source
+                    };
+                }
+
+                if (dex.object.isFunction(config.relationships[ri].target)) {
+                    target = config.relationships[ri].target(config.csv, i);
+                }
+                else {
+                    target =
+                    {
+                        'nodeName': config.csv.data[i][config.relationships[ri].target],
+                        'name': config.csv.data[i][config.relationships[ri].target],
+                        'column': (config.relationships[ri].column) ?
+                            config.relationships[ri].column(csv, i, config.relationships[ri].target) :
+                            config.relationships[ri].target
+                    }
+                }
+
+                relation.source = source.nodeName;
+                relation.target = target.nodeName;
+
+                // Store this to translate nodenames back to display names.
+                nodeMap[source.nodeName] = source;
+                nodeMap[target.nodeName] = target;
+
+                // Wrap source and target info:
+                //dex.console.log("RELATION", config.relationships[ri]);
+                if (typeof config.relationships[ri].category === "undefined") {
+                    //relation.category = csv.data[i][config.relationships[ri].source];
+                    relation.category = 1;
+                }
+                else if (dex.object.isFunction(config.relationships[ri].category)) {
+                    relation.category = config.relationships[ri].category(config.csv, i);
+                }
+                else {
+                    relation.category = config.relationships[ri].category;
+                }
+
+                relation.linkid = "L" + i;
+
+                if (typeof config.relationships[ri].value === "undefined") {
+                    relation.value = 1;
+                }
+                else if (dex.object.isFunction(config.relationships[ri].value)) {
+                    relation.value = config.relationships[ri].value(config.csv, i);
+                }
+                else {
+                    relation.value = config.relationships[ri].value;
+                }
+
+                sankeyData.push(relation);
+            }
+        }
+        //dex.console.log("sankeyData", sankeyData);
+        var units = "Units";
+
+        var formatNumber = d3.format(",.0f"),    // zero decimal places
+            format = function (d) {
+                return formatNumber(d) + " " + units;
+            };
+
+        chartContainer.onresize = chart.resize;
+
+        function manualColumnLayout(nodes, nodeWidth, size) {
+            var numSinks = 1;
+
+            nodes.forEach(function (node) {
+                //node.x = (nodeMap[node.name].column) * nodeWidth;
+                node.x = (nodeMap[node.name].column - 1) * nodeWidth;
+                numSinks = Math.max(numSinks, node.x);
+                node.dx = nodeWidth;
+            });
+
+            var nodeBreadth = (size[0] - nodeWidth) / (numSinks - 1);
+            nodes.forEach(function (node) {
+                node.x *= nodeBreadth;
+            });
+        }
+
+        // Set the sankey diagram properties
+        var sankey = d3.sankey()
+            .nodeWidth(config.mouseout.node.rectangle.width)
+            .nodePadding(config.mouseout.node.padding)
+            .size([width - config.mouseout.node.padding, height - config.mouseout.node.padding]);
+
+        if (config.manualColumnLayout) {
+            sankey.columnLayout(manualColumnLayout);
+        }
+
+        var path = sankey.link();
+
+        //set up graph in same style as original example but empty
+        graph = {"nodes": [], "links": []};
+
+        sankeyData.forEach(function (d, i) {
+            graph.nodes.push({"name": d.source});
+            graph.nodes.push({"name": d.target});
+            graph.links.push({
+                "source": d.source, "target": d.target, "value": +d.value,
+                "category": d.category, "linkid": d.linkid
+            });
+        });
+
+        //dex.console.log("GRAPH NODES 1", graph.nodes);
+
+        //thanks Mike Bostock https://groups.google.com/d/msg/d3-js/pl297cFtIQk/Eso4q_eBu1IJ
+        //this handy little function returns only the distinct / unique nodes
+        graph.nodes = d3.keys(d3.nest()
+            .key(function (d) {
+                return d.name;
+            })
+            .map(graph.nodes));
+
+        //dex.console.log("GRAPH NODES 2", graph.nodes);
+
+        // it appears d3 with force layout wants a numeric source and target
+        // so loop through each link replacing the text with its index from node
+        graph.links.forEach(function (d, i) {
+            graph.links[i].source = graph.nodes.indexOf(graph.links[i].source);
+            graph.links[i].target = graph.nodes.indexOf(graph.links[i].target);
+        });
+
+        //now loop through each nodes to make nodes an array of objects rather than an array of strings
+        graph.nodes.forEach(function (d, i) {
+            graph.nodes[i] = {"name": d};
+        });
+
+        sankey
+            .nodes(graph.nodes)
+            .links(graph.links)
+            .curvature(config.mouseout.link.curvature)
+            .layout(config.layoutIterations);
+
+        // add in the links
+        var link = chartContainer.append("g").selectAll(".link")
+            .data(graph.links)
+            .enter().append("path")
+            .attr("class", "link")
+            .attr("id", function (d) {
+                return d.linkid;
+            })
+            .attr("d", path)
+            .call(dex.config.configureLink, config.mouseout.link)
+            .sort(function (a, b) {
+                return b.dy - a.dy;
+            })
+            .on("mouseover", function (d) {
+                d3.selectAll("#" + d.linkid)//.style("stroke-opacity", 1)
+                    .call(dex.config.configureLink, config.mouseover.link);
+            })
+            .on("mouseout", function (d) {
+                d3.selectAll("#" + d.linkid)//.style("stroke-opacity", config.link.stroke.opacity);
+                    .call(dex.config.configureLink, config.mouseout.link);
+            });
+
+        // add the link titles
+        link.append("tooltip-content")
+            .text(function (d) {
+                return nodeMap[d.source.name].name + " -> " +
+                    nodeMap[d.target.name].name + "\n" + format(d.value);
+            });
+
+        // add in the nodes
+        var node = chartContainer.append("g").selectAll(".node")
+            .data(graph.nodes)
+            .enter().append("g")
+            .attr("class", "node")
+            .attr("transform", function (d) {
+                return "translate(" + d.x + "," + d.y + ")";
+            })
+            .call(d3.behavior.drag()
+                .origin(function (d) {
+                    return d;
+                })
+                .on("dragstart", function () {
+                    this.parentNode.appendChild(this);
+                })
+                .on("drag", dragmove));
+
+        // add the rectangles for the nodes
+        node.append("rect")
+            .call(dex.config.configureRectangle, config.mouseout.node.rectangle)
+            .on("mouseover", function (d) {
+                var links = (d.sourceLinks.length > 0) ?
+                    d.sourceLinks : d.targetLinks;
+
+                links.forEach(function (link) {
+                    d3.selectAll("#" + link.linkid)
+                        .call(dex.config.configureLink, config.mouseover.node);
+                });
+            })
+            .on("mouseout", function (d) {
+
+                var links = (d.sourceLinks.length > 0) ?
+                    d.sourceLinks : d.targetLinks;
+                links.forEach(function (link) {
+                    d3.selectAll("#" + link.linkid)
+                        .call(dex.config.configureLink, config.mouseout.link);
+                });
+            })
+            .append("title")
+            .text(function (d) {
+                return nodeMap[d.name].name + "\n" + format(d.value);
+            });
+
+        config.label.text = function (d) {
+            return nodeMap[d.name].name;
+        };
+
+        /////////// A HACK TO ADD TITLE LABELS
+        var locations = {};
+        var rects = d3.selectAll("rect").each(function (rect) {
+            locations[rect.x] = true;
+        });
+
+        var orderedLocations = dex.object.keys(locations).sort(function (a, b) {
+            return a - b;
+        });
+
+        //var locationWidth = (orderedLocations[1] - orderedLocations[0]) / 2;
+
+        //orderedLocations = orderedLocations.map(function(d) { return +d + locationWidth});
+
+        var titles = chartContainer.append("g").selectAll("text")
+            .data(orderedLocations)
+            .enter()
+            .append("text")
+            .call(dex.config.configureText, config.columnTitle)
+            .text(function (d, i) {
+                return csv.header[i];
+            });
+
+        //////////// END OF HACK
+
+        // add in the title for the nodes
+        node.append("text")
+            .call(dex.config.configureText, config.label);
+
+        // the function for moving the nodes
+        function dragmove(d) {
+            d3.select(this).attr("transform",
+                "translate(" + (
+                    d.x = Math.max(0, Math.min(width - d.dx, d3.event.x))
+                ) + "," + (
+                    d.y = Math.max(0, Math.min(height - d.dy, d3.event.y))
+                ) + ")");
+            sankey.relayout();
+            link.attr("d", path);
+        }
+    };
+
+    return chart;
+}
+
+// SANKEY.JS : from Mike Bostock
+d3.sankey = function () {
+    var sankey = {},
+        nodeWidth = 24,
+        nodePadding = 8,
+        columnLayout = defaultColumnLayout,
+        curvature = .5,
+        size = [1, 1],
+        nodes = [],
+        links = [];
+
+    sankey.columnLayout = function (_) {
+        if (!arguments.length) return columnLayout;
+        columnLayout = _;
+        return sankey;
+    };
+
+    sankey.curvature = function (_) {
+        if (!arguments.length) return curvature;
+        curvature = +_;
+        return sankey;
+    };
+
+    sankey.nodeWidth = function (_) {
+        if (!arguments.length) return nodeWidth;
+        nodeWidth = +_;
+        return sankey;
+    };
+
+    sankey.nodePadding = function (_) {
+        if (!arguments.length) return nodePadding;
+        nodePadding = +_;
+        return sankey;
+    };
+
+    sankey.nodes = function (_) {
+        if (!arguments.length) return nodes;
+        nodes = _;
+        return sankey;
+    };
+
+    sankey.links = function (_) {
+        if (!arguments.length) return links;
+        links = _;
+        return sankey;
+    };
+
+    sankey.size = function (_) {
+        if (!arguments.length) return size;
+        size = _;
+        return sankey;
+    };
+
+    sankey.layout = function (iterations) {
+        computeNodeLinks();
+        computeNodeValues();
+        computeNodeBreadths(nodes);
+        computeNodeDepths(iterations);
+        computeLinkDepths();
+        return sankey;
+    };
+
+    sankey.relayout = function () {
+        computeLinkDepths();
+        return sankey;
+    };
+
+    sankey.link = function () {
+//    var curvature = .5;
+
+        function link(d) {
+            var x0 = d.source.x + d.source.dx,
+                x1 = d.target.x,
+                xi = d3.interpolateNumber(x0, x1),
+                x2 = xi(curvature),
+                x3 = xi(1 - curvature),
+                y0 = d.source.y + d.sy + d.dy / 2,
+                y1 = d.target.y + d.ty + d.dy / 2;
+            return "M" + x0 + "," + y0
+                + "C" + x2 + "," + y0
+                + " " + x3 + "," + y1
+                + " " + x1 + "," + y1;
+        }
+
+        link.curvature = function (_) {
+            if (!arguments.length) return curvature;
+            curvature = +_;
+            return link;
+        };
+
+        return link;
+    };
+
+    // Populate the sourceLinks and targetLinks for each node.
+    // Also, if the source and target are not objects, assume they are indices.
+    function computeNodeLinks() {
+        nodes.forEach(function (node) {
+            node.sourceLinks = [];
+            node.targetLinks = [];
+        });
+        links.forEach(function (link) {
+            var source = link.source,
+                target = link.target;
+            if (typeof source === "number") source = link.source = nodes[link.source];
+            if (typeof target === "number") target = link.target = nodes[link.target];
+            source.sourceLinks.push(link);
+            target.targetLinks.push(link);
+        });
+    }
+
+    // Compute the value (size) of each node by summing the associated links.
+    function computeNodeValues() {
+        nodes.forEach(function (node) {
+            node.value = Math.max(
+                d3.sum(node.sourceLinks, value),
+                d3.sum(node.targetLinks, value)
+            );
+        });
+    }
+
+    // Iteratively assign the breadth (x-position) for each node.
+    // Nodes are assigned the maximum breadth of incoming neighbors plus one;
+    // nodes with no incoming links are assigned breadth zero, while
+    // nodes with no outgoing links are assigned the maximum breadth.
+    function computeNodeBreadths() {
+        columnLayout(nodes, nodeWidth, size);
+    }
+
+    function defaultColumnLayout(nodes, nodeWidth, size) {
+        var remainingNodes = nodes,
+            visited = {},
+            x = 0;
+
+        //dex.console.log("NODE", nodes[0]);
+        while (remainingNodes.length) {
+            nextNodes = [];
+            visited[remainingNodes[0].name] = true;
+            remainingNodes.forEach(function (node) {
+                node.x = x;
+                node.dx = nodeWidth;
+                node.sourceLinks.forEach(function (link) {
+                    if (!visited[link.target.name]) {
+                        nextNodes.push(link.target);
+                    }
+                    else {
+                        dex.console.log("CYCLE DETECTED AT: " + node.name + "->" + link.target.name);
+                    }
+                });
+            });
+            remainingNodes = nextNodes;
+            ++x;
+        }
+
+        moveSinksRight(x);
+        scaleNodeBreadths((size[0] - nodeWidth) / (x - 1));
+    }
+
+    function moveSourcesRight() {
+        nodes.forEach(function (node) {
+            if (!node.targetLinks.length) {
+                node.x = d3.min(node.sourceLinks, function (d) {
+                        return d.target.x;
+                    }) - 1;
+            }
+        });
+    }
+
+    function moveSinksRight(x) {
+        nodes.forEach(function (node) {
+            if (!node.sourceLinks.length) {
+                node.x = x - 1;
+            }
+        });
+    }
+
+    function scaleNodeBreadths(kx) {
+        nodes.forEach(function (node) {
+            node.x *= kx;
+        });
+    }
+
+    function computeNodeDepths(iterations) {
+        var nodesByBreadth = d3.nest()
+            .key(function (d) {
+                return d.x;
+            })
+            .sortKeys(d3.ascending)
+            .entries(nodes)
+            .map(function (d) {
+                return d.values;
+            });
+
+        //
+        initializeNodeDepth();
+        resolveCollisions();
+        for (var alpha = 1; iterations > 0; --iterations) {
+            relaxRightToLeft(alpha *= .99);
+            resolveCollisions();
+            relaxLeftToRight(alpha);
+            resolveCollisions();
+        }
+
+        function initializeNodeDepth() {
+            var ky = d3.min(nodesByBreadth, function (nodes) {
+                return (size[1] - (nodes.length - 1) * nodePadding) / d3.sum(nodes, value);
+            });
+
+            nodesByBreadth.forEach(function (nodes) {
+                nodes.forEach(function (node, i) {
+                    node.y = i;
+                    node.dy = node.value * ky;
+                });
+            });
+
+            links.forEach(function (link) {
+                link.dy = link.value * ky;
+            });
+        }
+
+        function relaxLeftToRight(alpha) {
+            nodesByBreadth.forEach(function (nodes, breadth) {
+                nodes.forEach(function (node) {
+                    if (node.targetLinks.length) {
+                        var y = d3.sum(node.targetLinks, weightedSource) / d3.sum(node.targetLinks, value);
+                        node.y += (y - center(node)) * alpha;
+                    }
+                });
+            });
+
+            function weightedSource(link) {
+                return center(link.source) * link.value;
+            }
+        }
+
+        function relaxRightToLeft(alpha) {
+            nodesByBreadth.slice().reverse().forEach(function (nodes) {
+                nodes.forEach(function (node) {
+                    if (node.sourceLinks.length) {
+                        var y = d3.sum(node.sourceLinks, weightedTarget) / d3.sum(node.sourceLinks, value);
+                        node.y += (y - center(node)) * alpha;
+                    }
+                });
+            });
+
+            function weightedTarget(link) {
+                return center(link.target) * link.value;
+            }
+        }
+
+        function resolveCollisions() {
+            nodesByBreadth.forEach(function (nodes) {
+                var node,
+                    dy,
+                    y0 = 0,
+                    n = nodes.length,
+                    i;
+
+                // Push any overlapping nodes down.
+                nodes.sort(ascendingDepth);
+                for (i = 0; i < n; ++i) {
+                    node = nodes[i];
+                    dy = y0 - node.y;
+                    if (dy > 0) node.y += dy;
+                    y0 = node.y + node.dy + nodePadding;
+                }
+
+                // If the bottommost node goes outside the bounds, push it back up.
+                dy = y0 - nodePadding - size[1];
+                if (dy > 0) {
+                    y0 = node.y -= dy;
+
+                    // Push any overlapping nodes back up.
+                    for (i = n - 2; i >= 0; --i) {
+                        node = nodes[i];
+                        dy = node.y + node.dy + nodePadding - y0;
+                        if (dy > 0) node.y -= dy;
+                        y0 = node.y;
+                    }
+                }
+            });
+        }
+
+        function ascendingDepth(a, b) {
+            return a.y - b.y;
+        }
+    }
+
+    function computeLinkDepths() {
+        nodes.forEach(function (node) {
+            node.sourceLinks.sort(ascendingTargetDepth);
+            node.targetLinks.sort(ascendingSourceDepth);
+        });
+        nodes.forEach(function (node) {
+            var sy = 0, ty = 0;
+            node.sourceLinks.forEach(function (link) {
+                link.sy = sy;
+                sy += link.dy;
+            });
+            node.targetLinks.forEach(function (link) {
+                link.ty = ty;
+                ty += link.dy;
+            });
+        });
+
+        function ascendingSourceDepth(a, b) {
+            return a.source.y - b.source.y;
+        }
+
+        function ascendingTargetDepth(a, b) {
+            return a.target.y - b.target.y;
+        }
+    }
+
+    function center(node) {
+        return node.y + node.dy / 2;
+    }
+
+    function value(link) {
+        return link.value;
+    }
+
+    $(document).ready(function () {
+        // Add tooltips
+        $(document).tooltip({
+            items: "path",
+            content: function () {
+                return $(this).find("tooltip-content").text();
+            },
+            track: true
+        });
+
+        // Make the entire chart draggable.
+        //$(sankey.config.parent).draggable();
+    });
+
+    return sankey;
+};
+
+module.exports = sankey;
+},{}],30:[function(require,module,exports){
+var sankeyparticles = function (userConfig) {
+  var chart;
+
+  var defaults =
+  {
+    // The parent container of this chart.
+    'parent': '#SankeyParticles',
+    // Set these when you need to CSS style components independently.
+    'id': 'SankeyParticles',
+    'class': 'SankeyParticles',
+    'resizable': true,
+    // Our data...
+    'csv': {
+      // Give folks without data something to look at anyhow.
+      'header': ["X", "Y", "Z"],
+      'data': [
+        [0, 0, 0],
+        [1, 1, 1],
+        [2, 2, 2]
+      ]
+    },
+    'width': "100%",
+    'height': "100%",
+    'margin' : { 'top' : 2, 'bottom' : 10, 'left' : 2, 'right' : 10 },
+    'transform': "translate(0 0)",
+    'title': dex.config.text(),
+    'label': dex.config.text()
+  };
+
+  var chart = new dex.component(userConfig, defaults);
+
+  chart.render = function render() {
+    window.onresize = this.resize;
+    chart.resize();
+  };
+
+  chart.resize = function resize() {
+    if (chart.config.resizable) {
+      var width = d3.select(chart.config.parent).property("clientWidth");
+      var height = d3.select(chart.config.parent).property("clientHeight");
+      dex.console.log(chart.config.id + ": resize(" + width + "," + height + ")");
+      chart.attr("width", width).attr("height", height).update();
+    }
+    else {
+      chart.update();
+    }
+  };
+
+  d3.sankey = function () {
+    var sankey = {},
+      nodeWidth = 24,
+      nodePadding = 8,
+      size = [1, 1],
+      nodes = [],
+      links = [];
+
+    sankey.nodeWidth = function (_) {
+      if (!arguments.length) return nodeWidth;
+      nodeWidth = +_;
+      return sankey;
+    };
+
+    sankey.nodePadding = function (_) {
+      if (!arguments.length) return nodePadding;
+      nodePadding = +_;
+      return sankey;
+    };
+
+    sankey.nodes = function (_) {
+      if (!arguments.length) return nodes;
+      nodes = _;
+      return sankey;
+    };
+
+    sankey.links = function (_) {
+      if (!arguments.length) return links;
+      links = _;
+      return sankey;
+    };
+
+    sankey.size = function (_) {
+      if (!arguments.length) return size;
+      size = _;
+      return sankey;
+    };
+
+    sankey.layout = function (iterations) {
+      computeNodeLinks();
+      computeNodeValues();
+      computeNodeBreadths();
+      computeNodeDepths(iterations);
+      computeLinkDepths();
+      return sankey;
+    };
+
+    sankey.relayout = function () {
+      computeLinkDepths();
+      return sankey;
+    };
+
+    sankey.link = function () {
+      var curvature = .5;
+
+      function link(d) {
+        var x0 = d.source.x + d.source.dx,
+          x1 = d.target.x,
+          xi = d3.interpolateNumber(x0, x1),
+          x2 = xi(curvature),
+          x3 = xi(1 - curvature),
+          y0 = d.source.y + d.sy + d.dy / 2,
+          y1 = d.target.y + d.ty + d.dy / 2;
+        return "M" + x0 + "," + y0
+          + "C" + x2 + "," + y0
+          + " " + x3 + "," + y1
+          + " " + x1 + "," + y1;
+      }
+
+      link.curvature = function (_) {
+        if (!arguments.length) return curvature;
+        curvature = +_;
+        return link;
+      };
+
+      return link;
+    };
+
+    // Populate the sourceLinks and targetLinks for each node.
+    // Also, if the source and target are not objects, assume they are indices.
+    function computeNodeLinks() {
+      nodes.forEach(function (node) {
+        node.sourceLinks = [];
+        node.targetLinks = [];
+      });
+      links.forEach(function (link) {
+        var source = link.source,
+          target = link.target;
+        if (typeof source === "number") source = link.source = nodes[link.source];
+        if (typeof target === "number") target = link.target = nodes[link.target];
+        source.sourceLinks.push(link);
+        target.targetLinks.push(link);
+      });
+    }
+
+    // Compute the value (size) of each node by summing the associated links.
+    function computeNodeValues() {
+      nodes.forEach(function (node) {
+        node.value = Math.max(
+          d3.sum(node.sourceLinks, value),
+          d3.sum(node.targetLinks, value)
+        );
+      });
+    }
+
+    // Iteratively assign the breadth (x-position) for each node.
+    // Nodes are assigned the maximum breadth of incoming neighbors plus one;
+    // nodes with no incoming links are assigned breadth zero, while
+    // nodes with no outgoing links are assigned the maximum breadth.
+    function computeNodeBreadths() {
+      var remainingNodes = nodes,
+        nextNodes,
+        x = 0;
+
+      while (remainingNodes.length) {
+        nextNodes = [];
+        remainingNodes.forEach(function (node) {
+          node.x = x;
+          node.dx = nodeWidth;
+          node.sourceLinks.forEach(function (link) {
+            if (nextNodes.indexOf(link.target) < 0) {
+              nextNodes.push(link.target);
+            }
+          });
+        });
+        remainingNodes = nextNodes;
+        ++x;
+      }
+
+      //
+      moveSinksRight(x);
+      scaleNodeBreadths((size[0] - nodeWidth) / (x - 1));
+    }
+
+    function moveSourcesRight() {
+      nodes.forEach(function (node) {
+        if (!node.targetLinks.length) {
+          node.x = d3.min(node.sourceLinks, function (d) {
+              return d.target.x;
+            }) - 1;
+        }
+      });
+    }
+
+    function moveSinksRight(x) {
+      nodes.forEach(function (node) {
+        if (!node.sourceLinks.length) {
+          node.x = x - 1;
+        }
+      });
+    }
+
+    function scaleNodeBreadths(kx) {
+      nodes.forEach(function (node) {
+        node.x *= kx;
+      });
+    }
+
+    function computeNodeDepths(iterations) {
+      var nodesByBreadth = d3.nest()
+        .key(function (d) {
+          return d.x;
+        })
+        .sortKeys(d3.ascending)
+        .entries(nodes)
+        .map(function (d) {
+          return d.values;
+        });
+
+      //
+      initializeNodeDepth();
+      resolveCollisions();
+      for (var alpha = 1; iterations > 0; --iterations) {
+        relaxRightToLeft(alpha *= .99);
+        resolveCollisions();
+        relaxLeftToRight(alpha);
+        resolveCollisions();
+      }
+
+      function initializeNodeDepth() {
+        var ky = d3.min(nodesByBreadth, function (nodes) {
+          return (size[1] - (nodes.length - 1) * nodePadding) / d3.sum(nodes, value);
+        });
+
+        nodesByBreadth.forEach(function (nodes) {
+          nodes.forEach(function (node, i) {
+            node.y = i;
+            node.dy = node.value * ky;
+          });
+        });
+
+        links.forEach(function (link) {
+          link.dy = link.value * ky;
+        });
+      }
+
+      function relaxLeftToRight(alpha) {
+        nodesByBreadth.forEach(function (nodes, breadth) {
+          nodes.forEach(function (node) {
+            if (node.targetLinks.length) {
+              var y = d3.sum(node.targetLinks, weightedSource) / d3.sum(node.targetLinks, value);
+              node.y += (y - center(node)) * alpha;
+            }
+          });
+        });
+
+        function weightedSource(link) {
+          return center(link.source) * link.value;
+        }
+      }
+
+      function relaxRightToLeft(alpha) {
+        nodesByBreadth.slice().reverse().forEach(function (nodes) {
+          nodes.forEach(function (node) {
+            if (node.sourceLinks.length) {
+              var y = d3.sum(node.sourceLinks, weightedTarget) / d3.sum(node.sourceLinks, value);
+              node.y += (y - center(node)) * alpha;
+            }
+          });
+        });
+
+        function weightedTarget(link) {
+          return center(link.target) * link.value;
+        }
+      }
+
+      function resolveCollisions() {
+        nodesByBreadth.forEach(function (nodes) {
+          var node,
+            dy,
+            y0 = 0,
+            n = nodes.length,
+            i;
+
+          // Push any overlapping nodes down.
+          nodes.sort(ascendingDepth);
+          for (i = 0; i < n; ++i) {
+            node = nodes[i];
+            dy = y0 - node.y;
+            if (dy > 0) node.y += dy;
+            y0 = node.y + node.dy + nodePadding;
+          }
+
+          // If the bottommost node goes outside the bounds, push it back up.
+          dy = y0 - nodePadding - size[1];
+          if (dy > 0) {
+            y0 = node.y -= dy;
+
+            // Push any overlapping nodes back up.
+            for (i = n - 2; i >= 0; --i) {
+              node = nodes[i];
+              dy = node.y + node.dy + nodePadding - y0;
+              if (dy > 0) node.y -= dy;
+              y0 = node.y;
+            }
+          }
+        });
+      }
+
+      function ascendingDepth(a, b) {
+        return a.y - b.y;
+      }
+    }
+
+    function computeLinkDepths() {
+      nodes.forEach(function (node) {
+        node.sourceLinks.sort(ascendingTargetDepth);
+        node.targetLinks.sort(ascendingSourceDepth);
+      });
+      nodes.forEach(function (node) {
+        var sy = 0, ty = 0;
+        node.sourceLinks.forEach(function (link) {
+          link.sy = sy;
+          sy += link.dy;
+        });
+        node.targetLinks.forEach(function (link) {
+          link.ty = ty;
+          ty += link.dy;
+        });
+      });
+
+      function ascendingSourceDepth(a, b) {
+        return a.source.y - b.source.y;
+      }
+
+      function ascendingTargetDepth(a, b) {
+        return a.target.y - b.target.y;
+      }
+    }
+
+    function center(node) {
+      return node.y + node.dy / 2;
+    }
+
+    function value(link) {
+      return link.value;
+    }
+
+    return sankey;
+  };
+
+  chart.update = function () {
+    var chart = this;
+    var config = chart.config;
+    var csv = config.csv;
+
+    d3.selectAll("#" + config.id).remove();
+
+    var data = dex.csv.getGraph(csv);
+    dex.console.log("DATA", data);
+
+    var margin = config.margin,
+      width = config.width - margin.left - margin.right,
+      height = config.height - margin.top - margin.bottom;
+
+    var formatNumber = d3.format(",.0f"),
+      format = function (d) {
+        return formatNumber(d) + " TWh";
+      },
+      color = d3.scale.category20();
+
+    var chartContainer = d3.select(config.parent)
+      .append("g")
+      .attr("class", config["id"])
+      .attr("id", config["id"])
+      .attr("transform", config.transform);
+
+    var sankey = d3.sankey()
+      .nodeWidth(15)
+      .nodePadding(10)
+      .size([width, height]);
+
+    var path = sankey.link();
+
+    var freqCounter = 1;
+
+    data.links.forEach(function (d) {
+      d.o_value = d.value;
+      d.value = 1;
+    })
+
+    sankey
+      .nodes(data.nodes)
+      .links(data.links)
+      .layout(32);
+
+    var link = chartContainer.append("g").selectAll(".link")
+      .data(data.links)
+      .enter().append("path")
+      .attr("class", "link")
+      .attr("d", path)
+      .style("stroke-width", function (d) {
+        return Math.max(1, d.dy);
+      })
+      .sort(function (a, b) {
+        return b.dy - a.dy;
+      });
+
+    link.append("title")
+      .text(function (d) {
+        return d.source.name + " → " + d.target.name + "\n" + format(d.o_value);
+      });
+
+    var node = chartContainer.append("g").selectAll(".node")
+      .data(data.nodes)
+      .enter().append("g")
+      .attr("class", "node")
+      .attr("transform", function (d) {
+        return "translate(" + d.x + "," + d.y + ")";
+      })
+      .call(d3.behavior.drag()
+        .origin(function (d) {
+          return d;
+        })
+        .on("dragstart", function () {
+          this.parentNode.appendChild(this);
+        })
+        .on("drag", dragmove));
+
+    node.append("rect")
+      .attr("height", function (d) {
+        return d.dy;
+      })
+      .attr("width", sankey.nodeWidth())
+      .style("fill", function (d) {
+        return d.color = color(d.name.replace(/ .*/, ""));
+      })
+      .style("stroke", "none")
+      .append("title")
+      .text(function (d) {
+        return d.name + "\n" + format(d.o_value);
+      });
+
+    node.append("text")
+      .attr("x", -6)
+      .attr("y", function (d) {
+        return d.dy / 2;
+      })
+      .attr("dy", ".35em")
+      .attr("text-anchor", "end")
+      .attr("transform", null)
+      .text(function (d) {
+        return d.name;
+      })
+      .filter(function (d) {
+        return d.x < width / 2;
+      })
+      .attr("x", 6 + sankey.nodeWidth())
+      .attr("text-anchor", "start");
+
+    function dragmove(d) {
+      d3.select(this).attr("transform", "translate(" + d.x + "," + (d.y = Math.max(0, Math.min(height - d.dy, d3.event.y))) + ")");
+      sankey.relayout();
+      link.attr("d", path);
+    }
+
+    var linkExtent = d3.extent(data.links, function (d) {
+      return d.o_value
+    });
+    var frequencyScale = d3.scale.linear().domain(linkExtent).range([0.05, 1]);
+    var particleSize = d3.scale.linear().domain(linkExtent).range([1, 5]);
+
+
+    data.links.forEach(function (link) {
+      link.freq = frequencyScale(link.o_value);
+      link.particleSize = 2;
+      link.particleColor = d3.scale.linear().domain([0, 1])
+        .range([link.source.color, link.target.color]);
+    })
+
+    var t = d3.timer(tick, 1000);
+    var particles = [];
+
+    function tick(elapsed, time) {
+
+      particles = particles.filter(function (d) {
+        return d.current < d.path.getTotalLength()
+      });
+
+      d3.selectAll("path.link")
+        .each(
+          function (d) {
+//        if (d.freq < 1) {
+            for (var x = 0; x < 2; x++) {
+              var offset = (Math.random() - .5) * (d.dy - 4);
+              if (Math.random() < d.freq) {
+                var length = this.getTotalLength();
+                particles.push({
+                  link: d,
+                  time: elapsed,
+                  offset: offset,
+                  path: this,
+                  length: length,
+                  animateTime: length,
+                  speed: 0.5 + (Math.random())
+                })
+              }
+            }
+
+//        }
+            /*        else {
+             for (var x = 0; x<d.freq; x++) {
+             var offset = (Math.random() - .5) * d.dy;
+             particles.push({link: d, time: elapsed, offset: offset, path: this})
+             }
+             } */
+          });
+
+      particleEdgeCanvasPath(elapsed);
+    }
+
+    function particleEdgeCanvasPath(elapsed) {
+      var context = d3.select("canvas").node().getContext("2d")
+
+      context.clearRect(0, 0, 1000, 1000);
+
+      context.fillStyle = "gray";
+      context.lineWidth = "1px";
+      for (var x in particles) {
+        var currentTime = elapsed - particles[x].time;
+//        var currentPercent = currentTime / 1000 * particles[x].path.getTotalLength();
+        particles[x].current = currentTime * 0.15 * particles[x].speed;
+        var currentPos = particles[x].path.getPointAtLength(particles[x].current);
+        context.beginPath();
+        context.fillStyle = particles[x].link.particleColor(0);
+        context.arc(currentPos.x, currentPos.y + particles[x].offset, particles[x].link.particleSize, 0, 2 * Math.PI);
+        context.fill();
+      }
+    }
+
+  };
+
+  $(document).ready(function () {
+    // Make the entire chart draggable.
+    //$(chart.config.parent).draggable();
+  });
+
+  return chart;
+};
+
+module.exports = sankeyparticles;
+},{}],31:[function(require,module,exports){
+var scatterplot = function (userConfig) {
+  var chart = new dex.component(userConfig,
+    {
+      'parent'           : "#ScatterPlot",
+      "id"               : "ScatterPlot",
+      "class"            : "ScatterPlot",
+      'width'            : "100%",
+      'height'           : "100%",
+      'csv'              : {
+        'header' : ["X", "Y"],
+        'data'   : [
+          [0, 0],
+          [1, 1],
+          [2, 4],
+          [3, 9],
+          [4, 16]
+        ],
+      },
+      'margin'           : {top : 20, right : 15, bottom : 60, left : 60},
+      'selectedColor'    : "red",
+      'unselectedColor'  : "steelblue",
+      'unselectedRadius' : 8,
+      'selectedRadius'   : 8,
+      'xi'               : 0,
+      'yi'               : 1,
+      'transform'        : 'scale(.95) translate(60,0)'
+    });
+
+  chart.render = function () {
+    window.onresize = this.resize;
+    chart.resize();
+  };
+
+  chart.resize = function () {
+    d3.selectAll("#" + chart.config.id).remove();
+    var width = d3.select(chart.config.parent).property("clientWidth");
+    var height = d3.select(chart.config.parent).property("clientHeight");
+    chart.attr("width", width).attr("height", height).update();
+  };
+
+  chart.update = function () {
+    var chart = this;
+    var config = chart.config;
+    var csv = config.csv;
+
+    //console.log("CONFIG: " + this.config);
+    //console.dir(this.registry);
+
+    x = d3.scale.linear()
+      .domain([0, d3.max(csv.data, function (d) {
+        return d[0];
+      })])
+      .range([0, config.width]);
+
+    y = d3.scale.linear()
+      .domain([0, d3.max(csv.data, function (d) {
+        return d[1];
+      })])
+      .range([config.height, 0]);
+
+    var chartContainer = d3.select(config.parent)
+      .append('g')
+      .attr('class', config["class"])
+      .attr('id', config["id"])
+      .attr('transform', config.transform);
+
+    // draw the x axis
+    var xAxis = d3.svg.axis()
+      .scale(x)
+      .orient('bottom');
+
+    var brush = d3.svg.brush()
+      .x(x)
+      .y(y)
+      .on("brushstart", function (d) {
+        brushstartHandler({});
+      })
+      .on("brush", function (d) {
+        brushmoveHandler({});
+      })
+      .on("brushend", function (d) {
+        brushendHandler({});
+      });
+
+    //console.log("BRUSH: " + brush);
+
+    chartContainer.append('g')
+      .attr('transform', 'translate(0,' + config.height + ')')
+      .attr('class', 'main axis date')
+      .call(xAxis);
+
+    // draw the y axis
+    var yAxis = d3.svg.axis()
+      .scale(y)
+      .orient('left');
+
+    chartContainer.append('g')
+      .attr('transform', 'translate(0,0)')
+      .attr('class', 'main axis date')
+      .call(yAxis);
+
+    var g = chartContainer.append("svg:g")
+      .attr("id", "pointContainer")
+      .call(brush);
+
+    g.selectAll("scatter-dots")
+      .data(csv.data)
+      .enter().append("svg:circle")
+      .attr("id", "scatter-dot")
+      .attr("cx", function (d) {
+        return x(d[config.xi]);
+      })
+      .attr("cy", function (d) {
+        return y(d[config.yi]);
+      })
+      .attr("r", config.unselectedRadius)
+      .style("fill", config.unselectedColor)
+      .on("mouseover", function (d) {
+        mouseOverHandler({node : this, data : d});
+      })
+      .on("mouseout", function (d) {
+        mouseOutHandler({node : this, data : d});
+      });
+
+    function brushstartHandler(chartEvent) {
+      //console.log("brush start()");
+      //console.log("brush empty? " + brush.empty());
+      d3.selectAll("#scatter-dot")
+        .attr("r", config.unselectedRadius)
+        .style("fill", config.unselectedColor);
+    }
+
+    function brushmoveHandler(chartEvent) {
+      //console.log("brush move(" + brush.extent() + ")");
+    }
+
+    function brushendHandler(chartEvent) {
+      //console.log("brushend");
+      //console.log("FOO: " + chart);
+      //this.dump("ScatterPlot.brushendHandler()");
+      //console.dir(config);
+      //console.dir(registry);
+      var extent = brush.extent();
+      //console.dir(brush.extent());
+
+      var data = [];
+
+      var active = d3.selectAll("#scatter-dot")
+        .filter(function (d, i) {
+          //console.dir(extent);
+          //console.dir(d);
+          if (d[0] >= extent[0][0] && d[0] <= extent[1][0] &&
+            d[1] >= extent[0][1] && d[1] <= extent[1][1]) {
+            data.push([d[0], d[1]]);
+            return this;
+          }
+          return null;
+        })
+        .attr("r", config.selectedRadius)
+        .style("fill", config.selectedColor);
+
+      chart.publish({type : "brushend", data : data});
+    }
+
+    function mouseOverHandler(chartEvent) {
+      //console.log("mouseover");
+      //console.log("MOUSEOVER: node=" + node + ", data=" + data + ", originator=" + originator);
+      // If we're the originator of this event, notify our listeners to
+      // update themselves in turn.
+
+      // Pick yourself so you have access to all the D3 goodies you get
+      // through selection.
+      d3.select(chartEvent.node)
+        .style("fill", config.selectedColor)
+        .attr("r", config.selectedRadius);
+
+      d3.select("#pointContainer")
+        .append("text")
+        .attr("x", x(chartEvent.data[0]))
+        .attr("y", y(chartEvent.data[1]) - 10)
+        .attr("dy", ".35m")
+        .style("font-size", 14)
+        .attr("text-anchor", "top")
+        .attr("fill", "black")
+        .text(function (d) {
+          return chartEvent.data[1];
+        });
+    }
+
+    function mouseOutHandler(chartEvent) {
+      d3.select("#pointContainer").selectAll("text").remove();
+      d3.select(chartEvent.node)
+        .style("fill", config.unselectedColor)
+        .attr("r", config.unselectedRadius);
+    }
+  };
+
+  $(document).ready(function () {
+    // Make the entire chart draggable.
+    //$(chart.config.parent).draggable();
+  });
+
+  return chart;
+};
+
+module.exports = scatterplot;
+},{}],32:[function(require,module,exports){
+var sunburst = function (userConfig) {
+  var chart;
+
+  var defaults =
+  {
+    // The parent container of this chart.
+    'parent': '#Sunburst',
+    // Set these when you need to CSS style components independently.
+    'id': 'Sunburst',
+    'class': 'Sunburst',
+    'resizable': true,
+    // Our data...
+    'csv': {
+      // Give folks without data something to look at anyhow.
+      'header': ["X", "Y", "Z"],
+      'data': [
+        [0, 0, 0],
+        [1, 1, 1],
+        [2, 2, 2]
+      ]
+    },
+    'width': "100%",
+    'height': "100%",
+    'transform': "translate(0 0)",
+    'title': dex.config.text(),
+    'label': dex.config.text()
+  };
+
+  var chart = new dex.component(userConfig, defaults);
+
+  chart.render = function render() {
+    window.onresize = this.resize;
+    chart.resize();
+  };
+
+  chart.resize = function resize() {
+    if (chart.config.resizable) {
+      var width = d3.select(chart.config.parent).property("clientWidth");
+      var height = d3.select(chart.config.parent).property("clientHeight");
+      dex.console.log(chart.config.id + ": resize(" + width + "," + height + ")");
+      chart.attr("width", width).attr("height", height).update();
+    }
+    else {
+      chart.update();
+    }
+  };
+
+  chart.update = function () {
+    var chart = this;
+    var config = chart.config;
+    var csv = config.csv;
+
+    d3.selectAll("#" + config.id).remove();
+
+    var data = dex.csv.toNestedJson(dex.csv.copy(csv));
+    dex.console.log("DATA", csv, data);
+
+    var width = 960,
+      height = 700,
+      radius = Math.min(width, height) / 2;
+
+    var x = d3.scale.linear()
+      .range([0, 2 * Math.PI]);
+
+    var y = d3.scale.linear()
+      .range([0, radius]);
+
+    var color = d3.scale.category20c();
+
+    var chartContainer = d3.select(config.parent).append("g")
+      .attr("class", config["id"])
+      .attr("id", config["id"])
+      .attr("transform", "translate(" + width / 2 + "," + (height / 2 + 10) + ")");
+
+    var partition = d3.layout.partition()
+      .value(function (d) {
+        return d.size;
+      });
+
+    var arc = d3.svg.arc()
+      .startAngle(function (d) {
+        return Math.max(0, Math.min(2 * Math.PI, x(d.x)));
+      })
+      .endAngle(function (d) {
+        return Math.max(0, Math.min(2 * Math.PI, x(d.x + d.dx)));
+      })
+      .innerRadius(function (d) {
+        return Math.max(0, y(d.y));
+      })
+      .outerRadius(function (d) {
+        return Math.max(0, y(d.y + d.dy));
+      });
+
+
+
+    //d3.json("https://s3-us-west-2.amazonaws.com/s.cdpn.io/65174/flare.json", function (error, root) {
+
+    var root = data;
+
+      var g = chartContainer.selectAll("g")
+        .data(partition.nodes(root))
+        .enter().append("g");
+
+      var path = g.append("path")
+        .attr("d", arc)
+        .style("fill", function (d) {
+          return color((d.children ? d : d.parent).name);
+        })
+        .on("click", click);
+
+      var text = g.append("text")
+        .attr("transform", function (d) {
+          dex.console.log("D", d);
+          return "rotate(" + computeTextRotation(d) + ")";
+        })
+        .attr("x", function (d) {
+          return y(d.y);
+        })
+        .attr("dx", "6") // margin
+        .attr("dy", ".35em") // vertical-align
+        .text(function (d) {
+          return d.name;
+        });
+
+      function click(d) {
+        // fade out all text elements
+        text.transition().attr("opacity", 0);
+
+        path.transition()
+          .duration(750)
+          .attrTween("d", arcTween(d))
+          .each("end", function (e, i) {
+            // check if the animated element's data e lies within the visible angle span given in d
+            if (e.x >= d.x && e.x < (d.x + d.dx)) {
+              // get a selection of the associated text element
+              var arcText = d3.select(this.parentNode).select("text");
+              // fade in the text element and recalculate positions
+              arcText.transition().duration(750)
+                .attr("opacity", 1)
+                .attr("transform", function () {
+                  return "rotate(" + computeTextRotation(e) + ")"
+                })
+                .attr("x", function (d) {
+                  return y(d.y);
+                });
+            }
+          });
+      }
+
+    d3.select(self.frameElement).style("height", height + "px");
+
+// Interpolate the scales!
+    function arcTween(d) {
+      var xd = d3.interpolate(x.domain(), [d.x, d.x + d.dx]),
+        yd = d3.interpolate(y.domain(), [d.y, 1]),
+        yr = d3.interpolate(y.range(), [d.y ? 20 : 0, radius]);
+      return function (d, i) {
+        return i
+          ? function (t) {
+          return arc(d);
+        }
+          : function (t) {
+          x.domain(xd(t));
+          y.domain(yd(t)).range(yr(t));
+          return arc(d);
+        };
+      };
+    }
+
+    function computeTextRotation(d) {
+      return (x(d.x + d.dx / 2) - Math.PI / 2) / Math.PI * 180;
+    }
+
+  };
+
+  $(document).ready(function () {
+    // Make the entire chart draggable.
+    //$(chart.config.parent).draggable();
+  });
+
+  return chart;
+};
+
+module.exports = sunburst;
+},{}],33:[function(require,module,exports){
+var titledtreemap = function (userConfig) {
+  var chart;
+
+  var defaults =
+  {
+    // The parent container of this chart.
+    'parent': '#Treemap',
+    // Set these when you need to CSS style components independently.
+    'id': 'Treemap',
+    'class': 'Treemap',
+    'resizable': true,
+    // Our data...
+    'csv': {
+      // Give folks without data something to look at anyhow.
+      'header': ["NAME", "PACAGE", "SIZE"],
+      'data': [
+        ["name1", "package1", 100],
+        ["name2", "package2", 50],
+        ["name3", "package3", 25]
+      ]
+    },
+    'width': "100%",
+    'height': "100%",
+    'transform': "translate(0 0)",
+    'title': dex.config.text(),
+    'label': dex.config.text()
+  };
+
+  var chart = new dex.component(userConfig, defaults);
+
+  chart.render = function render() {
+    window.onresize = this.resize;
+    chart.resize();
+  };
+
+  chart.resize = function resize() {
+    if (chart.config.resizable) {
+      var width = d3.select(chart.config.parent).property("clientWidth");
+      var height = d3.select(chart.config.parent).property("clientHeight");
+      dex.console.log(chart.config.id + ": resize(" + width + "," + height + ")");
+      chart.attr("width", width).attr("height", height).update();
+    }
+    else {
+      chart.update();
+    }
+  };
+
+  chart.update = function () {
+    var chart = this;
+    var config = chart.config;
+    var csv = config.csv;
+
+    d3.selectAll("#" + config.id).remove();
+    //var isIE = BrowserDetect.browser == 'Explorer';
+    var chartWidth = config.width;
+    var chartHeight = config.height;
+    var xscale = d3.scale.linear().range([0, chartWidth]);
+    var yscale = d3.scale.linear().range([0, chartHeight]);
+    var color = d3.scale.category10();
+    var headerHeight = 20;
+    var headerColor = "#555555";
+    var transitionDuration = 500;
+    var root;
+    var node;
+
+    var treemap = d3.layout.treemap()
+      .round(false)
+      .size([chartWidth, chartHeight])
+      .sticky(true)
+      .value(function (d) {
+        return d.size;
+      });
+
+    //var chart = d3.select("#body")
+    //  .append("svg:svg")
+    //  .attr("width", chartWidth)
+    //  .attr("height", chartHeight)
+    //  .append("svg:g");
+
+    var chart = d3.select(config.parent)
+      .append("g")
+      .attr("class", config["id"])
+      .attr("id", config["id"])
+      .attr("transform", config.transform);
+
+    var data = dex.csv.toNestedJson(csv);
+
+    node = root = data;
+    var nodes = treemap.nodes(root);
+
+    var children = nodes.filter(function (d) {
+      return !d.children;
+    });
+    var parents = nodes.filter(function (d) {
+      return d.children;
+    });
+
+    // create parent cells
+    var parentCells = chart.selectAll("g.cell.parent")
+      .data(parents, function (d) {
+        return "p-" + d.name;
+      });
+    var parentEnterTransition = parentCells.enter()
+      .append("g")
+      .attr("class", "cell parent")
+      .on("click", function (d) {
+        zoom(d);
+      });
+    parentEnterTransition.append("rect")
+      .attr("width", function (d) {
+        return Math.max(0.01, d.dx);
+      })
+      .attr("height", function (d) {
+        return d.dy;
+      })
+      .style("fill", headerColor);
+    parentEnterTransition.append('foreignObject')
+      .attr("class", "foreignObject")
+      .append("xhtml:body")
+      .attr("class", "labelbody")
+      .append("div")
+      .attr("class", "label");
+    // update transition
+    var parentUpdateTransition = parentCells.transition().duration(transitionDuration);
+    parentUpdateTransition.select(".cell")
+      .attr("transform", function (d) {
+        return "translate(" + d.dx + "," + d.y + ")";
+      });
+    parentUpdateTransition.select("rect")
+      .attr("width", function (d) {
+        return Math.max(0.01, d.dx);
+      })
+      .attr("height", function (d) {
+        return d.dy;
+      })
+      .style("fill", headerColor);
+    parentUpdateTransition.select(".foreignObject")
+      .attr("width", function (d) {
+        return Math.max(0.01, d.dx);
+      })
+      .attr("height", function (d) {
+        return d.dy;
+      })
+      .select(".labelbody .label")
+      .text(function (d) {
+        return "FOREIGN" + d.name;
+      });
+    // remove transition
+    parentCells.exit()
+      .remove();
+
+    // create children cells
+    var childrenCells = chart.selectAll("g.cell.child")
+      .data(children, function (d) {
+        return "c-" + d.name;
+      });
+    // enter transition
+    var childEnterTransition = childrenCells.enter()
+      .append("g")
+      .attr("class", "cell child")
+      .on("click", function (d) {
+        zoom(node === d.parent ? root : d.parent);
+      });
+    childEnterTransition.append("rect")
+      .classed("background", true)
+      .style("fill", function (d) {
+        return color(d.parent.name);
+      });
+    childEnterTransition.append('foreignObject')
+      .attr("class", "foreignObject")
+      .attr("width", function (d) {
+        return Math.max(0.01, d.dx);
+      })
+      .attr("height", function (d) {
+        return Math.max(0.01, d.dy);
+      })
+      .append("xhtml:body")
+      .attr("class", "labelbody")
+      .append("div")
+      .attr("class", "label")
+      .text(function (d) {
+        return "FO" + d.name;
+      });
+
+//    if (isIE) {
+//      childEnterTransition.selectAll(".foreignObject .labelbody .label")
+//        .style("display", "none");
+//    } else {
+    childEnterTransition.selectAll(".foreignObject")
+      .style("display", "none");
+//    }
+
+    // update transition
+    var childUpdateTransition = childrenCells.transition().duration(transitionDuration);
+    childUpdateTransition.select(".cell")
+      .attr("transform", function (d) {
+        return "translate(" + d.x + "," + d.y + ")";
+      });
+    childUpdateTransition.select("rect")
+      .attr("width", function (d) {
+        return Math.max(0.01, d.dx);
+      })
+      .attr("height", function (d) {
+        return d.dy;
+      })
+      .style("fill", function (d) {
+        return color(d.parent.name);
+      });
+    childUpdateTransition.select(".foreignObject")
+      .attr("width", function (d) {
+        return Math.max(0.01, d.dx);
+      })
+      .attr("height", function (d) {
+        return Math.max(0.01, d.dy);
+      })
+      .select(".labelbody .label")
+      .text(function (d) {
+        return "FO2" + d.name;
+      });
+    // exit transition
+    childrenCells.exit()
+      .remove();
+
+    d3.select("select").on("change", function () {
+      console.log("select zoom(node)");
+      treemap.value(this.value == "size" ? size : count)
+        .nodes(root);
+      zoom(node);
+    });
+
+    zoom(node);
+
+
+    function size(d) {
+      return d.size;
+    }
+
+
+    function count(d) {
+      return 1;
+    }
+
+
+    //and another one
+    function textHeight(d) {
+      var ky = chartHeight / d.dy;
+      yscale.domain([d.y, d.y + d.dy]);
+      return (ky * d.dy) / headerHeight;
+    }
+
+
+    function getRGBComponents(color) {
+      var r = color.substring(1, 3);
+      var g = color.substring(3, 5);
+      var b = color.substring(5, 7);
+      return {
+        R: parseInt(r, 16),
+        G: parseInt(g, 16),
+        B: parseInt(b, 16)
+      };
+    }
+
+
+    function idealTextColor(bgColor) {
+      var nThreshold = 105;
+      var components = getRGBComponents(bgColor);
+      var bgDelta = (components.R * 0.299) + (components.G * 0.587) + (components.B * 0.114);
+      return ((255 - bgDelta) < nThreshold) ? "#000000" : "#ffffff";
+    }
+
+    function zoom(d) {
+      treemap
+        .padding([headerHeight / (chartHeight / d.dy), 4, 4, 4])
+        .nodes(d);
+
+      // moving the next two lines above treemap layout messes up padding of zoom result
+      var kx = chartWidth / d.dx;
+      var ky = chartHeight / d.dy;
+      var level = d;
+
+      xscale.domain([d.x, d.x + d.dx]);
+      yscale.domain([d.y, d.y + d.dy]);
+
+      if (node != level) {
+//        if (isIE) {
+//          chart.selectAll(".cell.child .foreignObject .labelbody .label")
+//            .style("display", "none");
+//        } else {
+        chart.selectAll(".cell.child .foreignObject")
+          .style("display", "none");
+//        }
+      }
+
+      var zoomTransition = chart.selectAll("g.cell").transition().duration(transitionDuration)
+        .attr("transform", function (d) {
+          return "translate(" + xscale(d.x) + "," + yscale(d.y) + ")";
+        })
+        .each("end", function (d, i) {
+          if (!i && (level !== self.root)) {
+            chart.selectAll(".cell.child")
+              .filter(function (d) {
+                return d.parent === self.node; // only get the children for selected group
+              })
+              .select(".foreignObject .labelbody .label")
+              .style("color", function (d) {
+                return idealTextColor(color(d.parent.name));
+              });
+
+//            if (isIE) {
+//              chart.selectAll(".cell.child")
+//                .filter(function (d) {
+//                  return d.parent === self.node; // only get the children for selected group
+//                })
+//                .select(".foreignObject .labelbody .label")
+//                .style("display", "")
+//            } else {
+            chart.selectAll(".cell.child")
+              .filter(function (d) {
+                return d.parent === self.node; // only get the children for selected group
+              })
+              .select(".foreignObject")
+              .style("display", "")
+//            }
+          }
+        });
+
+      zoomTransition.select(".foreignObject")
+        .attr("width", function (d) {
+          return Math.max(0.01, kx * d.dx);
+        })
+        .attr("height", function (d) {
+          return d.children ? (ky * d.dy) : Math.max(0.01, ky * d.dy);
+        })
+        .select(".labelbody .label")
+        .text(function (d) {
+          dex.console.log("D", d);
+          return d.name;
+        });
+
+      // update the width/height of the rects
+      zoomTransition.select("rect")
+        .attr("width", function (d) {
+          return Math.max(0.01, kx * d.dx);
+        })
+        .attr("height", function (d) {
+          return d.children ? (ky * d.dy) : Math.max(0.01, ky * d.dy);
+        })
+        .style("fill", function (d) {
+          return d.children ? headerColor : color(d.parent.name);
+        });
+
+      node = d;
+
+      if (d3.event) {
+        d3.event.stopPropagation();
+      }
+    }
+  };
+
+  $(document).ready(function () {
+    // Make the entire chart draggable.
+    //$(chart.config.parent).draggable();
+  });
+
+  return chart;
+};
+
+module.exports = titledtreemap;
+
+},{}],34:[function(require,module,exports){
+var treemap = function (userConfig) {
+    var chart;
+
+    var defaults =
+    {
+        // The parent container of this chart.
+        'parent': '#Treemap',
+        // Set these when you need to CSS style components independently.
+        'id': 'Treemap',
+        'class': 'Treemap',
+        'resizable': true,
+        // Our data...
+        'csv': {
+            // Give folks without data something to look at anyhow.
+            'header': ["NAME", "PACAGE", "SIZE"],
+            'data': [
+                ["name1", "package1", 100],
+                ["name2", "package2", 50],
+                ["name3", "package3", 25]
+            ]
+        },
+        'width': "100%",
+        'height': "100%",
+        'transform': "translate(0 0)",
+        'title': dex.config.text(),
+        'label': dex.config.text()
+    };
+
+    var chart = new dex.component(userConfig, defaults);
+
+    chart.render = function render() {
+        window.onresize = this.resize;
+        chart.resize();
+    };
+
+    chart.resize = function resize() {
+        if (chart.config.resizable) {
+            var width = d3.select(chart.config.parent).property("clientWidth");
+            var height = d3.select(chart.config.parent).property("clientHeight");
+            dex.console.log(chart.config.id + ": resize(" + width + "," + height + ")");
+            chart.attr("width", width).attr("height", height).update();
+        }
+        else {
+            chart.update();
+        }
+    };
+
+    chart.update = function () {
+        var chart = this;
+        var config = chart.config;
+        var csv = config.csv;
+
+        d3.selectAll("#" + config.id).remove();
+
+        var chartContainer = d3.select(config.parent).append("g")
+            .attr("class", config["id"])
+            .attr("id", config["id"])
+            .attr("transform", config.transform);
+
+        var w = 1280 - 80,
+            h = 800 - 180,
+            x = d3.scale.linear().range([0, w]),
+            y = d3.scale.linear().range([0, h]),
+            color = d3.scale.category20c(),
+            root,
+            node;
+
+        var treemap = d3.layout.treemap()
+            .round(false)
+            .size([w, h])
+            .sticky(true)
+            .value(function (d) {
+                return d.size;
+            });
+
+        var data = dex.csv.toNestedJson(dex.csv.copy(csv));
+        dex.console.log("DATA", csv, data);
+
+        /*
+        var svg = d3.select("#body").append("div")
+            .attr("class", "chart")
+            .style("width", w + "px")
+            .style("height", h + "px")
+            .append("svg:svg")
+            .attr("width", w)
+            .attr("height", h)
+            .append("svg:g")
+            .attr("transform", "translate(.5,.5)");
+*/
+
+        node = root = data;
+
+        var nodes = treemap.nodes(root)
+            .filter(function (d) {
+                return !d.children;
+            });
+
+        var cell = chartContainer.selectAll("g")
+            .data(nodes)
+            .enter().append("svg:g")
+            .attr("class", "cell")
+            .attr("transform", function (d) {
+                return "translate(" + d.x + "," + d.y + ")";
+            })
+            .on("click", function (d) {
+                return zoom(node == d.parent ? root : d.parent);
+            });
+
+        cell.append("svg:rect")
+            .attr("width", function (d) {
+                return d.dx - 1;
+            })
+            .attr("height", function (d) {
+                return d.dy - 1;
+            })
+            .style("fill", function (d) {
+                return color(d.parent.name);
+            });
+
+        cell.append("svg:text")
+            .attr("x", function (d) {
+                return d.dx / 2;
+            })
+            .attr("y", function (d) {
+                return d.dy / 2;
+            })
+            .attr("dy", ".35em")
+            .attr("text-anchor", "middle")
+            .text(function (d) {
+                return d.name;
+            })
+            .style("opacity", function (d) {
+                d.w = this.getComputedTextLength();
+                return d.dx > d.w ? 1 : 0;
+            });
+
+        d3.select(window).on("click", function () {
+            zoom(root);
+        });
+
+        d3.select("select").on("change", function () {
+            treemap.value(this.value == "size" ? size : count).nodes(root);
+            zoom(node);
+        });
+
+
+        function size(d) {
+            return d.size;
+        }
+
+        function count(d) {
+            return 1;
+        }
+
+        function zoom(d) {
+            var kx = w / d.dx, ky = h / d.dy;
+            x.domain([d.x, d.x + d.dx]);
+            y.domain([d.y, d.y + d.dy]);
+
+            var t = chartContainer.selectAll("g.cell").transition()
+                .duration(d3.event.altKey ? 7500 : 750)
+                .attr("transform", function (d) {
+                    return "translate(" + x(d.x) + "," + y(d.y) + ")";
+                });
+
+            t.select("rect")
+                .attr("width", function (d) {
+                    return kx * d.dx - 1;
+                })
+                .attr("height", function (d) {
+                    return ky * d.dy - 1;
+                })
+
+            t.select("text")
+                .attr("x", function (d) {
+                    return kx * d.dx / 2;
+                })
+                .attr("y", function (d) {
+                    return ky * d.dy / 2;
+                })
+                .style("opacity", function (d) {
+                    return kx * d.dx > d.w ? 1 : 0;
+                });
+
+            node = d;
+            d3.event.stopPropagation();
+        }
+
+    };
+
+    $(document).ready(function () {
+        // Make the entire chart draggable.
+        //$(chart.config.parent).draggable();
+    });
+
+    return chart;
+};
+
+module.exports = treemap;
+},{}],35:[function(require,module,exports){
+var verticallegend = function (userConfig) {
+
+  var defaults = {
+    'labels'          : ["A", "B", "C"],
+    'id'              : "VerticalLegend",
+    'class'           : "VerticalLegend",
+    'resizeable'      : false,
+    'parent'          : null,
+    'height'          : 250,
+    'width'           : 250,
+    //'transform'       : 'translate(100,100)',
+    //'xoffset'         : 50,
+    //'yoffset'         : 30,
+    //'cellWidth'       : 30,
+    //'cellHeight'      : 20,
+    'tickLength'      : 5,
+    'caption'         : "Legend",
+    'captionFontSize' : 14,
+    'captionXOffset'  : -30,
+    'captionYOffset'  : -20,
+    'margin'          : {
+      'top'    : 10,
+      'bottom' : 10,
+      'left'   : 20,
+      'right'  : 10
+    },
+    'cell'            : {
+      'appearance.mouseover.rect.width' : 35,
+      'appearance.mouseout.rect.width'  : 30,
+      'appearance.mousedown.rect.width' : 50,
+      'appearance.mouseup.rect.width'   : 35,
+      'rect'                            : dex.config.rectangle({
+        'width'  : 30,
+        'height' : 20,
+        'y'      : function (d) {
+          return chart.config.yscale(d);
+        },
+        'x'      : function (d) {
+          return chart.config.width / 10;
+        },
+        'events' : {
+          'mouseover' : function (d, i) {
+            dex.console.log("mouseover event(d=" + d + ", i=" + i + ")");
+            //dex.console.log("this", d3.select(this), "Mouseover config",
+            //chart.config);
+            //dex.console.log("cell.events.mouseover.config",
+            //  chart.config.cell.appearance.mouseover);
+            d3.select(this).call(dex.config.configureRectangle,
+              chart.config.cell.appearance.mouseover.rect);
+            chart.publish({"type" : "mouseover", "d" : d});
+          },
+          'mouseout'  : function (d) {
+            dex.console.log("mouseout event(d=" + d + ", i=" + i + ")");
+            d3.select(this).call(dex.config.configureRectangle,
+              chart.config.cell.appearance.mouseout.rect);
+            chart.publish({"type" : "mouseout", "d" : d});
+          },
+          'mousedown' : function (d) {
+            dex.console.log("mousedown event(d=" + d + ", i=" + i + ")");
+            d3.select(this).call(dex.config.configureRectangle,
+              chart.config.cell.appearance.mousedown.rect);
+            chart.publish({"type" : "mousedown", "d" : d});
+          },
+          'mouseup'   : function (d) {
+            dex.console.log("mouseup event(d=" + d + ", i=" + i + ")");
+            d3.select(this).call(dex.config.configureRectangle,
+              chart.config.cell.appearance.mouseup.rect);
+            chart.publish({"type" : "mouseup", "d" : d});
+          }
+        }
+      }),
+      'label'                           : dex.config.text({
+        'text'        : function (d) {
+          return d;
+        },
+        'font.scale'  : function (d) {
+          dex.console.log("FONT.SCALE: width=" + chart.config.width + 'x' + chart.config.height);
+          var scale = d3.scale.linear()
+            .domain([0, 150])
+            .range([0, 32]);
+          return scale;
+        },
+        'font.weight' : "bold",
+        'font.size'   : function (d) {
+          dex.console.log("FONT-SIZE: width=" + chart.config.width +
+          ", height=" + chart.config.height +
+          ", fontScale=" + chart.config.cell.label.font.scale()(chart.config.width * .2));
+          return chart.config.cell.label.font.scale()(chart.config.width * .2);
+        },
+        'anchor'      : 'end',
+        'y'           : function (d) {
+          return chart.config.yscale(d);
+        },
+        'dx'          : function (d, i) {
+          dex.console.log("dx", chart.config.cell.label.font.size(d));
+          return -1 * chart.config.cell.label.font.size(d) / 2;
+          //dex.console.log("this", this, "select(this)", d3.select(this), chart.config);
+          //return -(chart.config.cell.label.font.size / 2);
+        },
+        'dy'          : function (d, i) {
+          //dex.console.log("CURENT-FONT-SIZE " + chart.config.cell.label.font.size(d))
+          ;         // return Math.floor(chart.config.cell.rect.height / 2);// + Math.floor(chart.config.cell.label.font.size(d) / 2);
+          return 0;
+        },
+        'fill'        : dex.config.fill({'fillColor' : 'black'})
+      })
+    },
+    'title'           : dex.config.text({
+      'text'       : 'title.text',
+      'anchor'     : 'middle',
+      'font.scale' : function (d) {
+        dex.console.log("TITLE.FONT.SCALE: width=" + chart.config.width + 'x' + chart.config.height);
+        var scale = d3.scale.linear()
+          .domain([0, 200])
+          .range([4, 64]);
+        return scale;
+      },
+      'font.size'  : function (d) {
+        dex.console.log("TITLE-FONT-SIZE: width=" + chart.config.width +
+        ", height=" + chart.config.height +
+        ", fontScale=" + chart.config.cell.label.font.scale()(
+          Math.min(chart.config.width, chart.config.height) / 5));
+        return chart.config.title.font.scale()
+        (Math.min(chart.config.width, chart.config.height) * .2);
+      },
+      'y'          : function (d) {
+        return chart.config.height / 12;
+      },
+      'x'          : function (d) {
+        return chart.config.width / 10 + chart.config.cell.rect.width / 2;
+      }
+    })
+  };
+
+  // Create our chart.
+  var chart = new dex.component(userConfig, defaults);
+  var config = chart.config;
+
+  chart.render = function render() {
+    window.onresize = this.resize;
+    chart.resize();
+  };
+
+  chart.resize = function resize() {
+    if (chart.config.resizeable) {
+
+      var width = d3.select(chart.config.parent).property("clientWidth");
+      var height = d3.select(chart.config.parent).property("clientHeight");
+      var cellWidth = width * .4;
+      var cellHeight = height * .8 / (chart.config.labels.length + 1);
+      dex.console.log("Resizing VerticalLegend: " + width + "x" + height);
+      chart
+        .attr("width", width)
+        .attr("height", height)
+        .attr("cell.rect.width", cellWidth)
+        .attr("cell.rect.height", cellHeight)
+        .attr("margin.top", height * .1)
+        .attr("margin.bottom", height * .1)
+        .attr("margin.left", width * .1)
+        .attr("margin.right", width * .1)
+        .attr("cell.appearance.mouseover.rect.width", cellWidth * 1.1)
+        .attr("cell.appearance.mouseout.rect.width", cellWidth)
+        .attr("cell.appearance.mousedown.rect.width", cellWidth * 1.2)
+        .attr("cell.appearance.mouseup.rect.width", cellWidth * 1.1)
+        .attr("cell.label.dx", width * .4)
+        .attr("cell.rect.x", width * .5)
+        .attr("title.y", height * .08)
+        .attr("title.x", width * .4 + cellWidth / 2)
+        .attr("cell.label.x", width * .1)
+        .update();
+    }
+    else {
+      chart.update();
+    }
+  };
+
+  chart.update = function update() {
+    var chart = this;
+    var config = this.config;
+    dex.console.log("RESIZE");
+    dex.console.log(config.id + ": " + config.width + "x" + config.height);
+    d3.selectAll("#" + config.id).remove();
+
+    config.yscale = d3.scale.ordinal()
+      .domain(config.labels)
+      .rangeBands([config.margin.top, config.height - config.margin.bottom]);
+
+    // Append a graphics node to the supplied svg node.
+    var chartContainer = d3.select(config.parent).append("g")
+      .attr("id", config["id"])
+      .attr("class", config["class"])
+      .attr("transform", config.transform);
+
+    var rects = chartContainer.selectAll("rect")
+      .data(config.labels)
+      .enter()
+      .append("rect")
+      .call(dex.config.configureRectangle, config.cell.rect);
+
+    chartContainer.selectAll("label")
+      .data(config.labels)
+      .enter().append("text")
+      .call(dex.config.configureText, config.cell.label);
+
+    chartContainer.append("text")
+      .call(dex.config.configureText, config.title)
+      .text(config.title.text);
+  };
+
+  $(document).ready(function () {
+    // Make the entire chart draggable.
+    $(chart.config.parent).draggable();
+  });
+
+  return chart;
+};
+
+module.exports = verticallegend;
+},{}],36:[function(require,module,exports){
+/**
+ *
+ * This module provides D3 based visualization components.
+ *
+ * @module dex/charts/d3
+ * @name d3
+ * @memberOf dex.charts
+ *
+ */
+var d3 = {};
+
+/**
+ *
+ * A class for drawing an axis.
+ *
+ * @name Axis
+ *
+ */
+d3.Axis = require("./Axis");
+d3.BarChart = require("./BarChart");
+d3.Chord = require("./Chord");
+d3.ClusteredForce = require("./ClusteredForce");
+d3.Dendrogram = require("./Dendrogram");
+d3.Force = require("./Force");
+d3.HeatMap = require("./HeatMap");
+d3.HorizonChart = require("./HorizonChart");
+d3.HorizontalLegend = require("./HorizontalLegend");
+d3.LineChart = require("./LineChart");
+d3.MotionBarChart = require("./MotionBarChart");
+d3.MotionChart = require("./MotionChart");
+d3.MotionCircleChart = require("./MotionCircleChart");
+d3.MotionLineChart = require("./MotionLineChart");
+d3.OrbitalLayout = require("./OrbitalLayout");
+d3.ParallelCoordinates = require("./ParallelCoordinates");
+d3.PieChart = require("./PieChart");
+d3.RadarChart = require("./RadarChart");
+d3.RadialTree = require("./RadialTree");
+d3.Sankey = require("./Sankey");
+d3.SankeyParticles = require("./SankeyParticles");
+d3.ScatterPlot = require("./ScatterPlot");
+d3.Sunburst = require("./Sunburst");
+d3.TitledTreemap = require("./TitledTreemap");
+d3.Treemap = require("./Treemap");
+d3.VerticalLegend = require("./VerticalLegend");
+
+// Too large, need optional config
+//d3.map = require("./map/map");
+
+module.exports = d3;
+},{"./Axis":10,"./BarChart":11,"./Chord":12,"./ClusteredForce":13,"./Dendrogram":14,"./Force":15,"./HeatMap":16,"./HorizonChart":17,"./HorizontalLegend":18,"./LineChart":19,"./MotionBarChart":20,"./MotionChart":21,"./MotionCircleChart":22,"./MotionLineChart":23,"./OrbitalLayout":24,"./ParallelCoordinates":25,"./PieChart":26,"./RadarChart":27,"./RadialTree":28,"./Sankey":29,"./SankeyParticles":30,"./ScatterPlot":31,"./Sunburst":32,"./TitledTreemap":33,"./Treemap":34,"./VerticalLegend":35}],37:[function(require,module,exports){
+var network = function (userConfig) {
+    var chart;
+
+    var defaults =
+    {
+        // The parent container of this chart.
+        'parent': '#RingNetwork',
+        // Set these when you need to CSS style components independently.
+        'id': 'RingNetwork',
+        'class': 'RingNetwork',
+        'resizable': true,
+        // Our data...
+        'csv': {
+            // Give folks without data something to look at anyhow.
+            'header': ["NAME", "GENDER", "VEHICLE"],
+            'data': [
+                ["JIM", "M", "CAR"],
+                ["JOE", "M", "CAR"],
+                ["PAT", "M", "TRUCK"],
+                ["SALLY", "F", "TRUCK"]
+            ]
+        },
+        'connect': 'first',
+        'type' : 'rings',
+        //'connect' : 'all',
+        'width': "100%",
+        'height': "100%",
+        'transform': "translate(0 0)",
+    };
+
+    var chart = new dex.component(userConfig, defaults);
+
+    chart.render = function render() {
+        window.onresize = this.resize;
+        chart.resize();
+    };
+
+    chart.resize = function resize() {
+        if (chart.config.resizable) {
+            var width = d3.select(chart.config.parent).property("clientWidth");
+            var height = d3.select(chart.config.parent).property("clientHeight");
+            dex.console.log(chart.config.id + ": resize(" + width + "," + height + ")");
+            chart.attr("width", width).attr("height", height).update();
+        }
+        else {
+            chart.update();
+        }
+    };
+
+    chart.update = function () {
+        var chart = this;
+        var config = chart.config;
+        var csv = config.csv;
+
+        var connections = [];
+
+        // Connect everything in the row to the first column.
+        if (config.connect == 'first') {
+            for (var ri = 0; ri < csv.data.length; ri++) {
+                for (var ci = 1; ci < csv.header.length; ci++) {
+                    connections.push({'source': csv.data[ri][0], 'target': csv.data[ri][ci]});
+                }
+            }
+        }
+        // Connect everything in the row to everything else in the row.
+        else {
+            for (var ri = 0; ri < csv.data.length; ri++) {
+                for (var ci = 1; ci < csv.header.length; ci++) {
+                    connections.push({'source': csv.data[ri][ci - 1], 'target': csv.data[ri][ci]});
+                }
+                connections.push({'source': csv.data[ri][csv.header.length - 1], 'target': csv.data[ri][0]});
+            }
+        }
+
+        //dex.console.log("Connections", connections);
+
+        // instantiate d3plus
+        var viz = d3plus.viz()
+            .container(config.parent)
+            .type(config.type)
+            .edges(connections);
+
+        if (config.edges)
+        {
+            viz.edges(config.edges);
+        }
+
+        if (config.focus)
+        {
+            viz.focus(config.focus);
+        }
+
+        viz.draw();             // finally, draw the visualization!
+    };
+
+    $(document).ready(function () {
+        // Make the entire chart draggable.
+        //$(chart.config.parent).draggable();
+    });
+
+    return chart;
+};
+
+module.exports = network;
+},{}],38:[function(require,module,exports){
+/**
+ *
+ * This module provides d3plus based visualizations.
+ *
+ * @module dex/charts/d3plus
+ * @name d3plus
+ * @memberOf dex.charts
+ *
+ */
+var d3plus = {};
+
+d3plus.Network = require("./Network");
+
+module.exports = d3plus;
+},{"./Network":37}],39:[function(require,module,exports){
+/**
+ * This will construct a new DygraphsLineChart with the user supplied userConfig applied.
+ * @param userConfig - A user supplied configuration of the form:
+ * @returns {DexComponent} The LineChart
+ * @constructor
+ *
+ */
+var linechart = function (userConfig) {
+  var defaults =
+  {
+    'parent'    : null,
+    'id'        : "DygraphsLineChart",
+    "class"     : "DygraphsLineChart",
+    'csv'       : {
+      'header' : ["X", "Y"],
+      'data'   : [
+        [0, 0],
+        [1, 1],
+        [2, 4],
+        [3, 9],
+        [4, 16]
+      ]
+    },
+    'width'     : 600,
+    'height'    : 400,
+    'transform' : '',
+    'options'   : {}
+  };
+
+  var chart = new dex.component(userConfig, defaults);
+  var config = chart.config;
+
+  chart.render = function () {
+    this.update();
+  };
+
+  chart.update = function () {
+    var chart = this;
+    var config = chart.config;
+    var csv = config.csv;
+
+    var csvIndices = dex.range(0, csv.header.length);
+    dex.console.trace("CSV INDICES: ", csvIndices);
+    // Map the header.
+
+    var csvData = csvIndices.map(function (i) {
+        return csv.header[i];
+      }).join(",") + "\n";
+
+    csvData += config.csv.data.map(function (row) {
+      return csvIndices.map(function (i) {
+        return row[i];
+      }).join(",");
+    }).join("\n") + "\n";
+
+    d3.selectAll(config.id).remove();
+    g = new Dygraph(document.getElementById(config.parent.substring(1)),
+      csvData, config.options);
+  };
+
+  $(document).ready(function () {
+    // Make the entire chart draggable.
+    //$(chart.config.parent).draggable();
+  });
+
+  return chart;
+};
+
+module.exports = linechart;
+},{}],40:[function(require,module,exports){
+/**
+ *
+ * This module provides a dygraphs linechart component.
+ *
+ * @module dex/charts/dygraphs
+ * @name dygraphs
+ * @memberOf dex.charts
+ *
+ */
+
+var dygraphs = {};
+
+dygraphs.LineChart = require("./LineChart");
+
+module.exports = dygraphs;
+},{"./LineChart":39}],41:[function(require,module,exports){
+var diffbarchart = function (userConfig) {
+
+  var defaults = {
+    // The parent container of this chart.
+    'parent'     : null,
+    // Set these when you need to CSS style components independently.
+    'id'         : 'PieChart',
+    'class'      : 'PieChart',
+    // Our data...
+    'csv'        : {
+      'header' : ['Category', 'Major', 'Degrees'],
+      'data'   : [
+        ['old', 'Business', 256070],
+        ['old', 'Education', 108034],
+        ['old', 'Social Sciences & History', 127101],
+        ['old', 'Health', 81863],
+        ['old', 'Psychology', 74194],
+        ['new', 'Business', 358293],
+        ['new', 'Education', 101265],
+        ['new', 'Social Sciences & History', 172780],
+        ['new', 'Health', 129634],
+        ['new', 'Psychology', 97216]]
+    },
+    'resizeable' : true,
+    'diff'       : {
+      'compare'       : 'Category',
+      'compareGroups' : ['old', 'new']
+    },
+    'options'    : {
+      'bars' : 'horizontal',
+      'hAxis.viewWindowMode' : 'maximized',
+      'vAxis.viewWindowMode' : 'maximized',
+      'chartArea.width' : function() { return chart.config.width * 0.8; },
+      'chartArea.height' : function() { return chart.config.height * 0.8; }
+    }
+  };
+
+  var chart = new dex.component(userConfig, defaults);
+
+  chart.render = function render() {
+    window.onresize = this.resize;
+    chart.attr("options.chart.title", 'title')
+      .attr("options.chart.subtitle", 'subtitle')
+      .attr("options.colors", [
+        'steelblue', 'red', 'blue', 'green',
+        'orange', 'purple', 'grey', 'brown',
+        'cyan', 'magenta']);
+    chart.resize();
+  };
+
+  chart.resize = function resize() {
+    if (chart.config.resizeable) {
+      var config = chart.config;
+      var target = (config.parent && config.parent[0] == '#') ?
+        config.parent.substring(1) : config.parent;
+      var targetElt = document.getElementById(target);
+
+      var width = targetElt.clientWidth;
+      var height = targetElt.clientHeight;
+      dex.console.log("google.DiffPieChart Resize: " + width + "x" + height);
+
+      chart
+        .attr("width", width)
+        .attr("height", height)
+        .update();
+    }
+    else {
+      chart.update();
+    }
+  };
+
+  chart.update = function update() {
+    var chart = this;
+    var config = chart.config;
+
+    // Keep a copy of the before and after data
+    var beforeData = [dex.array.copy(config.csv.header)];
+    var afterData = [dex.array.copy(config.csv.header)];
+
+    // Find the category we're grouping on.
+    var groupIndex = config.csv.header.indexOf(config.diff.category);
+
+    // Nothing to chart if the group index is invalid.  Simply return.
+    if (groupIndex < 0) {
+      return;
+    }
+
+    // Iterate over each row in the data:
+    config.csv.data.forEach(function (row) {
+      // Copy the rows with matching group indexes.
+      if (row[groupIndex] == config.diff.compareGroups[0]) {
+        beforeData.push(dex.array.copy(row));
+      }
+      else if (row[groupIndex] == config.diff.compareGroups[1]) {
+        afterData.push(dex.array.copy(row));
+      }
+    })
+
+    // Remove the group index from the copied data.
+    beforeData.forEach(function (row) {
+      row.splice(groupIndex, 1);
+    });
+    afterData.forEach(function (row) {
+      row.splice(groupIndex, 1);
+    });
+
+    dex.console.log("csv", config.csv, "before", beforeData, "after", afterData);
+
+    // Get the valid query string for the parent:
+    var target = (config.parent && config.parent[0] == '#') ?
+      config.parent.substring(1) : config.parent;
+
+    // Use js dom to locate the target node.
+    var targetNode = document.getElementById(target);
+
+    // Delete the children.
+    while (targetNode.firstChild) {
+      targetNode.removeChild(targetNode.firstChild);
+    }
+
+    var beforeDataTable = google.visualization.arrayToDataTable(beforeData);
+    var afterDataTable = google.visualization.arrayToDataTable(afterData);
+
+    var diffChart = new google.visualization.BarChart(targetNode);
+
+    var diffDataTable = diffChart.computeDiff(beforeDataTable, afterDataTable);
+    diffChart.draw(diffDataTable, config.options);
+  };
+
+  $(document).ready(function () {
+    // Make the entire chart draggable.
+    $(chart.config.parent).draggable();
+  });
+
+  return chart;
+};
+
+module.exports = diffbarchart;
+},{}],42:[function(require,module,exports){
+var diffpiechart = function (userConfig) {
+
+  var defaults = {
+    // The parent container of this chart.
+    'parent'     : null,
+    // Set these when you need to CSS style components independently.
+    'id'         : 'PieChart',
+    'class'      : 'PieChart',
+    // Our data...
+    'csv'        : {
+      'header' : ['Category', 'Major', 'Degrees'],
+      'data'   : [
+        ['old', 'Business', 256070],
+        ['old', 'Education', 108034],
+        ['old', 'Social Sciences & History', 127101],
+        ['old', 'Health', 81863],
+        ['old', 'Psychology', 74194],
+        ['new', 'Business', 358293],
+        ['new', 'Education', 101265],
+        ['new', 'Social Sciences & History', 172780],
+        ['new', 'Health', 129634],
+        ['new', 'Psychology', 97216]]
+    },
+    'resizeable' : true,
+    'diff'       : {
+      'compare'       : 'Category',
+      'compareGroups' : ['old', 'new']
+    },
+    'options'    : {
+      'title'           : 'default title',
+      'legend.position' : 'bottom'
+    }
+  };
+
+  var chart = new dex.component(userConfig, defaults);
+
+  chart.render = function render() {
+    window.onresize = this.resize;
+    chart
+      .resize();
+  };
+
+  chart.resize = function resize() {
+    if (chart.config.resizeable) {
+      var config = chart.config;
+      var target = (config.parent && config.parent[0] == '#') ?
+        config.parent.substring(1) : config.parent;
+      var targetElt = document.getElementById(target);
+
+      var width = targetElt.clientWidth;
+      var height = targetElt.clientHeight;
+      dex.console.log("google.DiffPieChart Resize: " + width + "x" + height);
+
+      chart
+        .attr("width", width)
+        .attr("height", height)
+        .attr("options.chartArea.width", width * .8)
+        .attr("options.chartArea.height", height * .8)
+        .update();
+    }
+    else {
+      chart.update();
+    }
+  };
+
+  chart.update = function update() {
+    var chart = this;
+    var config = chart.config;
+
+    var oldData = [dex.array.copy(config.csv.header)];
+    var newData = [dex.array.copy(config.csv.header)];
+    var groupIndex = config.csv.header.indexOf(config.diff.category);
+
+    if (groupIndex < 0) {
+      return;
+    }
+
+    config.csv.data.forEach(function (row) {
+      if (row[groupIndex] == config.diff.compareGroups[0]) {
+        oldData.push(dex.array.copy(row));
+      }
+      else if (row[groupIndex] == config.diff.compareGroups[1]) {
+        newData.push(dex.array.copy(row));
+      }
+    })
+
+    newData.forEach(function (row) {
+      row.splice(groupIndex, 1);
+    });
+    oldData.forEach(function (row) {
+      row.splice(groupIndex, 1);
+    });
+
+    dex.console.log("csv", config.csv, "old", oldData, "new", newData);
+
+    var target = (config.parent && config.parent[0] == '#') ?
+      config.parent.substring(1) : config.parent;
+
+    var targetNode = document.getElementById(target);
+
+    while (targetNode.firstChild) {
+      targetNode.removeChild(targetNode.firstChild);
+    }
+
+    var oldDataTable = google.visualization.arrayToDataTable(oldData);
+    var newDataTable = google.visualization.arrayToDataTable(newData);
+
+    var diffChart = new google.visualization.PieChart(targetNode);
+
+    var diffDataTable = diffChart.computeDiff(oldDataTable, newDataTable);
+    diffChart.draw(diffDataTable, config.options);
+  };
+
+  $(document).ready(function () {
+    // Make the entire chart draggable.
+    $(chart.config.parent).draggable();
+  });
+
+  return chart;
+};
+
+module.exports = diffpiechart;
+},{}],43:[function(require,module,exports){
+/**
+ *
+ * @param userConfig A user supplied configuration object which will override the defaults.
+ * @returns {DexComponent} Returns the Axis object.
+ * @constructor
+ *
+ */
+var piechart = function (userConfig) {
+
+  // Todo: Mouseover events to communicate with other charting components.
+  var defaults = {
+    // The parent container of this chart.
+    'parent'     : null,
+    // Set these when you need to CSS style components independently.
+    'id'         : 'PieChart',
+    'class'      : 'PieChart',
+    // Our data...
+    'csv'        : {
+      'header' : ["Task", "Hours per Day"],
+      'data'   : [
+        ['Work', 8],
+        ['Eat', 2],
+        ['Watch TV', 1],
+        ['Sleep', 7],
+        ['Chores', 2],
+        ['Code', 4]
+      ]
+    },
+    'resizeable' : true,
+    'title'      : "title",
+    'options'    : {}
+  };
+
+  var chart = new dex.component(userConfig, defaults);
+
+  chart.render = function render() {
+    window.onresize = this.resize;
+    chart.resize();
+  };
+
+  chart.resize = function resize() {
+    if (chart.config.resizeable) {
+      var config = chart.config;
+      var target = (config.parent && config.parent[0] == '#') ?
+        config.parent.substring(1) : config.parent;
+      var targetNode = document.getElementById(target);
+
+      while (targetNode.firstChild) {
+        targetNode.removeChild(targetNode.firstChild);
+      }
+
+      var width = targetNode.clientWidth;
+      var height = targetNode.clientHeight;
+      //dex.console.log("google.PieChart Resize: " + width + "x" + height);
+      //var width = d3.select(chart.config.parent).property("clientWidth");
+      //var height = d3.select(chart.config.parent).property("clientHeight");
+      //chart.attr("width", width).attr("height", height).update();
+      chart.update();
+    }
+    else {
+      chart.update();
+    }
+  };
+
+  chart.update = function update() {
+    var chart = this;
+    var config = chart.config;
+
+    var data = dex.matrix.copy(config.csv.data);
+    data.unshift(dex.array.copy(config.csv.header));
+    dex.console.log("google.PieChart Data:", data, "Options", config.options);
+
+    var dataTable = google.visualization.arrayToDataTable(data);
+
+    var target = (config.parent && config.parent[0] == '#') ?
+      config.parent.substring(1) : config.parent;
+
+    var chart = new google.visualization.PieChart(
+      document.getElementById(target));
+
+    chart.draw(dataTable, config.options);
+  };
+
+  $(document).ready(function () {
+    // Make the entire chart draggable.
+    $(chart.config.parent).draggable().zIndex(0);
+  });
+
+  return chart;
+};
+
+module.exports = piechart;
+},{}],44:[function(require,module,exports){
+/**
+ *
+ * @param userConfig A user supplied configuration object which will override the defaults.
+ * @returns {DexComponent} Returns the Axis object.
+ * @constructor
+ *
+ */
+var timeline = function (userConfig) {
+
+  var defaults = {
+    // The parent container of this chart.
+    'parent'     : null,
+    // Set these when you need to CSS style components independently.
+    'id'         : 'Timeline',
+    'class'      : 'Timeline',
+    // Our data...
+    'csv'        : {
+      'header' : ["President", "Start", "End"],
+      'data'   : [
+        ['Washington', '3/29/1789', '2/3/1797'],
+        ['Adams', '2/3/1797', '2/3/1801'],
+        ['Jefferson', '2/3/1801', '2/3/1809']
+      ]
+    },
+    'resizeable' : true,
+    'title'      : "Timeline",
+    'options'    : {}
+  };
+
+  var chart = new dex.component(userConfig, defaults);
+
+  chart.render = function render() {
+    window.onresize = this.resize;
+    chart.resize();
+  };
+
+  chart.resize = function resize() {
+    if (chart.config.resizeable || isNaN(chart.config.height) ||
+      isNaN(chart.config.width)) {
+      var config = chart.config;
+      var target = (config.parent && config.parent[0] == '#') ?
+        config.parent.substring(1) : config.parent;
+      var targetElt = document.getElementById(target);
+
+      var width = targetElt.clientWidth;
+      var height = targetElt.clientHeight;
+      dex.console.log("google.Timeline Resize: " + width + "x" + height);
+      //var width = d3.select(chart.config.parent).property("clientWidth");
+      //var height = d3.select(chart.config.parent).property("clientHeight");
+      //chart.attr("width", width).attr("height", height).update();
+      chart.update();
+    }
+    else {
+      chart.update();
+    }
+  };
+
+  chart.update = function update() {
+    var chart = this;
+    var config = chart.config;
+
+    // Guessing types, then setting the category column to the first
+    // string.  The fromIndex to the first occurrence of a 'date' type
+    // and toIndex to the second occurrence of a 'date' type.
+    //
+    // If the data does not contain at least a string and two dates, it
+    // will chart nothing.
+    var categoryIndex;
+    var fromIndex;
+    var toIndex;
+
+    var types = dex.csv.guessTypes(config.csv);
+
+    categoryIndex = types.indexOf('string');
+    fromIndex = types.indexOf('date');
+    toIndex = types.indexOf('date', fromIndex + 1);
+
+    if (categoryIndex == -1 || fromIndex == -1 || toIndex == -1) {
+      return;
+    }
+
+    var chartCsv = dex.csv.columnSlice(config.csv, [categoryIndex, fromIndex, toIndex]);
+    var data = chartCsv.data;
+    data.unshift(dex.array.copy(chartCsv.header));
+    dex.console.log("google.PieChart Data:", data, "Options", config.options);
+
+    var dataTable = google.visualization.arrayToDataTable(data);
+
+    var target = (config.parent && config.parent[0] == '#') ?
+      config.parent.substring(1) : config.parent;
+
+    var chart = new google.visualization.Timeline(
+      document.getElementById(target));
+
+    chart.draw(dataTable, config.options);
+  };
+
+  $(document).ready(function () {
+    // Make the entire chart draggable.
+    $(chart.config.parent).draggable();
+  });
+
+  return chart;
+};
+
+module.exports = timeline;
+},{}],45:[function(require,module,exports){
+/**
+ *
+ * @param userConfig A user supplied configuration object which will override the defaults.
+ * @returns {DexComponent} Returns the Axis object.
+ * @constructor
+ *
+ */
+var wordtree = function (userConfig) {
+
+  var defaults = {
+    // The parent container of this chart.
+    'parent'     : null,
+    // Set these when you need to CSS style components independently.
+    'id'         : 'WordTree',
+    'class'      : 'WordTree',
+    // Our data...
+    'csv'        : {
+      'header' : ["LINE"],
+      'data'   : [
+        ['Now is the time for all good men to fight.'],
+        ['Now is the time for all good men to flee.'],
+        ['Now is not the time.']
+      ]
+    },
+    'resizeable' : true,
+    'options'    : {
+      'wordtree' : {
+        'format' : 'implicit'
+      }
+    }
+  };
+
+  var chart = new dex.component(userConfig, defaults);
+
+  chart.render = function render() {
+    window.onresize = this.resize;
+    chart.resize();
+  };
+
+  chart.resize = function resize() {
+    if (chart.config.resizeable) {
+      var config = chart.config;
+      var target = (config.parent && config.parent[0] == '#') ?
+        config.parent.substring(1) : config.parent;
+      var targetElt = document.getElementById(target);
+
+      var width = targetElt.clientWidth;
+      var height = targetElt.clientHeight;
+      dex.console.log("google.WordTree Resize: " + width + "x" + height);
+      //var width = d3.select(chart.config.parent).property("clientWidth");
+      //var height = d3.select(chart.config.parent).property("clientHeight");
+      //chart.attr("width", width).attr("height", height).update();
+      chart
+        //.attr("options.height", height)
+        //.attr("options.width", width)
+        .update();
+    }
+    else {
+      chart.update();
+    }
+  };
+
+  chart.update = function update() {
+    var chart = this;
+    var config = chart.config;
+    var target = (config.parent && config.parent[0] == '#') ?
+      config.parent.substring(1) : config.parent;
+
+    var phrases = [["Phrases"]];
+    config.csv.data.forEach(function (row) {
+      row.forEach(function (col) {
+        phrases.push([col.toLowerCase()]);
+      })
+    });
+
+    dex.console.log("PHRASES", phrases);
+
+    var data = google.visualization.arrayToDataTable(phrases);
+
+    var chart = new google.visualization.WordTree(
+      document.getElementById(target));
+    chart.draw(data, config.options);
+  };
+
+  $(document).ready(function () {
+
+    // Make the entire chart draggable.
+    $(chart.config.parent).draggable();
+  });
+
+  return chart;
+};
+
+module.exports = wordtree;
+},{}],46:[function(require,module,exports){
+/**
+ *
+ * This module provides routines for dealing with arrays.
+ *
+ * @module dex/charts/google
+ * @name google
+ * @memberOf dex.charts
+ *
+ */
+var google = {};
+
+google.DiffBarChart = require("./DiffBarChart");
+google.DiffPieChart = require("./DiffPieChart");
+google.PieChart = require("./PieChart");
+google.Timeline = require("./Timeline");
+google.WordTree = require("./WordTree");
+
+module.exports = google;
+},{"./DiffBarChart":41,"./DiffPieChart":42,"./PieChart":43,"./Timeline":44,"./WordTree":45}],47:[function(require,module,exports){
+var scatterplot = function (userConfig) {
+  var defaults = {
+    // The parent container of this chart.
+    'parent'  : null,
+    // Set these when you need to CSS style components independently.
+    'id'      : 'ScatterPlot3D',
+    'class'   : 'ScatterPlot3D',
+    // Our data...
+    'csv'     : {
+      // Give folks without data something to look at anyhow.
+      'header' : ["X", "Y", "Z"],
+      'data'   : [[0, 0, 0], [1, 1, 1], [2, 4, 8], [3, 9, 27]]
+    },
+    'width'   : 400,
+    'height'  : 400,
+    'xoffset' : 20,
+    'yoffset' : 0
+  };
+
+  var chart = new dex.component(userConfig, defaults);
+
+  chart.render = function () {
+    this.update();
+  };
+
+  chart.update = function () {
+    var chart = this;
+    var config = chart.config;
+    var csv = config.csv;
+
+    var bounds =
+    {
+      'maxx' : dex.matrix.max(csv.data, 0),
+      'minx' : dex.matrix.min(csv.data, 0),
+      'maxy' : dex.matrix.max(csv.data, 1),
+      'miny' : dex.matrix.min(csv.data, 1),
+      'maxz' : dex.matrix.max(csv.data, 2),
+      'minz' : dex.matrix.min(csv.data, 2)
+    };
+
+    var i, j;
+
+// <!--
+    function mousewheel(event) {
+      var fovMAX = 160;
+      var fovMIN = 1;
+
+      camera.fov -= event.wheelDeltaY * 0.05;
+      camera.fov = Math.max(Math.min(camera.fov, fovMAX), fovMIN);
+      camera.projectionMatrix = new THREE.Matrix4().makePerspective(camera.fov, config.width / config.height, camera.near, camera.far);
+    }
+
+    function generateTexture() {
+      // draw a circle in the center of the canvas
+      var size = 128;
+
+      // create canvas
+      var canvas = document.createElement('canvas');
+      canvas.width = size;
+      canvas.height = size;
+
+      // get context
+      var context = canvas.getContext('2d');
+
+      // draw circle
+      var centerX = size / 2;
+      var centerY = size / 2;
+      var radius = size / 2;
+
+//var gradient = context.createRadialGradient( canvas.width / 2, canvas.height / 2, 0, canvas.width / 2, canvas.height / 2, canvas.width / 2 );
+//        gradient.addColorStop( 0, 'rgba(255,255,255,1)' );
+//        gradient.addColorStop( 0.2, 'rgba(0,255,255,1)' );
+//        gradient.addColorStop( 0.4, 'rgba(0,0,64,1)' );
+//        gradient.addColorStop( 1, 'rgba(0,0,0,1)' );
+
+      context.beginPath();
+      context.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
+      //context.fillStyle = gradient;
+      //context.fillRect( 0, 0, canvas.width, canvas.height );
+      context.fillStyle = "#FFFFFF";
+      context.fill();
+
+      return canvas;
+    }
+
+    function createTextCanvas(text, color, font, size) {
+      size = size || 24;
+      var canvas = document.createElement('canvas');
+      var ctx = canvas.getContext('2d');
+      var fontStr = (size + 'px ') + (font || 'Arial');
+      ctx.font = fontStr;
+      var w = ctx.measureText(text).width;
+      var h = Math.ceil(size);
+      canvas.width = w;
+      canvas.height = h;
+      ctx.font = fontStr;
+      ctx.fillStyle = color || 'black';
+      ctx.fillText(text, 0, Math.ceil(size * 0.8));
+      return canvas;
+    }
+
+    function createText2D(text, color, font, size, segW, segH) {
+      var canvas = createTextCanvas(text, color, font, size);
+      var plane = new THREE.PlaneGeometry(canvas.width, canvas.height, segW, segH);
+      var tex = new THREE.Texture(canvas);
+      tex.needsUpdate = true;
+      var planeMat = new THREE.MeshBasicMaterial({
+        map : tex, color : 0xffffff, transparent : true
+      });
+      var mesh = new THREE.Mesh(plane, planeMat);
+      mesh.scale.set(0.25, 0.25, 0.25);
+      mesh.doubleSided = true;
+      return mesh;
+    }
+
+    var maxRange = Math.max(Math.max(bounds.maxx - bounds.minx, bounds.maxy - bounds.miny),
+      bounds.maxz - bounds.minz);
+    var renderer = new THREE.WebGLRenderer({antialias : true});
+    var w = config.width;
+    var h = config.height;
+    renderer.setSize(w, h);
+
+//document.body.appendChild(renderer.domElement);
+    config.parent.appendChild(renderer.domElement);
+
+    renderer.setClearColorHex(0xEEEEEE, 1.0);
+
+//var camera = new THREE.PerspectiveCamera(45, w/h, 1, 1000 );
+    var camera = new THREE.PerspectiveCamera(45, w / h, 1, 100000);
+//var camera = new THREE.OrthographicCamera( w / - 2, w / 2, h / 2, h / - 2, 1, h );
+    camera.position.z = bounds.maxz * 4;
+    camera.position.x = 0;
+    camera.position.y = bounds.maxy * 1.25;
+
+    var scene = new THREE.Scene();
+//scene.fog = new THREE.FogExp2( 0xFFFFFF, 0.000005 );
+
+    var scatterPlot = new THREE.Object3D();
+    scene.add(scatterPlot);
+
+    scatterPlot.rotation.y = 0.5;
+    function v(x, y, z) {
+      return new THREE.Vertex(new THREE.Vector3(x, y, z));
+    }
+
+//var lineGeo = new THREE.CubeGeometry(bounds.maxx - bounds.maxx, bounds.maxy - bounds.miny,
+//  bounds.maxz - bounds.minz);
+
+    var xAxisGeo = new THREE.Geometry();
+    var yAxisGeo = new THREE.Geometry();
+    var zAxisGeo = new THREE.Geometry();
+    var boundaryGeo = new THREE.Geometry();
+
+    xAxisGeo.vertices.push(v(bounds.minx, 0, 0), v(bounds.maxx, 0, 0));
+    yAxisGeo.vertices.push(v(0, bounds.miny, 0), v(0, bounds.maxy, 0));
+    zAxisGeo.vertices.push(v(0, 0, bounds.minz), v(0, 0, bounds.maxz));
+    boundaryGeo.vertices.push(
+      v(bounds.minx, bounds.maxy, bounds.minz), v(bounds.maxx, bounds.maxy, bounds.minz),
+      v(bounds.minx, bounds.miny, bounds.minz), v(bounds.maxx, bounds.miny, bounds.minz),
+      v(bounds.minx, bounds.maxy, bounds.maxz), v(bounds.maxx, bounds.maxy, bounds.maxz),
+      v(bounds.minx, bounds.miny, bounds.maxz), v(bounds.maxx, bounds.miny, bounds.maxz),
+
+      v(bounds.minx, 0, bounds.maxz), v(bounds.maxx, 0, bounds.maxz),
+      v(bounds.minx, 0, bounds.minz), v(bounds.maxx, 0, bounds.minz),
+      v(bounds.minx, bounds.maxy, 0), v(bounds.maxx, bounds.maxy, 0),
+      v(bounds.minx, bounds.miny, 0), v(bounds.maxx, bounds.miny, 0),
+
+      v(bounds.maxx, bounds.miny, bounds.minz), v(bounds.maxx, bounds.maxy, bounds.minz),
+      v(bounds.minx, bounds.miny, bounds.minz), v(bounds.minx, bounds.maxy, bounds.minz),
+      v(bounds.maxx, bounds.miny, bounds.maxz), v(bounds.maxx, bounds.maxy, bounds.maxz),
+      v(bounds.minx, bounds.miny, bounds.maxz), v(bounds.minx, bounds.maxy, bounds.maxz),
+
+      v(0, bounds.miny, bounds.maxz), v(0, bounds.maxy, bounds.maxz),
+      v(0, bounds.miny, bounds.minz), v(0, bounds.maxy, bounds.minz),
+      v(bounds.maxx, bounds.miny, 0), v(bounds.maxx, bounds.maxy, 0),
+      v(bounds.minx, bounds.miny, 0), v(bounds.minx, bounds.maxy, 0),
+
+      v(bounds.maxx, bounds.maxy, bounds.minz), v(bounds.maxx, bounds.maxy, bounds.maxz),
+      v(bounds.maxx, bounds.miny, bounds.minz), v(bounds.maxx, bounds.miny, bounds.maxz),
+      v(bounds.minx, bounds.maxy, bounds.minz), v(bounds.minx, bounds.maxy, bounds.maxz),
+      v(bounds.minx, bounds.miny, bounds.minz), v(bounds.minx, bounds.miny, bounds.maxz),
+
+      v(bounds.minx, 0, bounds.minz), v(bounds.minx, 0, bounds.maxz),
+      v(bounds.maxx, 0, bounds.minz), v(bounds.maxx, 0, bounds.maxz),
+      v(0, bounds.maxy, bounds.minz), v(0, bounds.maxy, bounds.maxz),
+      v(0, bounds.miny, bounds.minz), v(0, bounds.miny, bounds.maxz)
+    );
+
+    var xAxisMat = new THREE.LineBasicMaterial({color : 0xff0000, lineWidth : 1});
+    var xAxis = new THREE.Line(xAxisGeo, xAxisMat);
+    xAxis.type = THREE.Lines;
+    scatterPlot.add(xAxis);
+
+    var yAxisMat = new THREE.LineBasicMaterial({color : 0x0000ff, lineWidth : 1});
+    var yAxis = new THREE.Line(yAxisGeo, yAxisMat);
+    yAxis.type = THREE.Lines;
+    scatterPlot.add(yAxis);
+
+    var zAxisMat = new THREE.LineBasicMaterial({color : 0x00ff00, lineWidth : 1});
+    var zAxis = new THREE.Line(zAxisGeo, zAxisMat);
+    zAxis.type = THREE.Lines;
+    scatterPlot.add(zAxis);
+
+    var boundaryMat = new THREE.LineBasicMaterial({color : 0x090909, lineWidth : 1, transparent : true});
+    var boundary = new THREE.Line(boundaryGeo, boundaryMat);
+    boundary.type = THREE.Lines;
+    scatterPlot.add(boundary);
+
+    var fontSize = Math.max(Math.round(maxRange / 4), 8);
+    var fontOffset = Math.min(Math.round(fontSize / 4), 8);
+    console.log("OFFSET: " + fontOffset);
+    console.log("  FONT: " + fontSize);
+
+    var titleX = createText2D("-" + csv.header[0], new THREE.Color().setRGB(1, 0, 0), "", fontSize);
+    titleX.position.x = bounds.minx - fontOffset;
+    scatterPlot.add(titleX);
+
+    var titleX = createText2D(csv.header[0], new THREE.Color().setRGB(1, 0, 0), "", fontSize);
+    titleX.position.x = bounds.maxx + fontOffset;
+    scatterPlot.add(titleX);
+
+    var titleY = createText2D('-' + csv.header[1], new THREE.Color().setRGB(1, 0, 0), "", fontSize);
+    titleY.position.y = bounds.miny - fontOffset;
+    scatterPlot.add(titleY);
+
+// (text, color, font, size, segW, segH)
+    var titleY = createText2D(csv.header[1], new THREE.Color().setRGB(1, 0, 0), "", fontSize);
+    titleY.position.y = bounds.maxy + fontOffset;
+    scatterPlot.add(titleY);
+
+    var titleZ = createText2D('-' + csv.header[2], new THREE.Color().setRGB(1, 0, 0), "", fontSize);
+    titleZ.position.z = bounds.minz - fontOffset;
+    scatterPlot.add(titleZ);
+
+    var titleZ = createText2D(csv.header[2], new THREE.Color().setRGB(1, 0, 0), "", fontSize);
+    titleZ.position.z = bounds.maxz + fontOffset;
+    scatterPlot.add(titleZ);
+
+    attributes = {
+
+      size        : {type : 'f', value : []},
+      customColor : {type : 'c', value : []}
+
+    };
+
+    uniforms =
+    {
+      amplitude : {type : "f", value : 1.0},
+      color     : {type : "c", value : new THREE.Color(0xff0000)}
+      //texture: { type: "t", value: THREE.ImageUtils.loadTexture( "textures/ball.png" ) },
+    };
+
+    var texture = new THREE.Texture(generateTexture());
+    texture.needsUpdate = true; // important
+
+//var mat = new THREE.ParticleBasicMaterial({vertexColors:true, size: 1});
+//var mat = new THREE.ParticleBasicMaterial( { blending: THREE.AdditiveBlending, vertexColors: true, size: 1, map: THREE.ImageUtils.loadTexture( 'textures/ball.png' ) } );
+//var mat = new THREE.ParticleBasicMaterial({vertexColors:true, size: 1});
+//var mat = new THREE.ParticleCanvasMaterial( { size: 50, map: new THREE.Texture( generateSprite() ), blending: THREE.AdditiveBlending } );
+    var mat = new THREE.ParticleBasicMaterial(
+      {
+        size         : Math.max(maxRange / 25, 1),
+        map          : texture,
+        blending     : THREE.AdditiveBlending, // required
+        depthTest    : false, // required
+        transparent  : false,
+        opacity      : 0.7,
+        vertexColors : true // optional
+      });
+
+    var pointGeo = new THREE.Geometry();
+
+//var pointCount = 1000;
+
+    var colors =
+      [
+        new THREE.Color().setRGB(1, 0, 0),
+        new THREE.Color().setRGB(0, 0, 1),
+        new THREE.Color().setRGB(0, 1, 0),
+        new THREE.Color().setRGB(1, 0, 1),
+        new THREE.Color().setRGB(1, 1, 0),
+        new THREE.Color().setRGB(0, 1, 1),
+        new THREE.Color().setRGB(.5, .5, .5)
+      ];
+
+    for (i = 0; i < csv.data.length; i++) {
+      //var x = Math.random() * 100 - 50;
+      //var y = x*0.8+Math.random() * 20 - 10;
+      //var z = x*0.7+Math.random() * 30 - 15;
+
+      for (j = 2; j < csv.header.length; j++) {
+        pointGeo.vertices.push(new THREE.Vertex(new THREE.Vector3(csv.data[i][0], csv.data[i][1], csv.data[i][j])));
+        pointGeo.colors.push(colors[(j - 2) % colors.length]);
+      }
+    }
+
+    var points = new THREE.ParticleSystem(pointGeo, mat);
+    scatterPlot.add(points);
+
+//camera.lookAt( scatterPlot );
+//camera.target.position.copy( scatterPlot );
+
+    renderer.render(scene, camera);
+    var paused = false;
+    var last = new Date().getTime();
+    var down = false;
+    var sx = 0, sy = 0;
+    window.onmousedown = function (ev) {
+      down = true;
+      sx = ev.clientX;
+      sy = ev.clientY;
+    };
+
+    window.addEventListener('DOMMouseScroll', mousewheel, false);
+    window.addEventListener('mousewheel', mousewheel, false);
+
+    window.onmouseup = function () {
+      down = false;
+    };
+    window.onmousemove = function (ev) {
+      if (down) {
+        var dx = ev.clientX - sx;
+        var dy = ev.clientY - sy;
+        scatterPlot.rotation.y += dx * 0.01;
+        camera.position.y += dy;
+        sx += dx;
+        sy += dy;
+      }
+    };
+
+    var animating = false;
+    window.ondblclick = function () {
+      animating = !animating;
+    };
+    function animate(t) {
+      if (!paused) {
+        last = t;
+        if (animating) {
+          var v = pointGeo.vertices;
+          for (i = 0; i < v.length; i++) {
+            var u = v[i];
+            u.angle += u.speed * 0.01;
+            u.position.x = Math.cos(u.angle) * u.radius;
+            u.position.z = Math.sin(u.angle) * u.radius;
+          }
+          pointGeo.__dirtyVertices = true;
+        }
+        renderer.clear();
+        camera.lookAt(scene.position);
+        renderer.render(scene, camera);
+      }
+      window.requestAnimationFrame(animate, renderer.domElement);
+    };
+    animate(new Date().getTime());
+    onmessage = function (ev) {
+      paused = (ev.data == 'pause');
+    };
+//-->
+
+  };
+
+  return chart;
+};
+
+module.exports = scatterplot;
+},{}],48:[function(require,module,exports){
+/**
+ *
+ * This module provides ThreeJS/WebGL based visualization components.
+ *
+ * @module dex/charts/threejs
+ * @name d3plus
+ * @memberOf dex.charts
+ *
+ */
+var threejs = {};
+
+threejs.ScatterPlot = require("./ScatterPlot");
+
+module.exports = threejs;
+},{"./ScatterPlot":47}],49:[function(require,module,exports){
 /**
  *
  * This module provides routines for dealing with colors.
  *
- * @module color
+ * @module dex/color
+ * @name color
+ * @memberOf dex
  *
  */
 
@@ -828,7 +11122,7 @@ exports.gradient = function (baseColor) {
   return "url(#" + gradientId + ")";
 };
 
-},{}],5:[function(require,module,exports){
+},{}],50:[function(require,module,exports){
 /**
  *
  * This module provides base capabilities which are available to all dex components.
@@ -1355,11 +11649,13 @@ module.exports = function (userConfig, defaultConfig) {
     console.log("Unimplemented routine: update()");
   };
 };
-},{}],6:[function(require,module,exports){
+},{}],51:[function(require,module,exports){
 /**
  *
  * Config module.
- * @module config
+ * @module dex/config
+ * @name config
+ * @memberOf dex
  *
  */
 
@@ -2633,12 +12929,14 @@ exports.configureScale = function configureScale(scale, config) {
 };
 
 //module.exports = config;
-},{}],7:[function(require,module,exports){
+},{}],52:[function(require,module,exports){
 /**
  *
  * This module provides console logging capabilities.
  *
- * @module console
+ * @module dex/console
+ * @name console
+ * @memberOf dex
  *
  */
 
@@ -2769,13 +13067,15 @@ exports.logLevels = function () {
   return logLevels;
 };
 
-},{}],8:[function(require,module,exports){
+},{}],53:[function(require,module,exports){
 /**
  *
  * This module provides support for dealing with csv structures.  This
  * is the core datatype on which dexjs components operate.
  *
- * @module csv
+ * @module dex/csv
+ * @name csv
+ * @memberOf dex
  *
  */
 
@@ -3623,12 +13923,14 @@ exports.getConnectionMap = function (csv) {
 
   return rootMap;
 };
-},{}],9:[function(require,module,exports){
+},{}],54:[function(require,module,exports){
 /**
  *
  * This module provides support for creating various datasets.
  *
- * @module datagen
+ * @module dex/datagen
+ * @name datagen
+ * @memberOf dex
  *
  */
 
@@ -3758,12 +14060,196 @@ exports.identityHeader = function (spec) {
   });
 };
 
-},{}],10:[function(require,module,exports){
+},{}],55:[function(require,module,exports){
+/**
+ *
+ * The main dexjs module.
+ *
+ * @module dex
+ * @name dex
+ *
+ * @requires d3
+ * @requires jquery
+ * @requires jquery-ui
+ * @requires underscore
+ *
+ */
+var dex = {};
+
+/**
+ *
+ * The version of dexjs.
+ *
+ * @name version
+ * @type {string}
+ *
+ */
+dex.version = "0.7";
+
+/**
+ * This routine will return an array [ start, ..., start + len ] using an increment of 1.
+ *
+ * @param {number} start - The starting index.
+ * @param {number} len - The number of integers to generate.
+ * @example {@lang javascript}
+ * // returns [ 0, 1, 2 ]
+ * range(0, 3)
+ *
+ * @returns {Array} An array consisting of elements [ start, ..., start + len ].
+ *
+ */
+dex.range = function (start, len) {
+  return _.range(start, start + len);
+};
+
+/**
+ *
+ * This routine is simply a convenience function as it
+ * simply wraps underscore's implementation of a shallow
+ * copy.  This method will create a shallow-copied clone
+ * of the provided plain object. Any nested objects or
+ * arrays will be copied by reference, not duplicated.
+ *
+ * @param obj
+ * @returns {*}
+ */
+dex.copy = function(obj) {
+  return _.copy(obj);
+};
+
+/**
+ *
+ * The pub/sub bus used by dex in order to publish and subscribe to events.
+ *
+ * @name bus
+ * @type {PubSub}
+ * @see https://github.com/federico-lox/pubsub.js
+ *
+ */
+dex.bus = require("../lib/pubsub");
+
+/**
+ *
+ * A module for dealing with arrays.
+ *
+ * @name array
+ * @type {module:dex.array}
+ *
+ */
+dex.array = require('./array/array');
+
+/**
+ * A module for dealing with colors.
+ *
+ * @name color
+ * @type {module:dex.color}
+ *
+ */
+dex.color = require("./color/color");
+
+/**
+ *
+ * A module for configuring things.
+ *
+ * @name config
+ * @type {module:dex.config}
+ *
+ */
+dex.config = require("./config/config");
+
+/**
+ *
+ * A module for logging to the console.
+ *
+ * @name console
+ * @type {module:dex.console}
+ *
+ */
+dex.console = require("./console/console");
+
+/**
+ *
+ * A module for handling CSV data structures.
+ *
+ * @name csv
+ * @type {module:dex.csv}
+ *
+ */
+dex.csv = require("./csv/csv");
+
+/**
+ *
+ * A module providing utilities for data generation.
+ *
+ * @name datagen
+ * @type {module:dex.datagen}
+ *
+ */
+dex.datagen = require("./datagen/datagen");
+
+/**
+ *
+ * A module for dealing with JSON data.
+ *
+ * @name json
+ * @type {module:dex.json}
+ *
+ */
+dex.json = require("./json/json");
+
+/**
+ * A module for dealing with matrices.
+ *
+ * @name matrix
+ * @type {module:dex/matrix}
+ *
+ */
+dex.matrix = require("./matrix/matrix");
+
+/**
+ * @module dex/object
+ */
+dex.object = require("./object/object");
+
+/**
+ *
+ * A module for creating ui components such as players and sliders.
+ *
+ * @name ui
+ * @type {module:ui}
+ *
+ */
+dex.ui = require("./ui/ui");
+
+/**
+ *
+ * A module for dealing dex components.
+ *
+ * @name component
+ * @type {module:component}
+ *
+ */
+dex.component = require("./component/component");
+
+/**
+ *
+ * An overall charting module composed of many sub-modules.
+ *
+ * @name charts
+ * @type {module:charts}
+ *
+ */
+dex.charts = require("./charts/charts");
+
+module.exports = dex;
+},{"../lib/pubsub":1,"./array/array":2,"./charts/charts":9,"./color/color":49,"./component/component":50,"./config/config":51,"./console/console":52,"./csv/csv":53,"./datagen/datagen":54,"./json/json":56,"./matrix/matrix":57,"./object/object":58,"./ui/ui":68}],56:[function(require,module,exports){
 /**
  *
  * This module provides routines dealing with json data.
  *
- * @module json
+ * @module dex/json
+ * @name json
+ * @memberOf dex
  *
  */
 
@@ -3848,12 +14334,14 @@ exports.keys = function (json) {
   return keys;
 };
 
-},{}],11:[function(require,module,exports){
+},{}],57:[function(require,module,exports){
 /**
  *
  * This module provides routines dealing with matrices.
  *
- * @module matrix
+ * @module dex/matrix
+ * @name matrix
+ * @memberOf dex
  *
  */
 
@@ -4182,12 +14670,14 @@ exports.min = function (matrix, columnNum) {
   return minValue;
 };
 
-},{}],12:[function(require,module,exports){
+},{}],58:[function(require,module,exports){
 /**
  *
  * This module provides routines dealing with javascript objects.
  *
- * @module object
+ * @module dex/object
+ * @name object
+ * @memberOf dex
  *
  */
 
@@ -4498,6 +14988,855 @@ exports.setHierarchical = function (hierarchy, name, value, delimiter) {
   return hierarchy;
 };
 
-},{}]},{},[1])(1)
+},{}],59:[function(require,module,exports){
+/**
+ *
+ * This class creates and attaches a SqlQuery user interface onto the
+ * parent node.
+ *
+ * @name dex.ui.SqlQuery
+ * @param userConfig The following configuration options are available for configuring the
+ * behavior of the SqlQuery component.<br><br>
+ *
+ * 'parent' : The default
+ *
+ * @returns {SqlQuery}
+ *
+ * @constructor
+ *
+ */
+var sqlquery = function (userConfig) {
+
+  var defaults =
+  {
+    'parent' : '#SqlQuery', // The parent container of this chart.
+    // Set these when you need to CSS style components independently.
+    'id'     : 'SqlQuery',
+    'class'  : 'SqlQuery',
+    'query'  : 'select * from dex;',
+    // Our data...
+    'csv'    : {
+      // Give folks without data something to look at anyhow.
+      'header' : ["X", "Y", "Z"],
+      'data'   : [
+        [0, 0, 0],
+        [1, 1, 1],
+        [2, 2, 2]
+      ]
+    }
+  };
+
+  var chart = new dex.component(userConfig, defaults);
+  var config = config;
+
+  var sql = window.SQL;
+  var db = new sql.Database();
+
+  chart.render = function () {
+    // Create the table only at render time.
+    var createStr = "create table dex(" + csv.header.map(function (h, i) {
+        var colName = h.trim();
+        return "'" + colName + "' " + ((dex.csv.isColumnNumeric(csv, i)) ? "float" : "text");
+      }).join(",") + ")";
+    console.log("CREATESTR: " + createStr);
+    db.exec("drop table if exists dex;");
+    db.exec(createStr);
+
+    var populateSql = "BEGIN;" + csv.data.map(function (row) {
+        var insertStr =
+          "insert into dex values(" + row.map(function (col) {
+            return "'" + col.replace("'", "") + "'";
+          }).join(",") + ");";
+        //console.log(insertStr);
+        //db.exec(insertStr);
+        return insertStr;
+      }).join("") + "COMMIT;";
+    console.log(populateSql);
+    db.exec(populateSql);
+    chart.update();
+  };
+
+  chart.query = function (query) {
+    var csv = [];
+    var myQuery = chart.attr("query");
+    if (query && query.length > 0) {
+      myQuery = query;
+    }
+    console.log("QUERY: " + myQuery);
+
+    csv.header = [];
+    csv.data = [];
+
+    var rs = db.exec(myQuery);
+
+    console.log("RS:");
+    console.dir(rs);
+    csv.header = rs[0].columns.map(function (s) {
+      return s.trim();
+    });
+    csv.data = rs[0].values;
+
+    console.log(csv);
+    return csv;
+  }
+
+  chart.update = function () {
+  };
+
+  return chart;
+};
+
+module.exports = sqlquery;
+},{}],60:[function(require,module,exports){
+/**
+ *
+ * @constructor
+ * @classdesc This class constructs an html table from the supplied CSV data.
+ * @memberOf dex/ui
+ * @implements {dex/component}
+ *
+ * @example {@lang javascript}
+ * var myTable = new dex.ui.Table({
+ *   'parent' : "#MyTableContainer",
+ *   'id'     : "MyTableId"
+ *   'csv'    : { header : [ "X", "Y", "Z" ],
+ *                data   : [[ 1, 2, 3 ], [4, 5, 6], [7, 8, 9]]}
+ * });
+ * @param {object} userConfig - A user supplied configuration object which will override the defaults.
+ * @param {string} [userConfig.parent=#Table] - The parent node to which this component will be attached.
+ * Ex: #MyParent will attach to a node with an id = "MyParent".
+ * @param {string} [userConfig.id=Table] - The id of this component.
+ * @param {string} [userConfig.class=Table] - The class of this component.
+ * @param {csv} userConfig.csv - The user's CSV data.
+ *
+ */
+var table = function (userConfig) {
+
+  var defaults =
+  {
+    // The parent container of this chart.
+    'parent' : '#Table',
+    // Set these when you need to CSS style components independently.
+    'id'     : 'Table',
+    'class'  : 'Table',
+    // Our data...
+    'csv'    : {
+      // Give folks without data something to look at anyhow.
+      'header' : ["X", "Y", "Z"],
+      'data'   : [
+        [0, 0, 0],
+        [1, 1, 1],
+        [2, 2, 2]
+      ]
+    }
+  };
+
+  var chart = new dex.component(userConfig, defaults);
+  var config = chart.config;
+
+  chart.render = function () {
+    chart.update();
+  };
+
+  chart.update = function () {
+    var chart = this;
+    var config = chart.config;
+    var csv = config.csv;
+
+    d3.selectAll("#" + config.id).remove();
+
+    var table = d3.select(config.parent)
+      .append("table")
+      .attr("height", "100%")
+      .attr("width", "100%")
+      .attr("border", 1)
+      .attr("class", config["class"])
+      .attr("id", config["id"]);
+
+    var thead = table.append("thead");
+    var tbody = table.append("tbody");
+
+    thead.append("tr")
+      .selectAll("th")
+      .data(csv.header)
+      .enter()
+      .append("th")
+      .text(function (column) {
+        return column;
+      });
+
+    var rows = tbody.selectAll("tr")
+      .data(csv.data)
+      .enter()
+      .append("tr");
+
+    var cells = rows.selectAll("td")
+      .data(function (row) {
+        return csv.header.map(function (column, i) {
+          return {column : i, value : row[i]};
+        });
+      })
+      .enter()
+      .append("td")
+      .html(function (d) {
+        return d.value;
+      });
+  };
+
+  return chart;
+};
+
+module.exports = table;
+},{}],61:[function(require,module,exports){
+var typestable = function (userConfig) {
+
+  var defaults =
+  {
+    // The parent container of this chart.
+    'parent' : '#Table',
+    // Set these when you need to CSS style components independently.
+    'id'     : 'Table',
+    'class'  : 'Table',
+    // Our data...
+    'csv'    : {
+      // Give folks without data something to look at anyhow.
+      'header' : ["X", "Y", "Z"],
+      'data'   : [
+        [0, 0, 0],
+        [1, 1, 1],
+        [2, 2, 2]
+      ]
+    }
+  };
+
+  var chart = new dex.component(userConfig, defaults);
+
+  chart.render = function () {
+    chart.update();
+  };
+
+  chart.update = function () {
+    var chart = this;
+    var config = chart.config;
+    var types = dex.csv.guessTypes(config.csv);
+    var csv = dex.csv.copy(config.csv);
+
+    d3.selectAll("#" + config.id).remove();
+
+    var table = d3.select(config.parent)
+      .append("table")
+      .attr("height", "100%")
+      .attr("width", "100%")
+      .attr("border", 1)
+      .attr("class", config["class"])
+      .attr("id", config["id"]);
+
+    var thead = table.append("thead");
+    var tbody = table.append("tbody");
+
+    thead.append("tr")
+      .selectAll("th")
+      .data(csv.header)
+      .enter()
+      .append("th")
+      .text(function (column, i) {
+        return column + " (" + types[i] + ")";
+      });
+
+    var rows = tbody.selectAll("tr")
+      .data(csv.data)
+      .enter()
+      .append("tr");
+
+    var cells = rows.selectAll("td")
+      .data(function (row) {
+        return csv.header.map(function (column, i) {
+          return {
+            column : i,
+            value  : row[i]
+          };
+        });
+      })
+      .enter()
+      .append("td")
+      .html(function (d) {
+        return d.value;
+      });
+  };
+
+  return chart;
+};
+
+module.exports = typestable;
+},{}],62:[function(require,module,exports){
+var configurationbox = function (userConfig) {
+
+  var defaults =
+  {
+    // The parent container of this chart.
+    'parent'     : 'body',
+    // Set these when you need to CSS style components independently.
+    'id'         : 'ConfigurationBox',
+    'class'      : 'ui-widget-content',
+    'width'      : 600,
+    'height'     : 100,
+    'xoffset'    : 10,
+    'yoffset'    : 10,
+    'title'      : "Options",
+    'components' : [],
+    'resizable' : true,
+    'draggable'  : true
+  };
+
+  var chart = new dex.component(userConfig, defaults);
+
+  chart.render = function () {
+    var chart = this;
+    var config = chart.config;
+    var i;
+
+    var chartContainer = $(config.parent);
+
+    chart.main =
+      jQuery('<div/>',
+        {
+          'id'    : config['id'],
+          'class' : config['class']
+        }).appendTo(chartContainer);
+
+    for (i = 0; i < config.components.length; i++) {
+      config.components[i].attr('parent', chart.main);
+      config.components[i].render();
+    }
+    chart.main.css('width', config.width);
+    chart.main.css('height', config.height);
+    //chart.main.css('top', '-400px');
+    chart.update();
+  };
+
+  chart.update = function () {
+    var chart = this,
+      config = chart.config,
+      ri, ci;
+
+    jQuery('<h3/>',
+      {
+        'class' : 'ui-widget-header',
+        'text'  : config.title
+      }).appendTo(chart.main);
+
+    for (ci = 0; ci < config.components.length; ci += 1) {
+      config.components[ci].update();
+      //dex.console.log("CMP", config.components[ci], "DOM", config.components[ci].dom());
+      config.components[ci].dom().appendTo(chart.main);
+    }
+
+    config.resizable && $("#" + config.id).resizable();
+    config.draggable && $("#" + config.id).draggable();
+  };
+
+  chart.dom = function () {
+    return chart.main;
+  };
+
+  chart.add = function (components) {
+    var chart = this,
+      config = chart.config,
+      i;
+
+    for (i = 0; i < arguments.length; i += 1) {
+      config.components.push(arguments[i]);
+    }
+    return chart;
+  };
+
+  return chart;
+};
+
+module.exports = configurationbox;
+},{}],63:[function(require,module,exports){
+var player = function (userConfig) {
+
+  var defaults = {
+    // The parent container of this chart.
+    'parent': null,
+    // Set these when you need to CSS style components independently.
+    'id': 'Player',
+    'class': 'ui-widget-content',
+    'width': 600,
+    'height': 100,
+    'delay': 1000,
+    'frameIndex': 0,
+    'csv': {
+      header : ['C1', 'C2', 'C3' ],
+      data : [
+        [1, 2, 3],
+        [2, 3, 4],
+        [3, 4, 5]
+      ]
+    }
+  };
+
+  var chart = new dex.component(userConfig, defaults);
+  var config = chart.config;
+  var frames = dex.csv.getFramesByIndex(config.csv, config.frameIndex);
+  var frameNum = 0;
+  chart.attr("frames", frames);
+
+  chart.render = function () {
+    var timer;
+    var state = "stopped";
+    frames = dex.csv.getFramesByIndex(config.csv, config.frameIndex);
+    dex.console.log(frames);
+    chart.attr("frames", frames);
+
+    dex.console.log("FRAMES:", frames);
+
+    $(function () {
+      $("#beginning").button({
+        text: false,
+        icons: {
+          primary: "ui-icon-seek-start"
+        }
+      }).click(function () {
+        gotoFrame(0);
+      });
+      $("#previous").button({
+        text: false,
+        icons: {
+          primary: "ui-icon-seek-prev"
+        }
+      }).click(function () {
+        previous();
+      });
+      $("#play").button({
+          text: false,
+          icons: {
+            primary: "ui-icon-play"
+          }
+        })
+        .click(function () {
+          var options;
+          if ($(this).text() === "play") {
+            options = {
+              label: "pause",
+              icons: {
+                primary: "ui-icon-pause"
+              }
+            };
+            play();
+          } else {
+            options = {
+              label: "play",
+              icons: {
+                primary: "ui-icon-play"
+              }
+            };
+
+            clearTimeout(timer);
+          }
+          $(this).button("option", options);
+        });
+      $("#next").button({
+        text: false,
+        icons: {
+          primary: "ui-icon-seek-next"
+        }
+      }).click(function () {
+        next();
+      });
+      $("#end").button({
+        text: false,
+        icons: {
+          primary: "ui-icon-seek-end"
+        }
+      }).click(function () {
+        gotoFrame(frames.frames.length-1);
+      });
+    });
+
+    function play() {
+      frameNum++;
+      gotoFrame((frameNum >= frames.frameIndices.length) ? 0 : frameNum);
+
+      // Set a timer for playing the next frame.
+      timer = setTimeout(play, config.delay);
+    }
+
+    gotoFrame(0);
+  };
+
+  chart.update = function () {
+    frames = dex.csv.getFramesByIndex(config.csv, config.frameIndex);
+    chart.attr("frames", frames);
+    gotoFrame(0);
+  };
+
+  function previous() {
+    gotoFrame(frameNum > 0 ? (frameNum-1) : 0)
+  }
+
+  function next() {
+    gotoFrame((frameNum + 1) % frames.frameIndices.length);
+  }
+
+  function gotoFrame(frameIndex) {
+    frameNum = frameIndex;
+    chart.publish({
+      "type"  : "new-frame",
+      "data"  : frames.frames[frameNum],
+      "name"  : frames.frameIndices[frameNum],
+      "frameBy" : csv.header[config.frameIndex] }
+    );
+    dex.console.log("Displaying frame: " + frameNum);
+  }
+
+  $(document).ready(function () {
+    // Make the entire chart draggable.
+    //$(chart.config.parent).draggable();
+  });
+
+  return chart;
+};
+
+module.exports = player;
+},{}],64:[function(require,module,exports){
+var selectable = function (userConfig) {
+
+  var defaults =
+  {
+    // The parent container of this chart.
+    'parent'    : null,
+    // Set these when you need to CSS style components independently.
+    'id'        : 'Selectable',
+    'class'     : 'Selectable',
+    'width'     : 200,
+    'height'    : 100,
+    'xoffset'   : 10,
+    'yoffset'   : 10,
+    'label'     : "",
+    'selection' : ["X", "Y"],
+    'mode'      : "SINGLE",
+    'options'   : {}
+  };
+
+  var chart = new dex.component(userConfig, defaults);
+  var config = chart.config;
+
+  chart.render = function () {
+    var chart = this,
+      config = chart.config,
+      i;
+
+    dex.console.debug("RENDERING: " + config.id);
+
+    if (config.mode == "SINGLE") {
+      chart.attr('options.stop',
+        function (event, ui) {
+          $(event.target).children('.ui-selected').not(':first').removeClass('ui-selected');
+        }
+      );
+    }
+
+    chart.attr('options.selected',
+      function (event, ui) {
+        chart.publish({'type' : 'selected', 'id' : ui.selected.id});
+      });
+
+    chart.attr('options.unselected',
+      function (event, ui) {
+        chart.publish({'type' : 'unselected', 'id' : ui.unselected.id});
+      });
+
+    // Create the main container.
+    chart.main = jQuery('<div/>',
+      {
+        'id'    : config['id'],
+        'class' : config['class']
+      }).appendTo(config['parent']);
+
+    // Create the main container.
+    var label = jQuery('<div/>',
+      {
+        'id'   : config['id'] + '-label',
+        'text' : config['label']
+      }).appendTo(chart.main);
+
+    // Create the main container.
+    var orderedList = jQuery('<ol/>',
+      {
+        'id' : config['id'] + '-ol'
+      }).appendTo(chart.main);
+
+    orderedList.css('overflow', "scroll");
+    orderedList.css('border', "1px solid black");
+    orderedList.css('height', config.height + "px");
+    orderedList.css('width', config.width + "px");
+
+    for (i = 0; i < config.selection.length; i++) {
+      var selectable = jQuery('<li/>',
+        {
+          'id'    : i,
+          'class' : 'ui-widget-content',
+          'text'  : config.selection[i]
+        }).appendTo(orderedList);
+    }
+
+    $('#' + config['id'] + '-ol').children().first().addClass('ui-selected');
+    $('#' + config['id'] + '-ol').selectable(config.options);
+  };
+
+  chart.update = function () {
+  };
+
+  chart.dom = function () {
+    return chart.main;
+  };
+
+  return chart;
+};
+
+module.exports = selectable;
+},{}],65:[function(require,module,exports){
+var slider = function (userConfig) {
+
+  var defaults = {
+    // The parent container of this chart.
+    'parent'  : null,
+    // Set these when you need to CSS style components independently.
+    'id'      : 'Slider',
+    'class'   : 'ui-widget-content',
+    'width'   : 600,
+    'height'  : 100,
+    'xoffset' : 10,
+    'yoffset' : 10,
+    'label'   : "",
+    'options' : {
+      'range' : 'max',
+      'min'   : 1,
+      'max'   : 10,
+      'value' : 5,
+      'slide' : null
+    }
+  };
+
+  var chart = new dex.component(userConfig, defaults);
+  var config = chart.config;
+
+  chart.render = function () {
+    var chart = this,
+      config = chart.config,
+      ri, ci;
+
+    var chart = this;
+    chart.attr('options.slide',
+      function (event, ui) {
+        //dex.console.log("EVENT", event, "UI", ui);
+        $('#' + config['id'] + '-input').val(ui.value);
+        chart.publish("slider-change", {'type' : 'slider-change', 'value' : ui.value});
+      });
+
+    // Create the main container.
+    chart.main = jQuery('<div/>',
+      {
+        'id'    : config['id'],
+        'class' : config['class']
+      }).appendTo(config['parent']);
+
+    // Create the main container.
+    var label = jQuery('<label/>',
+      {
+        'id'    : config['id' + '-label'],
+        'class' : 'SliderLabel',
+        'text'  : config['label'],
+      }).appendTo(chart.main);
+
+    var input = jQuery('<input/>',
+      {
+        'type'  : 'text',
+        'id'    : config['id'] + '-input',
+        'class' : 'SliderInput',
+        'value' : config.options.value
+      }).appendTo(chart.main);
+
+    /*
+     <div>
+     <label for="ticklength">Tick Length:</label>
+     <input type="text" id="ticklength-input" size="5" />
+     <div id="ticklength-slider"/>
+     </div>
+     */
+    // Create the main container.
+    var slider = jQuery('<div/>',
+      {
+        'id'    : config['id'] + '-slider',
+        'class' : config['class']
+      }).appendTo(chart.main);
+
+    //config.parent.appendChild(main);
+
+    $('#' + config['id'] + '-slider').slider(config.options);
+  };
+
+  chart.update = function () {
+  };
+
+  chart.dom = function () {
+    return chart.main;
+  };
+
+  return chart;
+};
+
+module.exports = slider;
+},{}],66:[function(require,module,exports){
+var tabs = function (userConfig) {
+  var defaults = {
+    // The parent container of this chart.
+    'parent'     : null,
+    // Set these when you need to CSS style components independently.
+    'id'         : 'Tabs',
+    'class'      : 'ui-widget-content',
+    'width'      : 600,
+    'height'     : 100,
+    'xoffset'    : 10,
+    'yoffset'    : 10,
+    'title'      : "Options",
+    'components' : [],
+    'resizeable' : true,
+    'draggable'  : true
+  };
+
+  var chart = new dex.component(userConfig, defaults);
+  var config = chart.config;
+
+  chart.tabs = [];
+
+  chart.render = function () {
+    var chart = this,
+      config = chart.config,
+      tabs = chart.tabs,
+      ri, ci,
+      i, j,
+      tab,
+      tabName;
+
+    // Create the main container.
+    if (config.parent === null) {
+      config.parent = document.body;
+    }
+
+    chart.main =
+      jQuery('<div/>',
+        {
+          'id'    : config['id'],
+          'class' : config['class']
+        }).appendTo(config.parent);
+
+    var tabNames = jQuery('<ul/>').appendTo(chart.main);
+
+    for (i = 0; i < tabs.length; i += 1) {
+      jQuery('<li><a href="#' + config.id + '-' + (i + 1) + '">' + tabs[i].name + '</a></li>')
+        .appendTo(tabNames);
+    }
+    //dex.console.log(tabs);
+    for (i = 0; i < tabs.length; i += 1) {
+      var tabBody = jQuery('<div id="' + config.id + '-' + (i + 1) + '"/>').appendTo(chart.main);
+
+      for (j = 0; j < tabs[i].children.length; j++) {
+        tabs[i].children[j].attr('parent', tabBody);
+        tabs[i].children[j].render();
+        tabs[i].children[j].dom().appendTo(tabBody);
+      }
+    }
+
+    chart.main.tabs();
+  };
+
+  chart.update = function () {
+  };
+
+  chart.dom = function () {
+    return chart.main;
+  };
+
+  chart.add = function (tabName, components) {
+    var chart = this,
+      config = chart.config,
+      tabs = chart.tabs,
+      i, ti, tab;
+
+    if (typeof tabName === 'undefined') {
+      return;
+    }
+
+    dex.console.debug("TABS", chart);
+    // REM: Replaced implementation w/o testing.
+    ti = _.findIndex(tabs, {id : tabName});
+
+    if (ti >= 0) {
+      tab = tabs[ti];
+    }
+    else {
+      tab = {'name' : tabName, 'children' : []};
+      tabs.push(tab);
+    }
+
+    for (i = 1; i < arguments.length; i += 1) {
+      tab.children.push(arguments[i]);
+    }
+    dex.console.debug("ATABS", tabs, tab);
+    return chart;
+  };
+
+  return chart;
+};
+
+module.exports = tabs;
+},{}],67:[function(require,module,exports){
+/**
+ *
+ * This module provides ui components based upon jquery-ui.
+ *
+ * @module dex/ui/jqueryui
+ * @name jqueryui
+ * @memberOf dex.ui
+ *
+ */
+var jqueryui = {};
+
+jqueryui.ConfigurationBox = require("./ConfigurationBox");
+jqueryui.Player = require("./Player");
+jqueryui.Selectable = require("./Selectable");
+jqueryui.Slider = require("./Slider");
+jqueryui.Tabs = require("./Tabs");
+
+module.exports = jqueryui;
+},{"./ConfigurationBox":62,"./Player":63,"./Selectable":64,"./Slider":65,"./Tabs":66}],68:[function(require,module,exports){
+/**
+ *
+ * This module provides ui components from a variety of sources.
+ *
+ * @module dex/ui
+ * @name ui
+ * @memberOf dex
+ *
+ */
+var ui = {};
+
+/**
+ *
+ * A module for creating ui components such as players and sliders.
+ *
+ * @name jqueryui
+ * @type {module:jqueryui}
+ *
+ */
+ui.jqueryui = require("./jqueryui/jqueryui");
+ui.SqlQuery = require("./SqlQuery");
+ui.Table = require("./Table");
+ui.TypesTable = require("./TypesTable");
+
+module.exports = ui;
+},{"./SqlQuery":59,"./Table":60,"./TypesTable":61,"./jqueryui/jqueryui":67}]},{},[55])(55)
 });
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIm5vZGVfbW9kdWxlcy9icm93c2VyaWZ5L25vZGVfbW9kdWxlcy9icm93c2VyLXBhY2svX3ByZWx1ZGUuanMiLCJzcmMvZGV4LmpzIiwibGliL3B1YnN1Yi5qcyIsInNyYy9hcnJheS9hcnJheS5qcyIsInNyYy9jb2xvci9jb2xvci5qcyIsInNyYy9jb21wb25lbnQvY29tcG9uZW50LmpzIiwic3JjL2NvbmZpZy9jb25maWcuanMiLCJzcmMvY29uc29sZS9jb25zb2xlLmpzIiwic3JjL2Nzdi9jc3YuanMiLCJzcmMvZGF0YWdlbi9kYXRhZ2VuLmpzIiwic3JjL2pzb24vanNvbi5qcyIsInNyYy9tYXRyaXgvbWF0cml4LmpzIiwic3JjL29iamVjdC9vYmplY3QuanMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUE7QUNBQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBOztBQ2pNQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBOztBQ3pLQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7O0FDcE5BO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTs7QUN4UEE7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7O0FDN2dCQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBOztBQzV2Q0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBOztBQ3RJQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTs7QUNwMUJBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7O0FDcklBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7O0FDeEZBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTs7QUM1VUE7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBIiwiZmlsZSI6ImdlbmVyYXRlZC5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzQ29udGVudCI6WyIoZnVuY3Rpb24gZSh0LG4scil7ZnVuY3Rpb24gcyhvLHUpe2lmKCFuW29dKXtpZighdFtvXSl7dmFyIGE9dHlwZW9mIHJlcXVpcmU9PVwiZnVuY3Rpb25cIiYmcmVxdWlyZTtpZighdSYmYSlyZXR1cm4gYShvLCEwKTtpZihpKXJldHVybiBpKG8sITApO3ZhciBmPW5ldyBFcnJvcihcIkNhbm5vdCBmaW5kIG1vZHVsZSAnXCIrbytcIidcIik7dGhyb3cgZi5jb2RlPVwiTU9EVUxFX05PVF9GT1VORFwiLGZ9dmFyIGw9bltvXT17ZXhwb3J0czp7fX07dFtvXVswXS5jYWxsKGwuZXhwb3J0cyxmdW5jdGlvbihlKXt2YXIgbj10W29dWzFdW2VdO3JldHVybiBzKG4/bjplKX0sbCxsLmV4cG9ydHMsZSx0LG4scil9cmV0dXJuIG5bb10uZXhwb3J0c312YXIgaT10eXBlb2YgcmVxdWlyZT09XCJmdW5jdGlvblwiJiZyZXF1aXJlO2Zvcih2YXIgbz0wO288ci5sZW5ndGg7bysrKXMocltvXSk7cmV0dXJuIHN9KSIsIi8qKlxyXG4gKlxyXG4gKiBUaGUgbWFpbiBkZXhqcyBtb2R1bGUuXHJcbiAqXHJcbiAqIEBtb2R1bGUgZGV4XHJcbiAqIEByZXF1aXJlcyBkM1xyXG4gKiBAcmVxdWlyZXMganF1ZXJ5XHJcbiAqIEByZXF1aXJlcyBqcXVlcnktdWlcclxuICogQHJlcXVpcmVzIHVuZGVyc2NvcmVcclxuICpcclxuICovXHJcbnZhciBkZXggPSB7fTtcclxuXHJcbi8vcmVxdWlyZShcImQzXCIpO1xyXG4vLyQgPSByZXF1aXJlKFwianF1ZXJ5XCIpO1xyXG4vL3JlcXVpcmUoXCJqcXVlcnktdWlcIik7XHJcbi8vXyA9IHJlcXVpcmUoXCJ1bmRlcnNjb3JlXCIpO1xyXG5cclxuLyoqXHJcbiAqXHJcbiAqIFRoZSB2ZXJzaW9uIG9mIGRleGpzLlxyXG4gKlxyXG4gKiBAbmFtZSB2ZXJzaW9uXHJcbiAqIEB0eXBlIHtzdHJpbmd9XHJcbiAqXHJcbiAqL1xyXG5kZXgudmVyc2lvbiA9IFwiMC43XCI7XHJcblxyXG4vKipcclxuICogVGhpcyByb3V0aW5lIHdpbGwgcmV0dXJuIGFuIGFycmF5IFsgc3RhcnQsIC4uLiwgc3RhcnQgKyBsZW4gXSB1c2luZyBhbiBpbmNyZW1lbnQgb2YgMS5cclxuICpcclxuICogQHBhcmFtIHtudW1iZXJ9IHN0YXJ0IC0gVGhlIHN0YXJ0aW5nIGluZGV4LlxyXG4gKiBAcGFyYW0ge251bWJlcn0gbGVuIC0gVGhlIG51bWJlciBvZiBpbnRlZ2VycyB0byBnZW5lcmF0ZS5cclxuICogQGV4YW1wbGUge0BsYW5nIGphdmFzY3JpcHR9XHJcbiAqIC8vIHJldHVybnMgWyAwLCAxLCAyIF1cclxuICogcmFuZ2UoMCwgMylcclxuICpcclxuICogQHJldHVybnMge0FycmF5fSBBbiBhcnJheSBjb25zaXN0aW5nIG9mIGVsZW1lbnRzIFsgc3RhcnQsIC4uLiwgc3RhcnQgKyBsZW4gXS5cclxuICpcclxuICovXHJcbmRleC5yYW5nZSA9IGZ1bmN0aW9uIChzdGFydCwgbGVuKSB7XHJcbiAgcmV0dXJuIF8ucmFuZ2Uoc3RhcnQsIHN0YXJ0ICsgbGVuKTtcclxufTtcclxuXHJcbi8qKlxyXG4gKlxyXG4gKiBUaGlzIHJvdXRpbmUgaXMgc2ltcGx5IGEgY29udmVuaWVuY2UgZnVuY3Rpb24gYXMgaXRcclxuICogc2ltcGx5IHdyYXBzIHVuZGVyc2NvcmUncyBpbXBsZW1lbnRhdGlvbiBvZiBhIHNoYWxsb3dcclxuICogY29weS4gIFRoaXMgbWV0aG9kIHdpbGwgY3JlYXRlIGEgc2hhbGxvdy1jb3BpZWQgY2xvbmVcclxuICogb2YgdGhlIHByb3ZpZGVkIHBsYWluIG9iamVjdC4gQW55IG5lc3RlZCBvYmplY3RzIG9yXHJcbiAqIGFycmF5cyB3aWxsIGJlIGNvcGllZCBieSByZWZlcmVuY2UsIG5vdCBkdXBsaWNhdGVkLlxyXG4gKlxyXG4gKiBAcGFyYW0gb2JqXHJcbiAqIEByZXR1cm5zIHsqfVxyXG4gKi9cclxuZGV4LmNvcHkgPSBmdW5jdGlvbihvYmopIHtcclxuICByZXR1cm4gXy5jb3B5KG9iaik7XHJcbn07XHJcblxyXG4vKipcclxuICpcclxuICogQSBtb2R1bGUgZm9yIGRlYWxpbmcgd2l0aCBhcnJheXMuXHJcbiAqXHJcbiAqIEBuYW1lIGFycmF5XHJcbiAqIEB0eXBlIHttb2R1bGU6YXJyYXl9XHJcbiAqXHJcbiAqL1xyXG5kZXguYXJyYXkgPSByZXF1aXJlKCcuL2FycmF5L2FycmF5Jyk7XHJcblxyXG4vKipcclxuICpcclxuICogQSBtb2R1bGUgZm9yIGNvbmZpZ3VyaW5nIHRoaW5ncy5cclxuICpcclxuICogQG5hbWUgY29uZmlnXHJcbiAqIEB0eXBlIHttb2R1bGU6Y29uZmlnfVxyXG4gKlxyXG4gKi9cclxuZGV4LmNvbmZpZyA9IHJlcXVpcmUoXCIuL2NvbmZpZy9jb25maWdcIik7XHJcblxyXG4vKipcclxuICpcclxuICogVGhlIHB1Yi9zdWIgYnVzIHVzZWQgYnkgZGV4IGluIG9yZGVyIHRvIHB1Ymxpc2ggYW5kIHN1YnNjcmliZSB0byBldmVudHMuXHJcbiAqXHJcbiAqIEBuYW1lIGJ1c1xyXG4gKiBAdHlwZSB7UHViU3VifVxyXG4gKiBAc2VlIGh0dHBzOi8vZ2l0aHViLmNvbS9mZWRlcmljby1sb3gvcHVic3ViLmpzXHJcbiAqXHJcbiAqL1xyXG5kZXguYnVzID0gcmVxdWlyZShcIi4uL2xpYi9wdWJzdWJcIik7XHJcblxyXG4vKipcclxuICpcclxuICogQSBtb2R1bGUgZm9yIGxvZ2dpbmcgdG8gdGhlIGNvbnNvbGUuXHJcbiAqXHJcbiAqIEBuYW1lIGNvbnNvbGVcclxuICogQHR5cGUge21vZHVsZTpjb25zb2xlfVxyXG4gKlxyXG4gKi9cclxuZGV4LmNvbnNvbGUgPSByZXF1aXJlKFwiLi9jb25zb2xlL2NvbnNvbGVcIik7XHJcblxyXG4vKipcclxuICogQSBtb2R1bGUgZm9yIGRlYWxpbmcgd2l0aCBjb2xvcnMuXHJcbiAqXHJcbiAqIEBuYW1lIGNvbG9yXHJcbiAqIEB0eXBlIHttb2R1bGU6Y29sb3J9XHJcbiAqXHJcbiAqL1xyXG5kZXguY29sb3IgPSByZXF1aXJlKFwiLi9jb2xvci9jb2xvclwiKTtcclxuXHJcbi8qKlxyXG4gKlxyXG4gKiBBIGNoYXJ0aW5nIG1vZHVsZS5cclxuICpcclxuICogQG5hbWUgY2hhcnRzXHJcbiAqIEB0eXBlIHttb2R1bGU6Y2hhcnRzfVxyXG4gKlxyXG4gKi9cclxuZGV4LmNoYXJ0cyA9IHsnZDMnIDogeydtYXAnIDoge319LFxyXG4gICdjMycgICA6IHt9LFxyXG4gICdkeWdyYXBocycgOiB7fSxcclxuICAnZDNwbHVzJyAgIDoge30sXHJcbiAgJ2dvb2dsZScgOiB7fSxcclxuICAnaGFuZGxlYmFycycgOiB7fSxcclxuICAndGhyZWVqcycgOiB7fX07XHJcblxyXG4vKipcclxuICpcclxuICogQSBjaGFydGluZyBtb2R1bGUuXHJcbiAqXHJcbiAqIEBuYW1lIGNoYXJ0c1xyXG4gKiBAdHlwZSB7bW9kdWxlOmNoYXJ0c31cclxuICpcclxuICovXHJcbmRleC51aSA9IHsnanF1ZXJ5dWknIDoge319O1xyXG5cclxuLyoqXHJcbiAqXHJcbiAqIEEgbW9kdWxlIGZvciBoYW5kbGluZyBDU1YgZGF0YSBzdHJ1Y3R1cmVzLlxyXG4gKlxyXG4gKiBAbmFtZSBjc3ZcclxuICogQHR5cGUge21vZHVsZTpjc3Z9XHJcbiAqXHJcbiAqL1xyXG5kZXguY3N2ID0gcmVxdWlyZShcIi4vY3N2L2NzdlwiKTtcclxuXHJcbi8qKlxyXG4gKlxyXG4gKiBBIG1vZHVsZSBwcm92aWRpbmcgdXRpbGl0aWVzIGZvciBkYXRhIGdlbmVyYXRpb24uXHJcbiAqXHJcbiAqIEBuYW1lIGRhdGFnZW5cclxuICogQHR5cGUge21vZHVsZTpkYXRhZ2VufVxyXG4gKlxyXG4gKi9cclxuZGV4LmRhdGFnZW4gPSByZXF1aXJlKFwiLi9kYXRhZ2VuL2RhdGFnZW5cIik7XHJcblxyXG4vKipcclxuICpcclxuICogQSBtb2R1bGUgZm9yIGRlYWxpbmcgd2l0aCBKU09OIGRhdGEuXHJcbiAqXHJcbiAqIEBuYW1lIGpzb25cclxuICogQHR5cGUge21vZHVsZTpqc29ufVxyXG4gKlxyXG4gKi9cclxuZGV4Lmpzb24gPSByZXF1aXJlKFwiLi9qc29uL2pzb25cIik7XHJcblxyXG4vKipcclxuICogQSBtb2R1bGUgZm9yIGRlYWxpbmcgd2l0aCBtYXRyaWNlcy5cclxuICpcclxuICogQG5hbWUgbWF0cml4XHJcbiAqIEB0eXBlIHttb2R1bGU6bWF0cml4fVxyXG4gKlxyXG4gKi9cclxuZGV4Lm1hdHJpeCA9IHJlcXVpcmUoXCIuL21hdHJpeC9tYXRyaXhcIik7XHJcblxyXG4vKipcclxuICogQSBtb2R1bGUgZm9yIGRlYWxpbmcgd2l0aCBqYXZhc2NyaXB0IG9iamVjdHMuXHJcbiAqXHJcbiAqIEBuYW1lIG9iamVjdFxyXG4gKiBAdHlwZSB7bW9kdWxlOm9iamVjdH1cclxuICpcclxuICovXHJcbmRleC5vYmplY3QgPSByZXF1aXJlKFwiLi9vYmplY3Qvb2JqZWN0XCIpO1xyXG5cclxuLyoqXHJcbiAqXHJcbiAqIEEgbW9kdWxlIGZvciBkZWFsaW5nIGRleCBjb21wb25lbnRzLlxyXG4gKlxyXG4gKiBAbmFtZSBjb21wb25lbnRcclxuICogQHR5cGUge21vZHVsZTpjb21wb25lbnR9XHJcbiAqXHJcbiAqL1xyXG5kZXguY29tcG9uZW50ID0gcmVxdWlyZShcIi4vY29tcG9uZW50L2NvbXBvbmVudFwiKTtcclxuXHJcbm1vZHVsZS5leHBvcnRzID0gZGV4OyIsIi8qKlxyXG4gKiBwdWJzdWIuanNcclxuICpcclxuICogQSB0aW55LCBvcHRpbWl6ZWQsIHRlc3RlZCwgc3RhbmRhbG9uZSBhbmQgcm9idXN0XHJcbiAqIHB1YnN1YiBpbXBsZW1lbnRhdGlvbiBzdXBwb3J0aW5nIGRpZmZlcmVudCBqYXZhc2NyaXB0IGVudmlyb25tZW50c1xyXG4gKlxyXG4gKiBAYXV0aG9yIEZlZGVyaWNvIFwiTG94XCIgTHVjaWduYW5vIDxodHRwOi8vcGx1cy5seS9mZWRlcmljby5sb3g+XHJcbiAqXHJcbiAqIEBzZWUgaHR0cHM6Ly9naXRodWIuY29tL2ZlZGVyaWNvLWxveC9wdWJzdWIuanNcclxuICovXHJcblxyXG4vKmdsb2JhbCBkZWZpbmUsIG1vZHVsZSovXHJcbihmdW5jdGlvbiAoY29udGV4dCkge1xyXG4gICd1c2Ugc3RyaWN0JztcclxuXHJcbiAgLyoqXHJcbiAgICogQHByaXZhdGVcclxuICAgKi9cclxuICBmdW5jdGlvbiBpbml0KCkge1xyXG4gICAgLy90aGUgY2hhbm5lbCBzdWJzY3JpcHRpb24gaGFzaFxyXG4gICAgdmFyIGNoYW5uZWxzID0ge30sXHJcbiAgICAvL2hlbHAgbWluaWZpY2F0aW9uXHJcbiAgICAgIGZ1bmNUeXBlID0gRnVuY3Rpb247XHJcblxyXG4gICAgcmV0dXJuIHtcclxuICAgICAgLypcclxuICAgICAgICogQHB1YmxpY1xyXG4gICAgICAgKlxyXG4gICAgICAgKiBQdWJsaXNoIHNvbWUgZGF0YSBvbiBhIGNoYW5uZWxcclxuICAgICAgICpcclxuICAgICAgICogQHBhcmFtIFN0cmluZyBjaGFubmVsIFRoZSBjaGFubmVsIHRvIHB1Ymxpc2ggb25cclxuICAgICAgICogQHBhcmFtIE1peGVkIGFyZ3VtZW50IFRoZSBkYXRhIHRvIHB1Ymxpc2gsIHRoZSBmdW5jdGlvbiBzdXBwb3J0c1xyXG4gICAgICAgKiBhcyBtYW55IGRhdGEgcGFyYW1ldGVycyBhcyBuZWVkZWRcclxuICAgICAgICpcclxuICAgICAgICogQGV4YW1wbGUgUHVibGlzaCBzdHVmZiBvbiAnL3NvbWUvY2hhbm5lbCcuXHJcbiAgICAgICAqIEFueXRoaW5nIHN1YnNjcmliZWQgd2lsbCBiZSBjYWxsZWQgd2l0aCBhIGZ1bmN0aW9uXHJcbiAgICAgICAqIHNpZ25hdHVyZSBsaWtlOiBmdW5jdGlvbihhLGIsYyl7IC4uLiB9XHJcbiAgICAgICAqXHJcbiAgICAgICAqIFB1YlN1Yi5wdWJsaXNoKFxyXG4gICAgICAgKlx0XHRcIi9zb21lL2NoYW5uZWxcIiwgXCJhXCIsIFwiYlwiLFxyXG4gICAgICAgKlx0XHR7dG90YWw6IDEwLCBtaW46IDEsIG1heDogM31cclxuICAgICAgICogKTtcclxuICAgICAgICovXHJcbiAgICAgIHB1Ymxpc2g6IGZ1bmN0aW9uICgpIHtcclxuICAgICAgICAvL2hlbHAgbWluaWZpY2F0aW9uXHJcbiAgICAgICAgdmFyIGFyZ3MgPSBhcmd1bWVudHMsXHJcbiAgICAgICAgLy8gYXJnc1swXSBpcyB0aGUgY2hhbm5lbFxyXG4gICAgICAgICAgc3VicyA9IGNoYW5uZWxzW2FyZ3NbMF1dLFxyXG4gICAgICAgICAgbGVuLFxyXG4gICAgICAgICAgcGFyYW1zLFxyXG4gICAgICAgICAgeDtcclxuXHJcbiAgICAgICAgaWYgKHN1YnMpIHtcclxuICAgICAgICAgIGxlbiA9IHN1YnMubGVuZ3RoO1xyXG4gICAgICAgICAgcGFyYW1zID0gKGFyZ3MubGVuZ3RoID4gMSkgP1xyXG4gICAgICAgICAgICBBcnJheS5wcm90b3R5cGUuc3BsaWNlLmNhbGwoYXJncywgMSkgOiBbXTtcclxuXHJcbiAgICAgICAgICAvL3J1biB0aGUgY2FsbGJhY2tzIGFzeW5jaHJvbm91c2x5LFxyXG4gICAgICAgICAgLy9kbyBub3QgYmxvY2sgdGhlIG1haW4gZXhlY3V0aW9uIHByb2Nlc3NcclxuICAgICAgICAgIHNldFRpbWVvdXQoXHJcbiAgICAgICAgICAgIGZ1bmN0aW9uICgpIHtcclxuICAgICAgICAgICAgICAvL2V4ZWN1dGVzIGNhbGxiYWNrcyBpbiB0aGUgb3JkZXJcclxuICAgICAgICAgICAgICAvL2luIHdoaWNoIHRoZXkgd2VyZSByZWdpc3RlcmVkXHJcbiAgICAgICAgICAgICAgZm9yICh4ID0gMDsgeCA8IGxlbjsgeCArPSAxKSB7XHJcbiAgICAgICAgICAgICAgICBzdWJzW3hdLmFwcGx5KGNvbnRleHQsIHBhcmFtcyk7XHJcbiAgICAgICAgICAgICAgfVxyXG5cclxuICAgICAgICAgICAgICAvL2NsZWFyIHJlZmVyZW5jZXMgdG8gYWxsb3cgZ2FyYmFnZSBjb2xsZWN0aW9uXHJcbiAgICAgICAgICAgICAgc3VicyA9IGNvbnRleHQgPSBwYXJhbXMgPSBudWxsO1xyXG4gICAgICAgICAgICB9LFxyXG4gICAgICAgICAgICAwXHJcbiAgICAgICAgICApO1xyXG4gICAgICAgIH1cclxuICAgICAgfSxcclxuXHJcbiAgICAgIC8qXHJcbiAgICAgICAqIEBwdWJsaWNcclxuICAgICAgICpcclxuICAgICAgICogUmVnaXN0ZXIgYSBjYWxsYmFjayBvbiBhIGNoYW5uZWxcclxuICAgICAgICpcclxuICAgICAgICogQHBhcmFtIFN0cmluZyBjaGFubmVsIFRoZSBjaGFubmVsIHRvIHN1YnNjcmliZSB0b1xyXG4gICAgICAgKiBAcGFyYW0gRnVuY3Rpb24gY2FsbGJhY2sgVGhlIGV2ZW50IGhhbmRsZXIsIGFueSB0aW1lIHNvbWV0aGluZyBpc1xyXG4gICAgICAgKiBwdWJsaXNoZWQgb24gYSBzdWJzY3JpYmVkIGNoYW5uZWwsIHRoZSBjYWxsYmFjayB3aWxsIGJlIGNhbGxlZFxyXG4gICAgICAgKiB3aXRoIHRoZSBwdWJsaXNoZWQgYXJyYXkgYXMgb3JkZXJlZCBhcmd1bWVudHNcclxuICAgICAgICpcclxuICAgICAgICogQHJldHVybiBBcnJheSBBIGhhbmRsZSB3aGljaCBjYW4gYmUgdXNlZCB0byB1bnN1YnNjcmliZSB0aGlzXHJcbiAgICAgICAqIHBhcnRpY3VsYXIgc3Vic2NyaXB0aW9uXHJcbiAgICAgICAqXHJcbiAgICAgICAqIEBleGFtcGxlIFB1YlN1Yi5zdWJzY3JpYmUoXHJcbiAgICAgICAqXHRcdFx0XHRcIi9zb21lL2NoYW5uZWxcIixcclxuICAgICAgICpcdFx0XHRcdGZ1bmN0aW9uKGEsIGIsIGMpeyAuLi4gfVxyXG4gICAgICAgKlx0XHRcdCk7XHJcbiAgICAgICAqL1xyXG4gICAgICBzdWJzY3JpYmU6IGZ1bmN0aW9uIChjaGFubmVsLCBjYWxsYmFjaykge1xyXG4gICAgICAgIGlmICh0eXBlb2YgY2hhbm5lbCAhPT0gJ3N0cmluZycpIHtcclxuICAgICAgICAgIHRocm93IFwiaW52YWxpZCBvciBtaXNzaW5nIGNoYW5uZWxcIjtcclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIGlmICghKGNhbGxiYWNrIGluc3RhbmNlb2YgZnVuY1R5cGUpKSB7XHJcbiAgICAgICAgICB0aHJvdyBcImludmFsaWQgb3IgbWlzc2luZyBjYWxsYmFja1wiO1xyXG4gICAgICAgIH1cclxuXHJcbiAgICAgICAgaWYgKCFjaGFubmVsc1tjaGFubmVsXSkge1xyXG4gICAgICAgICAgY2hhbm5lbHNbY2hhbm5lbF0gPSBbXTtcclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIGNoYW5uZWxzW2NoYW5uZWxdLnB1c2goY2FsbGJhY2spO1xyXG5cclxuICAgICAgICByZXR1cm4ge2NoYW5uZWw6IGNoYW5uZWwsIGNhbGxiYWNrOiBjYWxsYmFja307XHJcbiAgICAgIH0sXHJcblxyXG4gICAgICAvKlxyXG4gICAgICAgKiBAcHVibGljXHJcbiAgICAgICAqXHJcbiAgICAgICAqIERpc2Nvbm5lY3QgYSBzdWJzY3JpYmVkIGZ1bmN0aW9uIGYuXHJcbiAgICAgICAqXHJcbiAgICAgICAqIEBwYXJhbSBNaXhlZCBoYW5kbGUgVGhlIHJldHVybiB2YWx1ZSBmcm9tIGEgc3Vic2NyaWJlIGNhbGwgb3IgdGhlXHJcbiAgICAgICAqIG5hbWUgb2YgYSBjaGFubmVsIGFzIGEgU3RyaW5nXHJcbiAgICAgICAqIEBwYXJhbSBGdW5jdGlvbiBjYWxsYmFjayBbT1BUSU9OQUxdIFRoZSBldmVudCBoYW5kbGVyIG9yaWdpbmFhbGx5XHJcbiAgICAgICAqIHJlZ2lzdGVyZWQsIG5vdCBuZWVkZWQgaWYgaGFuZGxlIGNvbnRhaW5zIHRoZSByZXR1cm4gdmFsdWVcclxuICAgICAgICogb2Ygc3Vic2NyaWJlXHJcbiAgICAgICAqXHJcbiAgICAgICAqIEBleGFtcGxlXHJcbiAgICAgICAqIHZhciBoYW5kbGUgPSBQdWJTdWIuc3Vic2NyaWJlKFwiL3NvbWUvY2hhbm5lbFwiLCBmdW5jdGlvbigpe30pO1xyXG4gICAgICAgKiBQdWJTdWIudW5zdWJzY3JpYmUoaGFuZGxlKTtcclxuICAgICAgICpcclxuICAgICAgICogb3JcclxuICAgICAgICpcclxuICAgICAgICogUHViU3ViLnVuc3Vic2NyaWJlKFwiL3NvbWUvY2hhbm5lbFwiLCBjYWxsYmFjayk7XHJcbiAgICAgICAqL1xyXG4gICAgICB1bnN1YnNjcmliZTogZnVuY3Rpb24gKGhhbmRsZSwgY2FsbGJhY2spIHtcclxuICAgICAgICBpZiAoaGFuZGxlLmNoYW5uZWwgJiYgaGFuZGxlLmNhbGxiYWNrKSB7XHJcbiAgICAgICAgICBjYWxsYmFjayA9IGhhbmRsZS5jYWxsYmFjaztcclxuICAgICAgICAgIGhhbmRsZSA9IGhhbmRsZS5jaGFubmVsO1xyXG4gICAgICAgIH1cclxuXHJcbiAgICAgICAgaWYgKHR5cGVvZiBoYW5kbGUgIT09ICdzdHJpbmcnKSB7XHJcbiAgICAgICAgICB0aHJvdyBcImludmFsaWQgb3IgbWlzc2luZyBjaGFubmVsXCI7XHJcbiAgICAgICAgfVxyXG5cclxuICAgICAgICBpZiAoIShjYWxsYmFjayBpbnN0YW5jZW9mIGZ1bmNUeXBlKSkge1xyXG4gICAgICAgICAgdGhyb3cgXCJpbnZhbGlkIG9yIG1pc3NpbmcgY2FsbGJhY2tcIjtcclxuICAgICAgICB9XHJcblxyXG4gICAgICAgIHZhciBzdWJzID0gY2hhbm5lbHNbaGFuZGxlXSxcclxuICAgICAgICAgIHgsXHJcbiAgICAgICAgICB5ID0gKHN1YnMgaW5zdGFuY2VvZiBBcnJheSkgPyBzdWJzLmxlbmd0aCA6IDA7XHJcblxyXG4gICAgICAgIGZvciAoeCA9IDA7IHggPCB5OyB4ICs9IDEpIHtcclxuICAgICAgICAgIGlmIChzdWJzW3hdID09PSBjYWxsYmFjaykge1xyXG4gICAgICAgICAgICBzdWJzLnNwbGljZSh4LCAxKTtcclxuICAgICAgICAgICAgYnJlYWs7XHJcbiAgICAgICAgICB9XHJcbiAgICAgICAgfVxyXG4gICAgICB9XHJcbiAgICB9O1xyXG4gIH1cclxuXHJcbiAgLy9VTURcclxuICBpZiAodHlwZW9mIGRlZmluZSA9PT0gJ2Z1bmN0aW9uJyAmJiBkZWZpbmUuYW1kKSB7XHJcbiAgICAvL0FNRCBtb2R1bGVcclxuICAgIGRlZmluZSgncHVic3ViJywgaW5pdCk7XHJcbiAgfSBlbHNlIGlmICh0eXBlb2YgbW9kdWxlID09PSAnb2JqZWN0JyAmJiBtb2R1bGUuZXhwb3J0cykge1xyXG4gICAgLy9Db21tb25KUyBtb2R1bGVcclxuICAgIG1vZHVsZS5leHBvcnRzID0gaW5pdCgpO1xyXG4gIH0gZWxzZSB7XHJcbiAgICAvL3RyYWRpdGlvbmFsIG5hbWVzcGFjZVxyXG4gICAgY29udGV4dC5QdWJTdWIgPSBpbml0KCk7XHJcbiAgfVxyXG59KHRoaXMpKTsiLCIvKipcclxuICpcclxuICogVGhpcyBtb2R1bGUgcHJvdmlkZXMgcm91dGluZXMgZm9yIGRlYWxpbmcgd2l0aCBhcnJheXMuXHJcbiAqXHJcbiAqIEBtb2R1bGUgYXJyYXlcclxuICpcclxuICovXHJcblxyXG52YXIgYXJyYXkgPSB7fTtcclxubW9kdWxlLmV4cG9ydHMgPSBhcnJheTtcclxuXHJcbi8qKlxyXG4gKlxyXG4gKiBUYWtlIGEgc2xpY2Ugb2YgYW4gYXJyYXkgd2l0aG91dCBtb2RpZnlpbmcgdGhlIG9yaWdpbmFsIGFycmF5LlxyXG4gKlxyXG4gKiBkZXguYXJyYXkuc2xpY2UoYXJyYXkpIC0gUmV0dXJuIGEgY29weSBvZiB0aGUgYXJyYXkuXHJcbiAqIGRleC5hcnJheS5zbGljZShhcnJheSwgcm93UmFuZ2UpIC0gQ29weSB0aGUgYXJyYXksIHRoZW4gcmV0dXJuIGEgc2xpY2VcclxuICogd2l0aGluIHRoZSBzcGVjaWZpZWQgcmFuZ2UuXHJcbiAqIGRleC5hcnJheS5zbGljZShhcnJheSwgcm93UmFuZ2UsIG1heFJvd3MpIC0gQ29weSB0aGUgYXJyYXksIHRoZW4gcmV0dXJuIGEgc2xpY2VcclxuICogd2l0aGluIHRoZSBzcGVjaWZpZWQgcmFuZ2UgdXAgdG8sIGJ1dCBub3QgZXhjZWVkaW5nLCBtYXhSb3dzIHJvd3MuXHJcbiAqXHJcbiAqIEBwYXJhbSAoYXJyYXkpIGFycmF5IC0gVGhlIGFycmF5IHRvIHNsaWNlLlxyXG4gKiBAcGFyYW0gKGFycmF5fG51bWJlcikgcm93UmFuZ2UgLSBJZiBzdXBwbGllZCBhbiBhcnJheSwgdGhlIHJhbmdlIGRlZmluZWQgYnkgdGhlIG9mIHJvd3MgdG8gc2xpY2UuXHJcbiAqIEBwYXJhbSB7bnVtYmVyfSBtYXhSb3dzIC0gVGhlIG1heGltdW0gbnVtYmVyIG9mIHJvd3MgdG8gcmV0dXJuLlxyXG4gKlxyXG4gKiBAZXhhbXBsZSB7QGxhbmcgamF2YXNjcmlwdH1cclxuICogdmFyIG15QXJyYXkgPSBbIDEsIDIsIDMsIDQsIDUgXTtcclxuICpcclxuICogLy8gUmV0dXJuczogWyAzLCA0LCA1XVxyXG4gKiBzbGljZShteUFycmF5LCAyKTtcclxuICpcclxuICogLy8gUmV0dXJuczogWyAxLCAzLCA1IF1cclxuICogc2xpY2UobXlBcnJheSwgWzAsIDIsIDRdKTtcclxuICpcclxuICogLy8gSSBhbSBub3Qgc3VyZSB3aHkgeW91IHdvdWxkIGRvIHRoaXMsIGJ1dCBpbiB0aGUgaW50ZXJlc3Qgb2Ygc3VwcG9ydGluZ1xyXG4gKiAvLyB0aGUgUHJpbmNpcGxlIG9mIExlYXN0IFN1cnByaXNlLCB0aGlzIHJldHVybnMgdGhlIGFycmF5IHVuY2hhbmdlZC5cclxuICogLy8gUmV0dXJuczogWyAxLCAyLCAzLCA0LCA1IF1cclxuICogc2xpY2UobXlBcnJheSlcclxuICpcclxuICovXHJcbm1vZHVsZS5leHBvcnRzLnNsaWNlID0gZnVuY3Rpb24gKGFycmF5LCByb3dSYW5nZSwgbWF4Um93cykge1xyXG4gICAgdmFyIGFycmF5U2xpY2UgPSBbXTtcclxuICAgIHZhciByYW5nZTtcclxuICAgIHZhciBpO1xyXG5cclxuICAgIHZhciBhcnJheUNvcHkgPSBkZXguYXJyYXkuY29weShhcnJheSk7XHJcblxyXG4gICAgLy8gTnVtZXJpYy5cclxuICAgIC8vIEFycmF5LlxyXG4gICAgLy8gT2JqZWN0LiAgTnVtZXJpYyB3aXRoIHN0YXJ0IGFuZCBlbmQuXHJcbiAgICBpZiAoYXJndW1lbnRzLmxlbmd0aCA8IDIpIHtcclxuICAgICAgICByZXR1cm4gYXJyYXlDb3B5O1xyXG4gICAgfVxyXG4gICAgZWxzZSBpZiAoYXJndW1lbnRzLmxlbmd0aCA9PSAyKSB7XHJcbiAgICAgICAgaWYgKEFycmF5LmlzQXJyYXkocm93UmFuZ2UpKSB7XHJcbiAgICAgICAgICAgIHJhbmdlID0gcm93UmFuZ2U7XHJcbiAgICAgICAgfVxyXG4gICAgICAgIGVsc2Uge1xyXG4gICAgICAgICAgICByYW5nZSA9IGRleC5yYW5nZShyb3dSYW5nZSwgYXJyYXlDb3B5Lmxlbmd0aCAtIHJvd1JhbmdlKTtcclxuICAgICAgICB9XHJcbiAgICB9XHJcbiAgICBlbHNlIGlmIChhcmd1bWVudHMubGVuZ3RoID4gMikge1xyXG4gICAgICAgIGlmIChBcnJheS5pc0FycmF5KHJvd1JhbmdlKSkge1xyXG4gICAgICAgICAgICByYW5nZSA9IHJvd1JhbmdlO1xyXG4gICAgICAgIH1cclxuICAgICAgICBlbHNlIHtcclxuICAgICAgICAgICAgcmFuZ2UgPSBkZXgucmFuZ2Uocm93UmFuZ2UsIG1heFJvd3MpO1xyXG4gICAgICAgIH1cclxuICAgIH1cclxuXHJcbiAgICAvL2RleC5jb25zb2xlLmxvZyhcIkJFRk9SRTogYXJyYXkuc2xpY2UocmFuZ2U9XCIgKyByYW5nZSArIFwiKTogYXJyYXlTbGljZT1cIiArIGFycmF5U2xpY2UpO1xyXG4gICAgZm9yIChpID0gMDsgaSA8IHJhbmdlLmxlbmd0aDsgaSsrKSB7XHJcbiAgICAgICAgYXJyYXlTbGljZS5wdXNoKGFycmF5Q29weVtyYW5nZVtpXV0pO1xyXG4gICAgfVxyXG4gICAgLy9kZXguY29uc29sZS5sb2coXCJBRlRFUjogYXJyYXkuc2xpY2UocmFuZ2U9XCIgKyByYW5nZSArIFwiKTogYXJyYXlTbGljZT1cIiArIGFycmF5U2xpY2UpO1xyXG4gICAgcmV0dXJuIGFycmF5U2xpY2U7XHJcbn07XHJcblxyXG4vKipcclxuICpcclxuICogVGhpcyBtZXRob2QgbG9jYXRlcyB0aGUgYXJyYXkgZWxlbWVudCB3aG9zZSBpZCB0YWcgbWF0Y2hlcyB0aGUgc3VwcGxpZWRcclxuICogaWQuICBJdCByZXR1cm5zIHRoZSBpbmRleCBvZiB0aGUgZmlyc3QgbWF0Y2hpbmcgYXJyYXkgZWxlbWVudCwgb3IgLTEgaWZcclxuICogbm9uZSB3YXMgZm91bmQuXHJcbiAqXHJcbiAqIEBwYXJhbSBhcnJheSBUaGUgYXJyYXkgdG8gc2VhcmNoLlxyXG4gKiBAcGFyYW0gaWQgVGhlIGlkIHRvIHNlYXJjaCBvbi5cclxuICpcclxuICogQHJldHVybnMge251bWJlcn0gVGhlIGluZGV4IG9mIHRoZSBmaXJzdCBtYXRjaGluZyBhcnJheSBlbGVtZW50LCBvciAtMVxyXG4gKiBpZiBub3QgZm91bmQuXHJcbiAqXHJcbiAqL1xyXG4vKlxyXG4gbW9kdWxlLmV4cG9ydHMuaW5kZXhPZkJ5SWQgPSBmdW5jdGlvbiAoYXJyYXksIGlkKSB7XHJcbiByZXR1cm4gXy5maW5kSW5kZXgoYXJyYXksIHsgaWQ6IGlkIH0pXHJcbiB9O1xyXG4gKi9cclxuXHJcbi8qKlxyXG4gKlxyXG4gKiBJcyB0aGlzIHJvdXRpbmUgYWN0dWFsbHkgdXNlZCBhbnltb3JlPyAgQ2FuIEkgZGVwcmVjYXRlIGl0PyAgSXQncyBsb25nIGFuZFxyXG4gKiBJIGRvbid0IHJlbWVtYmVyIGV4YWN0bHkgd2hhdCBpdHMgZG9pbmcuXHJcbiAqXHJcbiAqIEBwYXJhbSBkYXRhXHJcbiAqIEBwYXJhbSBudW1WYWx1ZXNcclxuICogQHJldHVybnMgeyp9XHJcbiAqXHJcbiAqL1xyXG4vKlxyXG4gbW9kdWxlLmV4cG9ydHMuaW5kZXhCYW5kcyA9IGZ1bmN0aW9uIChkYXRhLCBudW1WYWx1ZXMpIHtcclxuIGRleC5jb25zb2xlLmxvZyhcIkJBTkRTXCIpO1xyXG4gdmFyIGludGVydmFsLCByZXNpZHVhbCwgdGlja0luZGljZXMsIGxhc3QsIGk7XHJcblxyXG4gaWYgKG51bVZhbHVlcyA8PSAwKSB7XHJcbiB0aWNrSW5kaWNlcyA9IFtdO1xyXG4gfVxyXG4gZWxzZSBpZiAobnVtVmFsdWVzID09IDEpIHtcclxuIHRpY2tJbmRpY2VzID0gW01hdGguZmxvb3IobnVtVmFsdWVzIC8gMildO1xyXG4gfVxyXG4gZWxzZSBpZiAobnVtVmFsdWVzID09IDIpIHtcclxuIHRpY2tJbmRpY2VzID0gWzAsIGRhdGEubGVuZ3RoIC0gMV07XHJcbiB9XHJcbiBlbHNlIHtcclxuIC8vIFdlIGhhdmUgYXQgbGVhc3QgMiB0aWNrcyB0byBkaXNwbGF5LlxyXG4gLy8gQ2FsY3VsYXRlIHRoZSByb3VnaCBpbnRlcnZhbCBiZXR3ZWVuIHRpY2tzLlxyXG4gaW50ZXJ2YWwgPSBNYXRoLm1heCgxLCBNYXRoLmZsb29yKGRhdGEubGVuZ3RoIC8gKG51bVZhbHVlcyAtIDEpKSk7XHJcblxyXG4gLy8gSWYgaXQncyBub3QgcGVyZmVjdCwgcmVjb3JkIGl0IGluIHRoZSByZXNpZHVhbC5cclxuIHJlc2lkdWFsID0gTWF0aC5mbG9vcihkYXRhLmxlbmd0aCAlIChudW1WYWx1ZXMgLSAxKSk7XHJcblxyXG4gLy8gQWx3YXlzIGxhYmVsIG91ciBmaXJzdCBkYXRhIHBvaW50LlxyXG4gdGlja0luZGljZXMgPSBbMF07XHJcblxyXG4gLy8gU2V0IHN0b3AgcG9pbnQgb24gdGhlIGludGVyaW9yIHRpY2tzLlxyXG4gbGFzdCA9IGRhdGEubGVuZ3RoIC0gaW50ZXJ2YWw7XHJcblxyXG4gZGV4LmNvbnNvbGUubG9nKFwiVEVTVFwiLCBkYXRhLCBudW1WYWx1ZXMsIGludGVydmFsLCByZXNpZHVhbCwgbGFzdCk7XHJcblxyXG4gLy8gRmlndXJlIG91dCB0aGUgaW50ZXJpb3IgdGlja3MsIGdlbnRseSBkcmlmdCB0byBhY2NvbW1vZGF0ZVxyXG4gLy8gdGhlIHJlc2lkdWFsLlxyXG4gZm9yIChpID0gaW50ZXJ2YWw7IGkgPD0gbGFzdDsgaSArPSBpbnRlcnZhbCkge1xyXG4gaWYgKHJlc2lkdWFsID4gMCkge1xyXG4gaSArPSAxO1xyXG4gcmVzaWR1YWwgLT0gMTtcclxuIH1cclxuIHRpY2tJbmRpY2VzLnB1c2goaSk7XHJcbiB9XHJcbiAvLyBBbHdheXMgZ3JhcGggdGhlIGxhc3QgdGljay5cclxuIHRpY2tJbmRpY2VzLnB1c2goZGF0YS5sZW5ndGggLSAxKTtcclxuIH1cclxuIGRleC5jb25zb2xlLmxvZyhcIkJBTkRTXCIpO1xyXG4gcmV0dXJuIHRpY2tJbmRpY2VzO1xyXG4gfTtcclxuICovXHJcblxyXG4vKipcclxuICogUmV0dXJuIGFuIGFycmF5IGNvbnNpc3Rpbmcgb2YgdW5pcXVlIGVsZW1lbnRzIHdpdGhpbiB0aGUgZmlyc3QuXHJcbiAqXHJcbiAqIEBwYXJhbSBhcnJheSBUaGUgYXJyYXkgdG8gZXh0cmFjdCB1bmlxdWUgdmFsdWVzIGZyb20uXHJcbiAqXHJcbiAqIEByZXR1cm5zIHtBcnJheX0gQW4gYXJyYXkgd2hpY2ggY29uc2lzdHMgb2YgdW5pcXVlIGVsZW1lbnRzIHdpdGhpblxyXG4gKiB0aGUgdXNlciBzdXBwbGllZCBhcnJheS5cclxuICpcclxuICovXHJcbi8vbW9kdWxlLmV4cG9ydHMudW5pcXVlID0gZnVuY3Rpb24gKGFycmF5KSB7XHJcbi8vICByZXR1cm4gXy51bmlxKGFycmF5KTtcclxuLy99O1xyXG5cclxuLyoqXHJcbiAqXHJcbiAqIFJldHVybnMgYW4gYXJyYXkgb2YgdGhlIG1hdGhlbWF0aWNhbGx5IHNtYWxsZXN0IGFuZCBsYXJnZXN0XHJcbiAqIGVsZW1lbnRzIHdpdGhpbiB0aGUgYXJyYXkuXHJcbiAqXHJcbiAqIEBwYXJhbSBtYXRyaXggVGhlIGFycmF5IHRvIGV2YWx1YXRlLlxyXG4gKiBAcGFyYW0gaW5kaWNlcyBUaGUgYXJyYXkgaW5kaWNlcyB0byBiZSBjb25zaWRlcmVkIGluIHRoZSBldmFsdWF0aW9uLlxyXG4gKlxyXG4gKiBAcmV0dXJucyB7QXJyYXl9IC0gQW4gYXJyYXkgY29uc2lzdGluZyBvZiBbIG1pbiwgbWF4IF0gb2YgdGhlIGFycmF5LlxyXG4gKlxyXG4gKi9cclxubW9kdWxlLmV4cG9ydHMuZXh0ZW50ID0gZnVuY3Rpb24gKG1hdHJpeCwgaW5kaWNlcykge1xyXG4gICAgaWYgKCFtYXRyaXggfHwgbWF0cml4Lmxlbmd0aCA8PSAwIHx8ICFpbmRpY2VzIHx8IGluZGljZXMubGVuZ3RoIDw9IDApIHtcclxuICAgICAgICByZXR1cm4gWzAsIDBdO1xyXG4gICAgfVxyXG5cclxuICAgIHZhciBtaW4gPSBtYXRyaXhbMF1baW5kaWNlc1swXV07XHJcbiAgICB2YXIgbWF4ID0gbWluO1xyXG5cclxuICAgIGluZGljZXMuZm9yRWFjaChmdW5jdGlvbiAoY2kpIHtcclxuICAgICAgICBtYXRyaXguZm9yRWFjaChmdW5jdGlvbiAocm93KSB7XHJcbiAgICAgICAgICAgIGlmIChtaW4gPiByb3dbY2ldKSB7XHJcbiAgICAgICAgICAgICAgICBtaW4gPSByb3dbY2ldO1xyXG4gICAgICAgICAgICB9XHJcbiAgICAgICAgICAgIGlmIChtYXggPCByb3dbY2ldKSB7XHJcbiAgICAgICAgICAgICAgICBtYXggPSByb3dbY2ldO1xyXG4gICAgICAgICAgICB9XHJcbiAgICAgICAgfSlcclxuICAgIH0pO1xyXG4gICAgcmV0dXJuIFttaW4sIG1heF07XHJcbn07XHJcblxyXG4vKipcclxuICpcclxuICogUmV0dXJuIGEgZGlzdGluY3QgY29weSBvZiBhbiBhcnJheS5cclxuICpcclxuICogQHBhcmFtIHtBcnJheX0gYXJyYXkgVGhlIGFycmF5IHRvIGNvcHkuXHJcbiAqIEByZXR1cm5zIHtBcnJheX0gVGhlIGNvcHkgb2YgdGhlIGFycmF5LlxyXG4gKlxyXG4gKi9cclxubW9kdWxlLmV4cG9ydHMuY29weSA9IGZ1bmN0aW9uIChhcnJheSkge1xyXG4gICAgLy8gU2hhbGxvdyBjb3B5XHJcbiAgICByZXR1cm4gXy5jbG9uZShhcnJheSk7XHJcbiAgICAvLyBEZWVwIGNvcHk6XHJcbiAgICAvL3JldHVybiAkLmV4dGVuZCh0cnVlLCB7fSwgYXJyYXkpO1xyXG59OyIsIi8qKlxyXG4gKlxyXG4gKiBUaGlzIG1vZHVsZSBwcm92aWRlcyByb3V0aW5lcyBmb3IgZGVhbGluZyB3aXRoIGNvbG9ycy5cclxuICpcclxuICogQG1vZHVsZSBjb2xvclxyXG4gKlxyXG4gKi9cclxuXHJcbi8qKlxyXG4gKlxyXG4gKiBUaGlzIHJvdXRpbmUgY29udmVydHMgYSByZ2IocmVkLCBncmVlbiwgYmx1ZSkgY29sb3IgdG8gaXQnc1xyXG4gKiBlcXVpdmFsZW50ICNmZmZmZmYgaGV4YWRlY2ltYWwgZm9ybS5cclxuICpcclxuICogQHBhcmFtIGNvbG9yIFRoZSBjb2xvciB3ZSB3aXNoIHRvIGNvbnZlcnQgdG8gaGV4LlxyXG4gKiBAcmV0dXJucyB7Kn1cclxuICovXHJcbmV4cG9ydHMudG9IZXggPSBmdW5jdGlvbiAoY29sb3IpIHtcclxuICBpZiAoY29sb3Iuc3Vic3RyKDAsIDEpID09PSAnIycpIHtcclxuICAgIHJldHVybiBjb2xvcjtcclxuICB9XHJcbiAgLy9jb25zb2xlLmxvZyhcIkNPTE9SOiBcIiArIGNvbG9yKVxyXG4gIHZhciBkaWdpdHMgPSAvcmdiXFwoKFxcZCspLChcXGQrKSwoXFxkKylcXCkvLmV4ZWMoY29sb3IpO1xyXG4gIC8vY29uc29sZS5sb2coXCJESUdJVFM6IFwiICsgZGlnaXRzKTtcclxuICB2YXIgcmVkID0gcGFyc2VJbnQoZGlnaXRzWzFdKTtcclxuICB2YXIgZ3JlZW4gPSBwYXJzZUludChkaWdpdHNbMl0pO1xyXG4gIHZhciBibHVlID0gcGFyc2VJbnQoZGlnaXRzWzNdKTtcclxuXHJcbiAgdmFyIHJnYiA9IGJsdWUgfCAoZ3JlZW4gPDwgOCkgfCAocmVkIDw8IDE2KTtcclxuICByZXR1cm4gJyMnICsgcmdiLnRvU3RyaW5nKDE2KTtcclxufTtcclxuXHJcbi8qKlxyXG4gKlxyXG4gKiBUaGlzIHJvdXRpbmUgcmV0dXJucyB0aGUgcmVxdWVzdGVkIG5hbWVkIGNvbG9yIHNjaGVtZSB3aXRoXHJcbiAqIHRoZSByZXF1ZXN0ZWQgbnVtYmVyIG9mIGNvbG9ycy5cclxuICpcclxuICogQHBhcmFtIGNvbG9yU2NoZW1lIFRoZSBuYW1lZCBjb2xvciBzY2hlbWVzOiBjYXQxMCwgY2F0MjAsIGNhdDIwYiwgY2F0MjBjLCBIaUNvbnRyYXN0IG9yXHJcbiAqIGFueSBvZiB0aGUgbmFtZWQgY29sb3JzIGZyb20gY29sb3JicmV3ZXIuXHJcbiAqIEBwYXJhbSBudW1Db2xvcnMgVGhlIG51bWJlciBvZiBjb2xvcnMgYmVpbmcgcmVxdWVzdGVkLlxyXG4gKlxyXG4gKiBAcmV0dXJucyB7Kn0gVGhlIGFycmF5IG9mIGNvbG9ycy5cclxuICovXHJcbmV4cG9ydHMuY29sb3JTY2hlbWUgPSBmdW5jdGlvbiAoY29sb3JTY2hlbWUsIG51bUNvbG9ycykge1xyXG4gIGlmIChjb2xvclNjaGVtZSA9PT0gXCJjYXQxMFwiIHx8IGNvbG9yU2NoZW1lID09IFwiMVwiKSB7XHJcbiAgICByZXR1cm4gZDMuc2NhbGUuY2F0ZWdvcnkxMCgpO1xyXG4gIH1cclxuICBlbHNlIGlmIChjb2xvclNjaGVtZSA9PT0gXCJjYXQyMFwiIHx8IGNvbG9yU2NoZW1lID09IFwiMlwiKSB7XHJcbiAgICByZXR1cm4gZDMuc2NhbGUuY2F0ZWdvcnkyMCgpO1xyXG4gIH1cclxuICBlbHNlIGlmIChjb2xvclNjaGVtZSA9PT0gXCJjYXQyMGJcIiB8fCBjb2xvclNjaGVtZSA9PSBcIjNcIikge1xyXG4gICAgcmV0dXJuIGQzLnNjYWxlLmNhdGVnb3J5MjBiKCk7XHJcbiAgfVxyXG4gIGVsc2UgaWYgKGNvbG9yU2NoZW1lID09PSBcImNhdDIwY1wiIHx8IGNvbG9yU2NoZW1lID09IFwiNFwiKSB7XHJcbiAgICByZXR1cm4gZDMuc2NhbGUuY2F0ZWdvcnkyMGMoKTtcclxuICB9XHJcbiAgZWxzZSBpZiAoY29sb3JTY2hlbWUgPT0gXCJIaUNvbnRyYXN0XCIpIHtcclxuICAgIHJldHVybiBkMy5zY2FsZS5vcmRpbmFsKCkucmFuZ2UoY29sb3JicmV3ZXJbY29sb3JTY2hlbWVdWzldKTtcclxuICB9XHJcbiAgZWxzZSBpZiAoY29sb3JTY2hlbWUgaW4gY29sb3JicmV3ZXIpIHtcclxuICAgIC8vY29uc29sZS5sb2coXCJMRU5HVEg6IFwiICsgbGVuKTtcclxuICAgIHZhciBjO1xyXG4gICAgdmFyIGVmZkNvbG9ycyA9IE1hdGgucG93KDIsIE1hdGguY2VpbChNYXRoLmxvZyhudW1Db2xvcnMpIC8gTWF0aC5sb2coMikpKTtcclxuICAgIC8vY29uc29sZS5sb2coXCJFRkYgTEVOR1RIOiBcIiArIGxlbik7XHJcblxyXG4gICAgLy8gRmluZCB0aGUgYmVzdCBjbWFwOlxyXG4gICAgaWYgKGVmZkNvbG9ycyA+IDEyOCkge1xyXG4gICAgICBlZmZDb2xvcnMgPSAyNTY7XHJcbiAgICB9XHJcblxyXG4gICAgZm9yIChjID0gZWZmQ29sb3JzOyBjID49IDI7IGMtLSkge1xyXG4gICAgICBpZiAoY29sb3JicmV3ZXJbY29sb3JTY2hlbWVdW2NdKSB7XHJcbiAgICAgICAgcmV0dXJuIGQzLnNjYWxlLm9yZGluYWwoKS5yYW5nZShjb2xvcmJyZXdlcltjb2xvclNjaGVtZV1bY10pO1xyXG4gICAgICB9XHJcbiAgICB9XHJcbiAgICBmb3IgKGMgPSBlZmZDb2xvcnM7IGMgPD0gMjU2OyBjKyspIHtcclxuICAgICAgaWYgKGNvbG9yYnJld2VyW2NvbG9yU2NoZW1lXVtjXSkge1xyXG4gICAgICAgIHJldHVybiBkMy5zY2FsZS5vcmRpbmFsKCkucmFuZ2UoY29sb3JicmV3ZXJbY29sb3JTY2hlbWVdW2NdKTtcclxuICAgICAgfVxyXG4gICAgfVxyXG4gICAgcmV0dXJuIGQzLnNjYWxlLmNhdGVnb3J5MjAoKTtcclxuICB9XHJcbiAgZWxzZSB7XHJcbiAgICByZXR1cm4gZDMuc2NhbGUuY2F0ZWdvcnkyMCgpO1xyXG4gIH1cclxufTtcclxuXHJcbi8qKlxyXG4gKlxyXG4gKiBHaXZlbiBhIGNvbG9yLCBsaWdodGVuIG9yIGRhcmtlbiBpdCBieSB0aGUgcmVxdWVzdGVkIHBlcmNlbnQuXHJcbiAqXHJcbiAqIEBwYXJhbSBjb2xvciBUaGUgY29sb3IgdG8gbW9kaWZ5LlxyXG4gKiBAcGFyYW0gcGVyY2VudCBBIGZsb2F0aW5nIHBvaW50IG51bWJlciBpbiB0aGUgcmFuZ2Ugb2YgWy0xLjAsIDEuMF0uICBOZWdhdGl2ZVxyXG4gKiB2YWx1ZXMgd2lsbCBsaWdodGVuIHRoZSBjb2xvciwgcG9zaXRpdmUgdmFsdWVzIHdpbGwgZGFya2VuIGl0LlxyXG4gKlxyXG4gKiBAcmV0dXJucyB7c3RyaW5nfSBUaGUgbGlnaHRlbmVkIG9yIGRhcmtlbmVkIGNvbG9yIGluIHRoZSBmb3JtIG9mICNmZmZmZmYuXHJcbiAqXHJcbiAqL1xyXG5leHBvcnRzLnNoYWRlQ29sb3IgPSBmdW5jdGlvbiAoY29sb3IsIHBlcmNlbnQpIHtcclxuICB2YXIgZiA9IHBhcnNlSW50KGNvbG9yLnNsaWNlKDEpLCAxNiksIHQgPSBwZXJjZW50IDwgMCA/IDAgOiAyNTUsXHJcbiAgICBwID0gcGVyY2VudCA8IDAgPyBwZXJjZW50ICogLTEgOiBwZXJjZW50LFxyXG4gICAgUiA9IGYgPj4gMTYsIEcgPSBmID4+IDggJiAweDAwRkYsIEIgPSBmICYgMHgwMDAwRkY7XHJcbiAgcmV0dXJuIFwiI1wiICsgKDB4MTAwMDAwMCArIChNYXRoLnJvdW5kKCh0IC0gUikgKiBwKSArIFIpICogMHgxMDAwMCArIChNYXRoLnJvdW5kKCh0IC0gRykgKiBwKSArIEcpICpcclxuICAgIDB4MTAwICsgKE1hdGgucm91bmQoKHQgLSBCKSAqIHApICsgQikpLnRvU3RyaW5nKDE2KS5zbGljZSgxKTtcclxufTtcclxuXHJcbi8qKlxyXG4gKlxyXG4gKiBHaXZlbiB0d28gY29sb3JzLCBibGVuZCB0aGVtIHRvZ2V0aGVyLlxyXG4gKlxyXG4gKiBAcGFyYW0gY29sb3IxXHJcbiAqIEBwYXJhbSBjb2xvcjJcclxuICogQHBhcmFtIHBlcmNlbnRcclxuICogQHJldHVybnMge3N0cmluZ31cclxuICpcclxuICovXHJcbmV4cG9ydHMuYmxlbmRDb2xvcnMgPSBmdW5jdGlvbihjb2xvcjEsIGNvbG9yMiwgcGVyY2VudCkge1xyXG4gIHZhciBmID0gcGFyc2VJbnQoY29sb3IxLnNsaWNlKDEpLCAxNiksIHQgPSBwYXJzZUludChjb2xvcjIuc2xpY2UoMSksIDE2KSxcclxuICAgIFIxID0gZiA+PiAxNiwgRzEgPSBmID4+IDggJiAweDAwRkYsXHJcbiAgICBCMSA9IGYgJiAweDAwMDBGRiwgUjIgPSB0ID4+IDE2LFxyXG4gICAgRzIgPSB0ID4+IDggJiAweDAwRkYsIEIyID0gdCAmIDB4MDAwMEZGO1xyXG5cclxuICByZXR1cm4gXCIjXCIgKyAoMHgxMDAwMDAwICsgKE1hdGgucm91bmQoKFIyIC0gUjEpICogcGVyY2VudCkgKyBSMSkgKiAweDEwMDAwICtcclxuICAgIChNYXRoLnJvdW5kKChHMiAtIEcxKSAqIHBlcmNlbnQpICsgRzEpICogMHgxMDAgK1xyXG4gICAgKE1hdGgucm91bmQoKEIyIC0gQjEpICogcGVyY2VudCkgKyBCMSkpLnRvU3RyaW5nKDE2KS5zbGljZSgxKTtcclxufTtcclxuXHJcbi8qKlxyXG4gKlxyXG4gKiBAcGFyYW0gY29sb3JcclxuICogQHBhcmFtIHBlcmNlbnRcclxuICogQHJldHVybnMge3N0cmluZ31cclxuICovXHJcbmV4cG9ydHMuc2hhZGVSR0JDb2xvciA9IGZ1bmN0aW9uIChjb2xvciwgcGVyY2VudCkge1xyXG4gIHZhciBmID0gY29sb3Iuc3BsaXQoXCIsXCIpLCB0ID0gcGVyY2VudCA8IDAgPyAwIDogMjU1LFxyXG4gICAgcCA9IHBlcmNlbnQgPCAwID8gcGVyY2VudCAqIC0xIDogcGVyY2VudCwgUiA9IHBhcnNlSW50KGZbMF0uc2xpY2UoNCkpLFxyXG4gICAgRyA9IHBhcnNlSW50KGZbMV0pLCBCID0gcGFyc2VJbnQoZlsyXSk7XHJcbiAgcmV0dXJuIFwicmdiKFwiICsgKE1hdGgucm91bmQoKHQgLSBSKSAqIHApICsgUikgKyBcIixcIiArXHJcbiAgICAoTWF0aC5yb3VuZCgodCAtIEcpICogcCkgKyBHKSArIFwiLFwiICtcclxuICAgIChNYXRoLnJvdW5kKCh0IC0gQikgKiBwKSArIEIpICsgXCIpXCI7XHJcbn07XHJcblxyXG4vKipcclxuICpcclxuICogQHBhcmFtIGNvbG9yMVxyXG4gKiBAcGFyYW0gY29sb3IyXHJcbiAqIEBwYXJhbSBwZXJjZW50XHJcbiAqIEByZXR1cm5zIHtzdHJpbmd9XHJcbiAqL1xyXG5leHBvcnRzLmJsZW5kUkdCQ29sb3JzID0gZnVuY3Rpb24oY29sb3IxLCBjb2xvcjIsIHBlcmNlbnQpIHtcclxuICB2YXIgZiA9IGNvbG9yMS5zcGxpdChcIixcIiksIHQgPSBjb2xvcjIuc3BsaXQoXCIsXCIpLCBSID0gcGFyc2VJbnQoZlswXS5zbGljZSg0KSksXHJcbiAgICBHID0gcGFyc2VJbnQoZlsxXSksIEIgPSBwYXJzZUludChmWzJdKTtcclxuICByZXR1cm4gXCJyZ2IoXCIgKyAoTWF0aC5yb3VuZCgocGFyc2VJbnQodFswXS5zbGljZSg0KSkgLSBSKSAqIHApICsgUikgKyBcIixcIiArXHJcbiAgICAoTWF0aC5yb3VuZCgocGFyc2VJbnQodFsxXSkgLSBHKSAqIHBlcmNlbnQpICsgRykgKyBcIixcIiArXHJcbiAgICAoTWF0aC5yb3VuZCgocGFyc2VJbnQodFsyXSkgLSBCKSAqIHBlcmNlbnQpICsgQikgKyBcIilcIjtcclxufTtcclxuXHJcbi8qKlxyXG4gKlxyXG4gKiBAcGFyYW0gY29sb3JcclxuICogQHBhcmFtIHBlcmNlbnRcclxuICogQHJldHVybnMgeyp9XHJcbiAqL1xyXG5leHBvcnRzLnNoYWRlID0gZnVuY3Rpb24oY29sb3IsIHBlcmNlbnQpIHtcclxuICBpZiAoY29sb3IubGVuZ3RoID4gNykgcmV0dXJuIHNoYWRlUkdCQ29sb3IoY29sb3IsIHBlcmNlbnQpO1xyXG4gIGVsc2UgcmV0dXJuIHNoYWRlQ29sb3IyKGNvbG9yLCBwZXJjZW50KTtcclxufTtcclxuXHJcbi8qKlxyXG4gKlxyXG4gKiBAcGFyYW0gY29sb3IxXHJcbiAqIEBwYXJhbSBjb2xvcjJcclxuICogQHBhcmFtIHBlcmNlbnRcclxuICovXHJcbmV4cG9ydHMuYmxlbmQgPSBmdW5jdGlvbiAoY29sb3IxLCBjb2xvcjIsIHBlcmNlbnQpIHtcclxuICBpZiAoY29sb3IxLmxlbmd0aCA+IDcpIHJldHVybiBibGVuZFJHQkNvbG9ycyhjb2xvcjEsIGNvbG9yMiwgcGVyY2VudCk7XHJcbiAgZWxzZSByZXR1cm4gYmxlbmRDb2xvcnMoY29sb3IxLCBjb2xvcjIsIHBlcmNlbnQpO1xyXG59O1xyXG5cclxuLyoqXHJcbiAqXHJcbiAqIEdpdmVuIGEgY29sb3IgYW5kIGEgcGVyY2VudCB0byBsaWdodGVuIG9yIGRhcmtlbiBpdC5cclxuICpcclxuICogQHBhcmFtIGNvbG9yIFRoZSBiYXNlIGNvbG9yLlxyXG4gKiBAcGFyYW0gcGVyY2VudCBUaGUgcGVjZW50YWdlIHRvIGxpZ2h0ZW4gKG5lZ2F0aXZlKSBvciBkYXJrZW4gKHBvc2l0aXZlKSB0aGUgY29sb3IuXHJcbiAqXHJcbiAqIEByZXR1cm5zIHtzdHJpbmd9IFRoZSBjb21wdXRlZCBjb2xvci5cclxuICpcclxuICovXHJcbi8qXHJcbiBleHBvcnRzLnNoYWRlQ29sb3IgPSBmdW5jdGlvbiAoY29sb3IsIHBlcmNlbnQpIHtcclxuIHZhciBSID0gcGFyc2VJbnQoY29sb3Iuc3Vic3RyaW5nKDEsIDMpLCAxNilcclxuIHZhciBHID0gcGFyc2VJbnQoY29sb3Iuc3Vic3RyaW5nKDMsIDUpLCAxNilcclxuIHZhciBCID0gcGFyc2VJbnQoY29sb3Iuc3Vic3RyaW5nKDUsIDcpLCAxNik7XHJcblxyXG4gUiA9IHBhcnNlSW50KFIgKiAoMTAwICsgcGVyY2VudCkgLyAxMDApO1xyXG4gRyA9IHBhcnNlSW50KEcgKiAoMTAwICsgcGVyY2VudCkgLyAxMDApO1xyXG4gQiA9IHBhcnNlSW50KEIgKiAoMTAwICsgcGVyY2VudCkgLyAxMDApO1xyXG5cclxuIFIgPSAoUiA8IDI1NSkgPyBSIDogMjU1O1xyXG4gRyA9IChHIDwgMjU1KSA/IEcgOiAyNTU7XHJcbiBCID0gKEIgPCAyNTUpID8gQiA6IDI1NTtcclxuXHJcbiB2YXIgUlIgPSAoKFIudG9TdHJpbmcoMTYpLmxlbmd0aCA9PSAxKSA/IFwiMFwiICsgUi50b1N0cmluZygxNikgOiBSLnRvU3RyaW5nKDE2KSk7XHJcbiB2YXIgR0cgPSAoKEcudG9TdHJpbmcoMTYpLmxlbmd0aCA9PSAxKSA/IFwiMFwiICsgRy50b1N0cmluZygxNikgOiBHLnRvU3RyaW5nKDE2KSk7XHJcbiB2YXIgQkIgPSAoKEIudG9TdHJpbmcoMTYpLmxlbmd0aCA9PSAxKSA/IFwiMFwiICsgQi50b1N0cmluZygxNikgOiBCLnRvU3RyaW5nKDE2KSk7XHJcblxyXG4gcmV0dXJuIFwiI1wiICsgUlIgKyBHRyArIEJCO1xyXG4gfTtcclxuICovXHJcblxyXG5leHBvcnRzLmdyYWRpZW50ID0gZnVuY3Rpb24gKGJhc2VDb2xvcikge1xyXG4gIGlmIChiYXNlQ29sb3IuY2hhckF0KDApID09ICdyJykge1xyXG4gICAgYmFzZUNvbG9yID0gY29sb3JUb0hleChiYXNlQ29sb3IpO1xyXG4gIH1cclxuICB2YXIgZ3JhZGllbnRJZDtcclxuICBncmFkaWVudElkID0gXCJncmFkaWVudFwiICsgYmFzZUNvbG9yLnN1YnN0cmluZygxKVxyXG4gIGNvbnNvbGUubG9nKFwiR3JhZGllbnRJZDogXCIgKyBncmFkaWVudElkKTtcclxuICBjb25zb2xlLmxvZyhcIkJhc2VDb2xvciA6IFwiICsgYmFzZUNvbG9yKTtcclxuXHJcbiAgLy92YXIgbGlnaHRDb2xvciA9IHNoYWRlQ29sb3IoYmFzZUNvbG9yLCAtMTApXHJcbiAgdmFyIGRhcmtDb2xvciA9IHNoYWRlQ29sb3IoYmFzZUNvbG9yLCAtMjApXHJcblxyXG4gIHZhciBncmFkID0gZDMuc2VsZWN0KFwiI2dyYWRpZW50c1wiKS5zZWxlY3RBbGwoXCIjXCIgKyBncmFkaWVudElkKVxyXG4gICAgLmRhdGEoW2dyYWRpZW50SWRdKVxyXG4gICAgLmVudGVyKClcclxuICAgIC5hcHBlbmQoXCJyYWRpYWxHcmFkaWVudFwiKVxyXG4gICAgLmF0dHIoXCJjbGFzc1wiLCBcImNvbG9yR3JhZGllbnRcIilcclxuICAgIC5hdHRyKFwiaWRcIiwgZ3JhZGllbnRJZClcclxuICAgIC5hdHRyKFwiZ3JhZGllbnRVbml0c1wiLCBcIm9iamVjdEJvdW5kaW5nQm94XCIpXHJcbiAgICAuYXR0cihcImZ4XCIsIFwiMzAlXCIpXHJcbiAgICAuYXR0cihcImZ5XCIsIFwiMzAlXCIpXHJcblxyXG4gIGdyYWQuYXBwZW5kKFwic3RvcFwiKVxyXG4gICAgLmF0dHIoXCJvZmZzZXRcIiwgXCIwJVwiKVxyXG4gICAgLmF0dHIoXCJzdHlsZVwiLCBcInN0b3AtY29sb3I6I0ZGRkZGRlwiKVxyXG5cclxuICAvLyBNaWRkbGVcclxuICBncmFkLmFwcGVuZChcInN0b3BcIilcclxuICAgIC5hdHRyKFwib2Zmc2V0XCIsIFwiNDAlXCIpXHJcbiAgICAuYXR0cihcInN0eWxlXCIsIFwic3RvcC1jb2xvcjpcIiArIGJhc2VDb2xvcilcclxuXHJcbiAgLy8gT3V0ZXIgRWRnZXNcclxuICBncmFkLmFwcGVuZChcInN0b3BcIilcclxuICAgIC5hdHRyKFwib2Zmc2V0XCIsIFwiMTAwJVwiKVxyXG4gICAgLmF0dHIoXCJzdHlsZVwiLCBcInN0b3AtY29sb3I6XCIgKyBkYXJrQ29sb3IpXHJcblxyXG4gIHJldHVybiBcInVybCgjXCIgKyBncmFkaWVudElkICsgXCIpXCI7XHJcbn07XHJcbiIsIi8qKlxyXG4gKlxyXG4gKiBUaGlzIG1vZHVsZSBwcm92aWRlcyBiYXNlIGNhcGFiaWxpdGllcyB3aGljaCBhcmUgYXZhaWxhYmxlIHRvIGFsbCBkZXggY29tcG9uZW50cy5cclxuICpcclxuICogQGludGVyZmFjZVxyXG4gKlxyXG4gKi9cclxuXHJcbi8qKlxyXG4gKlxyXG4gKiBBIG1hdHJpeCBpcyBhIHR3byBkaW1lbnNpb25hbCBhcnJheSBvZiB2YWx1ZXMuICBJdCdzIGEgZGF0YSBzdHJ1Y3R1cmVcclxuICogd2hpY2ggaXMgYSBrZXkgY29tcG9uZW50IG9mIGEgY3N2IHdoaWNoIGlzIHVzZWQgZXh0ZW5zaXZlbHlcclxuICogdGhyb3VnaG91dCBEZXhKcy4gIFRoZSBkYXRhIHBvcnRpb24gb2YgYSBjc3YgaXMgc2ltcGx5IGEgbWF0cml4LlxyXG4gKiBBIGNzdiBpcyB0aGUgc3RhbmRhcmQgZm9ybSBvZiBkYXRhIGlucHV0IGV4cGVjdGVkIGJ5IGRleCBjb21wb25lbnRzLlxyXG4gKlxyXG4gKiBAdHlwZWRlZiB7QXJyYXkuPEFycmF5LjxPYmplY3Q+Pn0gbWF0cml4XHJcbiAqIEBleGFtcGxlIHtAbGFuZyBqYXZhc2NyaXB0fVxyXG4gKiAvLyBBIDJ4MiBtYXRyaXggb2YgbnVtYmVycy5cclxuICogdmFyIG1hdHJpeDEgPSBbWzEsIDJdLCBbMywgNF1dO1xyXG4gKlxyXG4gKiAvLyBBIDJ4MiBtYXRyaXggb2Ygc3RyaW5ncy5cclxuICogdmFyIG1hdHJpeDIgPSBbWydQYXQnLCAnTWFydGluJ10sIFsnTWlrZScsICdQYXJ0b24nXV07XHJcbiAqL1xyXG5cclxuLyoqXHJcbiAqIEEgQ1NWIGRhdGEgc3RydWN0dXJlLlxyXG4gKlxyXG4gKiBAdHlwZWRlZiB7T2JqZWN0fSBjc3ZcclxuICpcclxuICogQHByb3BlcnR5IHtBcnJheX0gaGVhZGVyIC0gQW4gYXJyYXkgY29udGFpbmluZyB0aGUgaGVhZGluZ3MgZm9yIHRoaXMgY3N2LlxyXG4gKiBAcHJvcGVydHkge21hdHJpeH0gZGF0YSAtIEEgbWF0cml4IGNvbnRhaW5pbmcgdGhlIGRhdGEgZm9yIHRoaXMgY3N2LlxyXG4gKiBAZXhhbXBsZSB7QGxhbmcgamF2YXNjcmlwdH1cclxuICogdmFyIG15Q3N2ID0geyBoZWFkZXIgOiBbIFwiRmlyc3ROYW1lXCIsIFwiTGFzdE5hbWVcIiBdLFxyXG4gKiAgICAgICAgICAgICAgIGRhdGEgICA6IFtbIFwiQm9iXCIsIFwiSm9uZXNcIiBdLCBbIFwiUmlja3lcIiwgXCJCb2JieVwiIF1dIH07XHJcbiAqXHJcbiAqL1xyXG5cclxuLyoqXHJcbiAqIEEgRDMgYXhpcyBzcGVjaWZpY2F0aW9uLlxyXG4gKiBAdHlwZWRlZiB7T2JqZWN0fSBkM2F4aXNfc3BlY1xyXG4gKlxyXG4gKiBAcHJvcGVydHkge2Qzc2NhbGV9IFtzY2FsZT1kZXguY29uZmlnLnNjYWxlKHt0eXBlOidsaW5lYXInfSldIC0gVGhlIHNjYWxlIHRvIGJlIHVzZWQgZm9yIHRoaXMgYXhpcy5cclxuICogQHByb3BlcnR5IHtTdHJpbmd9IFtvcmllbnQ9Ym90dG9tXSAtIFRoZSBvcmllbnRhdGlvbiBvZiB0aGUgYXhpcy4gKGxlZnR8cmlnaHR8dG9wfGJvdHRvbSlcclxuICogQHByb3BlcnR5IHtTdHJpbmd9IFt0aWNrc10gLSBUaGUgbnVtYmVyIG9mIHRpY2tzIHRvIGdlbmVyYXRlIGZvciB0aGlzIGF4aXMuXHJcbiAqIEBwcm9wZXJ0eSB7QXJyYXl9IFt0aWNrVmFsdWVzXSAtIFN1cHBseSBzcGVjaWZpYyBwbGFjZXMgdG8gZHJhdyB0aGUgdGlja3MuXHJcbiAqIEBwcm9wZXJ0eSB7U3RyaW5nfSBbdGlja1NpemU9WzYsNl1dIC0gU2V0cyB0aGUgbGVuZ3RoIG9mIGJvdGggdGhlIGlubmVyIGFuZCBvdXRlciB0aWNrcy5cclxuICogQHByb3BlcnR5IHtTdHJpbmd9IFtpbm5lclRpY2tTaXplPWRdIC0gU2V0cyB0aGUgbGVuZ3RoIG9mIGlubmVyIHRpY2tzLlxyXG4gKiBAcHJvcGVydHkge1N0cmluZ30gW291dGVyVGlja1NpemU9Nl0gLSBTZXRzIHRoZSBsZW5ndGggb2Ygb3V0ZXIgdGlja3MuXHJcbiAqIEBwcm9wZXJ0eSB7U3RyaW5nfSBbdGlja1BhZGRpbmc9M10gLSBTZXRzIHRoZSB0aWNrIHBhZGRpbmcgaW4gcGl4ZWxzLlxyXG4gKiBAcHJvcGVydHkge1N0cmluZ30gW3RpY2tGb3JtYXRdIC0gU2V0cyB0aGUgZm9ybWF0IG9mIHRpY2sgbGFiZWxzLiBleDogZDMuZm9ybWF0KFwiLC4wZlwiKVxyXG4gKlxyXG4gKi9cclxuXHJcbi8qKlxyXG4gKlxyXG4gKiBBIEQzIHNjYWxlIHNwZWNpZmljYXRpb24uXHJcbiAqXHJcbiAqIEB0eXBlZGVmIHtPYmplY3R9IGQzc2NhbGVfc3BlY1xyXG4gKlxyXG4gKiBAcHJvcGVydHkge3N0cmluZ30gW3R5cGU9bGluZWFyXSAtIFRoZSB0eXBlIG9mIHNjYWxlIHRvIGNyZWF0ZS4gIFZhbGlkIHR5cGVzIGFyZVxyXG4gKiAobGluZWFyfHNxcnR8cG93fHRpbWV8bG9nfG9yZGluYWx8cXVhbnRpbGV8cXVhbnRpemV8aWRlbnRpdHkpXHJcbiAqIEBwcm9wZXJ0eSB7QXJyYXl9IFtkb21haW49WzAsIDEwMF1dIC0gVGhlIGRvbWFpbiBmb3IgdGhpcyBzY2FsZS5cclxuICogQHByb3BlcnR5IHtBcnJheX0gW3JhbmdlPVswLCA4MDBdXSAtIFRoZSByYW5nZSBmb3IgdGhpcyBzY2FsZS5cclxuICogQHByb3BlcnR5IHtBcnJheX0gW3JhbmdlUm91bmRdIC0gU2V0cyB0aGUgc2NhbGUncyBvdXRwdXQgcmFuZ2UgdG8gdGhlIHNwZWNpZmllZCBhcnJheSBvZiB2YWx1ZXMsIHdoaWxlIGFsc29cclxuICogc2V0dGluZyB0aGUgc2NhbGUncyBpbnRlcnBvbGF0b3IgdG8gZDMuaW50ZXJwb2xhdGVSb3VuZC5cclxuICogQHByb3BlcnR5IHtTdHJpbmd9IFtpbnRlcnBvbGF0ZV0gLSBXaGVuIHN1cHBsaWVkLCBzZXRzIHRoZSBzY2FsZSdzIG91dHB1dFxyXG4gKiBpbnRlcnBvbGF0b3IgdXNpbmcgdGhlIHNwZWNpZmllZCBmYWN0b3J5LlxyXG4gKiBAcHJvcGVydHkge1N0cmluZ30gW2NsYW1wXSAtIFNldCB0byB0cnVlIGluIG9yZGVyIHRvIGVuYWJsZSBjbGFtcGluZywgZmFsc2UgdG8gZGlzYWJsZVxyXG4gKiBpdC4gIEVuc3VyZXMgaW50ZXJwb2xhdGlvbi9leHRyYXBvbGF0aW9uIGRvZXMgbm90IGdlbmVyYXRlIHZhbHVlcyBvdXRzaWRlIG9mIHRoaXNcclxuICogc2NhbGUncyByYW5nZS5cclxuICogQHByb3BlcnR5IHtTdHJpbmd9IFtuaWNlXSAtIElmIHRydWUsIHdpbGwgZXh0ZW5kIHRoZSBzY2FsZSdzIGRvbWFpbiB0byBiZWdpbiBhbmRcclxuICogZW5kIG9uIG5pY2Ugcm91bmQgaW50ZWdlciB2YWx1ZXMuXHJcbiAqIEBwcm9wZXJ0eSB7c3RyaW5nfSBbdGlja0Zvcm1hdF0gLSBPbmx5IGFwcGxpZXMgdG8gdGltZSBzY2FsZXMuICBTZXQncyB0aGUgdGlja1xyXG4gKiBmb3JtYXQuXHJcbiAqXHJcbiAqL1xyXG5cclxuLyoqXHJcbiAqXHJcbiAqIEEgRDMgZm9udCBzcGVjaWZpY2F0aW9uLiAgTW9yZSBpbmZvcm1hdGlvbiBjYW4gYmUgZm91bmQgaW4gdGhlIHtAbGluayBodHRwOi8vd3d3LnczLm9yZy9UUi9TVkcvdGV4dC5odG1sfFczQyBTVkcgMS4xIFRleHQgU3BlY2lmaWNhdGlvbn0uXHJcbiAqXHJcbiAqIEB0eXBlZGVmIHtPYmplY3R9IGQzZm9udF9zcGVjXHJcbiAqXHJcbiAqIEBwcm9wZXJ0eSB7c3RyaW5nfSBbZGVjb3JhdGlvbj1ub25lXSAtIFRoaXMgcHJvcGVydHkgZGVzY3JpYmVzIGRlY29yYXRpb25zIHRoYXQgYXJlIGFkZGVkIHRvIHRoZSB0ZXh0IG9mIGFuIGVsZW1lbnQuXHJcbiAqIFZhbGlkIHZhbHVlczogKCBub25lIHwgdW5kZXJsaW5lIHwgb3ZlcmxpbmUgfCBsaW5lLXRocm91Z2ggfCBibGluayB8IGluaGVyaXQgKVxyXG4gKiBAcHJvcGVydHkge3N0cmluZ30gW2ZhbWlseT1zYW5zLXNlcmlmXSAtIFRoaXMgcHJvcGVydHkgaW5kaWNhdGVzIHdoaWNoIGZvbnQgZmFtaWx5IGlzIHRvIGJlIHVzZWQgdG8gcmVuZGVyIHRoZSB0ZXh0LlxyXG4gKiBAcHJvcGVydHkge3N0cmluZ30gW2xldHRlclNwYWNpbmc9bm9ybWFsXSAtXHJcbiAqIEBwcm9wZXJ0eSB7aW50ZWdlcn0gW3NpemU9MTRdIC0gVGhlIHNpemUgb2YgdGhlIGZvbnQuXHJcbiAqIEBwcm9wZXJ0eSB7c3RyaW5nfSBbc3R5bGU9bm9ybWFsXSAtIFRoaXMgcHJvcGVydHkgc3BlY2lmaWVzIHdoZXRoZXIgdGhlIHRleHQgaXMgdG8gYmUgcmVuZGVyZWQgdXNpbmcgYSBub3JtYWwsXHJcbiAqIGl0YWxpYyBvciBvYmxpcXVlIGZhY2UuIFZhbGlkIHZhbHVlcyBhcmU6ICggbm9ybWFsIHwgaXRhbGljIHwgb2JsaXF1ZSB8IGluaGVyaXQgKS5cclxuICogQHByb3BlcnR5IHtzdHJpbmd9IFt3ZWlnaHQ9bm9ybWFsXSAtIFRoaXMgcHJvcGVydHkgaW5kaWNhdGVzIHdoZXRoZXIgdGhlIHRleHQgaXMgdG8gYmUgcmVuZGVyZWQgdXNpbmcgdGhlIG5vcm1hbCBnbHlwaHNcclxuICogZm9yIGxvd2VyY2FzZSBjaGFyYWN0ZXJzIG9yIHVzaW5nIHNtYWxsLWNhcHMgZ2x5cGhzIGZvciBsb3dlcmNhc2UgY2hhcmFjdGVycy4gIFZhbGlkIHZhbHVlcyBmb3IgdGhpcyBmaWVsZCBhcmU6XHJcbiAqICggbm9ybWFsIHwgYm9sZCB8IGxpZ2h0ZXIgfCAxMDAgfCAyMDAgfCAzMDAgfCA0MDAgfCA1MDAgfCA2MDAgfCA3MDAgfCA4MDAgfCA5MDAgfCBpbmhlcml0KVxyXG4gKiBAcHJvcGVydHkge3N0cmluZ3xpbnRlZ2VyfSBbd29yZFNwYWNpbmc9bm9ybWFsXSAtIFNwZWNpZmllcyB0aGUgYW1vdW50IG9mIHNwYWNlIHRoYXQgaXMgdG8gYmUgYWRkZWQgYmV0d2VlbiB0ZXh0IGNoYXJhY3RlcnMuXHJcbiAqIFZhbGlkIHZhbHVlczogKCBhdXRvIHwgPGludGVnZXItbGVuZ3RoPiB8IGluaGVyaXQgKVxyXG4gKiBAcHJvcGVydHkge3N0cmluZ30gW3ZhcmlhbnQ9bm9ybWFsXSAtIGhpcyBwcm9wZXJ0eSBpbmRpY2F0ZXMgd2hldGhlciB0aGUgdGV4dCBpcyB0byBiZSByZW5kZXJlZCB1c2luZ1xyXG4gKiB0aGUgbm9ybWFsIGdseXBocyBmb3IgbG93ZXJjYXNlIGNoYXJhY3RlcnMgb3IgdXNpbmcgc21hbGwtY2FwcyBnbHlwaHMgZm9yIGxvd2VyY2FzZSBjaGFyYWN0ZXJzLlxyXG4gKiBWYWxpZCB2YWx1ZXM6ICggbm9ybWFsIHwgc21hbGwtY2FwcyB8IGluaGVyaXQgKVxyXG4gKlxyXG4gKi9cclxuXHJcbi8qKlxyXG4gKlxyXG4gKiBBIEQzIHN0cm9rZSBzcGVjaWZpY2F0aW9uLlxyXG4gKlxyXG4gKiBAdHlwZWRlZiB7T2JqZWN0fSBkM3N0cm9rZV9zcGVjXHJcbiAqXHJcbiAqIEBwcm9wZXJ0eSB7ZmxvYXR9IFt3aWR0aD0xXSAtIFRoZSB3aWR0aCAoaW4gcGl4ZWxzKSBvZiB0aGlzIHN0cm9rZS5cclxuICogQHByb3BlcnR5IHtzdHJpbmd9IFtjb2xvcj1ibGFja10gLSBUaGUgY29sb3Igb2YgdGhpcyBzdHJva2UuXHJcbiAqIEBwcm9wZXJ0eSB7ZmxvYXR9IFtvcGFjaXR5PTFdIC0gVGhlIG9wYWNpdHkgb2YgdGhpcyBzdHJva2UgaW4gdGhlIHJhbmdlIG9mXHJcbiAqIHdoZXJlIDAgaXMgaW52aXNpYmxlIGFuZCAxIHJlcHJlc2VudHMgMTAwJSBvcGFxdWUgc3Ryb2tlLiBbMCwgMV1cclxuICogQHByb3BlcnR5IHtzdHJpbmd9IFtkYXNoYXJyYXldIC0gVXNlZCB0byBkcmF3IGRhc2hlZCBsaW5lcy4gIEV4OiBcIjEgMVwiIHdpbGwgZHJhd1xyXG4gKiBhIGRhc2hlZCBsaW5lIHdoaWNoIGNvbnNpc3RzIG9mIHNpbmdsZSBwaXhlbCBkYXNoZXMgc2VwYXJhdGVkIGJ5IDEgZW1wdHkgcGl4ZWwuXHJcbiAqIEBwcm9wZXJ0eSB7c3RyaW5nfSBbdHJhbnNmb3JtXSAtIEEgdHJhbnNmb3JtIHRvIGJlIGFwcGxpZWQgdG8gdGhlIHN0cm9rZS5cclxuICpcclxuICovXHJcblxyXG4vKipcclxuICpcclxuICogQSBEMyB0ZXh0IHNwZWNpZmljYXRpb24uXHJcbiAqXHJcbiAqIEB0eXBlZGVmIHtPYmplY3R9IGQzdGV4dF9zcGVjXHJcbiAqXHJcbiAqIEBwcm9wZXJ0eSB7ZDNmb250X3NwZWN9IFtmb250XSAtIFRoZSBkMyBmb250IHNwZWNpZmljYXRpb24gZm9yIHRoaXMgc3Ryb2tlLlxyXG4gKiBAcHJvcGVydHkge2ludGVnZXJ9IFt4PTBdIC0gVGhlIHggY29vcmRpbmF0ZSBmb3IgdGhlIGZpcnN0IGNoYXJhY3RlciBvZiB0aGlzIHRleHQuXHJcbiAqIEBwcm9wZXJ0eSB7aW50ZWdlcn0gW3k9MF0gLSBUaGUgeSBjb29yZGluYXRlIGZvciB0aGUgZmlyc3QgY2hhcmFjdGVyIG9mIHRoaXMgdGV4dC5cclxuICogQHByb3BlcnR5IHtpbnRlZ2VyfSBbdGV4dExlbmd0aF0gLSBUaGUgYXV0aG9yJ3MgZXN0aW1hdGlvbiBvZiB0aGUgbGVuZ3RoIG9mIHRoaXMgdGV4dC5cclxuICogVGhlIHN5c3RlbSB3aWxsIHVzZSB0aGlzIGFzIGEgcHJlZmVyZW5jZSBhbmQgYXR0ZW1wdCB0byBzaXplIHRoZSB0ZXh0IHRvIHRoaXMgbGVuZ3RoLlxyXG4gKiBAcHJvcGVydHkge2ludGVnZXJ9IFtsZW5ndGhBZGp1c3RdIC0gSW5kaWNhdGVzIHRoZSB0eXBlIG9mIGFkanVzdG1lbnRzIHdoaWNoIHRoZSB1c2VyXHJcbiAqIGFnZW50IHNoYWxsIG1ha2UgdG8gbWFrZSB0aGUgcmVuZGVyZWQgbGVuZ3RoIG9mIHRoZSB0ZXh0IG1hdGNoIHRoZSB2YWx1ZSBzcGVjaWZpZWQgb25cclxuICogdGhlIHRleHRMZW5ndGggYXR0cmlidXRlLiAgVmFsaWQgdmFsdWVzOiAoIHNwYWNpbmcgfCBzcGFjaW5nQW5kR2x5cGhzIClcclxuICogQHByb3BlcnR5IHtzdHJpbmd9IFt0cmFuc2Zvcm1dIC0gQW55IGV4dHJhIHRyYW5zZm9ybWF0aW9ucyB0byBiZSBhcHBsaWVkIHRvIHRoaXNcclxuICogdGV4dC5cclxuICogQHByb3BlcnR5IHtzdHJpbmd9IFtnbHlwaE9yaWVudGF0aW9uVmVydGljYWxdIC0gQWxsb3dzIHRoZSB1c2VyIHRvIGNvbnRyb2wgdGhlXHJcbiAqIG9yaWVudGF0aW9uIG9mIHRleHQuICBWYWxpZCB2YWx1ZXM6ICggYXV0byB8IDxhbmdsZT4gfCBpbmhlcml0ICkuICBBbmdsZSBtYXkgYmUgZXhwcmVzc2VkXHJcbiAqIGluIGRlZ3JlZXMsIHJhZGlhbnMsIG9yIGFzIGEgZ3JhZGllbnQuXHJcbiAqIEBwcm9wZXJ0eSB7c3RyaW5nfSBbdGV4dF0gLSBUaGUgdGV4dCB3ZSBhcmUgcmVwcmVzZW50aW5nLlxyXG4gKiBAcHJvcGVydHkge2ludGVnZXJ9IFtkeD0wXSAtIEFuIHgtYXhpcyBvZmZzZXQgdG8gYmUgYXBwbGllZCB0byB0aGlzIHRleHQuXHJcbiAqIEBwcm9wZXJ0eSB7aW50ZWdlcn0gW2R5PTBdIC0gQSB5LWF4aXMgb2Zmc2V0IHRvIGJlIGFwcGxpZWQgdG8gdGhpcyB0ZXh0LlxyXG4gKiBAcHJvcGVydHkge3N0cmluZ30gW3dyaXRpbmdNb2RlXSAtIFNwZWNpZmllcyB3aGV0aGVyIHRleHQgZmxvd3MgbGVmdCB0byByaWdodCxcclxuICogcmlnaHQgdG8gbGVmdCwgdG9wIHRvIGJvdHRvbSBvciBib3R0b20gdG8gdG9wLiAgVmFsaWQgdmFsdWVzOiAoIGxyLXRiLCBybC10YiwgdGItcmwsXHJcbiAqIGxyLCBybCwgdGIsIGluaGVyaXQgKVxyXG4gKiBAcHJvcGVydHkge3N0cmluZ30gW2FuY2hvcj1zdGFydF0gLSBTcGVjaWZpZXMgd2hlcmUgdGhpcyB0ZXh0IHNob3VsZCBiZSBhbmNob3JlZCB0by5cclxuICogVmFsaWQgdmFsdWVzOiAoIHN0YXJ0IHwgbWlkZGxlIHwgZW5kIClcclxuICogQHByb3BlcnR5IHtkM2ZpbGxfc3BlY30gW2ZpbGxdIC0gVGhlIGZpbGwgdG8gYmUgYXBwbGllZCB0byB0aGlzIHRleHQuXHJcbiAqIEBwcm9wZXJ0eSB7c3RyaW5nfSBbZm9ybWF0XSAtIEEgZDMgZm9ybWF0IHRvIGJlIGFwcGxpZWQgdG8gdGhlIHRleHQuXHJcbiAqXHJcbiAqL1xyXG5cclxuLyoqXHJcbiAqXHJcbiAqIEEgRDMgcmVjdGFuZ2xlIHNwZWNpZmljYXRpb24uXHJcbiAqXHJcbiAqIEB0eXBlZGVmIHtPYmplY3R9IGQzcmVjdF9zcGVjXHJcbiAqXHJcbiAqIEBwcm9wZXJ0eSB7bnVtYmVyfSBbd2lkdGg9NTBdIC0gVGhlIHdpZHRoIG9mIHRoaXMgcmVjdGFuZ2xlLlxyXG4gKiBAcHJvcGVydHkge251bWJlcn0gW2hlaWdodD01MF0gLSBUaGUgaGVpZ2h0IG9mIHRoaXMgcmVjdGFuZ2xlLlxyXG4gKiBAcHJvcGVydHkge251bWJlcn0gW3g9MF0gLSBUaGUgeCBjb29yZGluYXRlIG9mIHRoZSB0b3AgbGVmdCBjb3JuZXIgb2YgdGhpcyByZWN0YW5nbGUuXHJcbiAqIEBwcm9wZXJ0eSB7bnVtYmVyfSBbeT0wXSAtIFRoZSB5IGNvb3JkaW5hdGUgb2YgdGhlIHRvcCBsZWZ0IGNvcm5lciBvZiB0aGlzIHJlY3RhbmdsZS5cclxuICogQHByb3BlcnR5IHtudW1iZXJ9IFtyeD0wXSAtIEZvciByb3VuZGVkIHJlY3RhbmdsZXMsIHRoZSB4LWF4aXMgcmFkaXVzIG9mIHRoZSBlbGxpcHNlXHJcbiAqIHVzZWQgdG8gcm91bmQgb2ZmIHRoZSBjb3JuZXJzIG9mIHRoZSByZWN0YW5nbGUuXHJcbiAqIEBwcm9wZXJ0eSB7bnVtYmVyfSBbcnk9MF0gLSBGb3Igcm91bmRlZCByZWN0YW5nbGVzLCB0aGUgeS1heGlzIHJhZGl1cyBvZiB0aGUgZWxsaXBzZVxyXG4gKiB1c2VkIHRvIHJvdW5kIG9mZiB0aGUgY29ybmVycyBvZiB0aGUgcmVjdGFuZ2xlLlxyXG4gKiBAcHJvcGVydHkge2Qzc3Ryb2tlX3NwZWN9IFtzdHJva2VdIC0gVGhlIHN0cm9rZSB3aGljaCB3aWxsIGJlIHVzZWQgdG8gZHJhdyB0aGUgcmVjdGFuZ2xlLlxyXG4gKiBAcHJvcGVydHkge251bWJlcn0gW29wYWNpdHk9MV0gLSBUaGUgb3BhY2l0eSBmb3IgdGhpcyByZWN0YW5nbGUgZXhwcmVzc2VkIGFzIGEgZmxvYXRpbmdcclxuICogcG9pbnQgbnVtYmVyIGluIHRoZSByYW5nZSBvZiBbIDAuMCwgMS4wIF0gd2hlcmUgMCBpcyB0cmFuc3BhcmVudCwgMSBpcyBvcGFxdWUsIGFuZCBhbGxcclxuICogb3RoZXJzIGFyZSBzb21ld2hlcmUgaW4gYmV0d2VlbiBmdWxseSB0cmFuc3BhcmVudCBhbmQgZnVsbHkgb3BhcXVlLlxyXG4gKiBAcHJvcGVydHkge2QzY29sb3JzY2FsZX0gW2NvbG9yPWQzLnNjYWxlLmNhdGVnb3J5MjAoKV0gLSBUaGUgY29sb3Igc2NhbGUgd2hpY2ggd2Ugd2lsbFxyXG4gKiB0byBjb2xvciB0aGlzIHJlY3RhbmdsZS5cclxuICogQHByb3BlcnR5IHtzdHJpbmd9IFt0cmFuc2Zvcm1dIC0gQSB0cmFuc2Zvcm0sIGlmIGFueSwgdG8gYmUgYXBwbGllZCB0byB0aGlzIHJlY3RhbmdsZS5cclxuICogQHByb3BlcnR5IHtldmVudHNfc3BlY30gW2V2ZW50c10gLSBBbnkgZXZlbnRzIHdoaWNoIHdlIHdpc2ggdG8gcmVzcG9uZCB0by5cclxuICpcclxuICovXHJcblxyXG4vKipcclxuICpcclxuICogQW4gZXZlbnRzIHNwZWNpZmljYXRpb24uICBNYW55IGV2ZW50cyBhcmUgc3VwcG9ydGVkLCB0aGUgb25lcyBsaXN0ZWQgaGVyZSBhcmUgYSBzdWJzZXRcclxuICogb2YgYWxsIG9mIHRoZSBwb3NzaWJsZSBldmVudHMuICBGb3IgYSBjb21wbGV0ZSBsaXN0LCByZWZlciB0byBNb3ppbGxhJ3MgZGV2ZWxvcGVyIGRvY3VtZW50YXRpb25cclxuICogY29uY2VybmluZyB7QGxpbmsgaHR0cHM6Ly9kZXZlbG9wZXIubW96aWxsYS5vcmcvZW4tVVMvZG9jcy9XZWIvRXZlbnRzI1N0YW5kYXJkX2V2ZW50c3xzdGFuZGFyZCBldmVudHN9LlxyXG4gKlxyXG4gKiBAdHlwZWRlZiB7T2JqZWN0fSBkZXhldmVudHNfc3BlY1xyXG4gKlxyXG4gKiBAcHJvcGVydHkge3N0cmluZ30gW21vdXNlZG93bl0gLSBIYW5kbGVzIGV2ZW50cyBnZW5lcmF0ZWQgd2hlbiBhIHBvaW50aW5nIGRldmljZSBidXR0b24gKHVzdWFsbHkgYSBtb3VzZSlcclxuICogaXMgcHJlc3NlZCBvbiBhbiBlbGVtZW50LlxyXG4gKiBAcHJvcGVydHkge3N0cmluZ30gW21vdXNlZW50ZXJdIC0gSGFuZGxlcyBtb3VzZW92ZXIgZXZlbnRzIGdlbmVyYXRlZCB3aGVuIGEgcG9pbnRpbmcgZGV2aWNlIGlzIG1vdmVkIG9udG9cclxuICogdGhlIGVsZW1lbnQgdGhhdCBoYXMgdGhlIGxpc3RlbmVyIGF0dGFjaGVkLlxyXG4gKiBAcHJvcGVydHkge3N0cmluZ30gW21vdXNlbGVhdmVdIC0gSGFuZGxlcyBtb3VzZW92ZXIgZXZlbnRzIGdlbmVyYXRlZCB3aGVuIGEgcG9pbnRpbmcgZGV2aWNlIGlzIG1vdmVkIG9mZlxyXG4gKiB0aGUgZWxlbWVudCB0aGF0IGhhcyB0aGUgbGlzdGVuZXIgYXR0YWNoZWQuXHJcbiAqIEBwcm9wZXJ0eSB7c3RyaW5nfSBbbW91c2Vtb3ZlXSAtIEhhbmRsZXMgbW91c2VvdmVyIGV2ZW50cyBnZW5lcmF0ZWQgd2hlbiBhIHBvaW50aW5nIGRldmljZSBpcyBtb3ZlZCBvdmVyXHJcbiAqIGFuIGVsZW1lbnQuXHJcbiAqIEBwcm9wZXJ0eSB7c3RyaW5nfSBbbW91c2VvdXRdIC0gSGFuZGxlcyBtb3VzZW92ZXIgZXZlbnRzIGdlbmVyYXRlZCB3aGVuIGEgcG9pbnRpbmcgZGV2aWNlIGlzIG1vdmVkIG9mZlxyXG4gKiB0aGUgZWxlbWVudCB0aGF0IGhhcyB0aGUgbGlzdGVuZXIgYXR0YWNoZWQgb3Igb2ZmIG9uZSBvZiBpdHMgY2hpbGRyZW4uXHJcbiAqIEBwcm9wZXJ0eSB7c3RyaW5nfSBbbW91c2VvdmVyXSAtIEhhbmRsZXMgbW91c2VvdmVyIGV2ZW50cyBnZW5lcmF0ZWQgd2hlbiBhIHBvaW50aW5nIGRldmljZSBpcyBtb3ZlZFxyXG4gKiBvbnRvIHRoZSBlbGVtZW50IHRoYXQgaGFzIHRoZSBsaXN0ZW5lciBhdHRhY2hlZCBvciBvbnRvIG9uZSBvZiBpdHMgY2hpbGRyZW4uXHJcbiAqIEBwcm9wZXJ0eSB7c3RyaW5nfSBbbW91c2V1cF0gLSBIYW5kbGVzIG1vdXNlb3ZlciBldmVudHMgZ2VuZXJhdGVkIHdoZW4gYSBwb2ludGluZyBkZXZpY2UgYnV0dG9uIGlzXHJcbiAqIHJlbGVhc2VkIG92ZXIgYW4gZWxlbWVudC5cclxuICogQHByb3BlcnR5IHtzdHJpbmd9IFtkYmxjbGlja10gLSBIYW5kbGVzIG1vdXNlb3ZlciBldmVudHMgZ2VuZXJhdGVkIHdoZW4gYSBwb2ludGluZyBkZXZpY2UgaXMgcXVpY2tseVxyXG4gKiBjbGlja2VkIHR3aWNlIG9uIGFuIGVsZW1lbnQuXHJcbiAqIEBwcm9wZXJ0eSB7c3RyaW5nfSBbd2hlZWxdIC0gVGhlIG1vdXNlIHdoZWVsIG9mIGEgcG9pbnRpbmcgZGV2aWNlIGhhcyBiZWVuIHJvdGF0ZWQgaW4gYW55IGRpcmVjdGlvbi5cclxuICogQHByb3BlcnR5IHtzdHJpbmd9IFtrZXlkb3duXSAtIEhhbmRsZXMgbW91c2VvdmVyIGV2ZW50cyBnZW5lcmF0ZWQgd2hlbiBhIGtleSBpcyBwcmVzc2VkIGRvd24uXHJcbiAqIEBwcm9wZXJ0eSB7c3RyaW5nfSBba2V5cHJlc3NdIC0gSGFuZGxlcyBtb3VzZW92ZXIgZXZlbnRzIGdlbmVyYXRlZCB3aGVuIGEga2V5IGlzIHByZXNzZWQgZG93blxyXG4gKiBhbmQgdGhhdCBrZXkgbm9ybWFsbHkgcHJvZHVjZXMgYSBjaGFyYWN0ZXIgdmFsdWUuXHJcbiAqIEBwcm9wZXJ0eSB7c3RyaW5nfSBba2V5dXBdIC0gSGFuZGxlcyBtb3VzZW92ZXIgZXZlbnRzIGdlbmVyYXRlZCB3aGVuIGEga2V5IGlzIHJlbGVhc2VkLlxyXG4gKiBAcHJvcGVydHkge3N0cmluZ30gW21lc3NhZ2VdIC0gQSBtZXNzYWdlIGlzIHJlY2VpdmVkIGZyb20gc29tZXRoaW5nLiAgaWU6IFdlYlNvY2tldCwgV2ViIFdvcmtlcixcclxuICogaWZyYW1lLCBwYXJlbnQgd2luZG93IG9yIG90aGVyIGV2ZW50IHNvdXJjZS5cclxuICogQHByb3BlcnR5IHtzdHJpbmd9IFtkcmFnXSAtIEhhbmRsZXMgbW91c2VvdmVyIGV2ZW50cyBnZW5lcmF0ZWQgd2hlbiBhbiBlbGVtZW50IG9yIHRleHQgc2VsZWN0aW9uXHJcbiAqIGlzIGJlaW5nIGRyYWdnZWQgKGV2ZXJ5IDM1MG1zKS5cclxuICogQHByb3BlcnR5IHtzdHJpbmd9IFtkcmFnZW5kXSAtIEhhbmRsZXMgbW91c2VvdmVyIGV2ZW50cyBnZW5lcmF0ZWQgd2hlbiBhIGRyYWcgb3BlcmF0aW9uIGlzIGJlaW5nXHJcbiAqIGVuZGVkIChieSByZWxlYXNpbmcgYSBtb3VzZSBidXR0b24gb3IgaGl0dGluZyB0aGUgZXNjYXBlIGtleSkuXHJcbiAqIEBwcm9wZXJ0eSB7c3RyaW5nfSBbZHJhZ2VudGVyXSAtIEhhbmRsZXMgbW91c2VvdmVyIGV2ZW50cyBnZW5lcmF0ZWQgd2hlbiBhIGRyYWdnZWQgZWxlbWVudCBvclxyXG4gKiB0ZXh0IHNlbGVjdGlvbiBlbnRlcnMgYSB2YWxpZCBkcm9wIHRhcmdldC5cclxuICogQHByb3BlcnR5IHtzdHJpbmd9IFtkcmFnbGVhdmVdIC0gSGFuZGxlcyBtb3VzZW92ZXIgZXZlbnRzIGdlbmVyYXRlZCB3aGVuIGEgZHJhZ2dlZCBlbGVtZW50IG9yXHJcbiAqIHRleHQgc2VsZWN0aW9uIGxlYXZlcyBhIHZhbGlkIGRyb3AgdGFyZ2V0LlxyXG4gKiBAcHJvcGVydHkge3N0cmluZ30gW2RyYWdvdmVyXSAtIEhhbmRsZXMgbW91c2VvdmVyIGV2ZW50cyBnZW5lcmF0ZWQgd2hlbiBhbiBuIGVsZW1lbnQgb3IgdGV4dFxyXG4gKiBzZWxlY3Rpb24gaXMgYmVpbmcgZHJhZ2dlZCBvdmVyIGEgdmFsaWQgZHJvcCB0YXJnZXQgKGV2ZXJ5IDM1MG1zKS5cclxuICogQHByb3BlcnR5IHtzdHJpbmd9IFtkcmFnc3RhcnRdIC0gSGFuZGxlcyBtb3VzZW92ZXIgZXZlbnRzIGdlbmVyYXRlZCB3aGVuIHRoZSB1c2VyIHN0YXJ0c1xyXG4gKiBkcmFnZ2luZyBhbiBlbGVtZW50IG9yIHRleHQgc2VsZWN0aW9uLlxyXG4gKiBAcHJvcGVydHkge3N0cmluZ30gW2Ryb3BdIC0gSGFuZGxlcyBtb3VzZW92ZXIgZXZlbnRzIGdlbmVyYXRlZCB3aGVuIGFuIGVsZW1lbnQgaXMgZHJvcHBlZFxyXG4gKiBvbiBhIHZhbGlkIGRyb3AgdGFyZ2V0LlxyXG4gKlxyXG4gKiBAcHJvcGVydHkge3N0cmluZ30gW3RvdWNoY2FuY2VsXSAtIEhhbmRsZXMgbW91c2VvdmVyIGV2ZW50cyBnZW5lcmF0ZWQgd2hlbiBhIHRvdWNoIHBvaW50XHJcbiAqIGhhcyBiZWVuIGRpc3J1cHRlZCBpbiBhbiBpbXBsZW1lbnRhdGlvbi1zcGVjaWZpYyBtYW5uZXJzICh0b28gbWFueSB0b3VjaCBwb2ludHMgZm9yIGV4YW1wbGUpLlxyXG4gKiBAcHJvcGVydHkge3N0cmluZ30gW3RvdWNoZW5kXSAtIEhhbmRsZXMgbW91c2VvdmVyIGV2ZW50cyBnZW5lcmF0ZWQgd2hlbiBhIHRvdWNoIHBvaW50IGlzXHJcbiAqIHJlbW92ZWQgZnJvbSB0aGUgdG91Y2ggc3VyZmFjZS5cclxuICogQHByb3BlcnR5IHtzdHJpbmd9IFt0b3VjaGVudGVyXSAtIEhhbmRsZXMgbW91c2VvdmVyIGV2ZW50cyBnZW5lcmF0ZWQgd2hlbiBhIHRvdWNoIHBvaW50XHJcbiAqIGlzIG1vdmVkIG9udG8gdGhlIGludGVyYWN0aXZlIGFyZWEgb2YgYW4gZWxlbWVudC5cclxuICogQHByb3BlcnR5IHtzdHJpbmd9IFt0b3VjaGxlYXZlXSAtIEhhbmRsZXMgbW91c2VvdmVyIGV2ZW50cyBnZW5lcmF0ZWQgd2hlbiBhIHRvdWNoIHBvaW50XHJcbiAqIGlzIG1vdmVkIG9mZiB0aGUgaW50ZXJhY3RpdmUgYXJlYSBvZiBhbiBlbGVtZW50LlxyXG4gKiBAcHJvcGVydHkge3N0cmluZ30gW3RvdWNobW92ZV0gLSBIYW5kbGVzIG1vdXNlb3ZlciBldmVudHMgZ2VuZXJhdGVkIHdoZW4gYSB0b3VjaCBwb2ludFxyXG4gKiBpcyBtb3ZlZCBhbG9uZyB0aGUgdG91Y2ggc3VyZmFjZS5cclxuICogQHByb3BlcnR5IHtzdHJpbmd9IFt0b3VjaHN0YXJ0XSAtIEhhbmRsZXMgbW91c2VvdmVyIGV2ZW50cyBnZW5lcmF0ZWQgd2hlbiBhIHRvdWNoIHBvaW50XHJcbiAqIGlzIHBsYWNlZCBvbiB0aGUgdG91Y2ggc3VyZmFjZS5cclxuICpcclxuICovXHJcblxyXG5cclxuLyoqXHJcbiAqXHJcbiAqIEEgRDMgbGluZSBzcGVjaWZpY2F0aW9uLlxyXG4gKlxyXG4gKiBAdHlwZWRlZiB7T2JqZWN0fSBkM2xpbmVfc3BlY1xyXG4gKlxyXG4gKiBAcHJvcGVydHkge2QzcG9pbnRfc3BlY30gW3N0YXJ0XSAtIFRoZSBzdGFydGluZyBwb2ludCBmb3IgdGhpcyBsaW5lLlxyXG4gKiBAcHJvcGVydHkge2QzX3BvaW50X3NwZWN9IFtlbmRdIC0gVGhlIGVuZGluZyBwb2ludCBmb3IgdGhpcyBsaW5lLlxyXG4gKiBAcHJvcGVydHkge2Qzc3Ryb2tlX3NwZWN9IFtzdHJva2NdIC0gVGhlIHN0cm9rZSB0byBiZSB1c2VkIHdoZW4gZHJhd2luZyB0aGlzIGxpbmUuXHJcbiAqXHJcbiAqL1xyXG5cclxuLyoqXHJcbiAqXHJcbiAqIEEgRDMgcG9pbnQgc3BlY2lmaWNhdGlvbi5cclxuICpcclxuICogQHR5cGVkZWYge09iamVjdH0gZDNwb2ludF9zcGVjXHJcbiAqXHJcbiAqIEBwcm9wZXJ0eSB7bnVtYmVyfSBbeF0gLSBUaGUgc3RhcnRpbmcgcG9pbnQgZm9yIHRoaXMgbGluZS5cclxuICogQHByb3BlcnR5IHtudW1iZXJ9IFt5XSAtIFRoZSBlbmRpbmcgcG9pbnQgZm9yIHRoaXMgbGluZS5cclxuICpcclxuICovXHJcblxyXG4vKipcclxuICpcclxuICogQSBEMyBjaXJjbGUgc3BlY2lmaWNhdGlvbi5cclxuICpcclxuICogQHR5cGVkZWYge09iamVjdH0gZDNwb2ludF9zcGVjXHJcbiAqXHJcbiAqIEBwcm9wZXJ0eSB7bnVtYmVyfSBbY3hdIC0gVGhlIHgtY29vcmRpbmF0ZSBvZiB0aGUgY2VudGVyIHBvaW50IG9mIHRoaXMgY2lyY2xlLlxyXG4gKiBAcHJvcGVydHkge251bWJlcn0gW2N5XSAtIFRoZSB5LWNvb3JkaW5hdGUgb2YgdGhlIGNlbnRlciBwb2ludCBvZiB0aGlzIGNpcmNsZS5cclxuICogQHByb3BlcnR5IHtudW1iZXJ9IFtyXSAtIFRoZSByYWRpdXMgb2YgdGhlIGNpcmNsZS5cclxuICogQHByb3BlcnR5IHtkM2ZpbGxfc3BlY30gW2ZpbGxdIC0gVGhlIGNpcmNsZSdzIGZpbGwuXHJcbiAqIEBwcm9wZXJ0eSB7ZDNzdHJva2Vfc3BlY30gW3N0cm9rZV0gLSBUaGUgY2lyY2xlJ3Mgc3Ryb2tlLlxyXG4gKiBAcHJvcGVydHkge3N0cmluZ30gW3RyYW5zZm9ybV0gLSBBIHRyYW5zZm9ybSwgaWYgYW55LCB0byBiZSBhcHBsaWVkIHRvIHRoaXMgY2lyY2xlLlxyXG4gKiBAcHJvcGVydHkge3N0cmluZ30gW3RpdGxlXSAtIFRoZSB0aXRsZSBvZiB0aGUgY2lyY2xlLlxyXG4gKiBAcHJvcGVydHkge2QzZXZlbnRzX3NwZWN9IFtldmVudHNdIC0gQW55IGV2ZW50cyB0byBiZSBhc3NvY2lhdGVkIHdpdGggdGhpcyBjaXJjbGUuXHJcbiAqXHJcbiAqL1xyXG5cclxuLyoqXHJcbiAqXHJcbiAqIEEgRDMgdGljayBzcGVjaWZpY2F0aW9uLlxyXG4gKlxyXG4gKiBAdHlwZWRlZiB7T2JqZWN0fSBkM3RpY2tfc3BlY1xyXG4gKlxyXG4gKiBAcHJvcGVydHkge251bWJlcn0gW2NvdW50XSAtIFRoZSBudW1iZXIgb2YgdGlja3MgdG8gZHJhLlxyXG4gKiBAcHJvcGVydHkge29iamVjdH0gW3NpemVdIC0gVGhlIHNpemUgb2YgdGhlIHRpY2suXHJcbiAqIEBwcm9wZXJ0eSB7bnVtYmVyfSBbc2l6ZS5tYWpvcl0gLSBUaGUgbGVuZ3RoIG9mIHRoZSBtYWpvciB0aWNrcy5cclxuICogQHByb3BlcnR5IHtudW1iZXJ9IFtzaXplLm1pbm9yXSAtIFRoZSBsZW5ndGggb2YgdGhlIG1pbm9yIHRpY2tzLlxyXG4gKiBAcHJvcGVydHkge251bWJlcn0gW3NpemUuZW5kXSAtIFRoZSBsZW5ndGggb2YgdGhlIHRpY2tzIGF0IHRoZSBlbmRzIG9mIHRoZSBheGlzLlxyXG4gKiBAcHJvcGVydHkge251bWJlcn0gW3BhZGRpbmddIC0gVGhlIHBhZGRpbmcgZm9yIHRpY2tzLlxyXG4gKiBAcHJvcGVydHkge3N0cmluZ30gW2Zvcm1hdF0gLSBUaGUgZm9ybWF0IHRvIGJlIGFwcGxpZWQgdG8gZWFjaCB0aWNrIGxhYmVsLlxyXG4gKiBAcHJvcGVydHkge2QzdGV4dF9zcGVjfSBbbGFiZWxdIC0gVGhlIHNwZWNpZmljYXRpb24gZm9yIHRoZSBhcHBlYXJhbmNlIG9mIHRpY2tcclxuICogbGFiZWxzLlxyXG4gKlxyXG4gKi9cclxuXHJcbi8qKlxyXG4gKlxyXG4gKiBBIEQzIHBhdGggc3BlY2lmaWNhdGlvbi5cclxuICpcclxuICogQHR5cGVkZWYge09iamVjdH0gZDNwYXRoX3NwZWNcclxuICpcclxuICogQHByb3BlcnR5IHtkM2ZpbGxfc3BlY30gW2ZpbGxdIC0gVGhlIGZpbGwgdG8gYXBwbHkgd2hlbiBkcmF3aW5nIHRoaXMgcGF0aC5cclxuICogQHByb3BlcnR5IHtkM3N0cm9rZV9zcGVjfSBbc3Ryb2tlXSAtIFRoZSBzdHJva2UgdG8gdXNlIHdoZW4gZHJhd2luZyB0aGlzIHBhdGguXHJcbiAqXHJcbiAqL1xyXG5cclxuLyoqXHJcbiAqXHJcbiAqIEEgRDMgZmlsbCBzcGVjaWZpY2F0aW9uLlxyXG4gKiBAdHlwZWRlZiB7T2JqZWN0fSBkM2ZpbGxfc3BlY1xyXG4gKlxyXG4gKiBAcHJvcGVydHkge3N0cmluZ30gW2ZpbGxDb2xvcj1ncmV5XSAtIFRoZSBjb2xvciBvZiB0aGlzIGZpbGwuXHJcbiAqIEBwcm9wZXJ0eSB7ZmxvYXR9IFtvcGFjaXR5PTFdIC0gVGhlIG9wYWNpdHkgb2YgdGhpcyBmaWxsIGluIHRoZSByYW5nZSBvZlxyXG4gKiB3aGVyZSAwIGlzIGludmlzaWJsZSBhbmQgMSByZXByZXNlbnRzIDEwMCUgb3BhcXVlIGZpbGwuIFswLCAxXVxyXG4gKlxyXG4gKi9cclxuXHJcbi8qKlxyXG4gKlxyXG4gKiBBIEQzIGxpbmsgc3BlY2lmaWNhdGlvbi5cclxuICogQHR5cGVkZWYge09iamVjdH0gZDNsaW5rX3NwZWNcclxuICpcclxuICogQHByb3BlcnR5IHtkM2ZpbGx9IFtmaWxsXSAtIFRoZSBmaWxsIHRvIGJlIHVzZWQgZm9yIHRoaXMgbGluay5cclxuICogQHByb3BlcnR5IHtkM3N0cm9rZX0gW3N0cm9rZV0gLSBUaGUgc3Ryb2tlIHRvIGJlIHVzZWQgZm9yIHRoaXMgbGluay5cclxuICogQHByb3BlcnR5IHtzdHJpbmd9IFt0cmFuc2Zvcm1dIC0gVGhlIHRyYW5zZm9ybSB0byBhcHBseSB0byB0aGlzIGxpbmsuXHJcbiAqIEBwcm9wZXJ0eSB7b2JqZWN0fSBkIC0gVGhlIGRhdGEgdG8gYXNzb2NpYXRlIHdpdGggdGhpcyBsaW5rLlxyXG4gKiBAcHJvcGVydHkge2QzZXZlbnRzfSBbZXZlbnRzXSAtIFRoZSBldmVudHMgdG8gYXNzb2NpYXRlIHdpdGggdGhpcyBsaW5rLlxyXG4gKlxyXG4gKi9cclxuXHJcbi8qKlxyXG4gKlxyXG4gKiBUaGlzIGlzIHRoZSBiYXNlIGNvbnN0cnVjdG9yIGZvciBhbGwgZGV4IGNvbXBvbmVudHMuICBJdCBwcm92aWRlcyBzb21lIG9mIHRoZSBjb21tb25cclxuICogZnVuY3Rpb25hbGl0eSBzdWNoIGFzIGF0dHJpYnV0ZSBnZXR0ZXJzL3NldHRlcnMsIGFiaWxpdHkgdG8gcHVibGlzaCBhbmQgc3Vic2NyaWJlXHJcbiAqIGV2ZW50cyBhcyB3ZWxsIGFzIHRoZSBhYmlsaXR5IGZvciB0aGUgdXNlciB0byBwcm92aWRlIGN1c3RvbWl6ZWQgc2V0dGluZ3MgZm9yIGFueVxyXG4gKiBjb21wb25lbnQgY29uZmlndXJhdGlvbiB2YWx1ZS5cclxuICpcclxuICogQGNvbnN0cnVjdG9yXHJcbiAqIEBjbGFzc2Rlc2MgVGhpcyBpbnRlcmZhY2UgcHJvdmlkZXMgYSBjb250cmFjdCBmb3IgZGV4IGNvbXBvbmVudHMgdG8gaW1wbGVtZW50LlxyXG4gKlxyXG4gKiBAbmFtZSBkZXguY29tcG9uZW50XHJcbiAqXHJcbiAqIEBwYXJhbSB1c2VyQ29uZmlnIEEgbWFwIGNvbnRhaW5pbmcgdGhlIHZhcmlvdXMgb3B0aW9ucyB0aGUgdXNlciB3aXNoZXMgdG8gb3ZlcnJpZGUuXHJcbiAqIEBwYXJhbSBkZWZhdWx0Q29uZmlnIEEgbWFwIGNvbnRhaW5pbmcgdGhlIGRlZmF1bHQgY29uZmlndXJhdGlvbiBmb3IgdGhpcyBjb21wb25lbnQuXHJcbiAqXHJcbiAqL1xyXG5tb2R1bGUuZXhwb3J0cyA9IGZ1bmN0aW9uICh1c2VyQ29uZmlnLCBkZWZhdWx0Q29uZmlnKSB7XHJcbiAgdXNlckNvbmZpZyA9IHVzZXJDb25maWcgfHwge307XHJcbiAgZGVmYXVsdENvbmZpZyA9IGRlZmF1bHRDb25maWcgfHwge307XHJcblxyXG4gIHRoaXMuZGVidWcgPSBmYWxzZTtcclxuXHJcbiAgLy8gQWxsb3dzIGNvbXBvbmVudCBjb25zdHJ1Y3Rpb24gZnJvbSBvdGhlciBjb21wb25lbnRzLlxyXG4gIGlmICh1c2VyQ29uZmlnLmhhc093blByb3BlcnR5KCdjb25maWcnKSkge1xyXG4gICAgdGhpcy5jb25maWcgPSBkZXguY29uZmlnLmV4cGFuZEFuZE92ZXJsYXkodXNlckNvbmZpZy5jb25maWcsIGRlZmF1bHRDb25maWcpO1xyXG4gIH1cclxuICAvLyBFbHNlLCB3ZSBoYXZlIGEgY29uZmlndXJhdGlvbi5cclxuICBlbHNlIHtcclxuICAgIHRoaXMuY29uZmlnID0gZGV4LmNvbmZpZy5leHBhbmRBbmRPdmVybGF5KHVzZXJDb25maWcsIGRlZmF1bHRDb25maWcpO1xyXG4gIH1cclxuXHJcbiAgZGV4LmNvbnNvbGUubG9nKFwiZGV4LmNvbXBvbmVudCBDb25maWd1cmF0aW9uXCIsIHRoaXMuY29uZmlnKTtcclxuXHJcbiAgaWYgKCF0aGlzLmNvbmZpZy5jaGFubmVsKSB7XHJcbiAgICB0aGlzLmNvbmZpZy5jaGFubmVsID0gKHRoaXMuY29uZmlnLnBhcmVudCB8fCBcIiNwYXJlbnRcIikgKyBcIi9cIiArXHJcbiAgICAodGhpcy5jb25maWcuaWQgfHwgXCJ1bmtub3duLWlkXCIpO1xyXG4gIH1cclxuXHJcbiAgLyoqXHJcbiAgICogVGhpcyBtZXRob2QgcHJvdmlkZXMgZ2V0dGVyL3NldHRlciBhY2Nlc3MgZm9yIHRoZSBjb25maWd1cmF0aW9uIG9mIGFcclxuICAgKiBEZXhDb21wb25lbnQuXHJcbiAgICpcclxuICAgKiBOYW1lcyBjYW4gZXhwcmVzcyBoaWVyYXJjaHkuICBBbiBhdHRyaWJ1dGUgbmFtZWQgJ2EnIG1heSBoYXZlIGFcclxuICAgKiBjaGlsZCBhdHRyaWJ1dGUgbmFtZWQgJ2InLiAgSW4gdGhpcyBjYXNlLCB0aGUgbmFtZSBvZiBhdHRyaWJ1dGVcclxuICAgKiAnYScgaXMgc2ltcGx5ICdhJy4gIFRoZSBuYW1lIG9mIGF0dHJpYnV0ZSAnYicgd291bGQgYmUgJ2EuYicuXHJcbiAgICpcclxuICAgKiBhdHRyKG5hbWUpIFJldHJpZXZlIHJldHJpZXZlIHRoZSBjdXJyZW50IHZhbHVlIG9mIHRoZSBhdHRyaWJ1dGUgd2l0aFxyXG4gICAqIG1hdGNoaW5nIG5hbWUuXHJcbiAgICpcclxuICAgKiBhdHRyKG5hbWUsIHZhbHVlKSBTZXQgdGhlIGF0dHJpYnV0ZSB3aXRoIHRoZSBtYXRjaGluZyBuYW1lIHRvIHRoZVxyXG4gICAqIHNwZWNpZmllZCB2YWx1ZS5cclxuICAgKlxyXG4gICAqIEBtZXRob2QgZGV4LmNvbXBvbmVudC5hdHRyXHJcbiAgICpcclxuICAgKiBAcGFyYW0gbmFtZSBUaGUgbmFtZSBvZiB0aGUgYXR0cmlidXRlLlxyXG4gICAqIEBwYXJhbSB2YWx1ZSBUaGUgdmFsdWUgb2YgdGhlIGF0dHJpYnV0ZS5cclxuICAgKlxyXG4gICAqIEBleGFtcGxlIHtAbGFuZyBqYXZhc2NyaXB0fVxyXG4gICAqIC8vIFNldCBhbiBhdHRyaWJ1dGUgbmFtZWQgXCJmb29cIiB0byBcImJhclwiXHJcbiAgICogbXlDb21wb25lbnQuYXR0cihcImZvb1wiLCBcImJhclwiKTtcclxuICAgKlxyXG4gICAqIC8vIFJldHVybnMgXCJiYXJcIlxyXG4gICAqIG15Q29tcG9uZW50LmF0dHIoXCJmb29cIik7XHJcbiAgICpcclxuICAgKiAvLyBTZXQgYW4gYXR0cmlidXRlIG5hbWVkIFwiZm9vXCIgd2hpY2ggYmVsb25ncyB0byBhbiBvYmplY3QgbmFtZWRcclxuICAgKiAvLyBuZXN0ZWQgd2hpY2ggaW4gdHVybiBiZWxvbmdzIHRvIG15Q29tcG9uZW50LlxyXG4gICAqIG15Q29tcG9uZW50LmF0dHIoXCJuZXN0ZWQuZm9vXCIsIFwiYmFyXCIpO1xyXG4gICAqXHJcbiAgICogLy8gUmV0dXJucyBcImJhclwiXHJcbiAgICogbXlDb21wb25lbnQuYXR0cihcIm5lc3RlZC5mb29cIik7XHJcbiAgICpcclxuICAgKiAvLyBEb2VzIG5vdGhpbmcsIHJldHVybnMgbXlDb21wb25lbnRcclxuICAgKiBteUNvbXBvbmVudC5hdHRyKCk7XHJcbiAgICpcclxuICAgKiBAcmV0dXJucyB7c3RyaW5nfGNvbXBvbmVudH0gSWYgb25seSBuYW1lIGlzIHByb3ZpZGVkLCBhdHRyIHdpbGwgcmV0dXJuIHRoZSB2YWx1ZSBvZlxyXG4gICAqIHRoZSByZXF1ZXN0ZWQgYXR0cmlidXRlLiAgSWYgYm90aCBuYW1lIGFuZCB2YWx1ZSBhcmUgcHJvdmlkZWQsIHRoZW5cclxuICAgKiB0aGUgYXR0cmlidXRlIGNvcnJlc3BvbmRpbmcgdG8gdGhlIG5hbWUgd2lsbCBiZSBzZXQgdG8gdGhlIHN1cHBsaWVkXHJcbiAgICogdmFsdWUgYW5kIHRoZSBjb21wb25lbnQgaXRzZWxmIHdpbGwgYmUgcmV0dXJuZWQuXHJcbiAgICovXHJcbiAgdGhpcy5hdHRyID0gZnVuY3Rpb24gKG5hbWUsIHZhbHVlKSB7XHJcbiAgICBpZiAoYXJndW1lbnRzLmxlbmd0aCA9PSAwKSB7XHJcbiAgICAgIHJldHVybiB0aGlzLmNvbmZpZztcclxuICAgIH1cclxuICAgIGVsc2UgaWYgKGFyZ3VtZW50cy5sZW5ndGggPT0gMSkge1xyXG4gICAgICAvLyBSRU06IE5lZWQgdG8gZ2V0SGllcmFyY2hpY2FsXHJcbiAgICAgIHJldHVybiB0aGlzLmNvbmZpZ1tuYW1lXTtcclxuICAgIH1cclxuICAgIGVsc2UgaWYgKGFyZ3VtZW50cy5sZW5ndGggPT0gMikge1xyXG4gICAgICAvL2NvbnNvbGUubG9nKFwiU2V0dGluZyBIaWVhcmFyY2hpY2FsOiBcIiArIG5hbWUgKyBcIj1cIiArIHZhbHVlKTtcclxuICAgICAgLy9jb25zb2xlLmRpcih0aGlzLmNvbmZpZyk7XHJcblxyXG4gICAgICAvLyBUaGlzIHdpbGwgaGFuZGxlIHRoZSBzZXR0aW5nIG9mIGEgc2luZ2xlIGF0dHJpYnV0ZVxyXG4gICAgICBkZXgub2JqZWN0LnNldEhpZXJhcmNoaWNhbCh0aGlzLmNvbmZpZywgbmFtZSwgdmFsdWUsICcuJyk7XHJcbiAgICB9XHJcbiAgICByZXR1cm4gdGhpcztcclxuICB9O1xyXG5cclxuICAvKipcclxuICAgKiBTdWJzY3JpYmUgdGhpcyBjb21wb25lbnQgdG8gdGhlIGV2ZW50cyBvZiB0eXBlIGV2ZW50VFlwZVxyXG4gICAqIGdlbmVyYXRlZCBieSB0aGUgc291cmNlIHRoaXMuICBXaGVuIGV2ZW50cyBhcmUgcmVjZWl2ZWQsXHJcbiAgICogaW52b2tlIHRoZSBjYWxsYmFjay5cclxuICAgKlxyXG4gICAqIEBtZXRob2QgZGV4LnRoaXMuc3Vic2NyaWJlXHJcbiAgICpcclxuICAgKiBAcGFyYW0ge2NvbXBvbmVudH0gc291cmNlIC0gVGhlIHNvdXJjZSBjb21wb25lbnRcclxuICAgKiBAcGFyYW0ge3N0cmluZ30gZXZlbnRUeXBlIC0gVGhlIG5hbWUgb2YgdGhlIGV2ZW50IHdlIGFyZSBzdWJzY3JpYmluZyB0by5cclxuICAgKiBAcGFyYW0gY2FsbGJhY2sgLSBUaGUgZnVuY3Rpb24gdG8gYmUgaW52b2tlZCB3aGVuIHRoaXMgZXZlbnQgaXNcclxuICAgKiByZWNlaXZlZC5cclxuICAgKlxyXG4gICAqIEByZXR1cm5zIHtoYW5kbGV8ZmFsc2V9IEZhbHNlIGlmIGZ1bmN0aW9uIGlzIGNhbGxlZCBpbmNvcnJlY3RseS5cclxuICAgKiBPdGhlcndpc2UsIHRoZSBmdW5jdGlvbiByZXR1cm5zIGEgaGFuZGxlIHdoaWNoIGNhbiBsYXRlciBiZSB1c2VkXHJcbiAgICogdG8gdW5zdWJzY3JpYmUgdG8gdGhlIGV2ZW50cy5cclxuICAgKlxyXG4gICAqL1xyXG4gIHRoaXMuc3Vic2NyaWJlID0gZnVuY3Rpb24gKHNvdXJjZSwgZXZlbnRUeXBlLCBjYWxsYmFjaykge1xyXG4gICAgaWYgKGFyZ3VtZW50cy5sZW5ndGggPT0gMykge1xyXG4gICAgICB2YXIgY2hhbm5lbCA9IHNvdXJjZS5jb25maWcuY2hhbm5lbCArICcvJyArIGV2ZW50VHlwZTtcclxuXHJcbiAgICAgIGRleC5jb25zb2xlLmxvZyhcInN1YnNjcmliZSB0byBcIiArIGNoYW5uZWwpO1xyXG4gICAgICBpZiAoYXJndW1lbnRzLmxlbmd0aCA8IDMpIHtcclxuICAgICAgICBkZXguY29uc29sZS5sb2coXCJmYWlsZWRcIik7XHJcbiAgICAgICAgcmV0dXJuIGZhbHNlO1xyXG4gICAgICB9XHJcbiAgICAgIHJldHVybiBkZXguYnVzLnN1YnNjcmliZShjaGFubmVsLCBjYWxsYmFjayk7XHJcbiAgICB9XHJcbiAgICBlbHNlIHtcclxuICAgICAgcmV0dXJuIGZhbHNlO1xyXG4gICAgfVxyXG4gIH07XHJcblxyXG4gIC8qKlxyXG4gICAqXHJcbiAgICogVW5zdWJzY3JpYmUgdGhpcyBjb21wb25lbnQuXHJcbiAgICpcclxuICAgKiBAbWV0aG9kIGRleC5jb21wb25lbnQudW5zdWJzY3JpYmVcclxuICAgKlxyXG4gICAqIEBwYXJhbSBoYW5kbGUgLSBUaGUgaGFuZGxlIGF0dGFpbmVkIHZpYSBzdWJzY3JpYmUuXHJcbiAgICpcclxuICAgKi9cclxuICB0aGlzLnVuc3Vic2NyaWJlID0gZnVuY3Rpb24gKGhhbmRsZSkge1xyXG4gICAgZGV4LmJ1cy51bnN1YnNjcmliZShoYW5kbGUpO1xyXG4gIH07XHJcblxyXG4gIC8qKlxyXG4gICAqXHJcbiAgICogUHVibGlzaCBhbiBldmVudCB0byB0aGUgY29tcG9uZW50J3Mgc3Vic2NyaWJlcnMuXHJcbiAgICpcclxuICAgKiBAbWV0aG9kIGRleC5jb21wb25lbnQucHVibGlzaFxyXG4gICAqXHJcbiAgICogQHBhcmFtIGV2ZW50IC0gVGhlIGV2ZW50IHRvIHB1Ymxpc2guICBBbiBldmVudCBjYW4gYmUgYW55IG9iamVjdCwgaG93ZXZlcixcclxuICAgKiBpdCBtdXN0IGRlZmluZSBhIHByb3BlcnR5IG5hbWVkIFwidHlwZVwiLlxyXG4gICAqIEBwYXJhbSBldmVudC50eXBlIC0gVGhlIHR5cGUgb2YgdGhlIGV2ZW50IHdlIGFyZSBwdWJsaXNoaW5nLlxyXG4gICAqXHJcbiAgICovXHJcbiAgdGhpcy5wdWJsaXNoID0gZnVuY3Rpb24gKGV2ZW50KSB7XHJcbiAgICB2YXIgY2hhbm5lbDtcclxuXHJcbiAgICBpZiAoIWV2ZW50IHx8ICFldmVudC50eXBlKSB7XHJcbiAgICAgIGRleC5jb25zb2xlLndhcm4oXCJwdWJsaXNoIG9mIGV2ZW50IHRvIFwiICsgdGhpcy5jaGFubmVsICsgXCIgZmFpbGVkLlwiKTtcclxuICAgICAgZGV4LmJ1cy5wdWJsaXNoKFwiZXJyb3JcIiwge1xyXG4gICAgICAgIHR5cGUgICAgICAgICAgOiBcImVycm9yXCIsXHJcbiAgICAgICAgXCJkZXNjcmlwdGlvblwiIDogXCJFcnJvciBwdWJsaXNoaW5nIGV2ZW50OiAnXCIgKyBldmVudCArIFwiJyB0byAnXCIgKyB0aGlzLmNoYW5uZWwgKyBcIidcIlxyXG4gICAgICB9KTtcclxuICAgIH1cclxuICAgIGVsc2Uge1xyXG4gICAgICBjaGFubmVsID0gdGhpcy5jb25maWcuY2hhbm5lbCArICcvJyArIGV2ZW50LnR5cGU7XHJcbiAgICAgIGRleC5jb25zb2xlLmxvZyhcInB1Ymxpc2ggdG8gXCIgKyBjaGFubmVsKTtcclxuICAgICAgZGV4LmJ1cy5wdWJsaXNoKGNoYW5uZWwsIGV2ZW50KTtcclxuICAgIH1cclxuICB9O1xyXG5cclxuICAvKipcclxuICAgKlxyXG4gICAqIEEgZGVmYXVsdCBuby1vcCBpbXBsZW1lbnRhdGlvbiBvZiByZW5kZXIuICBTdWJjbGFzc2VzIHNob3VsZFxyXG4gICAqIG92ZXJyaWRlIHRoaXMgbWV0aG9kIHdpdGggb25lIHdoaWNoIHByb3ZpZGVzIGFuIGluaXRpYWwgcmVuZGVyaW5nXHJcbiAgICogb2YgdGhlaXIgc3BlY2lmaWMgY29tcG9uZW50LiAgVGhpcyBpcyBhIGdyZWF0IHBsYWNlIHRvIHB1dFxyXG4gICAqIG9uZS10aW1lIG9ubHkgaW5pdGlhbGl6YXRpb24gbG9naWMuXHJcbiAgICpcclxuICAgKiBAbWV0aG9kIGRleC5jb21wb25lbnQucmVuZGVyXHJcbiAgICpcclxuICAgKi9cclxuICB0aGlzLnJlbmRlciA9IGZ1bmN0aW9uICgpIHtcclxuICAgIGNvbnNvbGUubG9nKFwiVW5pbXBsZW1lbnRlZCByb3V0aW5lOiByZW5kZXIoKVwiKTtcclxuICB9O1xyXG5cclxuICAvKipcclxuICAgKlxyXG4gICAqIEEgZGVmYXVsdCBuby1vcCBpbXBsZW1lbnRhdGlvbiBvZiB1cGRhdGUuICBUaGlzIHdpbGwgdXBkYXRlIHRoZVxyXG4gICAqIGN1cnJlbnQgY29tcG9uZW50IHJlbGF0aXZlIHRvIGFueSBuZXcgc2V0dGluZyBvciBkYXRhIGNoYW5nZXMuXHJcbiAgICpcclxuICAgKiBAbWV0aG9kIGRleC5jb21wb25lbnQudXBkYXRlXHJcbiAgICpcclxuICAgKi9cclxuICB0aGlzLnVwZGF0ZSA9IGZ1bmN0aW9uICgpIHtcclxuICAgIGNvbnNvbGUubG9nKFwiVW5pbXBsZW1lbnRlZCByb3V0aW5lOiB1cGRhdGUoKVwiKTtcclxuICB9O1xyXG59OyIsIi8qKlxyXG4gKlxyXG4gKiBDb25maWcgbW9kdWxlLlxyXG4gKiBAbW9kdWxlIGNvbmZpZ1xyXG4gKlxyXG4gKi9cclxuXHJcbi8qKlxyXG4gKlxyXG4gKiBUaGlzIHJvdXRpbmUgc3VwcG9ydHMgYSBzaG9ydGhhbmQgbm90YXRpb24gYWxsb3dpbmcgdGhlXHJcbiAqIHVzZXIgdG8gc3BlY2lmeSBkZWVwbHkgbmVzdGVkIGNvbmZpZ3VyYXRpb24gb3B0aW9ucyB3aXRob3V0XHJcbiAqIGhhdmluZyB0byBkZWFsIHdpdGggbmVzdGVkIGpzb24gc3RydWN0dXJlcy5cclxuICpcclxuICogT3B0aW9ucyBsaWtlOlxyXG4gKlxyXG4gKiB7XHJcbiAqICAgJ2NlbGwnIDoge1xyXG4gKiAgICAgJ3JlY3QnIDoge1xyXG4gKiAgICAgICAnd2lkdGgnIDogMTAsXHJcbiAqICAgICAgICdoZWlnaHQnIDogMjAsXHJcbiAqICAgICAgICdldmVudHMnIDoge1xyXG4gKiAgICAgICAgICdtb3VzZW92ZXInIDogZnVuY3Rpb24oZCkgeyBjb25zb2xlLmxvZyhcIk1vdXNlT3ZlcjogXCIgKyBkKTsgfVxyXG4gKiAgICAgICB9XHJcbiAqICAgICB9XHJcbiAqICAgfVxyXG4gKiB9XHJcbiAqXHJcbiAqIENhbiBub3cgYmUgZGVzY3JpYmVkIG1vcmUgc3VjY2luY3RseSBhbmQgbW9yZSByZWFkYWJseSBhczpcclxuICpcclxuICoge1xyXG4gKiAgICdjZWxsLnJlY3Qud2lkdGgnICAgICAgICAgICAgOiAxMCxcclxuICogICAnY2VsbC5yZWN0LmhlaWdodCcgICAgICAgICAgIDogMjAsXHJcbiAqICAgJ2NlbGwucmVjdC5ldmVudHMubW91c2VvdmVyJyA6IGZ1bmN0aW9uKGQpIHsgY29uc29sZS5sb2coXCJNb3VzZW92ZXI6IFwiICsgZCk7IH1cclxuICogfVxyXG4gKlxyXG4gKiBPciBhIGh5YnJpZCBzdHJhdGVneSBjYW4gYmUgdXNlZDpcclxuICpcclxuICoge1xyXG4gKiAgICdjZWxsLnJlY3QnIDoge1xyXG4gKiAgICAgJ3dpZHRoJyA6IDEwLFxyXG4gKiAgICAgJ2hlaWdodCcgOiAyMCxcclxuICogICAgICdldmVudHMubW91c2VvdmVyJyA6IGZ1bmN0aW9uKGQpIHsgY29uc29sZS5sb2coXCJNb3VzZW92ZXI6IFwiICsgZCk7IH1cclxuICogICB9XHJcbiAqIH1cclxuICpcclxuICogQHBhcmFtIHtvYmplY3R9IGNvbmZpZyBUaGUgY29uZmlndXJhdGlvbiB0byBleHBhbmQuXHJcbiAqIEByZXR1cm5zIHsqfSBUaGUgZXhwYW5kZWQgY29uZmlndXJhdGlvbi4gIFRoZSBvcmlnaW5hbCBjb25maWd1cmF0aW9uXHJcbiAqICAgaXMgbGVmdCB1bnRvdWNoZWQuXHJcbiAqXHJcbiAqL1xyXG5leHBvcnRzLmV4cGFuZCA9IGZ1bmN0aW9uIGV4cGFuZChjb25maWcpIHtcclxuICB2YXIgbmFtZSwgY2k7XHJcbiAgdmFyIGV4cGFuZGVkID0ge307XHJcblxyXG4gIC8vIFdlIGhhdmUgbm90aGluZywgcmV0dXJuIG5vdGhpbmcuXHJcbiAgaWYgKCFjb25maWcpIHtcclxuICAgIHJldHVybiBjb25maWc7XHJcbiAgfVxyXG5cclxuICAvL2RleC5jb25zb2xlLmxvZyhcImRleC5jb25maWcuZXhwYW5kKGNvbmZpZz1cIiwgY29uZmlnKTtcclxuXHJcbiAgZm9yICh2YXIgbmFtZSBpbiBjb25maWcpIHtcclxuICAgIGlmIChjb25maWcuaGFzT3duUHJvcGVydHkobmFtZSkpIHtcclxuICAgICAgLy8gTmFtZSBjb250YWlucyBoaWVyYXJjaHk6XHJcbiAgICAgIGlmIChuYW1lICYmIG5hbWUuaW5kZXhPZignLicpID4gLTEpIHtcclxuICAgICAgICBleHBhbmRlZFtuYW1lXSA9IGNvbmZpZ1tuYW1lXTtcclxuICAgICAgICBkZXgub2JqZWN0LnNldEhpZXJhcmNoaWNhbChleHBhbmRlZCwgbmFtZSxcclxuICAgICAgICAgIGRleC5vYmplY3QuY2xvbmUoZXhwYW5kZWRbbmFtZV0pLCAnLicpO1xyXG4gICAgICAgIGRlbGV0ZSBleHBhbmRlZFtuYW1lXTtcclxuICAgICAgfVxyXG4gICAgICAvLyBTaW1wbGUgbmFtZVxyXG4gICAgICBlbHNlIHtcclxuICAgICAgICAvLyBJZiB0aGUgdGFyZ2V0IGlzIGFuIG9iamVjdCB3aXRoIG5vIGNoaWxkcmVuLCBjbG9uZSBpdC5cclxuICAgICAgICBpZiAoZGV4Lm9iamVjdC5pc0VtcHR5KGNvbmZpZ1tuYW1lXSkpIHtcclxuICAgICAgICAgIC8vZGV4LmNvbnNvbGUubG9nKFwiU0VUIFBSSU1JVElWRTogXCIgKyBuYW1lICsgXCI9XCIgKyBjb25maWdbbmFtZV0pO1xyXG4gICAgICAgICAgZXhwYW5kZWRbbmFtZV0gPSBkZXgub2JqZWN0LmNsb25lKGNvbmZpZ1tuYW1lXSk7XHJcbiAgICAgICAgICAvL2V4cGFuZGVkW25hbWVdID0gY29uZmlnW25hbWVdO1xyXG4gICAgICAgIH1cclxuICAgICAgICBlbHNlIHtcclxuICAgICAgICAgIC8vZGV4LmNvbnNvbGUubG9nKFwiU0VUIE9CSkVDVDogXCIgKyBuYW1lICsgXCIgdG8gdGhlIGV4cGFuc2lvbiBvZlwiLCBjb25maWdbbmFtZV0pO1xyXG4gICAgICAgICAgZXhwYW5kZWRbbmFtZV0gPSBkZXguY29uZmlnLmV4cGFuZChjb25maWdbbmFtZV0pO1xyXG4gICAgICAgIH1cclxuICAgICAgfVxyXG4gICAgfVxyXG4gIH1cclxuXHJcbiAgLy9kZXguY29uc29sZS5sb2coXCJDT05GSUdcIiwgY29uZmlnLCBcIkVYUEFOREVEXCIsIGV4cGFuZGVkKTtcclxuICByZXR1cm4gZXhwYW5kZWQ7XHJcbn07XHJcblxyXG4vKipcclxuICpcclxuICogVGhpcyByb3V0aW5lIHdpbGwgZXhwYW5kIGhpZWFyY2hpY2FsbHkgZGVsaW1pdGVkIG5hbWVzIHN1Y2ggYXNcclxuICogZm9vLmJhciBpbnRvIGEgc3RydWN0dXJlIHsgZm9vIDogeyBiYXIgOiB2YWx1ZX19LiAgSXQgd2lsbCBkZWxldGVcclxuICogdGhlIGhpZXJhcmNoaWNhbCBuYW1lIGFuZCBvdmVyd3JpdGUgdGhlIHZhbHVlIGludG8gdGhlIHByb3BlclxyXG4gKiBsb2NhdGlvbiBsZWF2aW5nIGFueSBwcmV2aW91cyBvYmplY3QgcHJvcGVydGllcyB1bmRpc3R1cmJlZC5cclxuICpcclxuICogQHBhcmFtIHtPYmplY3R9IGNvbmZpZyBUaGUgY29uZmlndXJhdGlvbiB3aGljaCB3ZSB3aWxsIGV4cGFuZC5cclxuICpcclxuICovXHJcblxyXG4vKlxyXG4gZXhwb3J0cy5leHBhbmRfZGVwcmVjYXRlID0gZnVuY3Rpb24gZXhwYW5kKGNvbmZpZykge1xyXG4gdmFyIG5hbWUsXHJcbiBjaSxcclxuIGV4cGFuZGVkO1xyXG5cclxuIC8vIFdlIGhhdmUgbm90aGluZywgcmV0dXJuIG5vdGhpbmcuXHJcbiBpZiAoIWNvbmZpZykge1xyXG4gcmV0dXJuIGNvbmZpZztcclxuIH1cclxuXHJcbiAvL2RleC5jb25zb2xlLmxvZyhcImRleC5jb25maWcuZXhwYW5kKGNvbmZpZz1cIiwgY29uZmlnKTtcclxuXHJcbiAvLyBNYWtlIGEgY2xvbmUgb2YgdGhlIHByZXZpb3VzIGNvbmZpZ3VyYXRpb24uXHJcbiBleHBhbmRlZCA9IGRleC5vYmplY3QuY2xvbmUoY29uZmlnKTtcclxuXHJcbiAvLyBJdGVyYXRlIG92ZXIgdGhlIHByb3BlcnR5IG5hbWVzLlxyXG4gZm9yIChuYW1lIGluIGNvbmZpZykge1xyXG4gLy8gSWYgdGhpcyBpcyBvdXIgcHJvcGVydHkgdGhlIHByb2Nlc3MgaXQsIG90aGVyd2lzZSBpZ25vcmUuXHJcbiBpZiAoY29uZmlnLmhhc093blByb3BlcnR5KG5hbWUpKSB7XHJcbiAvLyBUaGUgcHJvcGVydHkgbmFtZSBpcyBub24tbnVsbC5cclxuIGlmIChuYW1lKSB7XHJcbiAvLyBEZXRlcm1pbmUgY2hhcmFjdGVyIGluZGV4LlxyXG4gY2kgPSBuYW1lLmluZGV4T2YoJy4nKTtcclxuIH1cclxuIGVsc2Uge1xyXG4gLy8gRGVmYXVsdCB0byAtMVxyXG4gY2kgPSAtMTtcclxuIH1cclxuXHJcbiAvLyBpZiBDaGFyYWN0ZXIgaW5kZXggaXMgPiAtMSwgd2UgaGF2ZSBhIGhpZXJhcmNoaWNhbCBuYW1lLlxyXG4gLy8gT3RoZXJ3aXNlIGRvIG5vdGhpbmcsIGNvcHlpbmcgd2FzIGFscmVhZHkgaGFuZGxlZCBpbiB0aGVcclxuIC8vIGNsb25pbmcgYWN0aXZpdHkuXHJcbiBpZiAoY2kgPiAtMSkge1xyXG4gLy8gU2V0IGl0Li4uXHJcbiBkZXgub2JqZWN0LnNldEhpZXJhcmNoaWNhbChleHBhbmRlZCwgbmFtZSxcclxuIGRleC5vYmplY3QuY2xvbmUoZXhwYW5kZWRbbmFtZV0pLCAnLicpO1xyXG4gLy8gRGVsZXRlIHRoZSBvbGQgbmFtZS5cclxuIGRlbGV0ZSBleHBhbmRlZFtuYW1lXTtcclxuIH1cclxuIH1cclxuIH1cclxuXHJcbiAvL2RleC5jb25zb2xlLmxvZyhcIkNPTkZJR1wiLCBjb25maWcsIFwiRVhQQU5ERURcIiwgZXhwYW5kZWQpO1xyXG4gcmV0dXJuIGV4cGFuZGVkO1xyXG4gfTtcclxuICovXHJcblxyXG4vKipcclxuICpcclxuICogVGhpcyByb3V0aW5lIHdpbGwgdGFrZSB0d28gaGllcmFyY2hpZXMsIHRvcCBhbmQgYm90dG9tLCBhbmQgZXhwYW5kIGRvdCAoJy4nKVxyXG4gKiBkZWxpbWl0ZWQgbmFtZXMgc3VjaCBhczogJ2Zvby5iYXIuYml6LmJheicgaW50byBhIHN0cnVjdHVyZTpcclxuICogeyAnZm9vJyA6IHsgJ2JhcicgOiB7ICdiaXonIDogJ2JheicgfX19XHJcbiAqIEl0IHdpbGwgdGhlbiBvdmVybGF5IHRoZSB0b3AgaGllcmFyY2h5IG9udG8gdGhlIGJvdHRvbSBvbmUuICBUaGlzIGlzIHVzZWZ1bFxyXG4gKiBmb3IgY29uZmlndXJpbmcgb2JqZWN0cyBiYXNlZCB1cG9uIGEgZGVmYXVsdCBjb25maWd1cmF0aW9uIHdoaWxlIGFsbG93aW5nXHJcbiAqIHRoZSBjbGllbnQgdG8gY29udmVuaWVudGx5IG92ZXJyaWRlIHRoZXNlIGRlZmF1bHRzIGFzIG5lZWRlZC5cclxuICpcclxuICogQHBhcmFtIHtvYmplY3R9IHRvcCAtIFRoZSB0b3Agb2JqZWN0IGhpZXJhcmNoeS5cclxuICogQHBhcmFtIHtvYmplY3R9IGJvdHRvbSAtIFRoZSBib3R0b20sIGJhc2Ugb2JqZWN0IGhpZXJhcmNoeS5cclxuICogQHJldHVybnMge29iamVjdH0gLSBBIG5ldyBvYmplY3QgcmVwcmVzZW50aW5nIHRoZSBleHBhbmRlZCB0b3Agb2JqZWN0XHJcbiAqIGhpZXJhcmNoeSBvdmVybGFpZCBvbiB0b3Agb2YgdGhlIGV4cGFuZGVkIGJvdHRvbSBvYmplY3QgaGllcmFyY2h5LlxyXG4gKlxyXG4gKi9cclxuZXhwb3J0cy5leHBhbmRBbmRPdmVybGF5ID0gZnVuY3Rpb24gZXhwYW5kQW5kT3ZlcmxheSh0b3AsIGJvdHRvbSkge1xyXG4gIC8vZGV4LmNvbnNvbGUubG9nKFxyXG4gIC8vZGV4LmNvbmZpZy5nZXRDYWxsZXJTdHJpbmcoYXJndW1lbnRzLmNhbGxlZS5jYWxsZXIpLFxyXG4gIC8vXCJUT1BcIiwgdG9wLFxyXG4gIC8vXCJCT1RUT01cIiwgYm90dG9tLFxyXG4gIC8vXCJFWFBBTkRFRCBUT1BcIiwgZGV4LmNvbmZpZy5leHBhbmQodG9wKSxcclxuICAvL1wiRVhQQU5ERUQgQk9UVE9NXCIsIGRleC5jb25maWcuZXhwYW5kKGJvdHRvbSkpO1xyXG4gIHJldHVybiBkZXgub2JqZWN0Lm92ZXJsYXkoZGV4LmNvbmZpZy5leHBhbmQodG9wKSxcclxuICAgIGRleC5jb25maWcuZXhwYW5kKGJvdHRvbSkpO1xyXG59O1xyXG5cclxuLyoqXHJcbiAqXHJcbiAqIFJldHVybiB0aGUgY29uZmlndXJhdGlvbiBmb3IgYSBmb250IGFmdGVyIHRoZSB1c2VyJ3MgY3VzdG9taXphdGlvbnNcclxuICogaGF2ZSBiZWVuIGFwcGxpZWQuXHJcbiAqXHJcbiAqIEBwYXJhbSB7ZDNmb250X3NwZWN9IGN1c3RvbSAtIFRoZSB1c2VyIGN1c3RvbWl6YXRpb25zLlxyXG4gKiBAcmV0dXJucyB7ZDNmb250X3NwZWN9IC0gQW4gb2JqZWN0IGNvbnRhaW5pbmcgdGhlIGZvbnQncyBzcGVjaWZpY2F0aW9uc1xyXG4gKiBhZnRlciB0aGUgdXNlcidzIGN1c3RvbWl6YXRpb25zIGhhdmUgYmVlbiBhcHBsaWVkLlxyXG4gKlxyXG4gKi9cclxuZXhwb3J0cy5mb250ID0gZnVuY3Rpb24gZm9udChjdXN0b20pIHtcclxuICB2YXIgZGVmYXVsdHMgPVxyXG4gIHtcclxuICAgICdkZWNvcmF0aW9uJyAgICA6ICdub25lJyxcclxuICAgICdmYW1pbHknICAgICAgICA6ICdzYW5zLXNlcmlmJyxcclxuICAgICdsZXR0ZXJTcGFjaW5nJyA6ICdub3JtYWwnLFxyXG4gICAgJ3NpemUnICAgICAgICAgIDogMTQsXHJcbiAgICAnc3R5bGUnICAgICAgICAgOiAnbm9ybWFsJyxcclxuICAgICd3ZWlnaHQnICAgICAgICA6ICdub3JtYWwnLFxyXG4gICAgJ3dvcmRTcGFjaW5nJyAgIDogJ25vcm1hbCcsXHJcbiAgICAndmFyaWFudCcgICAgICAgOiAnbm9ybWFsJ1xyXG4gIH07XHJcblxyXG4gIHZhciBmb250U3BlYyA9IGRleC5jb25maWcuZXhwYW5kQW5kT3ZlcmxheShjdXN0b20sIGRlZmF1bHRzKTtcclxuICByZXR1cm4gZm9udFNwZWM7XHJcbn07XHJcblxyXG4vKipcclxuICpcclxuICogQ29uZmlndXJlIHRoZSBnaXZlbiBmb250IHdpdGggdGhlIHN1cHBsaWVkIGZvbnQgc3BlY2lmaWNhdGlvbi5cclxuICpcclxuICogQHBhcmFtIHtvYmplY3R9IG5vZGUgLSBUaGUgbm9kZSB0byBiZSBjb25maWd1cmVkLlxyXG4gKiBAcGFyYW0ge2QzZm9udF9zcGVjfSBmb250U3BlYyAtIFRoZSBmb250IHNwZWNpZmljYXRpb24gdG8gYmUgYXBwbGllZC5cclxuICpcclxuICogQHJldHVybnMgeyp9IFRoZSBub2RlIGFmdGVyIGhhdmluZyB0aGUgZm9udCBzcGVjaWZpY2F0aW9uIGFwcGxpZWQuXHJcbiAqXHJcbiAqL1xyXG5leHBvcnRzLmNvbmZpZ3VyZUZvbnQgPSBmdW5jdGlvbiBjb25maWd1cmVGb250KG5vZGUsIGZvbnRTcGVjLCBpKSB7XHJcbiAgLy9kZXguY29uc29sZS5sb2coXCJDT05GSUctRk9OVDogXCIgKyBpKTtcclxuICBpZiAoZm9udFNwZWMpIHtcclxuICAgIGRleC5jb25maWcuc2V0QXR0cihub2RlLCAnZm9udC1mYW1pbHknLCBmb250U3BlYy5mYW1pbHksIGkpO1xyXG4gICAgZGV4LmNvbmZpZy5zZXRBdHRyKG5vZGUsICdmb250LXNpemUnLCBmb250U3BlYy5zaXplLCBpKTtcclxuICAgIGRleC5jb25maWcuc2V0QXR0cihub2RlLCAnZm9udC13ZWlnaHQnLCBmb250U3BlYy53ZWlnaHQsIGkpO1xyXG4gICAgZGV4LmNvbmZpZy5zZXRBdHRyKG5vZGUsICdmb250LXN0eWxlJywgZm9udFNwZWMuc3R5bGUsIGkpO1xyXG4gICAgZGV4LmNvbmZpZy5zZXRBdHRyKG5vZGUsICd0ZXh0LWRlY29yYXRpb24nLCBmb250U3BlYy5kZWNvcmF0aW9uLCBpKTtcclxuXHJcbiAgICBkZXguY29uZmlnLnNldEF0dHIobm9kZSwgJ3dvcmQtc3BhY2luZycsIGZvbnRTcGVjLndvcmRTcGFjaW5nLCBpKTtcclxuICAgIGRleC5jb25maWcuc2V0QXR0cihub2RlLCAnbGV0dGVyLXNwYWNpbmcnLCBmb250U3BlYy5sZXR0ZXJTcGFjaW5nLCBpKTtcclxuICAgIGRleC5jb25maWcuc2V0QXR0cihub2RlLCAndmFyaWFudCcsIGZvbnRTcGVjLnZhcmlhbnQsIGkpO1xyXG4gIH1cclxuICByZXR1cm4gbm9kZTtcclxufTtcclxuXHJcbi8qKlxyXG4gKlxyXG4gKiBDb25zdHJ1Y3QgYSB0ZXh0IHNwZWZpY2lhdGlvbi5cclxuICpcclxuICogQHBhcmFtIHtkM3RleHRfc3BlY30gY3VzdG9tIC0gVGhlIHVzZXIncyBhZGp1c3RtZW50cyB0byB0aGUgZGVmYXVsdCB0ZXh0XHJcbiAqIHNwZWNpZmljYXRpb24uXHJcbiAqXHJcbiAqIEByZXR1cm5zIHtkM3RleHRfc3BlY30gQSByZXZpc2VkIHRleHQgc3BlY2lmaWNhdGlvbiBhZnRlciBoYXZpbmcgYXBwbGllZFxyXG4gKiB0aGUgdXNlcidzIG1vZGZpaWNhdGlvbnMuXHJcbiAqXHJcbiAqL1xyXG5leHBvcnRzLnRleHQgPSBmdW5jdGlvbiB0ZXh0KGN1c3RvbSkge1xyXG4gIHZhciBkZWZhdWx0cyA9XHJcbiAge1xyXG4gICAgJ2ZvbnQnICAgICAgICAgICAgICAgICAgICAgOiBkZXguY29uZmlnLmZvbnQoKSxcclxuICAgICd4JyAgICAgICAgICAgICAgICAgICAgICAgIDogMCxcclxuICAgICd5JyAgICAgICAgICAgICAgICAgICAgICAgIDogMCxcclxuICAgICd0ZXh0TGVuZ3RoJyAgICAgICAgICAgICAgIDogdW5kZWZpbmVkLFxyXG4gICAgJ2xlbmd0aEFkanVzdCcgICAgICAgICAgICAgOiB1bmRlZmluZWQsXHJcbiAgICAndHJhbnNmb3JtJyAgICAgICAgICAgICAgICA6ICcnLFxyXG4gICAgJ2dseXBoT3JpZW50YXRpb25WZXJ0aWNhbCcgOiB1bmRlZmluZWQsXHJcbiAgICAndGV4dCcgICAgICAgICAgICAgICAgICAgICA6IHVuZGVmaW5lZCxcclxuICAgICdkeCcgICAgICAgICAgICAgICAgICAgICAgIDogMCxcclxuICAgICdkeScgICAgICAgICAgICAgICAgICAgICAgIDogMCxcclxuICAgICd3cml0aW5nTW9kZScgICAgICAgICAgICAgIDogdW5kZWZpbmVkLFxyXG4gICAgJ2FuY2hvcicgICAgICAgICAgICAgICAgICAgOiAnc3RhcnQnLFxyXG4gICAgJ2ZpbGwnICAgICAgICAgICAgICAgICAgICAgOiBkZXguY29uZmlnLmZpbGwoKSxcclxuICAgICdmb3JtYXQnICAgICAgICAgICAgICAgICAgIDogdW5kZWZpbmVkLFxyXG4gICAgJ2V2ZW50cycgICAgICAgICAgICAgICAgICAgOiBkZXguY29uZmlnLmV2ZW50cygpXHJcbiAgfTtcclxuXHJcbiAgdmFyIHRleHRTcGVjID0gZGV4LmNvbmZpZy5leHBhbmRBbmRPdmVybGF5KGN1c3RvbSwgZGVmYXVsdHMpO1xyXG4gIHJldHVybiB0ZXh0U3BlYztcclxufTtcclxuXHJcbi8qKlxyXG4gKlxyXG4gKiBUaGlzIHJvdXRpbmUgd2lsbCBkeW5hbWljYWxseSBjb25maWd1cmUgYW4gU1ZHIHRleHQgZW50aXR5IGJhc2VkIHVwb24gdGhlXHJcbiAqIHN1cHBsaWVkIGNvbmZpZ3VyYXRpb24uXHJcbiAqXHJcbiAqIEBwYXJhbSB7b2JqZWN0fSBub2RlIFRoZSBTVkcgdGV4dCBub2RlIHRvIGJlIGNvbmZpZ3VyZWQuXHJcbiAqIEBwYXJhbSB7ZDN0ZXh0X3NwZWN9IHRleHRTcGVjIFRoZSB0ZXh0IHNwZWNpZmljYXRpb24gZm9yIHRoaXMgbm9kZS5cclxuICpcclxuICogQHJldHVybnMgeyp9IFRoZSBub2RlIGFmdGVyIGhhdmluZyBhcHBsaWVkIHRoZSB0ZXh0IHNwZWNpZmljYXRpb24uXHJcbiAqXHJcbiAqL1xyXG5leHBvcnRzLmNvbmZpZ3VyZVRleHQgPSBmdW5jdGlvbiBjb25maWd1cmVUZXh0KG5vZGUsIHRleHRTcGVjLCBpKSB7XHJcbiAgLy9kZXguY29uc29sZS5sb2coXCJDT05GSUctVEVYVDogXCIgKyBpKTtcclxuICBpZiAodGV4dFNwZWMpIHtcclxuICAgIGRleC5jb25maWcuc2V0QXR0cihub2RlLCBcInhcIiwgdGV4dFNwZWMueCwgaSk7XHJcbiAgICBkZXguY29uZmlnLnNldEF0dHIobm9kZSwgXCJ5XCIsIHRleHRTcGVjLnksIGkpO1xyXG4gICAgZGV4LmNvbmZpZy5zZXRBdHRyKG5vZGUsIFwiZHhcIiwgdGV4dFNwZWMuZHgsIGkpO1xyXG4gICAgZGV4LmNvbmZpZy5zZXRBdHRyKG5vZGUsIFwiZHlcIiwgdGV4dFNwZWMuZHksIGkpO1xyXG4gICAgZGV4LmNvbmZpZy5zZXRTdHlsZShub2RlLCBcInRleHQtYW5jaG9yXCIsIHRleHRTcGVjLmFuY2hvciwgaSk7XHJcbiAgICBkZXguY29uZmlnLmNvbmZpZ3VyZUZvbnQobm9kZSwgdGV4dFNwZWMuZm9udCwgaSk7XHJcbiAgICBkZXguY29uZmlnLnNldEF0dHIobm9kZSwgJ3RleHRMZW5ndGgnLCB0ZXh0U3BlYy50ZXh0TGVuZ3RoLCBpKTtcclxuICAgIGRleC5jb25maWcuc2V0QXR0cihub2RlLCAnbGVuZ3RoQWRqdXN0JywgdGV4dFNwZWMubGVuZ3RoQWRqdXN0LCBpKTtcclxuICAgIGRleC5jb25maWcuc2V0QXR0cihub2RlLCAndHJhbnNmb3JtJywgdGV4dFNwZWMudHJhbnNmb3JtLCBpKTtcclxuICAgIGRleC5jb25maWcuc2V0QXR0cihub2RlLCAnZ2x5cGgtb3JpZW50YXRpb24tdmVydGljYWwnLFxyXG4gICAgICB0ZXh0U3BlYy5nbHlwaE9yaWVudGF0aW9uVmVydGljYWwsIGkpO1xyXG4gICAgZGV4LmNvbmZpZy5zZXRBdHRyKG5vZGUsICd3cml0aW5nLW1vZGUnLCB0ZXh0U3BlYy53cml0aW5nTW9kZSwgaSk7XHJcbiAgICBkZXguY29uZmlnLmNhbGxJZkRlZmluZWQobm9kZSwgJ3RleHQnLCB0ZXh0U3BlYy50ZXh0LCBpKTtcclxuICAgIGRleC5jb25maWcuY29uZmlndXJlRmlsbChub2RlLCB0ZXh0U3BlYy5maWxsLCBpKTtcclxuICAgIGRleC5jb25maWcuY29uZmlndXJlRXZlbnRzKG5vZGUsIHRleHRTcGVjLmV2ZW50cywgaSk7XHJcbiAgfVxyXG4gIHJldHVybiBub2RlO1xyXG59O1xyXG5cclxuLyoqXHJcbiAqXHJcbiAqIENvbnN0cnVjdCBhIHN0cm9rZSBzcGVjaWZpY2F0aW9uLlxyXG4gKlxyXG4gKiBAcGFyYW0ge2QzdGV4dF9zcGVjfSBzdHJva2VTcGVjIC0gVGhlIHVzZXIncyBjdXN0b21pemF0aW9ucyB0byB0aGUgc3BlY2lmaWNhdGlvbi5cclxuICpcclxuICogQHJldHVybnMge2QzdGV4dF9zcGVjfSBUaGUgc3Ryb2tlIHNwZWNpZmljYXRpb24gYWZ0ZXIgaGF2aW5nIGFwcGxpZWQgdGhlIHVzZXInc1xyXG4gKiBjb25maWd1cmF0aW9uLlxyXG4gKlxyXG4gKi9cclxuZXhwb3J0cy5zdHJva2UgPSBmdW5jdGlvbiBzdHJva2Uoc3Ryb2tlU3BlYykge1xyXG4gIHZhciBkZWZhdWx0cyA9XHJcbiAge1xyXG4gICAgJ3dpZHRoJyAgICAgOiAxLFxyXG4gICAgJ2NvbG9yJyAgICAgOiBcImJsYWNrXCIsXHJcbiAgICAnb3BhY2l0eScgICA6IDEsXHJcbiAgICAnZGFzaGFycmF5JyA6ICcnLFxyXG4gICAgJ3RyYW5zZm9ybScgOiAnJ1xyXG4gIH07XHJcblxyXG4gIHZhciBjb25maWcgPSBkZXguY29uZmlnLmV4cGFuZEFuZE92ZXJsYXkoc3Ryb2tlU3BlYywgZGVmYXVsdHMpO1xyXG4gIHJldHVybiBjb25maWc7XHJcbn07XHJcblxyXG4vKipcclxuICpcclxuICogQXBwbHkgYSBzdHJva2Ugc3BlY2lmaWNhdGlvbiB0byBhIG5vZGUuXHJcbiAqXHJcbiAqIEBwYXJhbSB7b2JqZWN0fSBub2RlIC0gVGhlIG5vZGUgdG8gYmUgY29uZmlndXJlZC5cclxuICogQHBhcmFtIHtkM3N0cm9rZV9zcGVjfSBzdHJva2VTcGVjIC0gVGhlIHN0cm9rZSBzcGVjaWZpY2F0aW9uIHRvIGJlIGFwcGxpZWQuXHJcbiAqIEByZXR1cm5zIFRoZSBuZXdseSBjb25maWd1cmVkIG5vZGUuXHJcbiAqL1xyXG5leHBvcnRzLmNvbmZpZ3VyZVN0cm9rZSA9IGZ1bmN0aW9uIGNvbmZpZ3VyZVN0cm9rZShub2RlLCBzdHJva2VTcGVjLCBpKSB7XHJcbiAgaWYgKHN0cm9rZVNwZWMpIHtcclxuICAgIGRleC5jb25maWcuc2V0QXR0cihub2RlLCBcInN0cm9rZVwiLCBzdHJva2VTcGVjLmNvbG9yLCBpKTtcclxuICAgIGRleC5jb25maWcuc2V0U3R5bGUobm9kZSwgJ3N0cm9rZS13aWR0aCcsIHN0cm9rZVNwZWMud2lkdGgsIGkpO1xyXG4gICAgZGV4LmNvbmZpZy5zZXRTdHlsZShub2RlLCAnc3Ryb2tlLW9wYWNpdHknLCBzdHJva2VTcGVjLm9wYWNpdHksIGkpO1xyXG4gICAgZGV4LmNvbmZpZy5zZXRTdHlsZShub2RlLCAnc3Ryb2tlLWRhc2hhcnJheScsIHN0cm9rZVNwZWMuZGFzaGFycmF5LCBpKTtcclxuICAgIGRleC5jb25maWcuc2V0QXR0cihub2RlLCAndHJhbnNmb3JtJywgc3Ryb2tlU3BlYy50cmFuc2Zvcm0sIGkpO1xyXG4gIH1cclxuICByZXR1cm4gbm9kZTtcclxufTtcclxuLyoqXHJcbiAqXHJcbiAqIENvbnN0cnVjdCBhIGZpbGwgc3BlY2lmaWNhdGlvbiB3aGljaCBhbGxvdyB0aGUgdXNlciB0byBvdmVycmlkZSBhbnlcclxuICogaXRzIHNldHRpbmdzLlxyXG4gKlxyXG4gKiBAcGFyYW0ge2QzZmlsbF9zcGVjfSBjdXN0b20gLSBUaGUgdXNlcidzIGN1c3RvbWl6YXRpb25zLlxyXG4gKiBAcmV0dXJucyB7ZDNmaWxsX3NwZWN9IEEgZmlsbCBzcGVjaWZpY2F0aW9uIHdoaWNoIGhhcyBhcHBsaWVkIHRoZSB1c2VyJ3NcclxuICogY3VzdG9taXphdGlvbnMuXHJcbiAqXHJcbiAqL1xyXG5leHBvcnRzLmZpbGwgPSBmdW5jdGlvbiBmaWxsKGN1c3RvbSkge1xyXG4gIHZhciBkZWZhdWx0cyA9XHJcbiAge1xyXG4gICAgJ2ZpbGxDb2xvcicgICA6IFwiZ3JleVwiLFxyXG4gICAgJ2ZpbGxPcGFjaXR5JyA6IDFcclxuICB9O1xyXG5cclxuICB2YXIgY29uZmlnID0gZGV4LmNvbmZpZy5leHBhbmRBbmRPdmVybGF5KGN1c3RvbSwgZGVmYXVsdHMpO1xyXG4gIHJldHVybiBjb25maWc7XHJcbn07XHJcblxyXG4vKipcclxuICpcclxuICogQXBwbHkgYSBmaWxsIHNwZWNpZmljYXRpb24gdG8gYSBub2RlLlxyXG4gKlxyXG4gKiBAcGFyYW0ge29iamVjdH0gbm9kZSAtIFRoZSBub2RlIHRvIGJlIGNvbmZpZ3VyZWQuXHJcbiAqIEBwYXJhbSB7ZDNmaWxsX3NwZWN9IGNvbmZpZyAtIFRoZSBmaWxsIHNwZWNpZmljYXRpb24uXHJcbiAqXHJcbiAqIEByZXR1cm5zIHtvYmplY3R9IFRoZSBub2RlIGFmdGVyIGhhdmluZyBhcHBsaWVkIHRoZSBmaWxsIHNwZWNpZmljYXRpb24uXHJcbiAqXHJcbiAqL1xyXG5leHBvcnRzLmNvbmZpZ3VyZUZpbGwgPSBmdW5jdGlvbiBjb25maWd1cmVGaWxsKG5vZGUsIGNvbmZpZywgaSkge1xyXG4gIGlmIChjb25maWcpIHtcclxuICAgIGRleC5jb25maWcuc2V0U3R5bGUobm9kZSwgJ2ZpbGwnLCBjb25maWcuZmlsbENvbG9yLCBpKTtcclxuICAgIGRleC5jb25maWcuc2V0U3R5bGUobm9kZSwgJ2ZpbGwtb3BhY2l0eScsIGNvbmZpZy5maWxsT3BhY2l0eSwgaSk7XHJcbiAgfVxyXG4gIHJldHVybiBub2RlO1xyXG59O1xyXG5cclxuLyoqXHJcbiAqXHJcbiAqIENvbnN0cnVjdCBhIGxpbmsgc3BlY2lmaWNhdGlvbiB3aGljaCBhbGxvd3MgdGhlIHVzZXIgdG8gb3ZlcnJpZGUgYW55XHJcbiAqIG9mIHRoZSBzZXR0aW5ncy5cclxuICpcclxuICogQHBhcmFtIHtkM2xpbmtfc3BlY30gY3VzdG9tIC0gVGhlIHVzZXJzIGN1c3RvbWl6YXRpb25zLlxyXG4gKlxyXG4gKiBAcmV0dXJucyB7ZDNsaW5rX3NwZWN9IEEgbGluayBzcGVjaWZpY2F0aW9uIGdlbmVyYXRlZCBieSBjb21iaW5pbmcgdGhlXHJcbiAqIGRlZmF1bHQgd2l0aCB0aGUgdXNlcidzIGN1c3RvbWl6YXRpb25zLlxyXG4gKlxyXG4gKi9cclxuZXhwb3J0cy5saW5rID0gZnVuY3Rpb24gbGluayhjdXN0b20pIHtcclxuICB2YXIgZGVmYXVsdHMgPVxyXG4gIHtcclxuICAgICdmaWxsJyAgICAgIDogZGV4LmNvbmZpZy5maWxsKCksXHJcbiAgICAnc3Ryb2tlJyAgICA6IGRleC5jb25maWcuc3Ryb2tlKCksXHJcbiAgICAndHJhbnNmb3JtJyA6ICcnLFxyXG4gICAgJ2QnICAgICAgICAgOiB1bmRlZmluZWQsXHJcbiAgICAnZXZlbnRzJyAgICA6IGRleC5jb25maWcuZXZlbnRzKClcclxuICB9O1xyXG5cclxuICB2YXIgY29uZmlnID0gZGV4LmNvbmZpZy5leHBhbmRBbmRPdmVybGF5KGN1c3RvbSwgZGVmYXVsdHMpO1xyXG4gIHJldHVybiBjb25maWc7XHJcbn07XHJcblxyXG4vKipcclxuICpcclxuICogQXBwbHkgYSBsaW5rIHNwZWNpZmljYXRpb24gdG8gYSBub2RlLlxyXG4gKlxyXG4gKiBAcGFyYW0ge29iamVjdH0gbm9kZSAtIFRoZSBub2RlIHRvIGFwcGx5IHRoZSBzcGVjaWZpY2F0aW9uIHRvLlxyXG4gKiBAcGFyYW0ge2QzbGlua19zcGVjfSBjb25maWcgLSBUaGUgbGluayBzcGVjaWZpY2F0aW9uLlxyXG4gKlxyXG4gKiBAcmV0dXJucyB7b2JqZWN0fSBUaGUgbm9kZSBhZnRlciBoYXZpbmcgYXBwbGllZCB0aGUgc3BlY2lmaWNhdGlvbi5cclxuICpcclxuICovXHJcbmV4cG9ydHMuY29uZmlndXJlTGluayA9IGZ1bmN0aW9uIGNvbmZpZ3VyZUxpbmsobm9kZSwgY29uZmlnLCBpKSB7XHJcbiAgaWYgKGNvbmZpZykge1xyXG4gICAgZGV4LmNvbmZpZy5jb25maWd1cmVTdHJva2Uobm9kZSwgY29uZmlnLnN0cm9rZSwgaSk7XHJcbiAgICBkZXguY29uZmlnLmNvbmZpZ3VyZUZpbGwobm9kZSwgY29uZmlnLmZpbGwsIGkpO1xyXG4gICAgZGV4LmNvbmZpZy5zZXRBdHRyKG5vZGUsICd0cmFuc2Zvcm0nLCBjb25maWcudHJhbnNmb3JtLCBpKTtcclxuICAgIGRleC5jb25maWcuc2V0QXR0cihub2RlLCAnZCcsIGNvbmZpZy5kLCBpKTtcclxuICAgIGRleC5jb25maWcuY29uZmlndXJlRXZlbnRzKG5vZGUsIGNvbmZpZy5ldmVudHMsIGkpO1xyXG4gIH1cclxuICByZXR1cm4gbm9kZTtcclxufVxyXG5cclxuLyoqXHJcbiAqXHJcbiAqIENvbnN0cnVjdCBhIHJlY3RhbmdsZSBzcGVjaWZpY2F0aW9uIHdoaWNoIGFsbG93cyB0aGUgdXNlciB0byBvdmVycmlkZSBhbnlcclxuICogb2YgdGhlIHNldHRpbmdzLlxyXG4gKlxyXG4gKiBAcGFyYW0ge2QzcmVjdF9zcGVjfSBjdXN0b20gLSBUaGUgdXNlcnMgY3VzdG9taXphdGlvbnMuXHJcbiAqXHJcbiAqIEByZXR1cm5zIHtkM3JlY3Rfc3BlY30gQSByZWN0YW5nbGUgc3BlY2lmaWNhdGlvbiBnZW5lcmF0ZWQgYnkgY29tYmluaW5nIHRoZVxyXG4gKiBkZWZhdWx0IHdpdGggdGhlIHVzZXIncyBjdXN0b21pemF0aW9ucy5cclxuICpcclxuICovXHJcbmV4cG9ydHMucmVjdGFuZ2xlID0gZnVuY3Rpb24gcmVjdGFuZ2xlKGN1c3RvbSkge1xyXG4gIHZhciBjb25maWcgPVxyXG4gIHtcclxuICAgICd3aWR0aCcgICAgIDogNTAsXHJcbiAgICAnaGVpZ2h0JyAgICA6IDUwLFxyXG4gICAgJ3gnICAgICAgICAgOiAwLFxyXG4gICAgJ3knICAgICAgICAgOiAwLFxyXG4gICAgJ3J4JyAgICAgICAgOiAwLFxyXG4gICAgJ3J5JyAgICAgICAgOiAwLFxyXG4gICAgJ3N0cm9rZScgICAgOiBkZXguY29uZmlnLnN0cm9rZSgpLFxyXG4gICAgJ29wYWNpdHknICAgOiAxLFxyXG4gICAgJ2NvbG9yJyAgICAgOiBkMy5zY2FsZS5jYXRlZ29yeTIwKCksXHJcbiAgICAndHJhbnNmb3JtJyA6IHVuZGVmaW5lZCxcclxuICAgICdldmVudHMnICAgIDogZGV4LmNvbmZpZy5ldmVudHMoKVxyXG4gIH07XHJcbiAgaWYgKGN1c3RvbSkge1xyXG4gICAgY29uZmlnID0gZGV4Lm9iamVjdC5vdmVybGF5KGN1c3RvbSwgY29uZmlnKTtcclxuICB9XHJcbiAgcmV0dXJuIGNvbmZpZztcclxufTtcclxuXHJcbmV4cG9ydHMuY29uZmlndXJlUmVjdGFuZ2xlID0gZnVuY3Rpb24gY29uZmlndXJlUmVjdGFuZ2xlKG5vZGUsIGNvbmZpZywgaSkge1xyXG4gIGlmIChjb25maWcpIHtcclxuICAgIGRleC5jb25maWcuc2V0QXR0cihub2RlLCAnd2lkdGgnLCBjb25maWcud2lkdGgsIGkpO1xyXG4gICAgZGV4LmNvbmZpZy5zZXRBdHRyKG5vZGUsICdoZWlnaHQnLCBjb25maWcuaGVpZ2h0LCBpKTtcclxuICAgIGRleC5jb25maWcuc2V0QXR0cihub2RlLCAneCcsIGNvbmZpZy54LCBpKTtcclxuICAgIGRleC5jb25maWcuc2V0QXR0cihub2RlLCAneScsIGNvbmZpZy55LCBpKTtcclxuICAgIGRleC5jb25maWcuc2V0QXR0cihub2RlLCAncngnLCBjb25maWcucngsIGkpO1xyXG4gICAgZGV4LmNvbmZpZy5zZXRBdHRyKG5vZGUsICdyeScsIGNvbmZpZy5yeSwgaSk7XHJcbiAgICBkZXguY29uZmlnLnNldEF0dHIobm9kZSwgJ29wYWNpdHknLCBjb25maWcub3BhY2l0eSwgaSk7XHJcbiAgICBkZXguY29uZmlnLnNldEF0dHIobm9kZSwgJ2ZpbGwnLCBjb25maWcuY29sb3IsIGkpO1xyXG4gICAgZGV4LmNvbmZpZy5zZXRBdHRyKG5vZGUsICd0cmFuc2Zvcm0nLCBjb25maWcudHJhbnNmb3JtLCBpKTtcclxuICAgIGRleC5jb25maWcuY29uZmlndXJlU3Ryb2tlKG5vZGUsIGNvbmZpZy5zdHJva2UsIGkpO1xyXG4gICAgZGV4LmNvbmZpZy5jb25maWd1cmVFdmVudHMobm9kZSwgY29uZmlnLmV2ZW50cywgaSk7XHJcbiAgfVxyXG4gIHJldHVybiBub2RlO1xyXG59O1xyXG5cclxuLyoqXHJcbiAqXHJcbiAqIENvbnN0cnVjdCBhbiBldmVudHMgc3BlY2lmaWNhdGlvbiB3aGljaCBhbGxvd3MgdGhlIHVzZXIgdG8gb3ZlcnJpZGUgYW55XHJcbiAqIG9mIHRoZSBzZXR0aW5ncy5cclxuICpcclxuICogQHBhcmFtIHtkM2V2ZW50c19zcGVjfSBjdXN0b20gLSBUaGUgdXNlcnMgY3VzdG9taXphdGlvbnMuXHJcbiAqXHJcbiAqIEByZXR1cm5zIHtkM2V2ZW50c19zcGVjfSBBbiBldmVudHMgc3BlY2lmaWNhdGlvbiBnZW5lcmF0ZWQgYnkgY29tYmluaW5nIHRoZVxyXG4gKiBkZWZhdWx0IHdpdGggdGhlIHVzZXIncyBjdXN0b21pemF0aW9ucy5cclxuICpcclxuICovXHJcbmV4cG9ydHMuZXZlbnRzID0gZnVuY3Rpb24gZXZlbnRzKGN1c3RvbSkge1xyXG4gIHZhciBkZWZhdWx0cyA9XHJcbiAge1xyXG4gICAgJ21vdXNlb3ZlcicgOiBmdW5jdGlvbiAoZCkge1xyXG4gICAgICAvL2NvbnNvbGUubG9nKFwiRGVmYXVsdCBtb3VzZW92ZXJcIik7XHJcbiAgICB9XHJcbiAgfTtcclxuICB2YXIgY29uZmlnID0gZGVmYXVsdHM7XHJcblxyXG4gIGlmIChjdXN0b20pIHtcclxuICAgIGNvbmZpZyA9IGRleC5vYmplY3Qub3ZlcmxheShjdXN0b20sIGRlZmF1bHRzKTtcclxuICB9XHJcbiAgcmV0dXJuIGNvbmZpZztcclxufTtcclxuXHJcbmV4cG9ydHMuY29uZmlndXJlRXZlbnRzID0gZnVuY3Rpb24gY29uZmlndXJlRXZlbnRzKG5vZGUsIGNvbmZpZywgaSkge1xyXG4gIC8vZGV4LmNvbnNvbGUubG9nKFwiQ29uZmlndXJlIEV2ZW50c1wiLCBjb25maWcsIGkpO1xyXG4gIGlmIChjb25maWcpIHtcclxuICAgIGZvciAodmFyIGtleSBpbiBjb25maWcpIHtcclxuICAgICAgLy9kZXguY29uc29sZS5sb2coXCJLRVlcIiwga2V5LCBcIlZBTFVFXCIsIGNvbmZpZ1trZXldKTtcclxuICAgICAgZGV4LmNvbmZpZy5zZXRFdmVudEhhbmRsZXIobm9kZSwga2V5LCBjb25maWdba2V5XSwgaSk7XHJcbiAgICB9XHJcbiAgfVxyXG5cclxuICByZXR1cm4gbm9kZTtcclxufTtcclxuXHJcbi8qKlxyXG4gKlxyXG4gKiBDb25zdHJ1Y3QgYW4gbGluZSBzcGVjaWZpY2F0aW9uIHdoaWNoIGFsbG93cyB0aGUgdXNlciB0byBvdmVycmlkZSBhbnlcclxuICogb2YgdGhlIHNldHRpbmdzLlxyXG4gKlxyXG4gKiBAcGFyYW0ge2QzbGluZV9zcGVjfSBjdXN0b20gLSBUaGUgdXNlcnMgY3VzdG9taXphdGlvbnMuXHJcbiAqXHJcbiAqIEByZXR1cm5zIHtkM2xpbmVfc3BlY30gQSBsaW5lIHNwZWNpZmljYXRpb24gZ2VuZXJhdGVkIGJ5IGNvbWJpbmluZyB0aGVcclxuICogZGVmYXVsdCB3aXRoIHRoZSB1c2VyJ3MgY3VzdG9taXphdGlvbnMuXHJcbiAqXHJcbiAqL1xyXG5leHBvcnRzLmxpbmUgPSBmdW5jdGlvbiBsaW5lKGN1c3RvbSkge1xyXG4gIHZhciBkZWZhdWx0cyA9XHJcbiAge1xyXG4gICAgJ3N0YXJ0JyAgICAgICA6IGRleC5jb25maWcucG9pbnQoKSxcclxuICAgICdlbmQnICAgICAgICAgOiBkZXguY29uZmlnLnBvaW50KCksXHJcbiAgICAnc3Ryb2tlJyAgICAgIDogZGV4LmNvbmZpZy5zdHJva2UoKSxcclxuICAgICdmaWxsJyAgICAgICAgOiBkZXguY29uZmlnLmZpbGwoKSxcclxuICAgICdpbnRlcnBvbGF0ZScgOiB1bmRlZmluZWRcclxuICB9O1xyXG4gIHZhciBjb25maWcgPSBkZXguY29uZmlnLmV4cGFuZEFuZE92ZXJsYXkoY3VzdG9tLCBkZWZhdWx0cyk7XHJcbiAgcmV0dXJuIGNvbmZpZztcclxufTtcclxuXHJcbmV4cG9ydHMuY29uZmlndXJlTGluZSA9IGZ1bmN0aW9uIGNvbmZpZ3VyZUxpbmUobm9kZSwgY29uZmlnLCBpKSB7XHJcbiAgaWYgKGNvbmZpZykge1xyXG4gICAgZGV4LmNvbmZpZy5zZXRBdHRyKG5vZGUsICd4MScsIGNvbmZpZy5zdGFydC54LCBpKTtcclxuICAgIGRleC5jb25maWcuc2V0QXR0cihub2RlLCAneTEnLCBjb25maWcuc3RhcnQueSwgaSk7XHJcbiAgICBkZXguY29uZmlnLnNldEF0dHIobm9kZSwgJ3gyJywgY29uZmlnLmVuZC54LCBpKTtcclxuICAgIGRleC5jb25maWcuc2V0QXR0cihub2RlLCAneTInLCBjb25maWcuZW5kLnksIGkpO1xyXG4gICAgZGV4LmNvbmZpZy5jb25maWd1cmVTdHJva2Uobm9kZSwgY29uZmlnLnN0cm9rZSwgaSk7XHJcbiAgICBkZXguY29uZmlnLmNvbmZpZ3VyZUZpbGwobm9kZSwgY29uZmlnLmZpbGwsIGkpO1xyXG4gICAgaWYgKGNvbmZpZy5pbnRlcnBvbGF0ZSkge1xyXG4gICAgICAvL2RleC5jb25zb2xlLmxvZyhcImludGVycG9sYXRlXCIsIG5vZGUsIGNvbmZpZywgaSk7XHJcbiAgICAgIG5vZGUuaW50ZXJwb2xhdGUoY29uZmlnLmludGVycG9sYXRlKTtcclxuICAgICAgLy8gSSB0aGluayB0aGlzIGlzIGNsb3NlciB0byBjb3JyZWN0Li4uLmJ1dCBicmVha3MgdGhlIG1vdGlvbiBsaW5lIGNoYXJ0XHJcbiAgICAgIC8vbm9kZS5pbnRlcnBvbGF0ZShkZXguY29uZmlnLm9wdGlvblZhbHVlKGNvbmZpZy5pbnRlcnBvbGF0ZSwgaSkpO1xyXG4gICAgfVxyXG4gIH1cclxuICByZXR1cm4gbm9kZTtcclxufTtcclxuXHJcbi8qKlxyXG4gKlxyXG4gKiBDb25zdHJ1Y3QgYW4gcGF0aCBzcGVjaWZpY2F0aW9uIHdoaWNoIGFsbG93cyB0aGUgdXNlciB0byBvdmVycmlkZSBhbnlcclxuICogb2YgdGhlIHNldHRpbmdzLlxyXG4gKlxyXG4gKiBAcGFyYW0ge2QzcGF0aF9zcGVjfSBjdXN0b20gLSBUaGUgdXNlcnMgY3VzdG9taXphdGlvbnMuXHJcbiAqXHJcbiAqIEByZXR1cm5zIHtkM3BhdGhfc3BlY30gQSBwYXRoIHNwZWNpZmljYXRpb24gZ2VuZXJhdGVkIGJ5IGNvbWJpbmluZyB0aGVcclxuICogZGVmYXVsdCB3aXRoIHRoZSB1c2VyJ3MgY3VzdG9taXphdGlvbnMuXHJcbiAqXHJcbiAqL1xyXG5leHBvcnRzLnBhdGggPSBmdW5jdGlvbiBwYXRoKGN1c3RvbSkge1xyXG4gIHZhciBkZWZhdWx0cyA9XHJcbiAge1xyXG4gICAgJ2ZpbGwnICAgOiBkZXguY29uZmlnLmZpbGwoKSxcclxuICAgICdzdHJva2UnIDogZGV4LmNvbmZpZy5zdHJva2UoKVxyXG4gIH07XHJcbiAgdmFyIGNvbmZpZyA9IGRleC5jb25maWcuZXhwYW5kQW5kT3ZlcmxheShjdXN0b20sIGRlZmF1bHRzKTtcclxuICByZXR1cm4gY29uZmlnO1xyXG59O1xyXG5cclxuZXhwb3J0cy5jb25maWd1cmVQYXRoID0gZnVuY3Rpb24gY29uZmlndXJlUGF0aChub2RlLCBjb25maWcsIGkpIHtcclxuICBpZiAoY29uZmlnKSB7XHJcbiAgICBkZXguY29uZmlnLmNvbmZpZ3VyZUZpbGwobm9kZSwgY29uZmlnLmZpbGwsIGkpO1xyXG4gICAgZGV4LmNvbmZpZy5jb25maWd1cmVTdHJva2Uobm9kZSwgY29uZmlnLnN0cm9rZSwgaSk7XHJcbiAgfVxyXG4gIHJldHVybiBub2RlO1xyXG59O1xyXG5cclxuZXhwb3J0cy5nZXRDYWxsZXJzID0gZnVuY3Rpb24gZ2V0Q2FsbGVycyhjYWxsZXIpIHtcclxuICB2YXIgY2FsbGVycyA9IFtdO1xyXG4gIHZhciBjdXJyZW50Q2FsbGVyID0gY2FsbGVyO1xyXG4gIGZvciAoOyBjdXJyZW50Q2FsbGVyOyBjdXJyZW50Q2FsbGVyID0gY3VycmVudENhbGxlci5jYWxsZXIpIHtcclxuICAgIGlmIChjdXJyZW50Q2FsbGVyLm5hbWUpIHtcclxuICAgICAgY2FsbGVycy5wdXNoKGN1cnJlbnRDYWxsZXIubmFtZSk7XHJcbiAgICB9XHJcbiAgfVxyXG5cclxuICByZXR1cm4gY2FsbGVycy5yZXZlcnNlKCk7XHJcbn1cclxuXHJcbmV4cG9ydHMuZ2V0Q2FsbGVyU3RyaW5nID0gZnVuY3Rpb24gZ2V0Q2FsbGVyU3RyaW5nKGNhbGxlcikge1xyXG4gIHJldHVybiBkZXguY29uZmlnLmdldENhbGxlcnMoY2FsbGVyKS5qb2luKFwiLT5cIik7XHJcbn1cclxuXHJcbmV4cG9ydHMuc2V0RXZlbnRIYW5kbGVyID0gZnVuY3Rpb24gc2V0RXZlbnRIYW5kbGVyKG5vZGUsIGV2ZW50VHlwZSwgZXZlbnRIYW5kbGVyLCBpKSB7XHJcbiAgdmFyIGNhbGxlclN0ciA9IGRleC5jb25maWcuZ2V0Q2FsbGVyU3RyaW5nKGFyZ3VtZW50cy5jYWxsZWUuY2FsbGVyKTtcclxuXHJcbiAgLy9kZXguY29uc29sZS5kZWJ1ZyhjYWxsZXJTdHIgKyBcIjogc2V0RXZlbnRIYW5kbGVyKG5vZGU9XCIgKyBub2RlICsgXCIsIGV2ZW50VHlwZT1cIiArIGV2ZW50VHlwZSArIFwiLCBldmVudEhhbmRsZXI9XCIgKyBldmVudEhhbmRsZXIpO1xyXG4gIGlmICghbm9kZSkge1xyXG4gICAgZGV4LmNvbnNvbGUud2FybihjYWxsZXJTdHIgKyBcIjogZGV4LmNvbmZpZy5zZXRFdmVudEhhbmRsZXIoZXZlbnRUeXBlPSdcIiArIGV2ZW50VHlwZSArIFwiZXZlbnRIYW5kbGVyPVwiICsgZXZlbnRIYW5kbGVyICsgXCIpIDogbm9kZSBpcyBudWxsLlwiKTtcclxuICAgIHJldHVybiBub2RlO1xyXG4gIH1cclxuICBpZiAoIWRleC5vYmplY3QuaXNGdW5jdGlvbihub2RlLm9uKSkge1xyXG4gICAgZGV4LmNvbnNvbGUud2FybihjYWxsZXJTdHIgKyBcIjogZGV4LmNvbmZpZy5zZXRFdmVudEhhbmRsZXIoZXZlbnRUeXBlPSdcIiArIGV2ZW50VHlwZSArIFwiJywgZXZlbnRIYW5kbGVyPSdcIiArIGV2ZW50SGFuZGxlciArXHJcbiAgICBcIicpIDogdGFyZ2V0IG5vZGUgaXMgbWlzc2luZyBmdW5jdGlvbjogbm9kZS5vbihldmVudFR5cGUsZXZlbnRIYW5kbGVyKS4gIE5vZGUgZHVtcDpcIiwgbm9kZSk7XHJcbiAgICByZXR1cm4gbm9kZTtcclxuICB9XHJcbiAgaWYgKHR5cGVvZiBldmVudEhhbmRsZXIgIT0gJ3VuZGVmaW5lZCcpIHtcclxuICAgIGRleC5jb25zb2xlLmRlYnVnKGNhbGxlclN0ciArIFwiOiBTZXQgRXZlbnQgSGFuZGxlcjogJ1wiICsgZXZlbnRUeXBlICsgXCInPSdcIiArIGV2ZW50SGFuZGxlciArIFwiJ1wiKTtcclxuICAgIG5vZGUub24oZXZlbnRUeXBlLCBldmVudEhhbmRsZXIpO1xyXG4gIH1cclxuICBlbHNlIHtcclxuICAgIGRleC5jb25zb2xlLmRlYnVnKGNhbGxlclN0ciArPSBcIjogVW5kZWZpbmVkIEV2ZW50IEhhbmRsZXI6ICdcIiArIGV2ZW50VHlwZSArIFwiJz0nXCIgKyBldmVudEhhbmRsZXIgKyBcIidcIik7XHJcbiAgfVxyXG4gIHJldHVybiBub2RlO1xyXG59O1xyXG5cclxuZXhwb3J0cy5zZXRBdHRyID0gZnVuY3Rpb24gc2V0QXR0cihub2RlLCBuYW1lLCB2YWx1ZSwgaSkge1xyXG4gIHZhciBjYWxsZXJTdHIgPSBkZXguY29uZmlnLmdldENhbGxlclN0cmluZyhhcmd1bWVudHMuY2FsbGVlLmNhbGxlcik7XHJcbiAgaWYgKCFub2RlKSB7XHJcbiAgICBkZXguY29uc29sZS53YXJuKGNhbGxlclN0ciArIFwiOiBkZXguY29uZmlnLnNldEF0dHIobmFtZT0nXCIgKyBuYW1lICsgXCJ2YWx1ZT1cIiArIHZhbHVlICsgXCIpIDogbm9kZSBpcyBudWxsLlwiKTtcclxuICAgIHJldHVybiBub2RlO1xyXG4gIH1cclxuICBpZiAoIWRleC5vYmplY3QuaXNGdW5jdGlvbihub2RlLmF0dHIpKSB7XHJcbiAgICBkZXguY29uc29sZS53YXJuKGNhbGxlclN0ciArIFwiOiBkZXguY29uZmlnLnNldEF0dHIobmFtZT0nXCIgKyBuYW1lICsgXCInLCB2YWx1ZT0nXCIgKyB2YWx1ZSArXHJcbiAgICBcIicpIDogdGFyZ2V0IG5vZGUgaXMgbWlzc2luZyBmdW5jdGlvbjogbm9kZS5hdHRyLiAgTm9kZSBkdW1wOlwiLCBub2RlKTtcclxuICAgIHJldHVybiBub2RlO1xyXG4gIH1cclxuICBpZiAodHlwZW9mIHZhbHVlICE9ICd1bmRlZmluZWQnKSB7XHJcbiAgICBkZXguY29uc29sZS5kZWJ1ZyhjYWxsZXJTdHIgKyBcIjogU2V0IEF0dHI6ICdcIiArIG5hbWUgKyBcIic9J1wiICsgdmFsdWUgKyBcIidcIik7XHJcbiAgICBub2RlLmF0dHIobmFtZSwgZGV4LmNvbmZpZy5vcHRpb25WYWx1ZSh2YWx1ZSwgaSkpO1xyXG4gIH1cclxuICBlbHNlIHtcclxuICAgIGRleC5jb25zb2xlLmRlYnVnKGNhbGxlclN0ciArPSBcIjogVW5kZWZpbmVkIEF0dHI6ICdcIiArIG5hbWUgKyBcIic9J1wiICsgdmFsdWUgKyBcIidcIik7XHJcbiAgfVxyXG4gIHJldHVybiBub2RlO1xyXG59O1xyXG5cclxuZXhwb3J0cy5zZXRTdHlsZSA9IGZ1bmN0aW9uIHNldFN0eWxlKG5vZGUsIG5hbWUsIHZhbHVlLCBpKSB7XHJcbiAgdmFyIGNhbGxlclN0ciA9IGRleC5jb25maWcuZ2V0Q2FsbGVyU3RyaW5nKGFyZ3VtZW50cy5jYWxsZWUuY2FsbGVyKTtcclxuICBpZiAoIW5vZGUpIHtcclxuICAgIGRleC5jb25zb2xlLndhcm4oY2FsbGVyU3RyICsgXCI6IGRleC5jb25maWcuc2V0QXR0cihuYW1lPSdcIiArIG5hbWUgKyBcInZhbHVlPVwiICsgdmFsdWUgKyBcIikgOiBub2RlIGlzIG51bGwuXCIpO1xyXG4gICAgcmV0dXJuIG5vZGU7XHJcbiAgfVxyXG4gIGlmICghZGV4Lm9iamVjdC5pc0Z1bmN0aW9uKG5vZGUuc3R5bGUpKSB7XHJcbiAgICBkZXguY29uc29sZS53YXJuKGNhbGxlclN0ciArIFwiOiBkZXguY29uZmlnLnNldFN0eWxlKG5hbWU9J1wiICsgbmFtZSArIFwiJywgdmFsdWU9J1wiICsgdmFsdWUgK1xyXG4gICAgXCInKSA6IHRhcmdldCBub2RlIGlzIG1pc3NpbmcgZnVuY3Rpb246IG5vZGUuc3R5bGUuICBOb2RlIER1bXA6XCIsIG5vZGUpO1xyXG4gICAgcmV0dXJuIG5vZGU7XHJcbiAgfVxyXG4gIGlmICh0eXBlb2YgdmFsdWUgIT09ICd1bmRlZmluZWQnICYmIG5vZGUgJiYgZGV4Lm9iamVjdC5pc0Z1bmN0aW9uKG5vZGUuc3R5bGUpKSB7XHJcbiAgICBkZXguY29uc29sZS5kZWJ1ZyhjYWxsZXJTdHIgKyBcIjogU2V0IFN0eWxlOiBuYW1lPSdcIiArIG5hbWUgKyBcIicsIFZhbHVlIER1bXA6XCIsXHJcbiAgICAgIGRleC5jb25maWcub3B0aW9uVmFsdWUodmFsdWUsIGkpKTtcclxuICAgIG5vZGUuc3R5bGUobmFtZSwgZGV4LmNvbmZpZy5vcHRpb25WYWx1ZSh2YWx1ZSwgaSkpO1xyXG4gIH1cclxuICBlbHNlIHtcclxuICAgIGRleC5jb25zb2xlLmRlYnVnKGNhbGxlclN0ciArIFwiOiBVbmRlZmluZWQgU3R5bGU6IG5hbWU9J1wiICsgbmFtZSArIFwiJywgVmFsdWUgRHVtcDpcIiwgdmFsdWUpO1xyXG4gIH1cclxuICByZXR1cm4gbm9kZTtcclxufTtcclxuXHJcbmV4cG9ydHMub3B0aW9uVmFsdWUgPSBmdW5jdGlvbiBvcHRpb25WYWx1ZShvcHRpb24sIGkpIHtcclxuICAvL2RleC5jb25zb2xlLmxvZyhcIk9QVElPTi1JOiBcIiArIGkpO1xyXG5cclxuICAvLyBDdXJyeSB2YWx1ZSBpOlxyXG4gIGlmICh0eXBlb2YgaSAhPT0gJ3VuZGVmaW5lZCcpIHtcclxuICAgIHJldHVybiBmdW5jdGlvbiAoZCkge1xyXG4gICAgICAvL2RleC5jb25zb2xlLmxvZyhcIk9QVElPTlwiLCBvcHRpb24sIFwiRFwiLCBkLCBcIklcIiwgaSk7XHJcbiAgICAgIGlmIChkZXgub2JqZWN0LmlzRnVuY3Rpb24ob3B0aW9uKSkge1xyXG4gICAgICAgIHJldHVybiBvcHRpb24oZCwgaSk7XHJcbiAgICAgIH1cclxuICAgICAgZWxzZSB7XHJcbiAgICAgICAgcmV0dXJuIG9wdGlvbjtcclxuICAgICAgfVxyXG4gICAgfTtcclxuICB9XHJcbiAgZWxzZSB7XHJcbiAgICByZXR1cm4gZnVuY3Rpb24gKGQsIGkpIHtcclxuICAgICAgLy9kZXguY29uc29sZS5sb2coXCJPUFRJT05cIiwgb3B0aW9uLCBcIkRcIiwgZCwgXCJJXCIsIGkpO1xyXG4gICAgICBpZiAoZGV4Lm9iamVjdC5pc0Z1bmN0aW9uKG9wdGlvbikpIHtcclxuICAgICAgICByZXR1cm4gb3B0aW9uKGQsIGkpO1xyXG4gICAgICB9XHJcbiAgICAgIGVsc2Uge1xyXG4gICAgICAgIHJldHVybiBvcHRpb247XHJcbiAgICAgIH1cclxuICAgIH07XHJcbiAgfVxyXG59O1xyXG5cclxuLyoqXHJcbiAqXHJcbiAqIElzIHRoaXMgY29ycmVjdD8gIEl0IGxvb2tzIHN1c3BlY3QgdG8gbWUuXHJcbiAqXHJcbiAqIEBwYXJhbSBub2RlXHJcbiAqIEBwYXJhbSBmblxyXG4gKiBAcGFyYW0gdmFsdWVcclxuICogQHBhcmFtIGlcclxuICogQHJldHVybnMgeyp9XHJcbiAqL1xyXG5leHBvcnRzLmNhbGxJZkRlZmluZWQgPSBmdW5jdGlvbiBjYWxsSWZEZWZpbmVkKG5vZGUsIGZuLCB2YWx1ZSwgaSkge1xyXG4gIC8vZGV4LmNvbnNvbGUubG9nKFwiQ0FMTC1JRi1ERUZJTkVEOiBmbj1cIiArIGZuICsgXCIsIHZhbHVlPVwiICsgdmFsdWUgKyBcIiwgST1cIiArIGkpO1xyXG4gIGlmICh0eXBlb2YgdmFsdWUgPT09ICd1bmRlZmluZWQnKSB7XHJcbiAgICAvL2RleC5jb25zb2xlLmxvZyhcIlNraXBwaW5nOiBcIiArIGZuICsgXCIoKVwiKTtcclxuICB9XHJcbiAgZWxzZSB7XHJcbiAgICAvL2RleC5jb25zb2xlLmxvZyhcIkNhbGxpbmc6ICdcIiArIGZuICsgXCIoXCIgKyB2YWx1ZSArIFwiKVwiKTtcclxuICAgIHJldHVybiBub2RlW2ZuXShkZXguY29uZmlnLm9wdGlvblZhbHVlKHZhbHVlLCBpKSk7XHJcbiAgfVxyXG5cclxuICByZXR1cm4gbm9kZTtcclxufTtcclxuXHJcbi8qKlxyXG4gKlxyXG4gKiBDb25zdHJ1Y3QgYW4gcG9pbnQgc3BlY2lmaWNhdGlvbiB3aGljaCBhbGxvd3MgdGhlIHVzZXIgdG8gb3ZlcnJpZGUgYW55XHJcbiAqIG9mIHRoZSBzZXR0aW5ncy5cclxuICpcclxuICogQHBhcmFtIHtkM3BvaW50X3NwZWN9IGN1c3RvbSAtIFRoZSB1c2VycyBjdXN0b21pemF0aW9ucy5cclxuICpcclxuICogQHJldHVybnMge2QzcG9pbnRfc3BlY30gQSBwb2ludCBzcGVjaWZpY2F0aW9uIGdlbmVyYXRlZCBieSBjb21iaW5pbmcgdGhlXHJcbiAqIGRlZmF1bHQgd2l0aCB0aGUgdXNlcidzIGN1c3RvbWl6YXRpb25zLlxyXG4gKlxyXG4gKi9cclxuZXhwb3J0cy5wb2ludCA9IGZ1bmN0aW9uIHBvaW50KGN1c3RvbSkge1xyXG4gIHZhciBjb25maWcgPVxyXG4gIHtcclxuICAgICd4JyA6IHVuZGVmaW5lZCxcclxuICAgICd5JyA6IHVuZGVmaW5lZFxyXG4gIH07XHJcbiAgaWYgKGN1c3RvbSkge1xyXG4gICAgY29uZmlnID0gZGV4Lm9iamVjdC5vdmVybGF5KGN1c3RvbSwgY29uZmlnKTtcclxuICB9XHJcbiAgcmV0dXJuIGNvbmZpZztcclxufTtcclxuXHJcbmV4cG9ydHMuY29uZmlndXJlUG9pbnQgPSBmdW5jdGlvbiBjb25maWd1cmVQb2ludChub2RlLCBjb25maWcsIGkpIHtcclxuICBpZiAoY29uZmlnKSB7XHJcbiAgICBub2RlXHJcbiAgICAgIC5hdHRyKCd4JywgZGV4LmNvbmZpZy5vcHRpb25WYWx1ZShjb25maWcuY2VudGVyLmN4LCBpKSlcclxuICAgICAgLmF0dHIoJ3knLCBkZXguY29uZmlnLm9wdGlvblZhbHVlKGNvbmZpZy5jZW50ZXIuY3ksIGkpKTtcclxuICB9XHJcbiAgcmV0dXJuIG5vZGU7XHJcbn07XHJcblxyXG4vLyBDb25maWd1cmVzOiBvcGFjaXR5LCBjb2xvciwgc3Ryb2tlLlxyXG5leHBvcnRzLmNvbmZpZ3VyZVNoYXBlU3R5bGUgPSBmdW5jdGlvbiBjb25maWd1cmVTaGFwZVN0eWxlKG5vZGUsIGNvbmZpZywgaSkge1xyXG4gIGlmIChjb25maWcpIHtcclxuICAgIG5vZGVcclxuICAgICAgLmNhbGwoZGV4LmNvbmZpZy5jb25maWd1cmVTdHJva2UsIGNvbmZpZy5zdHJva2UsIGkpXHJcbiAgICAgIC5hdHRyKCdvcGFjaXR5JywgY29uZmlnLm9wYWNpdHkpXHJcbiAgICAgIC5zdHlsZSgnZmlsbCcsIGNvbmZpZy5jb2xvcik7XHJcbiAgfVxyXG4gIHJldHVybiBub2RlO1xyXG59O1xyXG5cclxuLyoqXHJcbiAqXHJcbiAqIENvbnN0cnVjdCBhbiBjaXJjbGUgc3BlY2lmaWNhdGlvbiB3aGljaCBhbGxvd3MgdGhlIHVzZXIgdG8gb3ZlcnJpZGUgYW55XHJcbiAqIG9mIHRoZSBzZXR0aW5ncy5cclxuICpcclxuICogQHBhcmFtIHtkM2NpcmNsZV9zcGVjfSBjdXN0b20gLSBUaGUgdXNlcnMgY3VzdG9taXphdGlvbnMuXHJcbiAqXHJcbiAqIEByZXR1cm5zIHtkM2NpcmNsZV9zcGVjfSBBIGNpcmNsZSBzcGVjaWZpY2F0aW9uIGdlbmVyYXRlZCBieSBjb21iaW5pbmcgdGhlXHJcbiAqIGRlZmF1bHQgd2l0aCB0aGUgdXNlcidzIGN1c3RvbWl6YXRpb25zLlxyXG4gKlxyXG4gKi9cclxuZXhwb3J0cy5jaXJjbGUgPSBmdW5jdGlvbiBjaXJjbGUoY3VzdG9tKSB7XHJcbiAgdmFyIGNvbmZpZyA9XHJcbiAge1xyXG4gICAgJ2N4JyAgICAgICAgOiAwLFxyXG4gICAgJ2N5JyAgICAgICAgOiAwLFxyXG4gICAgJ3InICAgICAgICAgOiAxMCxcclxuICAgICdmaWxsJyAgICAgIDogZGV4LmNvbmZpZy5maWxsKCksXHJcbiAgICAnc3Ryb2tlJyAgICA6IGRleC5jb25maWcuc3Ryb2tlKCksXHJcbiAgICAndHJhbnNmb3JtJyA6ICcnLFxyXG4gICAgJ3RpdGxlJyAgICAgOiAnJyxcclxuICAgICdldmVudHMnICAgIDogZGV4LmNvbmZpZy5ldmVudHMoKVxyXG4gIH07XHJcbiAgaWYgKGN1c3RvbSkge1xyXG4gICAgY29uZmlnID0gZGV4Lm9iamVjdC5vdmVybGF5KGN1c3RvbSwgY29uZmlnKTtcclxuICB9XHJcbiAgcmV0dXJuIGNvbmZpZztcclxufTtcclxuXHJcbmV4cG9ydHMuY29uZmlndXJlQ2lyY2xlID0gZnVuY3Rpb24gY29uZmlndXJlQ2lyY2xlKG5vZGUsIGNvbmZpZywgaSkge1xyXG4gIGlmIChjb25maWcpIHtcclxuICAgIGRleC5jb25maWcuc2V0QXR0cihub2RlLCBcInJcIiwgY29uZmlnLnIsIGkpO1xyXG4gICAgZGV4LmNvbmZpZy5zZXRBdHRyKG5vZGUsIFwiY3hcIiwgY29uZmlnLmN4LCBpKTtcclxuICAgIGRleC5jb25maWcuc2V0QXR0cihub2RlLCBcImN5XCIsIGNvbmZpZy5jeSwgaSk7XHJcbiAgICBkZXguY29uZmlnLnNldEF0dHIobm9kZSwgXCJ0cmFuc2Zvcm1cIiwgY29uZmlnLnRyYW5zZm9ybSwgaSk7XHJcbiAgICBkZXguY29uZmlnLnNldEF0dHIobm9kZSwgXCJ0aXRsZVwiLCBjb25maWcudGl0bGUsIGkpO1xyXG4gICAgZGV4LmNvbmZpZy5jb25maWd1cmVTdHJva2Uobm9kZSwgY29uZmlnLnN0cm9rZSwgaSk7XHJcbiAgICBkZXguY29uZmlnLmNvbmZpZ3VyZUZpbGwobm9kZSwgY29uZmlnLmZpbGwsIGkpO1xyXG4gICAgZGV4LmNvbmZpZy5jb25maWd1cmVFdmVudHMobm9kZSwgY29uZmlnLmV2ZW50cywgaSk7XHJcbiAgfVxyXG4gIHJldHVybiBub2RlO1xyXG59O1xyXG5cclxuLypcclxuIGV4cG9ydHMuY29uZmlndXJlQXhpc19kZXByZWNhdGVkID0gZnVuY3Rpb24gY29uZmlndXJlQXhpc19kZXByZWNhdGVkKGNvbmZpZykge1xyXG4gdmFyIGF4aXM7XHJcblxyXG4gaWYgKGNvbmZpZykge1xyXG4gdmFyIGF4aXMgPSBkMy5zdmcuYXhpcygpXHJcbiAudGlja3MoY29uZmlnLnRpY2suY291bnQpXHJcbiAudGlja1N1YmRpdmlkZShjb25maWcudGljay5zdWJkaXZpZGUpXHJcbiAudGlja1NpemUoY29uZmlnLnRpY2suc2l6ZS5tYWpvciwgY29uZmlnLnRpY2suc2l6ZS5taW5vcixcclxuIGNvbmZpZy50aWNrLnNpemUuZW5kKVxyXG4gLnRpY2tQYWRkaW5nKGNvbmZpZy50aWNrLnBhZGRpbmcpO1xyXG5cclxuIC8vIFJFTTogSG9ycmlibGUgd2F5IG9mIGRvaW5nIHRoaXMuICBOZWVkIGEgZnVuY3Rpb24gd2hpY2hcclxuIC8vIGlzIG1vcmUgZ2VuZXJpYyBhbmQgc21hcnRlciB0byBzaG9ydCBjaXJjdWl0IHN0dWZmIGxpa2VcclxuIC8vIHRoaXMuICBCdXQuLi5mb3Igbm93IGl0IGRvZXMgd2hhdCBJIHdhbnQuXHJcbiBpZiAoIWRleC5vYmplY3QuaXNGdW5jdGlvbihjb25maWcudGljay5mb3JtYXQpKSB7XHJcbiBheGlzLnRpY2tGb3JtYXQoY29uZmlnLnRpY2suZm9ybWF0KTtcclxuIH1cclxuXHJcbiBheGlzXHJcbiAub3JpZW50KGNvbmZpZy5vcmllbnQpXHJcbiAuc2NhbGUoY29uZmlnLnNjYWxlKTtcclxuIH1cclxuIGVsc2Uge1xyXG4gYXhpcyA9IGQzLnN2Zy5heGlzKCk7XHJcbiB9XHJcbiAvL2F4aXMuc2NhbGUgPSBjb25maWcuc2NhbGU7XHJcbiByZXR1cm4gYXhpcztcclxuIH07XHJcbiAqL1xyXG5cclxuLyoqXHJcbiAqXHJcbiAqIENvbnN0cnVjdCBhbiB0aWNrIHNwZWNpZmljYXRpb24gd2hpY2ggYWxsb3dzIHRoZSB1c2VyIHRvIG92ZXJyaWRlIGFueVxyXG4gKiBvZiB0aGUgc2V0dGluZ3MuXHJcbiAqXHJcbiAqIEBwYXJhbSB7ZDN0aWNrX3NwZWN9IGN1c3RvbSAtIFRoZSB1c2VycyBjdXN0b21pemF0aW9ucy5cclxuICpcclxuICogQHJldHVybnMge2QzdGlja19zcGVjfSBBIHRpY2sgc3BlY2lmaWNhdGlvbiBnZW5lcmF0ZWQgYnkgY29tYmluaW5nIHRoZVxyXG4gKiBkZWZhdWx0IHdpdGggdGhlIHVzZXIncyBjdXN0b21pemF0aW9ucy5cclxuICpcclxuICovXHJcbmV4cG9ydHMudGljayA9IGZ1bmN0aW9uIHRpY2soY3VzdG9tKSB7XHJcbiAgdmFyIGNvbmZpZyA9XHJcbiAge1xyXG4gICAgJ2NvdW50JyAgICAgOiA1LFxyXG4gICAgLy8ndGlja1ZhbHVlcycgIDogdW5kZWZpbmVkLFxyXG4gICAgJ3N1YmRpdmlkZScgOiAzLFxyXG4gICAgJ3NpemUnICAgICAgOiB7XHJcbiAgICAgICdtYWpvcicgOiA1LFxyXG4gICAgICAnbWlub3InIDogMyxcclxuICAgICAgJ2VuZCcgICA6IDVcclxuICAgIH0sXHJcbiAgICAncGFkZGluZycgICA6IDUsXHJcbiAgICAnZm9ybWF0JyAgICA6IGQzLmZvcm1hdChcIixkXCIpLFxyXG4gICAgJ2xhYmVsJyAgICAgOiBkZXguY29uZmlnLnRleHQoKVxyXG4gIH07XHJcbiAgaWYgKGN1c3RvbSkge1xyXG4gICAgY29uZmlnID0gZGV4Lm9iamVjdC5vdmVybGF5KGN1c3RvbSwgY29uZmlnKTtcclxuICB9XHJcbiAgcmV0dXJuIGNvbmZpZztcclxufTtcclxuXHJcbi8qXHJcbiBleHBvcnRzLnhheGlzX2RlcHJlY2F0ZSA9IGZ1bmN0aW9uIChjdXN0b20pIHtcclxuIHZhciBjb25maWcgPVxyXG4ge1xyXG4gJ3NjYWxlJyAgOiBkMy5zY2FsZS5saW5lYXIoKSxcclxuICdvcmllbnQnIDogXCJib3R0b21cIixcclxuICd0aWNrJyAgIDogdGhpcy50aWNrKCksXHJcbiAnbGFiZWwnICA6IGRleC5jb25maWcudGV4dCgpXHJcbiB9O1xyXG4gaWYgKGN1c3RvbSkge1xyXG4gY29uZmlnID0gZGV4Lm9iamVjdC5vdmVybGF5KGN1c3RvbSwgY29uZmlnKTtcclxuIH1cclxuIHJldHVybiBjb25maWc7XHJcbiB9O1xyXG5cclxuIGV4cG9ydHMueWF4aXNfZGVwcmVjYXRlID0gZnVuY3Rpb24gKGN1c3RvbSkge1xyXG4gdmFyIGNvbmZpZyA9XHJcbiB7XHJcbiAnc2NhbGUnICA6IGQzLnNjYWxlLmxpbmVhcigpLFxyXG4gJ29yaWVudCcgOiAnbGVmdCcsXHJcbiAndGljaycgICA6IHRoaXMudGljaygpLFxyXG4gJ2xhYmVsJyAgOiBkZXguY29uZmlnLnRleHQoeyd0cmFuc2Zvcm0nIDogJ3JvdGF0ZSgtOTApJ30pXHJcbiB9O1xyXG4gaWYgKGN1c3RvbSkge1xyXG4gY29uZmlnID0gZGV4Lm9iamVjdC5vdmVybGF5KGN1c3RvbSwgY29uZmlnKTtcclxuIH1cclxuIHJldHVybiBjb25maWc7XHJcbiB9O1xyXG4gKi9cclxuXHJcbmV4cG9ydHMuY2FsbENvbmRpdGlvbmFsbHkgPSBmdW5jdGlvbiBjYWxsQ29uZGl0aW9uYWxseShmbiwgdmFsdWUsIGkpIHtcclxuICAvL2RleC5jb25zb2xlLmxvZyhcIi0gRk46XCIgKyBmbik7XHJcbiAgLy9kZXguY29uc29sZS5sb2coXCItIFZBTFVFOlwiICsgdmFsdWUpO1xyXG4gIGlmICh2YWx1ZSAhPT0gdW5kZWZpbmVkKSB7XHJcbiAgICAvL2RleC5jb25zb2xlLmxvZyhcIi0gQ0FMTElORzogXCIgKyBmbiArIFwiIG9mIFwiICsgdmFsdWUpO1xyXG4gICAgaWYgKGkgIT09IHVuZGVmaW5lZCkge1xyXG4gICAgICBmbih2YWx1ZSwgaSk7XHJcbiAgICB9XHJcbiAgICBlbHNlIHtcclxuICAgICAgZm4odmFsdWUpO1xyXG4gICAgfVxyXG4gIH1cclxuICBlbHNlIHtcclxuICB9XHJcbn07XHJcblxyXG4vKipcclxuICpcclxuICogQ29uZmlndXJlIHRoZSBpbnB1dCBwYXJhbWV0ZXJzIGZvciBjb25maWd1cmluZyBhbiBheGlzLlxyXG4gKiBDZXJ0YWluIGRlZmF1bHRzIGFyZSBpbXBvc2VkIHNob3VsZCB0aGUgXCJjdXN0b21cIiB2YXJpYWJsZVxyXG4gKiBub3Qgc3BlY2lmeSB0aGF0IHBhcmFtZXRlci5cclxuICpcclxuICogQHBhcmFtIGN1c3RvbSBUaGUgdXNlciBzdXBwbGllZCBheGlzIGNvbmZpZ3VyYXRpb24uXHJcbiAqXHJcbiAqIEByZXR1cm5zIHtkM2F4aXNfc3BlY30gVGhlIGF4aXMgc3BlY2lmaWNhdGlvbiB3aXRoXHJcbiAqIHVzZXIgc3VwcGxpZWQgb3ZlcnJpZGVzIGFwcGxpZWQuXHJcbiAqXHJcbiAqL1xyXG5leHBvcnRzLmF4aXMgPSBmdW5jdGlvbiBheGlzKGN1c3RvbSkge1xyXG4gIHZhciBkZWZhdWx0cyA9XHJcbiAge1xyXG4gICAgJ3NjYWxlJyAgICAgICAgIDogZGV4LmNvbmZpZy5zY2FsZSh7J3R5cGUnIDogJ2xpbmVhcid9KSxcclxuICAgICdvcmllbnQnICAgICAgICA6ICdib3R0b20nLFxyXG4gICAgJ3RpY2tzJyAgICAgICAgIDogdW5kZWZpbmVkLFxyXG4gICAgJ3RpY2tWYWx1ZXMnICAgIDogdW5kZWZpbmVkLFxyXG4gICAgJ3RpY2tTaXplJyAgICAgIDogdW5kZWZpbmVkLFxyXG4gICAgJ2lubmVyVGlja1NpemUnIDogdW5kZWZpbmVkLFxyXG4gICAgJ291dGVyVGlja1NpemUnIDogdW5kZWZpbmVkLFxyXG4gICAgJ3RpY2tQYWRkaW5nJyAgIDogdW5kZWZpbmVkLFxyXG4gICAgJ3RpY2tGb3JtYXQnICAgIDogdW5kZWZpbmVkXHJcbiAgICAvLydsYWJlbCcgICAgICAgICA6IGRleC5jb25maWcudGV4dCgpXHJcbiAgfTtcclxuXHJcbiAgdmFyIGF4aXNTcGVjID0gZGV4LmNvbmZpZy5leHBhbmRBbmRPdmVybGF5KGN1c3RvbSwgZGVmYXVsdHMpO1xyXG4gIHJldHVybiBheGlzU3BlYztcclxufTtcclxuXHJcbi8qKlxyXG4gKlxyXG4gKiBDcmVhdGUgYW4gYXhpcyB3aXRoIHRoZSBzcGVjaWZpZWQgY29uZmlndXJhdGlvbi5cclxuICpcclxuICogQHBhcmFtIGF4aXMgVGhlIGF4aXMgdG8gY29uZmlndXJlLlxyXG4gKiBAcGFyYW0gY29uZmlnIFRoZSB1c2VyIHNwZWNpZmllZCBheGlzIGNvbmZpZ3VyYXRpb24uXHJcbiAqXHJcbiAqIEByZXR1cm5zIHsqfSBUaGUgbmV3bHkgY29uZmlndXJlZCBheGlzLlxyXG4gKi9cclxuZXhwb3J0cy5jb25maWd1cmVBeGlzID0gZnVuY3Rpb24gY29uZmlndXJlQXhpcyhheGlzLCBjb25maWcsIGkpIHtcclxuICAvL2RleC5jb25zb2xlLmxvZyhcIkNPTkZBWElTOiBcIiArIGkpO1xyXG4gIGlmIChjb25maWcpIHtcclxuICAgIFtcclxuICAgICAgJ3NjYWxlJyxcclxuICAgICAgJ29yaWVudCcsXHJcbiAgICAgICd0aWNrcycsXHJcbiAgICAgICd0aWNrVmFsdWVzJyxcclxuICAgICAgJ3RpY2tTaXplJyxcclxuICAgICAgJ2lubmVyVGlja1NpemUnLFxyXG4gICAgICAnb3V0ZXJUaWNrU2l6ZScsXHJcbiAgICAgICd0aWNrUGFkZGluZycsXHJcbiAgICAgICd0aWNrRm9ybWF0J1xyXG4gICAgXS5mb3JFYWNoKGZ1bmN0aW9uIChmbikge1xyXG4gICAgICAgIC8vZGV4LmNvbnNvbGUubG9nKFwiQ2FsbGluZzogXCIgKyBmbik7XHJcbiAgICAgICAgZGV4LmNvbmZpZy5jYWxsQ29uZGl0aW9uYWxseShheGlzW2ZuXSwgY29uZmlnW2ZuXSwgaSk7XHJcbiAgICAgIH0pO1xyXG4gIH1cclxuICByZXR1cm4gYXhpcztcclxufTtcclxuXHJcbmV4cG9ydHMuY3JlYXRlQXhpcyA9IGZ1bmN0aW9uIGNyZWF0ZUF4aXModXNlckNvbmZpZywgaSkge1xyXG4gIHZhciBjb25maWcgPSBkZXguY29uZmlnLmF4aXModXNlckNvbmZpZyk7XHJcbiAgcmV0dXJuIGRleC5jb25maWcuY29uZmlndXJlQXhpcyhkMy5zdmcuYXhpcygpLCBjb25maWcsIGkpO1xyXG59O1xyXG5cclxuLyoqXHJcbiAqXHJcbiAqIENvbnN0cnVjdCBhIHtkM2F4aXNfc3BlY30gYmFzZWQgb24gcmVhc29uYWJsZSBkZWZhdWx0cyB3aXRoXHJcbiAqIHVzZXIgY3VzdG9taXphdGlvbnMgYXBwbGllZCBvbiB0b3AuXHJcbiAqXHJcbiAqIEBwYXJhbSBjdXN0b20gVGhlIHVzZXIgY3VzdG9taXphdGlvbnMuXHJcbiAqXHJcbiAqIEByZXR1cm5zIHtkM3NjYWxlX3NwZWN9IFRoZSBzY2FsZSBzcGVjaWZpY2F0aW9uIHdpdGhcclxuICogdXNlciBzdXBwbGllZCBvdmVycmlkZXMgYXBwbGllZC5cclxuICpcclxuICovXHJcbmV4cG9ydHMuc2NhbGUgPSBmdW5jdGlvbiBzY2FsZShjdXN0b20pIHtcclxuICB2YXIgZm1hcCA9XHJcbiAge1xyXG4gICAgJ2xpbmVhcicgICA6IGRleC5jb25maWcubGluZWFyU2NhbGUsXHJcbiAgICAnc3FydCcgICAgIDogZGV4LmNvbmZpZy5zcXJ0U2NhbGUsXHJcbiAgICAncG93JyAgICAgIDogZGV4LmNvbmZpZy5wb3dTY2FsZSxcclxuICAgICd0aW1lJyAgICAgOiBkZXguY29uZmlnLnRpbWVTY2FsZSxcclxuICAgICdsb2cnICAgICAgOiBkZXguY29uZmlnLmxvZ1NjYWxlLFxyXG4gICAgJ29yZGluYWwnICA6IGRleC5jb25maWcub3JkaW5hbFNjYWxlLFxyXG4gICAgJ3F1YW50aWxlJyA6IGRleC5jb25maWcucXVhbnRpbGVTY2FsZSxcclxuICAgICdxdWFudGl6ZScgOiBkZXguY29uZmlnLnF1YW50aXplU2NhbGUsXHJcbiAgICAnaWRlbnRpdHknIDogZGV4LmNvbmZpZy5pZGVudGl0eVNjYWxlXHJcbiAgfTtcclxuXHJcbiAgdmFyIGRlZmF1bHRzID1cclxuICB7XHJcbiAgICAndHlwZScgOiAnbGluZWFyJ1xyXG4gIH07XHJcblxyXG4gIHZhciBjb25maWcgPSBkZXguY29uZmlnLmV4cGFuZEFuZE92ZXJsYXkoY3VzdG9tLCBkZWZhdWx0cyk7XHJcblxyXG4gIHJldHVybiBmbWFwW2NvbmZpZy50eXBlXShjb25maWcpO1xyXG59XHJcblxyXG4vKipcclxuICpcclxuICogR2l2ZW4gYSBzY2FsZSBzcGVjaWZpY2F0aW9uLCBjcmVhdGUsIGNvbmZpZ3VyZSwgYW5kIHJldHVybiBhXHJcbiAqIHNjYWxlIHdoaWNoIG1lZXRzIHRoYXQgc3BlY2lmaWNhdGlvbi5cclxuICpcclxuICogQHBhcmFtIHtkM3NjYWxlX3NwZWN9IHNjYWxlU3BlY1xyXG4gKiBAcmV0dXJucyB7T2JqZWN0fSBSZXR1cm5zIGEgZDMuc2NhbGUgd2l0aCB0aGUgc3VwcGxpZWQgc3BlY2lmaWNhdGlvbi5cclxuICpcclxuICovXHJcbmV4cG9ydHMuY3JlYXRlU2NhbGUgPSBmdW5jdGlvbiBjcmVhdGVTY2FsZShzY2FsZVNwZWMpIHtcclxuICB2YXIgc2NhbGU7XHJcblxyXG4gIHZhciBmbWFwID1cclxuICB7XHJcbiAgICAnbGluZWFyJyAgIDogZDMuc2NhbGUubGluZWFyLFxyXG4gICAgJ3NxcnQnICAgICA6IGQzLnNjYWxlLnNxcnQsXHJcbiAgICAncG93JyAgICAgIDogZDMuc2NhbGUucG93LFxyXG4gICAgJ3RpbWUnICAgICA6IGQzLnRpbWUuc2NhbGUsXHJcbiAgICAnbG9nJyAgICAgIDogZDMuc2NhbGUubG9nLFxyXG4gICAgJ29yZGluYWwnICA6IGQzLnNjYWxlLm9yZGluYWwsXHJcbiAgICAncXVhbnRpbGUnIDogZDMuc2NhbGUucXVhbnRpbGUsXHJcbiAgICAncXVhbnRpemUnIDogZDMuc2NhbGUucXVhbnRpemUsXHJcbiAgICAnaWRlbnRpdHknIDogZDMuc2NhbGUuaWRlbnRpdHlcclxuICB9O1xyXG5cclxuICBpZiAoc2NhbGVTcGVjKSB7XHJcbiAgICBzY2FsZSA9IGZtYXBbc2NhbGVTcGVjLnR5cGVdKCk7XHJcblxyXG4gICAgLy8gU2luY2Ugd2UgY3JlYXRlIGEgbm9uLXBhcmFtZXRlcml6ZWQgc2NhbGUsIGhlcmUgd2UgcGFyYW1ldGVyaXplIGl0IGJhc2VkIHVwb25cclxuICAgIC8vIHRoZSBzdXBwbGllZCBzcGVjaWZpY2F0aW9uXHJcbiAgICBkZXguY29uZmlnLmNvbmZpZ3VyZVNjYWxlKHNjYWxlLCBzY2FsZVNwZWMpO1xyXG4gIH1cclxuICBlbHNlIHtcclxuICAgIHNjYWxlID0gZDMuc2NhbGUubGluZWFyKCk7XHJcbiAgfVxyXG5cclxuICByZXR1cm4gc2NhbGU7XHJcbn1cclxuXHJcbi8qKlxyXG4gKlxyXG4gKiBDb25zdHJ1Y3QgYSBsaW5lYXIge2Qzc2NhbGVfc3BlY30gYmFzZWQgb24gcmVhc29uYWJsZVxyXG4gKiBkZWZhdWx0cyB3aXRoIHVzZXIgY3VzdG9taXphdGlvbnMgYXBwbGllZCBvbiB0b3AuXHJcbiAqXHJcbiAqIEBwYXJhbSBjdXN0b20gVGhlIHVzZXIgY3VzdG9taXphdGlvbnMuXHJcbiAqXHJcbiAqIEByZXR1cm5zIHtkM3NjYWxlX3NwZWN9IFRoZSBsaW5lYXIgc2NhbGUgc3BlY2lmaWNhdGlvbiB3aXRoXHJcbiAqIHVzZXIgc3VwcGxpZWQgb3ZlcnJpZGVzIGFwcGxpZWQuXHJcbiAqXHJcbiAqL1xyXG5leHBvcnRzLmxpbmVhclNjYWxlID0gZnVuY3Rpb24gbGluZWFyU2NhbGUoY3VzdG9tKSB7XHJcbiAgdmFyIGRlZmF1bHRzID1cclxuICB7XHJcbiAgICAndHlwZScgICAgICAgIDogJ2xpbmVhcicsXHJcbiAgICAnZG9tYWluJyAgICAgIDogWzAsIDEwMF0sXHJcbiAgICAncmFuZ2UnICAgICAgIDogWzAsIDgwMF0sXHJcbiAgICAncmFuZ2VSb3VuZCcgIDogdW5kZWZpbmVkLFxyXG4gICAgJ2ludGVycG9sYXRlJyA6IHVuZGVmaW5lZCxcclxuICAgICdjbGFtcCcgICAgICAgOiB1bmRlZmluZWQsXHJcbiAgICAnbmljZScgICAgICAgIDogdW5kZWZpbmVkXHJcbiAgfTtcclxuXHJcbiAgdmFyIGxpbmVhclNjYWxlU3BlYyA9IGRleC5jb25maWcuZXhwYW5kQW5kT3ZlcmxheShjdXN0b20sIGRlZmF1bHRzKTtcclxuICByZXR1cm4gbGluZWFyU2NhbGVTcGVjO1xyXG59O1xyXG5cclxuLyoqXHJcbiAqXHJcbiAqIENvbnN0cnVjdCBhIHBvd2VyIHtkM3NjYWxlX3NwZWN9IGJhc2VkIG9uIHJlYXNvbmFibGVcclxuICogZGVmYXVsdHMgd2l0aCB1c2VyIGN1c3RvbWl6YXRpb25zIGFwcGxpZWQgb24gdG9wLlxyXG4gKlxyXG4gKiBAcGFyYW0gY3VzdG9tIFRoZSB1c2VyIGN1c3RvbWl6YXRpb25zLlxyXG4gKlxyXG4gKiBAcmV0dXJucyB7ZDNzY2FsZV9zcGVjfSBUaGUgcG93ZXIgc2NhbGUgc3BlY2lmaWNhdGlvbiB3aXRoXHJcbiAqIHVzZXIgc3VwcGxpZWQgb3ZlcnJpZGVzIGFwcGxpZWQuXHJcbiAqXHJcbiAqL1xyXG5leHBvcnRzLnBvd1NjYWxlID0gZnVuY3Rpb24gcG93U2NhbGUoY3VzdG9tKSB7XHJcbiAgdmFyIGRlZmF1bHRzID1cclxuICB7XHJcbiAgICAndHlwZScgICAgICAgIDogJ3BvdycsXHJcbiAgICAnZG9tYWluJyAgICAgIDogWzAsIDEwMF0sXHJcbiAgICAncmFuZ2UnICAgICAgIDogWzAsIDgwMF0sXHJcbiAgICAncmFuZ2VSb3VuZCcgIDogdW5kZWZpbmVkLFxyXG4gICAgJ2ludGVycG9sYXRlJyA6IHVuZGVmaW5lZCxcclxuICAgICdjbGFtcCcgICAgICAgOiB1bmRlZmluZWQsXHJcbiAgICAnbmljZScgICAgICAgIDogdW5kZWZpbmVkXHJcbiAgfTtcclxuXHJcbiAgdmFyIGNvbmZpZyA9IGRleC5jb25maWcuZXhwYW5kQW5kT3ZlcmxheShjdXN0b20sIGRlZmF1bHRzKTtcclxuICByZXR1cm4gY29uZmlnO1xyXG59O1xyXG5cclxuLyoqXHJcbiAqXHJcbiAqIENvbnN0cnVjdCBhIHNxcnQge2Qzc2NhbGVfc3BlY30gYmFzZWQgb24gcmVhc29uYWJsZVxyXG4gKiBkZWZhdWx0cyB3aXRoIHVzZXIgY3VzdG9taXphdGlvbnMgYXBwbGllZCBvbiB0b3AuXHJcbiAqXHJcbiAqIEBwYXJhbSBjdXN0b20gVGhlIHVzZXIgY3VzdG9taXphdGlvbnMuXHJcbiAqXHJcbiAqIEByZXR1cm5zIHtkM3NjYWxlX3NwZWN9IFRoZSBzcXJ0IHNjYWxlIHNwZWNpZmljYXRpb24gd2l0aFxyXG4gKiB1c2VyIHN1cHBsaWVkIG92ZXJyaWRlcyBhcHBsaWVkLlxyXG4gKlxyXG4gKi9cclxuZXhwb3J0cy5zcXJ0U2NhbGUgPSBmdW5jdGlvbiBzcXJ0U2NhbGUoY3VzdG9tKSB7XHJcbiAgdmFyIGRlZmF1bHRzID1cclxuICB7XHJcbiAgICAndHlwZScgICAgICAgIDogJ3NxcnQnLFxyXG4gICAgJ2RvbWFpbicgICAgICA6IFswLCAxMDBdLFxyXG4gICAgJ3JhbmdlJyAgICAgICA6IFswLCA4MDBdLFxyXG4gICAgJ3JhbmdlUm91bmQnICA6IHVuZGVmaW5lZCxcclxuICAgICdpbnRlcnBvbGF0ZScgOiB1bmRlZmluZWQsXHJcbiAgICAnY2xhbXAnICAgICAgIDogdW5kZWZpbmVkLFxyXG4gICAgJ25pY2UnICAgICAgICA6IHVuZGVmaW5lZFxyXG4gIH07XHJcblxyXG4gIHZhciBjb25maWcgPSBkZXguY29uZmlnLmV4cGFuZEFuZE92ZXJsYXkoY3VzdG9tLCBkZWZhdWx0cyk7XHJcbiAgcmV0dXJuIGNvbmZpZztcclxufTtcclxuXHJcbi8qKlxyXG4gKlxyXG4gKiBDb25zdHJ1Y3QgYSBsb2cge2Qzc2NhbGVfc3BlY30gYmFzZWQgb24gcmVhc29uYWJsZVxyXG4gKiBkZWZhdWx0cyB3aXRoIHVzZXIgY3VzdG9taXphdGlvbnMgYXBwbGllZCBvbiB0b3AuXHJcbiAqXHJcbiAqIEBwYXJhbSBjdXN0b20gVGhlIHVzZXIgY3VzdG9taXphdGlvbnMuXHJcbiAqXHJcbiAqIEByZXR1cm5zIHtkM3NjYWxlX3NwZWN9IFRoZSBsb2cgc2NhbGUgc3BlY2lmaWNhdGlvbiB3aXRoXHJcbiAqIHVzZXIgc3VwcGxpZWQgb3ZlcnJpZGVzIGFwcGxpZWQuXHJcbiAqXHJcbiAqL1xyXG5leHBvcnRzLmxvZ1NjYWxlID0gZnVuY3Rpb24gbG9nU2NhbGUoY3VzdG9tKSB7XHJcbiAgdmFyIGRlZmF1bHRzID1cclxuICB7XHJcbiAgICAndHlwZScgICAgICAgIDogJ2xvZycsXHJcbiAgICAnZG9tYWluJyAgICAgIDogWzAsIDEwMF0sXHJcbiAgICAncmFuZ2UnICAgICAgIDogWzAsIDgwMF0sXHJcbiAgICAncmFuZ2VSb3VuZCcgIDogdW5kZWZpbmVkLFxyXG4gICAgJ2ludGVycG9sYXRlJyA6IHVuZGVmaW5lZCxcclxuICAgICdjbGFtcCcgICAgICAgOiB1bmRlZmluZWQsXHJcbiAgICAnbmljZScgICAgICAgIDogdW5kZWZpbmVkXHJcbiAgfTtcclxuXHJcbiAgdmFyIGxvZ1NwZWMgPSBkZXguY29uZmlnLmV4cGFuZEFuZE92ZXJsYXkoY3VzdG9tLCBkZWZhdWx0cyk7XHJcbiAgcmV0dXJuIGxvZ1NwZWM7XHJcbn07XHJcblxyXG4vKipcclxuICpcclxuICogQ29uc3RydWN0IGEgb3JkaW5hbCB7ZDNzY2FsZV9zcGVjfSBiYXNlZCBvbiByZWFzb25hYmxlXHJcbiAqIGRlZmF1bHRzIHdpdGggdXNlciBjdXN0b21pemF0aW9ucyBhcHBsaWVkIG9uIHRvcC5cclxuICpcclxuICogQHBhcmFtIGN1c3RvbSAtIFRoZSB1c2VyIGN1c3RvbWl6YXRpb25zLlxyXG4gKiBAcGFyYW0ge29iamVjdH0gW2N1c3RvbS5yYW5nZVJvdW5kQmFuZHNdIC1cclxuICogQHBhcmFtIHtvYmplY3R9IFtjdXN0b20ucmFuZ2VCYW5kc10gLVxyXG4gKiBAcGFyYW0ge29iamVjdH0gW2N1c3RvbS5yYW5nZVBvaW50c10gLSByYW5nZVBvaW50cyhpbnRlcnZhbCBbLCBwYWRkaW5nXSkgOiBTZXRzIHRoZSBvdXRwdXQgcmFuZ2UgZnJvbSB0aGUgc3BlY2lmaWVkIGNvbnRpbnVvdXNcclxuICogaW50ZXJ2YWwuIFRoZSBhcnJheSBpbnRlcnZhbCBjb250YWlucyB0d28gZWxlbWVudHMgcmVwcmVzZW50aW5nIHRoZSBtaW5pbXVtIGFuZCBtYXhpbXVtXHJcbiAqIG51bWVyaWMgdmFsdWUuIFRoaXMgaW50ZXJ2YWwgaXMgc3ViZGl2aWRlZCBpbnRvIG4gZXZlbmx5LXNwYWNlZCBwb2ludHMsIHdoZXJlIG4gaXMgdGhlXHJcbiAqIG51bWJlciBvZiAodW5pcXVlKSB2YWx1ZXMgaW4gdGhlIGlucHV0IGRvbWFpbi4gVGhlIGZpcnN0IGFuZCBsYXN0IHBvaW50IG1heSBiZSBvZmZzZXRcclxuICogZnJvbSB0aGUgZWRnZSBvZiB0aGUgaW50ZXJ2YWwgYWNjb3JkaW5nIHRvIHRoZSBzcGVjaWZpZWQgcGFkZGluZywgd2hpY2ggZGVmYXVsdHMgdG8gemVyby5cclxuICogVGhlIHBhZGRpbmcgaXMgZXhwcmVzc2VkIGFzIGEgbXVsdGlwbGUgb2YgdGhlIHNwYWNpbmcgYmV0d2VlbiBwb2ludHMuIEEgcmVhc29uYWJsZSB2YWx1ZVxyXG4gKiBpcyAxLjAsIHN1Y2ggdGhhdCB0aGUgZmlyc3QgYW5kIGxhc3QgcG9pbnQgd2lsbCBiZSBvZmZzZXQgZnJvbSB0aGUgbWluaW11bSBhbmQgbWF4aW11bVxyXG4gKiB2YWx1ZSBieSBoYWxmIHRoZSBkaXN0YW5jZSBiZXR3ZWVuIHBvaW50cy5cclxuICogQHBhcmFtIHtvYmplY3R9IFtjdXN0b20ucmFuZ2VCYW5kc10gLVxyXG4gKlxyXG4gKiBAcmV0dXJucyB7ZDNzY2FsZV9zcGVjfSBUaGUgb3JkaW5hbCBzY2FsZSBzcGVjaWZpY2F0aW9uIHdpdGhcclxuICogdXNlciBzdXBwbGllZCBvdmVycmlkZXMgYXBwbGllZC5cclxuICpcclxuICovXHJcbmV4cG9ydHMub3JkaW5hbFNjYWxlID0gZnVuY3Rpb24gb3JkaW5hbFNjYWxlKGN1c3RvbSkge1xyXG4gIHZhciBkZWZhdWx0cyA9XHJcbiAge1xyXG4gICAgJ3R5cGUnICAgICAgICAgICAgOiAnb3JkaW5hbCcsXHJcbiAgICAnZG9tYWluJyAgICAgICAgICA6IHVuZGVmaW5lZCxcclxuICAgICdyYW5nZScgICAgICAgICAgIDogdW5kZWZpbmVkLFxyXG4gICAgJ3JhbmdlUm91bmRCYW5kcycgOiB1bmRlZmluZWQsXHJcbiAgICAncmFuZ2VQb2ludHMnICAgICA6IHVuZGVmaW5lZCxcclxuICAgICdyYW5nZUJhbmRzJyAgICAgIDogdW5kZWZpbmVkXHJcbiAgfTtcclxuXHJcbiAgdmFyIG9yZGluYWxTcGVjID0gZGV4LmNvbmZpZy5leHBhbmRBbmRPdmVybGF5KGN1c3RvbSwgZGVmYXVsdHMpO1xyXG4gIHJldHVybiBvcmRpbmFsU3BlYztcclxufTtcclxuXHJcbmV4cG9ydHMudGltZVNjYWxlID0gZnVuY3Rpb24gdGltZVNjYWxlKGN1c3RvbSkge1xyXG4gIHZhciBkZWZhdWx0cyA9XHJcbiAge1xyXG4gICAgJ3R5cGUnICAgICAgICA6ICd0aW1lJyxcclxuICAgICdkb21haW4nICAgICAgOiB1bmRlZmluZWQsXHJcbiAgICAncmFuZ2UnICAgICAgIDogdW5kZWZpbmVkLFxyXG4gICAgJ3JhbmdlUm91bmQnICA6IHVuZGVmaW5lZCxcclxuICAgICdpbnRlcnBvbGF0ZScgOiB1bmRlZmluZWQsXHJcbiAgICAnY2xhbXAnICAgICAgIDogdW5kZWZpbmVkLFxyXG4gICAgJ3RpY2tzJyAgICAgICA6IHVuZGVmaW5lZCxcclxuICAgICd0aWNrRm9ybWF0JyAgOiB1bmRlZmluZWRcclxuICB9O1xyXG5cclxuICB2YXIgY29uZmlnID0gZGV4LmNvbmZpZy5leHBhbmRBbmRPdmVybGF5KGN1c3RvbSwgZGVmYXVsdHMpO1xyXG4gIHJldHVybiBjb25maWc7XHJcbn07XHJcblxyXG5leHBvcnRzLnF1YW50aWxlU2NhbGUgPSBmdW5jdGlvbiBxdWFudGlsZVNjYWxlKGN1c3RvbSkge1xyXG4gIHZhciBkZWZhdWx0cyA9XHJcbiAge1xyXG4gICAgJ3R5cGUnICAgOiAncXVhbnRpbGUnLFxyXG4gICAgJ2RvbWFpbicgOiB1bmRlZmluZWQsXHJcbiAgICAncmFuZ2UnICA6IHVuZGVmaW5lZFxyXG4gIH07XHJcblxyXG4gIHZhciBjb25maWcgPSBkZXguY29uZmlnLmV4cGFuZEFuZE92ZXJsYXkoY3VzdG9tLCBkZWZhdWx0cyk7XHJcbiAgcmV0dXJuIGNvbmZpZztcclxufTtcclxuXHJcbmV4cG9ydHMucXVhbnRpemVTY2FsZSA9IGZ1bmN0aW9uIHF1YW50aXplU2NhbGUoY3VzdG9tKSB7XHJcbiAgdmFyIGRlZmF1bHRzID1cclxuICB7XHJcbiAgICAndHlwZScgICA6ICdxdWFudGl6ZScsXHJcbiAgICAnZG9tYWluJyA6IHVuZGVmaW5lZCxcclxuICAgICdyYW5nZScgIDogdW5kZWZpbmVkXHJcbiAgfTtcclxuXHJcbiAgdmFyIGNvbmZpZyA9IGRleC5jb25maWcuZXhwYW5kQW5kT3ZlcmxheShjdXN0b20sIGRlZmF1bHRzKTtcclxuICByZXR1cm4gY29uZmlnO1xyXG59O1xyXG5cclxuZXhwb3J0cy5pZGVudGl0eVNjYWxlID0gZnVuY3Rpb24gaWRlbnRpdHlTY2FsZShjdXN0b20pIHtcclxuICB2YXIgZGVmYXVsdHMgPVxyXG4gIHtcclxuICAgICd0eXBlJyAgIDogJ2lkZW50aXR5JyxcclxuICAgICdkb21haW4nIDogdW5kZWZpbmVkLFxyXG4gICAgJ3JhbmdlJyAgOiB1bmRlZmluZWRcclxuICB9O1xyXG5cclxuICB2YXIgY29uZmlnID0gZGV4LmNvbmZpZy5leHBhbmRBbmRPdmVybGF5KGN1c3RvbSwgZGVmYXVsdHMpO1xyXG4gIHJldHVybiBjb25maWc7XHJcbn07XHJcblxyXG5leHBvcnRzLnRocmVzaG9sZFNjYWxlID0gZnVuY3Rpb24gdGhyZXNob2xkU2NhbGUoY3VzdG9tKSB7XHJcbiAgdmFyIGRlZmF1bHRzID1cclxuICB7XHJcbiAgICAndHlwZScgICA6ICd0aHJlc2hvbGQnLFxyXG4gICAgJ2RvbWFpbicgOiB1bmRlZmluZWQsXHJcbiAgICAncmFuZ2UnICA6IHVuZGVmaW5lZFxyXG4gIH07XHJcblxyXG4gIHZhciBjb25maWcgPSBkZXguY29uZmlnLmV4cGFuZEFuZE92ZXJsYXkoY3VzdG9tLCBkZWZhdWx0cyk7XHJcbiAgcmV0dXJuIGNvbmZpZztcclxufTtcclxuXHJcbmV4cG9ydHMuY29uZmlndXJlU2NhbGUgPSBmdW5jdGlvbiBjb25maWd1cmVTY2FsZShzY2FsZSwgY29uZmlnKSB7XHJcbiAgaWYgKGNvbmZpZykge1xyXG4gICAgZm9yICh2YXIgcHJvcGVydHkgaW4gY29uZmlnKSB7XHJcbiAgICAgIGRleC5jb25zb2xlLnRyYWNlKFwiQ29uZmlndXJlU2NhbGUgUHJvcGVydHk6ICdcIiArIHByb3BlcnR5ICsgXCInXCIpO1xyXG4gICAgICBpZiAoY29uZmlnLmhhc093blByb3BlcnR5KHByb3BlcnR5KSAmJiBwcm9wZXJ0eSAhPT0gJ3R5cGUnICYmIGNvbmZpZ1twcm9wZXJ0eV0gIT09IHVuZGVmaW5lZCkge1xyXG4gICAgICAgIGRleC5jb25zb2xlLnRyYWNlKFwiUHJvcGVydHk6ICdcIiArIHByb3BlcnR5ICsgXCInXCIpO1xyXG4gICAgICAgIGRleC5jb25maWcuY2FsbENvbmRpdGlvbmFsbHkoc2NhbGVbcHJvcGVydHldLCBjb25maWdbcHJvcGVydHldKTtcclxuICAgICAgfVxyXG4gICAgICBlbHNlIHtcclxuICAgICAgICBkZXguY29uc29sZS5kZWJ1ZyhcIk1pc3NpbmcgUHJvcGVydHk6ICdcIiArIHByb3BlcnR5ICsgXCInXCIpO1xyXG4gICAgICB9XHJcbiAgICB9XHJcbiAgfVxyXG5cclxuICByZXR1cm4gc2NhbGU7XHJcbn07XHJcblxyXG4vL21vZHVsZS5leHBvcnRzID0gY29uZmlnOyIsIi8qKlxyXG4gKlxyXG4gKiBUaGlzIG1vZHVsZSBwcm92aWRlcyBjb25zb2xlIGxvZ2dpbmcgY2FwYWJpbGl0aWVzLlxyXG4gKlxyXG4gKiBAbW9kdWxlIGNvbnNvbGVcclxuICpcclxuICovXHJcblxyXG4vKipcclxuICpcclxuICogQHR5cGUge3tUUkFDRTogbnVtYmVyLCBERUJVRzogbnVtYmVyLCBOT1JNQUw6IG51bWJlciwgV0FSTjogbnVtYmVyLCBGQVRBTDogbnVtYmVyLCBOT05FOiBudW1iZXJ9fVxyXG4gKi9cclxudmFyIGxvZ0xldmVscyA9IHtcclxuICAnVFJBQ0UnICA6IDUsXHJcbiAgJ0RFQlVHJyAgOiA0LFxyXG4gICdOT1JNQUwnIDogMyxcclxuICAnV0FSTicgICA6IDIsXHJcbiAgJ0ZBVEFMJyAgOiAxLFxyXG4gICdOT05FJyAgIDogMFxyXG59O1xyXG5cclxuZXhwb3J0cy5sb2dMZXZlbHMgPSBsb2dMZXZlbHM7XHJcblxyXG52YXIgbG9nTGV2ZWwgPSBsb2dMZXZlbHMuTk9STUFMO1xyXG5cclxuZXhwb3J0cy5sb2dMZXZlbCA9IGxvZ0xldmVsO1xyXG5cclxuLy8vL1xyXG4vL1xyXG4vLyBkZXguY29uc29sZSA6IFRoaXMgbW9kdWxlIHByb3ZpZGVzIHJvdXRpbmVzIGFzc2lzdGluZyB3aXRoIGNvbnNvbGUgb3V0cHV0LlxyXG4vL1xyXG4vLy8vXHJcblxyXG4vKipcclxuICogTG9nIHRoaXMgbWVzc2FnZSBpZiB0aGUgY3VycmVudCBsb2cgbGV2ZWwgaXMgZ3JlYXRlciB0aGFuIG9yIGVxdWFsXHJcbiAqIHRvIGRleC5jb25zb2xlLmxvZ0xldmVsLlxyXG4gKlxyXG4gKiBAcGFyYW0gbXNnTGV2ZWwgVGhlIGxvZyBsZXZlbCBmb3IgdGhpcyBtZXNzYWdlLlxyXG4gKiBAcGFyYW0gbXNnIE9uZSBvciBtb3JlIG1lc3NhZ2VzIHRvIGJlIGxvZ2dlZC4gIFN0cmluZ3Mgd2lsbCBzaW1wbHlcclxuICogdXNlIGNvbnNvbGUubG9nIHdoaWxlIG9iamVjdHMgd2lsbCB1c2UgY29uc29sZS5kaXIuXHJcbiAqXHJcbiAqIEByZXR1cm5zIHtkZXguY29uc29sZX1cclxuICovXHJcbmV4cG9ydHMubG9nV2l0aExldmVsID0gZnVuY3Rpb24gKG1zZ0xldmVsLCBtc2cpIHtcclxuLy8gIGNvbnNvbGUubG9nKGRleC5jb25zb2xlLmxvZ0xldmVsKCkpO1xyXG4vLyAgY29uc29sZS5sb2cobXNnTGV2ZWwpO1xyXG4vLyAgY29uc29sZS5kaXIobXNnKTtcclxuXHJcbiAgaWYgKGRleC5jb25zb2xlLmxvZ0xldmVsKCkgPj0gbXNnTGV2ZWwpIHtcclxuICAgIGZvciAoaSA9IDA7IGkgPCBtc2cubGVuZ3RoOyBpKyspIHtcclxuICAgICAgaWYgKHR5cGVvZiBtc2dbaV0gPT0gJ29iamVjdCcpIHtcclxuICAgICAgICBjb25zb2xlLmRpcihtc2dbaV0pO1xyXG4gICAgICB9XHJcbiAgICAgIGVsc2Uge1xyXG4gICAgICAgIGNvbnNvbGUubG9nKG1zZ1tpXSk7XHJcbiAgICAgIH1cclxuICAgIH1cclxuICB9XHJcbiAgcmV0dXJuIHRoaXM7XHJcbn1cclxuXHJcbi8qKlxyXG4gKiBXcml0ZSBvbmUgb3IgbW9yZSBUUkFDRSBsZXZlbCBtZXNzYWdlcy5cclxuICpcclxuICogQHBhcmFtIG1zZyBPbmUgb3IgbW9yZSBUUkFDRSBtZXNzYWdlcyB0byBsb2cuXHJcbiAqXHJcbiAqIEByZXR1cm5zIHtkZXguY29uc29sZXwqfVxyXG4gKi9cclxuZXhwb3J0cy50cmFjZSA9IGZ1bmN0aW9uICgpIHtcclxuICByZXR1cm4gZGV4LmNvbnNvbGUubG9nV2l0aExldmVsKGxvZ0xldmVscy5UUkFDRSwgYXJndW1lbnRzKVxyXG59O1xyXG5cclxuLyoqXHJcbiAqIFdyaXRlIG9uZSBvciBtb3JlIERFQlVHIGxldmVsIG1lc3NhZ2VzLlxyXG4gKlxyXG4gKiBAcGFyYW0gbXNnIE9uZSBvciBtb3JlIERFQlVHIG1lc3NhZ2VzIHRvIGxvZy5cclxuICpcclxuICogQHJldHVybnMge2RleC5jb25zb2xlfCp9XHJcbiAqL1xyXG5leHBvcnRzLmRlYnVnID0gZnVuY3Rpb24gKCkge1xyXG4gIHJldHVybiBkZXguY29uc29sZS5sb2dXaXRoTGV2ZWwobG9nTGV2ZWxzLkRFQlVHLCBhcmd1bWVudHMpXHJcbn07XHJcblxyXG4vKipcclxuICogV3JpdGUgb25lIG9yIG1vcmUgTk9STUFMIGxldmVsIG1lc3NhZ2VzLlxyXG4gKlxyXG4gKiBAcGFyYW0gbXNnIE9uZSBvciBtb3JlIE5PUk1BTCBtZXNzYWdlcyB0byBsb2cuXHJcbiAqXHJcbiAqIEByZXR1cm5zIHtkZXguY29uc29sZXwqfVxyXG4gKlxyXG4gKi9cclxuZXhwb3J0cy5sb2cgPSBmdW5jdGlvbiAoKSB7XHJcbiAgLy9jb25zb2xlLmxvZyhcImNhbGxlciBpcyBcIiArIGFyZ3VtZW50cy5jYWxsZWUuY2FsbGVyLnRvU3RyaW5nKCkpO1xyXG4gIHJldHVybiBkZXguY29uc29sZS5sb2dXaXRoTGV2ZWwobG9nTGV2ZWxzLk5PUk1BTCwgYXJndW1lbnRzKVxyXG59O1xyXG5cclxuLyoqXHJcbiAqIFdyaXRlIG9uZSBvciBtb3JlIFdBUk4gbGV2ZWwgbWVzc2FnZXMuXHJcbiAqXHJcbiAqIEBwYXJhbSBtc2cgT25lIG9yIG1vcmUgV0FSTiBtZXNzYWdlcyB0byBsb2cuXHJcbiAqXHJcbiAqIEByZXR1cm5zIHtkZXguY29uc29sZXwqfVxyXG4gKlxyXG4gKi9cclxuZXhwb3J0cy53YXJuID0gZnVuY3Rpb24gKCkge1xyXG4gIHJldHVybiBkZXguY29uc29sZS5sb2dXaXRoTGV2ZWwobG9nTGV2ZWxzLldBUk4sIGFyZ3VtZW50cylcclxufTtcclxuXHJcbi8qKlxyXG4gKiBXcml0ZSBvbmUgb3IgbW9yZSBGQVRBTCBsZXZlbCBtZXNzYWdlcy5cclxuICpcclxuICogQHBhcmFtIG1zZyBPbmUgb3IgbW9yZSBGQVRBTCBtZXNzYWdlcyB0byBsb2cuXHJcbiAqXHJcbiAqIEByZXR1cm5zIHtkZXguY29uc29sZXwqfVxyXG4gKi9cclxuZXhwb3J0cy5mYXRhbCA9IGZ1bmN0aW9uICgpIHtcclxuICByZXR1cm4gZGV4LmNvbnNvbGUubG9nV2l0aExldmVsKGxvZ0xldmVscy5GQVRBTCwgYXJndW1lbnRzKVxyXG59O1xyXG5cclxuLyoqXHJcbiAqIFRoaXMgZnVuY3Rpb24gcmV0dXJucyB0aGUgY3VycmVudCBsb2cgbGV2ZWwuXHJcbiAqXHJcbiAqIEByZXR1cm5zIFRoZSBjdXJyZW50IGxvZyBsZXZlbC5cclxuICpcclxuICovXHJcbmV4cG9ydHMubG9nTGV2ZWwgPSBmdW5jdGlvbiAoXykge1xyXG4gIGlmICghYXJndW1lbnRzLmxlbmd0aCkgcmV0dXJuIGxvZ0xldmVsO1xyXG4gIGxvZ0xldmVsID0gbG9nTGV2ZWxzW19dO1xyXG4gIHJldHVybiBsb2dMZXZlbDtcclxufTtcclxuXHJcbmV4cG9ydHMubG9nTGV2ZWxzID0gZnVuY3Rpb24gKCkge1xyXG4gIHJldHVybiBsb2dMZXZlbHM7XHJcbn07XHJcbiIsIi8qKlxyXG4gKlxyXG4gKiBUaGlzIG1vZHVsZSBwcm92aWRlcyBzdXBwb3J0IGZvciBkZWFsaW5nIHdpdGggY3N2IHN0cnVjdHVyZXMuICBUaGlzXHJcbiAqIGlzIHRoZSBjb3JlIGRhdGF0eXBlIG9uIHdoaWNoIGRleGpzIGNvbXBvbmVudHMgb3BlcmF0ZS5cclxuICpcclxuICogQG1vZHVsZSBjc3ZcclxuICpcclxuICovXHJcblxyXG4vKipcclxuICpcclxuICogQHBhcmFtIGhlYWRlclxyXG4gKiBAcGFyYW0gZGF0YVxyXG4gKiBAcmV0dXJucyB7e2hlYWRlcjogKiwgZGF0YTogKn19XHJcbiAqL1xyXG5leHBvcnRzLmNzdiA9IGZ1bmN0aW9uIChoZWFkZXIsIGRhdGEpIHtcclxuICB2YXIgY3N2ID1cclxuICB7XHJcbiAgICBcImhlYWRlclwiOiBoZWFkZXIsXHJcbiAgICBcImRhdGFcIjogZGF0YVxyXG4gIH07XHJcblxyXG4gIHJldHVybiBjc3Y7XHJcbn07XHJcblxyXG4vKipcclxuICpcclxuICogQHBhcmFtIGNzdlxyXG4gKiBAcmV0dXJucyB7e2hlYWRlcjogKiwgZGF0YToge2hlYWRlciwgZGF0YX19fVxyXG4gKi9cclxuZXhwb3J0cy50cmFuc3Bvc2UgPSBmdW5jdGlvbiAoY3N2KSB7XHJcbiAgcmV0dXJuIHtcclxuICAgIFwiaGVhZGVyXCI6IGNzdi5oZWFkZXIsXHJcbiAgICBcImRhdGFcIjogZGV4Lm1hdHJpeC50cmFuc3Bvc2UoY3N2LmRhdGEpXHJcbiAgfTtcclxufTtcclxuXHJcbi8qKlxyXG4gKiBHaXZlbiBhIENTViwgY3JlYXRlIGEgY29ubmVjdGlvbiBtYXRyaXggc3VpdGFibGUgZm9yIGZlZWRpbmcgaW50byBhIGNob3JkXHJcbiAqIGRpYWdyYW0uICBFeCwgZ2l2ZW4gQ1NWOlxyXG4gKlxyXG4gKiBAcGFyYW0gY3N2XHJcbiAqIEByZXR1cm5zIHt7aGVhZGVyOiBBcnJheSwgY29ubmVjdGlvbnM6IEFycmF5fXwqfVxyXG4gKlxyXG4gKi9cclxuZXhwb3J0cy5nZXRDb25uZWN0aW9uTWF0cml4ID0gZnVuY3Rpb24gKGNzdikge1xyXG4gIHZhciBtYXRyaXggPSBbXTtcclxuICB2YXIgcmksIGNpO1xyXG4gIHZhciByb3c7XHJcbiAgdmFyIGNpZDtcclxuICB2YXIgaGVhZGVyID0gW107XHJcbiAgdmFyIG5hbWVUb0luZGV4ID0ge307XHJcbiAgdmFyIGNvbm5lY3Rpb25NYXRyaXg7XHJcbiAgdmFyIHVuaXF1ZXM7XHJcbiAgdmFyIG5hbWVJbmRpY2VzID0gW107XHJcbiAgdmFyIHNyYywgZGVzdDtcclxuXHJcbiAgLy8gQ3JlYXRlIGEgbGlzdCBvZiB1bmlxdWUgdmFsdWVzIHRvIHJlbGF0ZSB0byBvbmUgYW5vdGhlci5cclxuICB1bmlxdWVzID0gZGV4Lm1hdHJpeC51bmlxdWVzKGNzdi5kYXRhKTtcclxuICAvLyBGbGF0dGVuIHRoZW0gaW50byBvdXIgaGVhZGVyLlxyXG4gIGhlYWRlciA9IGRleC5tYXRyaXguZmxhdHRlbih1bmlxdWVzKTtcclxuXHJcbiAgLy8gQ3JlYXRlIGEgbWFwIG9mIG5hbWVzIHRvIGhlYWRlciBpbmRleCBmb3IgZWFjaCBjb2x1bW4uXHJcbiAgbmFtZVRvSW5kZXggPSBuZXcgQXJyYXkodW5pcXVlcy5sZW5ndGgpO1xyXG4gIGZvciAocmkgPSAwLCBjaWQgPSAwOyByaSA8IHVuaXF1ZXMubGVuZ3RoOyByaSsrKSB7XHJcbiAgICBuYW1lVG9JbmRleFtyaV0gPVxyXG4gICAge307XHJcbiAgICBmb3IgKGNpID0gMDsgY2kgPCB1bmlxdWVzW3JpXS5sZW5ndGg7IGNpKyspIHtcclxuICAgICAgbmFtZVRvSW5kZXhbcmldW2hlYWRlcltjaWRdXSA9IGNpZDtcclxuICAgICAgY2lkICs9IDE7XHJcbiAgICB9XHJcbiAgfVxyXG5cclxuICAvLyBDcmVhdGUgYSBOIHggTiBtYXRyaXggb2YgemVybyB2YWx1ZXMuXHJcbiAgbWF0cml4ID0gbmV3IEFycmF5KGhlYWRlci5sZW5ndGgpO1xyXG4gIGZvciAocmkgPSAwOyByaSA8IGhlYWRlci5sZW5ndGg7IHJpKyspIHtcclxuICAgIHJvdyA9IG5ldyBBcnJheShoZWFkZXIubGVuZ3RoKTtcclxuICAgIGZvciAoY2kgPSAwOyBjaSA8IGhlYWRlci5sZW5ndGg7IGNpKyspIHtcclxuICAgICAgcm93W2NpXSA9IDA7XHJcbiAgICB9XHJcbiAgICBtYXRyaXhbcmldID0gcm93O1xyXG4gIH1cclxuICAvL2RleC5jb25zb2xlLmxvZyhcIm5hbWVUb0luZGV4XCIsIG5hbWVUb0luZGV4LCBcIm1hdHJpeFwiLCBtYXRyaXgpO1xyXG5cclxuICBmb3IgKHJpID0gMDsgcmkgPCBjc3YuZGF0YS5sZW5ndGg7IHJpKyspIHtcclxuICAgIGZvciAoY2kgPSAxOyBjaSA8IGNzdi5oZWFkZXIubGVuZ3RoOyBjaSsrKSB7XHJcbiAgICAgIHNyYyA9IG5hbWVUb0luZGV4W2NpIC0gMV1bY3N2LmRhdGFbcmldW2NpIC0gMV1dO1xyXG4gICAgICBkZXN0ID0gbmFtZVRvSW5kZXhbY2ldW2Nzdi5kYXRhW3JpXVtjaV1dO1xyXG5cclxuICAgICAgLy9kZXguY29uc29sZS5sb2coY3N2LmRhdGFbcmldW2NpLTFdICsgXCI8LT5cIiArIGNzdi5kYXRhW3JpXVtjaV0sIHNyYyArIFwiPC0+XCIgKyBkZXN0KTtcclxuICAgICAgbWF0cml4W3NyY11bZGVzdF0gPSAxO1xyXG4gICAgICBtYXRyaXhbZGVzdF1bc3JjXSA9IDE7XHJcbiAgICB9XHJcbiAgfVxyXG5cclxuICBjb25uZWN0aW9uTWF0cml4ID0ge1wiaGVhZGVyXCI6IGhlYWRlciwgXCJjb25uZWN0aW9uc1wiOiBtYXRyaXh9O1xyXG4gIC8vZGV4LmNvbnNvbGUubG9nKFwiQ29ubmVjdGlvbiBNYXRyaXhcIiwgY29ubmVjdGlvbk1hdHJpeCk7XHJcbiAgcmV0dXJuIGNvbm5lY3Rpb25NYXRyaXg7XHJcbn07XHJcblxyXG4vKipcclxuICpcclxuICogQHBhcmFtIGNzdlxyXG4gKiBAcGFyYW0ga2V5SW5kZXhcclxuICogQHJldHVybnMge3t9fVxyXG4gKi9cclxuZXhwb3J0cy5jcmVhdGVNYXAgPSBmdW5jdGlvbiAoY3N2LCBrZXlJbmRleCkge1xyXG4gIHZhciByaSwgY2ksIHJvd01hcCwgbWFwID1cclxuICB7fTtcclxuXHJcbiAgZm9yIChyaSA9IDA7IHJpIDwgY3N2LmRhdGEubGVuZ3RoOyByaSArPSAxKSB7XHJcbiAgICBpZiAoY3N2LmRhdGFbcmldLmxlbmd0aCA9PT0gY3N2LmhlYWRlci5sZW5ndGgpIHtcclxuICAgICAgcm93TWFwID1cclxuICAgICAge307XHJcblxyXG4gICAgICBmb3IgKGNpID0gMDsgY2kgPCBjc3YuaGVhZGVyLmxlbmd0aDsgY2kgKz0gMSkge1xyXG4gICAgICAgIHJvd01hcFtjc3YuaGVhZGVyW2NpXV0gPSBjc3YuZGF0YVtyaV1bY2ldO1xyXG4gICAgICB9XHJcbiAgICAgIG1hcFtjc3YuZGF0YVtyaV1ba2V5SW5kZXhdXSA9IHJvd01hcDtcclxuICAgIH1cclxuICB9XHJcbiAgcmV0dXJuIG1hcDtcclxufTtcclxuXHJcbi8qKlxyXG4gKlxyXG4gKiBAcGFyYW0gY3N2XHJcbiAqIEBwYXJhbSByb3dJbmRleFxyXG4gKiBAcGFyYW0gY29sdW1uSW5kZXhcclxuICogQHJldHVybnMgeyp9XHJcbiAqL1xyXG5leHBvcnRzLnRvSnNvbiA9IGZ1bmN0aW9uIChjc3YsIHJvd0luZGV4LCBjb2x1bW5JbmRleCkge1xyXG4gIHZhciBqc29uRGF0YSA9IFtdO1xyXG4gIHZhciByaSwgY2ksIGpzb25Sb3c7XHJcblxyXG4gIGlmIChhcmd1bWVudHMubGVuZ3RoID49IDMpIHtcclxuICAgIGpzb25Sb3cgPSB7fTtcclxuICAgIGpzb25Sb3dbY3N2LmhlYWRlcltjb2x1bW5JbmRleF1dID0gY3N2LmRhdGFbcm93SW5kZXhdW2NvbHVtbkluZGV4XTtcclxuICAgIHJldHVybiBqc29uUm93O1xyXG4gIH1cclxuICBlbHNlIGlmIChhcmd1bWVudHMubGVuZ3RoID09PSAyKSB7XHJcbiAgICB2YXIganNvblJvdyA9XHJcbiAgICB7fTtcclxuICAgIGZvciAoY2kgPSAwOyBjaSA8IGNzdi5oZWFkZXIubGVuZ3RoOyBjaSArPSAxKSB7XHJcbiAgICAgIGpzb25Sb3dbY3N2LmhlYWRlcltjaV1dID0gY3N2LmRhdGFbcm93SW5kZXhdW2NpXTtcclxuICAgIH1cclxuICAgIHJldHVybiBqc29uUm93O1xyXG4gIH1cclxuICBlbHNlIGlmIChhcmd1bWVudHMubGVuZ3RoID09PSAxKSB7XHJcbiAgICBmb3IgKHJpID0gMDsgcmkgPCBjc3YuZGF0YS5sZW5ndGg7IHJpKyspIHtcclxuICAgICAgdmFyIGpzb25Sb3cgPVxyXG4gICAgICB7fTtcclxuICAgICAgZm9yIChjaSA9IDA7IGNpIDwgY3N2LmhlYWRlci5sZW5ndGg7IGNpKyspIHtcclxuICAgICAgICBqc29uUm93W2Nzdi5oZWFkZXJbY2ldXSA9IGNzdi5kYXRhW3JpXVtjaV07XHJcbiAgICAgICAgLy9kZXguY29uc29sZS5sb2coY3N2LmhlYWRlcltjaV0gKyBcIj1cIiArIGNzdi5kYXRhW3JpXVtjaV0sIGpzb25Sb3cpO1xyXG4gICAgICB9XHJcbiAgICAgIGpzb25EYXRhLnB1c2goanNvblJvdyk7XHJcbiAgICB9XHJcbiAgfVxyXG4gIHJldHVybiBqc29uRGF0YTtcclxufTtcclxuXHJcbi8qKlxyXG4gKlxyXG4gKiBAcGFyYW0gY3N2XHJcbiAqIEByZXR1cm5zIHt7fX1cclxuICovXHJcbmV4cG9ydHMudG9Db2x1bW5BcnJheUpzb24gPSBmdW5jdGlvbiAoY3N2KSB7XHJcbiAgdmFyIGpzb24gPSB7fTtcclxuICB2YXIgcmksIGNpLCBqc29uUm93O1xyXG5cclxuICBpZiAoYXJndW1lbnRzLmxlbmd0aCA9PT0gMSkge1xyXG4gICAgZm9yIChjaSA9IDA7IGNpIDwgY3N2LmhlYWRlci5sZW5ndGg7IGNpKyspIHtcclxuICAgICAganNvbltjc3YuaGVhZGVyW2NpXV0gPSBbXTtcclxuICAgIH1cclxuXHJcbiAgICBmb3IgKHJpID0gMDsgcmkgPCBjc3YuZGF0YS5sZW5ndGg7IHJpKyspIHtcclxuICAgICAgZm9yIChjaSA9IDA7IGNpIDwgY3N2LmhlYWRlci5sZW5ndGg7IGNpKyspIHtcclxuICAgICAgICBqc29uW2Nzdi5oZWFkZXJbY2ldXS5wdXNoKGNzdi5kYXRhW3JpXVtjaV0pO1xyXG4gICAgICB9XHJcbiAgICB9XHJcbiAgfVxyXG5cclxuICByZXR1cm4ganNvbjtcclxufTtcclxuXHJcbi8qKlxyXG4gKlxyXG4gKiBAcGFyYW0gY3N2XHJcbiAqIEByZXR1cm5zIHt7aGVhZGVyOiAqLCBkYXRhOiAqfX1cclxuICpcclxuICovXHJcbmV4cG9ydHMuY29weSA9IGZ1bmN0aW9uIChjc3YpIHtcclxuICB2YXIgY29weSA9IHtcclxuICAgICdoZWFkZXInOiBkZXguYXJyYXkuY29weShjc3YuaGVhZGVyKSxcclxuICAgICdkYXRhJzogZGV4Lm1hdHJpeC5jb3B5KGNzdi5kYXRhKVxyXG4gIH07XHJcbiAgcmV0dXJuIGNvcHk7XHJcbn07XHJcblxyXG4vKipcclxuICpcclxuICogQSB1dGlsaXR5IHRyYW5zZm9ybSBmb3IgZGVhbGluZyB3aXRoIHNvbWUgb2YgRDMncyBtb3JlIGZpbmlreSBmb3JtYXRzLlxyXG4gKlxyXG4gKiBjc3YgPVxyXG4gKiB7XHJcbiAqIFx0IGhlYWRlciA6IHtDMSxDMixDM30sXHJcbiAqICAgZGF0YSAgIDogW1xyXG4gKiAgICAgW0EsQixDXSxcclxuICogICAgIFtBLEIsRF1cclxuICogICBdXHJcbiAqIH1cclxuICogaW50bzpcclxuICoganNvbiA9XHJcbiAqIHtcclxuICogXHRcIm5hbWVcIiAgICAgOiByb290TmFtZSxcclxuICogIFwiY2F0ZWdvcnlcIiA6IGNhdGVnb3J5LFxyXG4gKiAgXCJjaGlsZHJlblwiIDpcclxuICogIFtcclxuICogICAgXCJjaGlsZHJlblwiIDpcclxuICogICAgIFtcclxuICogICAgICAge1xyXG4gKiAgICAgICAgIFwibmFtZVwiICAgICA6IFwiQVwiLFxyXG4gKiAgICAgICAgIFwiY2F0ZWdvcnlcIiA6IFwiQzFcIixcclxuICogICAgICAgICBcImNoaWxkcmVuXCIgOlxyXG4gKiAgICAgICAgIFtcclxuICogICAgICAgICAgIHtcclxuICogXHQgICAgICAgICAgIFwibmFtZVwiIDogXCJCXCIsXHJcbiAqICAgICAgICAgICAgIFwiY2F0ZWdvcnlcIiA6IFwiQzJcIixcclxuICogICAgICAgICAgICAgXCJjaGlsZHJlblwiIDpcclxuICogICAgICAgICAgICAgW1xyXG4gKiAgICAgICAgICAgICAgIHtcclxuICogICAgICAgICAgICAgICAgIFwibmFtZVwiICAgICA6IFwiQ1wiLFxyXG4gKiAgICAgICAgICAgICAgICAgXCJjYXRlZ29yeVwiIDogXCJDM1wiLFxyXG4gKiAgICAgICAgICAgICAgICAgXCJzaXplXCIgICAgIDogMVxyXG4gKiAgICAgICAgICAgICAgIH1cclxuICogICAgICAgICAgICAgICB7XHJcbiAqICAgICAgICAgICAgICAgICBcIm5hbWVcIiAgICAgOiBcIkRcIixcclxuICogICAgICAgICAgICAgICAgIFwiY2F0ZWdvcnlcIiA6IFwiQzNcIixcclxuICogICAgICAgICAgICAgICAgIFwic2l6ZVwiICAgICA6IDFcclxuICogICAgICAgICAgICAgICB9XHJcbiAqICAgICAgICAgICAgIF1cclxuICogICAgICAgICAgIH1cclxuICogICAgICAgICBdXHJcbiAqICAgICAgIH1cclxuICogICAgIF1cclxuICogIF1cclxuICogfVxyXG4gKlxyXG4gKiBAcGFyYW0ge09iamVjdH0gY3N2XHJcbiAqL1xyXG5leHBvcnRzLnRvSGllcmFyY2hpY2FsSnNvbiA9IGZ1bmN0aW9uIChjc3YpIHtcclxuICB2YXIgY29ubmVjdGlvbnMgPSBkZXguY3N2LmNvbm5lY3Rpb25zKGNzdik7XHJcbiAgcmV0dXJuIGdldENoaWxkcmVuKGNvbm5lY3Rpb25zLCAwKTtcclxuXHJcbiAgZnVuY3Rpb24gZ2V0Q2hpbGRyZW4oY29ubmVjdGlvbnMsIGRlcHRoKSB7XHJcbiAgICAvL2RleC5jb25zb2xlLmxvZyhcImNvbm5lY3Rpb25zOlwiLCBjb25uZWN0aW9ucywgXCJkZXB0aD1cIitkZXB0aCk7XHJcbiAgICB2YXIga2lkcyA9IFtdLCBjbmFtZTtcclxuXHJcbiAgICBpZiAodHlwZW9mIGNvbm5lY3Rpb25zID09PSAndW5kZWZpbmVkJykge1xyXG4gICAgICByZXR1cm4ga2lkcztcclxuICAgIH1cclxuXHJcbiAgICBmb3IgKGNuYW1lIGluIGNvbm5lY3Rpb25zKSB7XHJcbiAgICAgIC8vZGV4LmNvbnNvbGUubG9nKFwiQ05BTUVcIiwgY25hbWUpO1xyXG4gICAgICBpZiAoY29ubmVjdGlvbnMuaGFzT3duUHJvcGVydHkoY25hbWUpKSB7XHJcbiAgICAgICAga2lkcy5wdXNoKGNyZWF0ZUNoaWxkKGNuYW1lLCBjc3YuaGVhZGVyW2RlcHRoXSxcclxuICAgICAgICAgIGdldENoaWxkcmVuKGNvbm5lY3Rpb25zW2NuYW1lXSwgZGVwdGggKyAxKSkpO1xyXG4gICAgICB9XHJcbiAgICB9XHJcblxyXG4gICAgcmV0dXJuIGtpZHM7XHJcbiAgfVxyXG5cclxuICBmdW5jdGlvbiBjcmVhdGVDaGlsZChuYW1lLCBjYXRlZ29yeSwgY2hpbGRyZW4pIHtcclxuICAgIHZhciBjaGlsZCA9XHJcbiAgICB7XHJcbiAgICAgIFwibmFtZVwiOiBuYW1lLFxyXG4gICAgICBcImNhdGVnb3J5XCI6IGNhdGVnb3J5LFxyXG4gICAgICBcImNoaWxkcmVuXCI6IGNoaWxkcmVuXHJcbiAgICB9O1xyXG4gICAgcmV0dXJuIGNoaWxkO1xyXG4gIH1cclxufTtcclxuXHJcbi8qKlxyXG4gKlxyXG4gKiBUcmFuc2Zvcm1zOlxyXG4gKiBjc3YgPVxyXG4gKiB7XHJcbiAqIFx0IGhlYWRlciA6IHtDMSxDMixDM30sXHJcbiAqICAgZGF0YSAgIDogW1xyXG4gKiAgICAgW0EsQixDXSxcclxuICogICAgIFtBLEIsRF1cclxuICogICBdXHJcbiAqIH1cclxuICogaW50bzpcclxuICogY29ubmVjdGlvbnMgPVxyXG4gKiB7IEE6e0I6e0M6e30sRDp7fX19fVxyXG4gKlxyXG4gKiBAcGFyYW0ge09iamVjdH0gY3N2XHJcbiAqXHJcbiAqL1xyXG5leHBvcnRzLmNvbm5lY3Rpb25zID0gZnVuY3Rpb24gKGNzdikge1xyXG4gIHZhciBjb25uZWN0aW9ucyA9XHJcbiAge307XHJcbiAgdmFyIHJpO1xyXG5cclxuICBmb3IgKHJpID0gMDsgcmkgPCBjc3YuZGF0YS5sZW5ndGg7IHJpKyspIHtcclxuICAgIGRleC5vYmplY3QuY29ubmVjdChjb25uZWN0aW9ucywgY3N2LmRhdGFbcmldKTtcclxuICB9XHJcblxyXG4gIC8vZGV4LmNvbnNvbGUubG9nKFwiY29ubmVjdGlvbnM6XCIsIGNvbm5lY3Rpb25zKTtcclxuICByZXR1cm4gY29ubmVjdGlvbnM7XHJcbn07XHJcblxyXG4vKipcclxuICpcclxuICogQHBhcmFtIGNzdlxyXG4gKiBAcGFyYW0ga2V5SW5kZXhcclxuICogQHJldHVybnMge3t9fVxyXG4gKlxyXG4gKi9cclxuZXhwb3J0cy5jcmVhdGVSb3dNYXAgPSBmdW5jdGlvbiAoY3N2LCBrZXlJbmRleCkge1xyXG4gIHZhciBtYXAgPVxyXG4gIHt9O1xyXG4gIHZhciByaTtcclxuXHJcbiAgZm9yIChyaSA9IDA7IHJpIDwgY3N2LmRhdGEubGVuZ3RoOyByaSsrKSB7XHJcbiAgICBpZiAoY3N2LmRhdGFbcmldLmxlbmd0aCA9PSBjc3YuaGVhZGVyLmxlbmd0aCkge1xyXG4gICAgICBtYXBbY3N2LmRhdGFbcmldW2tleUluZGV4XV0gPSBjc3YuZGF0YVtyaV07XHJcbiAgICB9XHJcbiAgfVxyXG4gIHJldHVybiBtYXA7XHJcbn07XHJcblxyXG4vKipcclxuICpcclxuICogQHBhcmFtIGNzdlxyXG4gKiBAcGFyYW0gY29sdW1uc1xyXG4gKiBAcmV0dXJucyB7e319XHJcbiAqL1xyXG5leHBvcnRzLmNvbHVtblNsaWNlID0gZnVuY3Rpb24gKGNzdiwgY29sdW1ucykge1xyXG4gIHZhciBzbGljZSA9IHt9O1xyXG4gIHNsaWNlLmhlYWRlciA9IGRleC5hcnJheS5zbGljZShjc3YuaGVhZGVyLCBjb2x1bW5zKTtcclxuICBzbGljZS5kYXRhID0gZGV4Lm1hdHJpeC5zbGljZShjc3YuZGF0YSwgY29sdW1ucyk7XHJcblxyXG4gIHJldHVybiBzbGljZTtcclxufTtcclxuXHJcbi8qKlxyXG4gKlxyXG4gKiBAcGFyYW0gY3N2XHJcbiAqIEByZXR1cm5zIHtBcnJheX1cclxuICovXHJcbmV4cG9ydHMuZ2V0TnVtZXJpY0NvbHVtbk5hbWVzID0gZnVuY3Rpb24gKGNzdikge1xyXG4gIHZhciBwb3NzaWJsZU51bWVyaWMgPVxyXG4gIHt9O1xyXG4gIHZhciBpLCBqLCByaSwgY2k7XHJcbiAgdmFyIG51bWVyaWNDb2x1bW5zID0gW107XHJcblxyXG4gIGZvciAoaSA9IDA7IGkgPCBjc3YuaGVhZGVyLmxlbmd0aDsgaSsrKSB7XHJcbiAgICBwb3NzaWJsZU51bWVyaWNbY3N2LmhlYWRlcltpXV0gPSB0cnVlO1xyXG4gIH1cclxuXHJcbiAgLy8gSXRlcmF0ZSB0aHJ1IHRoZSBkYXRhLCBza2lwIHRoZSBoZWFkZXIuXHJcbiAgZm9yIChyaSA9IDA7IHJpIDwgY3N2LmRhdGEubGVuZ3RoOyByaSsrKSB7XHJcbiAgICBmb3IgKGNpID0gMDsgY2kgPCBjc3YuZGF0YVtyaV0ubGVuZ3RoICYmIGNpIDwgY3N2LmhlYWRlci5sZW5ndGg7IGNpKyspIHtcclxuICAgICAgaWYgKHBvc3NpYmxlTnVtZXJpY1tjc3YuaGVhZGVyW2NpXV0gJiYgIWRleC5vYmplY3QuaXNOdW1lcmljKGNzdi5kYXRhW3JpXVtjaV0pKSB7XHJcbiAgICAgICAgcG9zc2libGVOdW1lcmljW2Nzdi5oZWFkZXJbY2ldXSA9IGZhbHNlO1xyXG4gICAgICB9XHJcbiAgICB9XHJcbiAgfVxyXG5cclxuICBmb3IgKGNpID0gMDsgY2kgPCBjc3YuaGVhZGVyLmxlbmd0aDsgY2krKykge1xyXG4gICAgaWYgKHBvc3NpYmxlTnVtZXJpY1tjc3YuaGVhZGVyW2NpXV0pIHtcclxuICAgICAgbnVtZXJpY0NvbHVtbnMucHVzaChjc3YuaGVhZGVyW2NpXSk7XHJcbiAgICB9XHJcbiAgfVxyXG5cclxuICByZXR1cm4gbnVtZXJpY0NvbHVtbnM7XHJcbn07XHJcblxyXG4vKipcclxuICpcclxuICogQHBhcmFtIGNzdlxyXG4gKiBAcmV0dXJucyB7QXJyYXl9XHJcbiAqL1xyXG5leHBvcnRzLmd1ZXNzVHlwZXMgPSBmdW5jdGlvbiAoY3N2KSB7XHJcbiAgdmFyIGkgPSAwO1xyXG4gIHZhciB0ZXN0UmVzdWx0cyA9IFtdO1xyXG4gIGNzdi5oZWFkZXIuZm9yRWFjaChmdW5jdGlvbiAoaGRyKSB7XHJcbiAgICB0ZXN0UmVzdWx0cy5wdXNoKHt9KVxyXG4gIH0pO1xyXG4gIHZhciBudW1Db2xzID0gY3N2LmhlYWRlci5sZW5ndGg7XHJcblxyXG4gIGNzdi5kYXRhLmZvckVhY2goZnVuY3Rpb24gKHJvdykge1xyXG4gICAgZm9yIChpID0gMDsgaSA8IG51bUNvbHM7IGkrKykge1xyXG5cclxuICAgICAgaWYgKCF0ZXN0UmVzdWx0c1tpXVtcIm5vdERhdGVcIl0pIHtcclxuICAgICAgICB2YXIgZGF0ZSA9IG5ldyBEYXRlKHJvd1tpXSk7XHJcbiAgICAgICAgaWYgKGlzTmFOKGRhdGUuZ2V0VGltZSgpKSkge1xyXG4gICAgICAgICAgZGV4LmNvbnNvbGUubG9nKFwibm90IGRhdGVcIiArIGkpO1xyXG4gICAgICAgICAgdGVzdFJlc3VsdHNbaV1bXCJub3REYXRlXCJdID0gdHJ1ZTtcclxuICAgICAgICB9XHJcbiAgICAgIH1cclxuXHJcbiAgICAgIGlmICghdGVzdFJlc3VsdHNbaV1bXCJub3ROdW1iZXJcIl0pIHtcclxuICAgICAgICBpZiAoaXNOYU4ocm93W2ldKSkge1xyXG4gICAgICAgICAgdGVzdFJlc3VsdHNbaV1bXCJub3ROdW1iZXJcIl0gPSB0cnVlO1xyXG4gICAgICAgIH1cclxuICAgICAgfVxyXG4gICAgfVxyXG4gIH0pO1xyXG5cclxuICB2YXIgdHlwZXMgPSBbXTtcclxuXHJcbiAgZm9yIChpID0gMDsgaSA8IG51bUNvbHM7IGkrKykge1xyXG4gICAgdmFyIHJlc3VsdHMgPSB0ZXN0UmVzdWx0c1tpXTtcclxuICAgIGlmICghcmVzdWx0cy5ub3REYXRlICYmIHJlc3VsdHMubm90TnVtYmVyKSB7XHJcbiAgICAgIHR5cGVzLnB1c2goJ2RhdGUnKTtcclxuICAgIH1cclxuICAgIGVsc2UgaWYgKCFyZXN1bHRzLm5vdE51bWJlcikge1xyXG4gICAgICB0eXBlcy5wdXNoKCdudW1iZXInKTtcclxuICAgIH1cclxuICAgIGVsc2Uge1xyXG4gICAgICB0eXBlcy5wdXNoKCdzdHJpbmcnKTtcclxuICAgIH1cclxuICB9XHJcblxyXG4gIHJldHVybiB0eXBlcztcclxufVxyXG5cclxuLyoqXHJcbiAqXHJcbiAqIEBwYXJhbSBjc3ZcclxuICogQHJldHVybnMgeyp9XHJcbiAqL1xyXG5leHBvcnRzLnN0cmljdFR5cGVzID0gZnVuY3Rpb24gc3RyaWN0VHlwZXMoY3N2KSB7XHJcbiAgdmFyIHR5cGVzID0gZGV4LmNzdi5ndWVzc1R5cGVzKGNzdik7XHJcblxyXG4gIGZvciAodmFyIGkgPSAwOyBpIDwgdHlwZXMubGVuZ3RoOyBpKyspIHtcclxuICAgIGlmICh0eXBlc1tpXSA9PSAnZGF0ZScpIHtcclxuICAgICAgY3N2LmRhdGEuZm9yRWFjaChmdW5jdGlvbiAocm93LCByaSkge1xyXG4gICAgICAgIGRleC5jb25zb2xlLmxvZyhcInJvd1tcIiArIHJpICsgXCJdPVwiICsgcm93W3JpXSk7XHJcbiAgICAgICAgY3N2LmRhdGFbcmldW2ldID0gbmV3IERhdGUoY3N2LmRhdGFbcmldW2ldKTtcclxuICAgICAgfSlcclxuICAgIH1cclxuICAgIGVsc2Uge1xyXG4gICAgICBpZiAodHlwZXNbaV0gPT0gJ251bWJlcicpIHtcclxuICAgICAgICBjc3YuZGF0YS5mb3JFYWNoKGZ1bmN0aW9uIChyb3csIHJpKSB7XHJcbiAgICAgICAgICBkZXguY29uc29sZS5sb2coXCJyb3dbXCIgKyByaSArIFwiXT1cIiArIHJvd1tyaV0pO1xyXG4gICAgICAgICAgY3N2LmRhdGFbcmldW2ldID0gbmV3IERvdWJsZShjc3YuZGF0YVtyaV1baV0pO1xyXG4gICAgICAgIH0pXHJcbiAgICAgIH1cclxuICAgIH1cclxuICB9XHJcblxyXG4gIHJldHVybiBjc3Y7XHJcbn07XHJcblxyXG4vKipcclxuICpcclxuICogVGhpcyByb3V0aW5lIHdpbGwgcmV0dXJuIGEgZnJhbWVzIHN0cnVjdHVyZSBiYXNlZCBvbiBhIGNzdiBhbmRcclxuICogYW4gaW5kZXguICBJdCB3aWxsIGZpcnN0IGlkZW50aWZ5IGFsbCB1bmlxdWUgdmFsdWVzIHdpdGhpbiB0aGVcclxuICogc2VsZWN0ZWQgY29sdW1uLCB0aGVuIHNvcnQgdGhlbSBpbnRvIGFuIGFycmF5IG9mIGZyYW1lIGluZGV4ZXMuXHJcbiAqIEZyb20gdGhlcmUsIGl0IHdpbGwgcmV0dXJuIGFuIGFycmF5IG9mIGNzdiB3aGVyZSB0aGUgZWxlbWVudHNcclxuICogY29udGFpbiB0aGUgc3BlY2lmaWVkIGZyYW1lIGluZGV4IGF0IHRoZSBjb29yZXNwb25kaW5nIGxvY2F0aW9uLlxyXG4gKiBUaGlzIHJvdXRpbmUgc3VwcG9ydHMgdGhpbmdzIHN1Y2ggYXMgdGltZS92YWx1ZSBmaWx0ZXJpbmcgZm9yXHJcbiAqIHRoaW5ncyBsaWtlIGEgdGltZSBvciBzbGljaW5nIGRpbWVuc2lvbiBmb3IgdmFyaW91cyBjaGFydHMuXHJcbiAqIElFOiBObyBuZWVkIHRvIHdyaXRlIGEgbW90aW9uIGJ1YmJsZSBjaGFydCwgc2ltcGx5IGNvbWJpbmUgYVxyXG4gKiB2Y3ItcGxheWVyIHdpdGggYSByZWd1bGFyIGJ1YmJsZSBjaGFydCBjb25uZWN0ZWQgdG8gcGxheS9yZXdpbmRcclxuICogZXZlbnRzIGFuZCBtb3Rpb24gd2lsbCBmb2xsb3cuXHJcbiAqXHJcbiAqIEBwYXJhbSBjc3ZcclxuICogQHBhcmFtIGNvbHVtbkluZGV4XHJcbiAqIEByZXR1cm5zIHt7ZnJhbWVJbmRpY2VzOiBBcnJheS48VD4sIGZyYW1lczogQXJyYXl9fVxyXG4gKi9cclxuZXhwb3J0cy5nZXRGcmFtZXNCeUluZGV4ID0gZnVuY3Rpb24oY3N2LCBjb2x1bW5JbmRleCkge1xyXG4gIHZhciB0eXBlcyA9IGRleC5jc3YuZ3Vlc3NUeXBlcyhjc3YpO1xyXG4gIC8vZGV4LmNvbnNvbGUubG9nKFwiVFlQRVNcIiwgdHlwZXMpO1xyXG4gIHZhciBmcmFtZUluZGljZXM7XHJcblxyXG4gIGlmICh0eXBlc1tjb2x1bW5JbmRleF0gPT0gXCJudW1iZXJcIilcclxuICB7XHJcbiAgICBmcmFtZUluZGljZXMgPSBfLnVuaXEoY3N2LmRhdGEubWFwKGZ1bmN0aW9uIChyb3cpIHtcclxuICAgICAgcmV0dXJuIHJvd1tjb2x1bW5JbmRleF1cclxuICAgIH0pKS5zb3J0KGZ1bmN0aW9uKGEsIGIpe3JldHVybiBhLWJ9KTtcclxuICB9XHJcbiAgZWxzZSBpZiAodHlwZXNbY29sdW1uSW5kZXhdID09IFwiZGF0ZVwiKVxyXG4gIHtcclxuICAgIGZyYW1lSW5kaWNlcyA9IF8udW5pcShjc3YuZGF0YS5tYXAoZnVuY3Rpb24gKHJvdykge1xyXG4gICAgICByZXR1cm4gcm93W2NvbHVtbkluZGV4XVxyXG4gICAgfSkpLnNvcnQoZnVuY3Rpb24oYSwgYil7XHJcbiAgICAgIGEgPSBuZXcgRGF0ZShhKTtcclxuICAgICAgYiA9IG5ldyBEYXRlKGIpO1xyXG4gICAgICByZXR1cm4gYT5iID8gMSA6IGE8YiA/IC0xIDogMDtcclxuICAgIH0pO1xyXG4gIH1cclxuICBlbHNlIHtcclxuICAgIGZyYW1lSW5kaWNlcyA9IF8udW5pcShjc3YuZGF0YS5tYXAoZnVuY3Rpb24gKHJvdykge1xyXG4gICAgICByZXR1cm4gcm93W2NvbHVtbkluZGV4XVxyXG4gICAgfSkpLnNvcnQoKTtcclxuICB9XHJcbiAgLy9kZXguY29uc29sZS5sb2coXCJGUkFNRS1JTkRJQ0VTXCIsIGZyYW1lSW5kaWNlcylcclxuICB2YXIgaGVhZGVyID0gZGV4LmFycmF5LmNvcHkoY3N2LmhlYWRlcik7XHJcbiAgdmFyIGZyYW1lSW5kZXhOYW1lID0gaGVhZGVyLnNwbGljZShjb2x1bW5JbmRleCwgMSk7XHJcbiAgdmFyIGZyYW1lcyA9IFtdO1xyXG5cclxuICBmb3IgKHZhciBmaT0wOyBmaTxmcmFtZUluZGljZXMubGVuZ3RoOyBmaSsrKVxyXG4gIHtcclxuICAgIHZhciBmcmFtZSA9IHsgaGVhZGVyIDogaGVhZGVyIH07XHJcbiAgICB2YXIgZnJhbWVEYXRhID0gW107XHJcblxyXG4gICAgZm9yICh2YXIgcmk9MDsgcmk8Y3N2LmRhdGEubGVuZ3RoOyByaSsrKVxyXG4gICAge1xyXG4gICAgICBpZiAoY3N2LmRhdGFbcmldW2NvbHVtbkluZGV4XSA9PSBmcmFtZUluZGljZXNbZmldKVxyXG4gICAgICB7XHJcbiAgICAgICAgdmFyIGZyYW1lUm93ID0gZGV4LmFycmF5LmNvcHkoY3N2LmRhdGFbcmldKTtcclxuICAgICAgICBmcmFtZVJvdy5zcGxpY2UoY29sdW1uSW5kZXgsIDEpO1xyXG4gICAgICAgIGZyYW1lRGF0YS5wdXNoKGZyYW1lUm93KTtcclxuICAgICAgfVxyXG4gICAgfVxyXG4gICAgZnJhbWVbXCJkYXRhXCJdID0gZnJhbWVEYXRhO1xyXG4gICAgZnJhbWVzLnB1c2goZnJhbWUpO1xyXG4gIH1cclxuXHJcbiAgcmV0dXJuIHtcclxuICAgICdmcmFtZUluZGljZXMnIDogZnJhbWVJbmRpY2VzLFxyXG4gICAgJ2ZyYW1lcycgOiBmcmFtZXNcclxuICB9XHJcbn07XHJcblxyXG4vKipcclxuICpcclxuICogQHBhcmFtIGNzdlxyXG4gKiBAcmV0dXJucyB7QXJyYXl9XHJcbiAqL1xyXG5leHBvcnRzLmdldE51bWVyaWNJbmRpY2VzID0gZnVuY3Rpb24gKGNzdikge1xyXG4gIHZhciBwb3NzaWJsZU51bWVyaWMgPVxyXG4gIHt9O1xyXG4gIHZhciBpLCBqO1xyXG4gIHZhciBudW1lcmljSW5kaWNlcyA9IFtdO1xyXG5cclxuICBmb3IgKGkgPSAwOyBpIDwgY3N2LmhlYWRlci5sZW5ndGg7IGkrKykge1xyXG4gICAgcG9zc2libGVOdW1lcmljW2Nzdi5oZWFkZXJbaV1dID0gdHJ1ZTtcclxuICB9XHJcblxyXG4gIC8vIEl0ZXJhdGUgdGhydSB0aGUgZGF0YSwgc2tpcCB0aGUgaGVhZGVyLlxyXG4gIGZvciAoaSA9IDE7IGkgPCBjc3YuZGF0YS5sZW5ndGg7IGkrKykge1xyXG4gICAgZm9yIChqID0gMDsgaiA8IGNzdi5kYXRhW2ldLmxlbmd0aCAmJiBqIDwgY3N2LmhlYWRlci5sZW5ndGg7IGorKykge1xyXG4gICAgICBpZiAocG9zc2libGVOdW1lcmljW2Nzdi5oZWFkZXJbal1dICYmICFkZXgub2JqZWN0LmlzTnVtZXJpYyhjc3YuZGF0YVtpXVtqXSkpIHtcclxuICAgICAgICBjb25zb2xlLmxvZyhcImNzdi5oZWFkZXJbXCIgKyBqICsgXCJdPVwiICsgY3N2LmhlYWRlcltqXSArIFwiIGlzIG5vdCBudW1lcmljIGR1ZSB0byBjc3YuZGF0YVtcIiArIGkgKyBcIl1bXCJcclxuICAgICAgICAgICsgaiArIFwiXT1cIiArIGNzdi5kYXRhW2ldW2pdKTtcclxuICAgICAgICBwb3NzaWJsZU51bWVyaWNbY3N2LmhlYWRlcltqXV0gPSBmYWxzZTtcclxuICAgICAgfVxyXG4gICAgfVxyXG4gIH1cclxuXHJcbiAgZm9yIChpID0gMDsgaSA8IGNzdi5oZWFkZXIubGVuZ3RoOyBpKyspIHtcclxuICAgIGlmIChwb3NzaWJsZU51bWVyaWNbY3N2LmhlYWRlcltpXV0pIHtcclxuICAgICAgbnVtZXJpY0luZGljZXMucHVzaChpKTtcclxuICAgIH1cclxuICB9XHJcblxyXG4gIHJldHVybiBudW1lcmljSW5kaWNlcztcclxufTtcclxuXHJcbmV4cG9ydHMuZ2V0Q2F0ZWdvcmljYWxJbmRpY2VzID0gZnVuY3Rpb24gKGNzdikge1xyXG4gIHZhciBwb3NzaWJsZU51bWVyaWMgPVxyXG4gIHt9O1xyXG4gIHZhciBpLCBqO1xyXG4gIHZhciBjYXRlZ29yaWNhbEluZGljZXMgPSBbXTtcclxuXHJcbiAgZm9yIChpID0gMDsgaSA8IGNzdi5oZWFkZXIubGVuZ3RoOyBpKyspIHtcclxuICAgIHBvc3NpYmxlTnVtZXJpY1tjc3YuaGVhZGVyW2ldXSA9IHRydWU7XHJcbiAgfVxyXG5cclxuICAvLyBJdGVyYXRlIHRocnUgdGhlIGRhdGEsIHNraXAgdGhlIGhlYWRlci5cclxuICBmb3IgKGkgPSAxOyBpIDwgY3N2LmRhdGEubGVuZ3RoOyBpKyspIHtcclxuICAgIGZvciAoaiA9IDA7IGogPCBjc3YuZGF0YVtpXS5sZW5ndGggJiYgaiA8IGNzdi5oZWFkZXIubGVuZ3RoOyBqKyspIHtcclxuICAgICAgaWYgKHBvc3NpYmxlTnVtZXJpY1tjc3YuaGVhZGVyW2pdXSAmJiAhZGV4Lm9iamVjdC5pc051bWVyaWMoY3N2LmRhdGFbaV1bal0pKSB7XHJcbiAgICAgICAgY29uc29sZS5sb2coXCJjc3YuaGVhZGVyW1wiICsgaiArIFwiXT1cIiArIGNzdi5oZWFkZXJbal0gKyBcIiBpcyBub3QgbnVtZXJpYyBkdWUgdG8gY3N2LmRhdGFbXCIgKyBpICsgXCJdW1wiXHJcbiAgICAgICAgICArIGogKyBcIl09XCIgKyBjc3YuZGF0YVtpXVtqXSk7XHJcbiAgICAgICAgcG9zc2libGVOdW1lcmljW2Nzdi5oZWFkZXJbal1dID0gZmFsc2U7XHJcbiAgICAgIH1cclxuICAgIH1cclxuICB9XHJcblxyXG4gIGZvciAoaSA9IDA7IGkgPCBjc3YuaGVhZGVyLmxlbmd0aDsgaSsrKSB7XHJcbiAgICBpZiAoIXBvc3NpYmxlTnVtZXJpY1tjc3YuaGVhZGVyW2ldXSkge1xyXG4gICAgICBjYXRlZ29yaWNhbEluZGljZXMucHVzaChpKTtcclxuICAgIH1cclxuICB9XHJcblxyXG4gIHJldHVybiBjYXRlZ29yaWNhbEluZGljZXM7XHJcbn07XHJcblxyXG4vKipcclxuICpcclxuICogQHBhcmFtIGNzdlxyXG4gKiBAcGFyYW0gY29sdW1uTnVtXHJcbiAqIEByZXR1cm5zIHtib29sZWFufVxyXG4gKi9cclxuZXhwb3J0cy5pc0NvbHVtbk51bWVyaWMgPSBmdW5jdGlvbiAoY3N2LCBjb2x1bW5OdW0pIHtcclxuICB2YXIgaTtcclxuXHJcbiAgZm9yIChpID0gMDsgaSA8IGNzdi5kYXRhLmxlbmd0aDsgaSsrKSB7XHJcbiAgICBpZiAoIWRleC5vYmplY3QuaXNOdW1lcmljKGNzdi5kYXRhW2ldW2NvbHVtbk51bV0pKSB7XHJcbiAgICAgIHJldHVybiBmYWxzZTtcclxuICAgIH1cclxuICB9XHJcbiAgcmV0dXJuIHRydWU7XHJcbn07XHJcblxyXG4vKipcclxuICpcclxuICogQHBhcmFtIGNzdlxyXG4gKiBAcGFyYW0gY29sdW1uc1xyXG4gKiBAcmV0dXJucyB7Kn1cclxuICovXHJcbmV4cG9ydHMuZ3JvdXAgPSBmdW5jdGlvbiAoY3N2LCBjb2x1bW5zKSB7XHJcbiAgdmFyIHJpLCBjaTtcclxuICB2YXIgZ3JvdXBzID0ge307XHJcbiAgdmFyIHJldHVybkdyb3VwcyA9IFtdO1xyXG4gIHZhciB2YWx1ZXM7XHJcbiAgdmFyIGtleTtcclxuICB2YXIgb3RoZXJDb2x1bW5zO1xyXG4gIHZhciBvdGhlckhlYWRlcnM7XHJcbiAgdmFyIGdyb3VwTmFtZTtcclxuXHJcbiAgaWYgKGFyZ3VtZW50cyA8IDIpIHtcclxuICAgIHJldHVybiBjc3Y7XHJcbiAgfVxyXG5cclxuICBmdW5jdGlvbiBjb21wYXJlKGEsIGIpIHtcclxuICAgIHZhciBzaSwgaDtcclxuXHJcbiAgICBmb3IgKHNpID0gMDsgc2kgPCBjb2x1bW5zLmxlbmd0aDsgc2krKykge1xyXG4gICAgICBoID0gY3N2LmhlYWRlcltjb2x1bW5zW3NpXV1cclxuICAgICAgaWYgKGFbaF0gPCBiW2hdKSB7XHJcbiAgICAgICAgcmV0dXJuIC0xO1xyXG4gICAgICB9XHJcbiAgICAgIGVsc2UgaWYgKGFbaF0gPiBiW2hdKSB7XHJcbiAgICAgICAgcmV0dXJuIDFcclxuICAgICAgfVxyXG4gICAgfVxyXG5cclxuICAgIHJldHVybiAwO1xyXG4gIH1cclxuXHJcbiAgLy9vdGhlckNvbHVtbnMgPSBkZXguYXJyYXkuZGlmZmVyZW5jZShkZXgucmFuZ2UoMCwgY3N2LmhlYWRlci5sZW5ndGgpLCBjb2x1bW5zKTtcclxuICAvL290aGVySGVhZGVycyA9IGRleC5hcnJheS5zbGljZShjc3YuaGVhZGVyLCBvdGhlckNvbHVtbnMpO1xyXG5cclxuICBmb3IgKHJpID0gMDsgcmkgPCBjc3YuZGF0YS5sZW5ndGg7IHJpICs9IDEpIHtcclxuICAgIHZhbHVlcyA9IGRleC5hcnJheS5zbGljZShjc3YuZGF0YVtyaV0sIGNvbHVtbnMpO1xyXG4gICAga2V5ID0gdmFsdWVzLmpvaW4oJzo6OicpO1xyXG5cclxuICAgIGlmIChncm91cHNba2V5XSkge1xyXG4gICAgICBncm91cCA9IGdyb3Vwc1trZXldO1xyXG4gICAgfVxyXG4gICAgZWxzZSB7XHJcbiAgICAgIC8vZ3JvdXAgPSB7ICdjc3YnIDogZGV4LmNzdi5jc3Yob3RoZXJIZWFkZXJzLCBbXSkgfTtcclxuICAgICAgZ3JvdXAgPVxyXG4gICAgICB7XHJcbiAgICAgICAgJ2tleSc6IGtleSxcclxuICAgICAgICAndmFsdWVzJzogW10sXHJcbiAgICAgICAgJ2Nzdic6IGRleC5jc3YuY3N2KGNzdi5oZWFkZXIsIFtdKVxyXG4gICAgICB9O1xyXG4gICAgICBmb3IgKGNpID0gMDsgY2kgPCB2YWx1ZXMubGVuZ3RoOyBjaSsrKSB7XHJcbiAgICAgICAgZ3JvdXAudmFsdWVzLnB1c2goeyduYW1lJzogY3N2LmhlYWRlcltjb2x1bW5zW2NpXV0sICd2YWx1ZSc6IHZhbHVlc1tjaV19KTtcclxuICAgICAgfVxyXG4gICAgICBncm91cHNba2V5XSA9IGdyb3VwO1xyXG4gICAgfVxyXG4gICAgLy9ncm91cC5jc3YuZGF0YS5wdXNoKGRleC5hcnJheS5zbGljZShjc3YuZGF0YVtyaV0sIG90aGVyQ29sdW1ucykpO1xyXG4gICAgZ3JvdXAuY3N2LmRhdGEucHVzaChjc3YuZGF0YVtyaV0pO1xyXG4gICAgLy9ncm91cHNba2V5XSA9IGdyb3VwO1xyXG4gIH1cclxuXHJcbiAgZm9yIChncm91cE5hbWUgaW4gZ3JvdXBzKSB7XHJcbiAgICBpZiAoZ3JvdXBzLmhhc093blByb3BlcnR5KGdyb3VwTmFtZSkpIHtcclxuICAgICAgcmV0dXJuR3JvdXBzLnB1c2goZ3JvdXBzW2dyb3VwTmFtZV0pO1xyXG4gICAgfVxyXG4gIH1cclxuXHJcbiAgcmV0dXJuIHJldHVybkdyb3Vwcy5zb3J0KGNvbXBhcmUpO1xyXG59O1xyXG5cclxuLyoqXHJcbiAqXHJcbiAqIEBwYXJhbSBjc3ZcclxuICogQHBhcmFtIGZ1bmNcclxuICovXHJcbmV4cG9ydHMudmlzaXRDZWxscyA9IGZ1bmN0aW9uIChjc3YsIGZ1bmMpIHtcclxuICB2YXIgY2ksIHJpO1xyXG5cclxuICBmb3IgKHJpID0gMDsgcmkgPCBjc3YuZGF0YS5sZW5ndGg7IHJpKyspIHtcclxuICAgIGZvciAoY2kgPSAwOyBjaSA8IGNzdi5oZWFkZXIubGVuZ3RoOyBjaSsrKSB7XHJcbiAgICAgIGZ1bmMoY2ksIHJpLCBjc3YuZGF0YVtyaV1bY2ldKTtcclxuICAgIH1cclxuICB9XHJcbn07XHJcblxyXG4vKipcclxuICpcclxuICogQHBhcmFtIGNzdlxyXG4gKiBAcmV0dXJucyB7bnVtYmVyfVxyXG4gKi9cclxuZXhwb3J0cy5sb25nZXN0V29yZCA9IGZ1bmN0aW9uIChjc3YpIHtcclxuICB2YXIgbG9uZ2VzdCA9IDA7XHJcbiAgZm9yICh2YXIgcm93ID0gMDsgcm93IDwgY3N2LmRhdGEubGVuZ3RoOyByb3crKykge1xyXG4gICAgZm9yICh2YXIgY29sID0gMDsgY29sIDwgY3N2LmRhdGFbcm93XS5sZW5ndGg7IGNvbCsrKSB7XHJcbiAgICAgIGlmIChsb25nZXN0IDwgY3N2LmRhdGFbcm93XVtjb2xdLmxlbmd0aCkge1xyXG4gICAgICAgIGxvbmdlc3QgPSBjc3YuZGF0YVtyb3ddW2NvbF0ubGVuZ3RoO1xyXG4gICAgICB9XHJcbiAgICB9XHJcbiAgfVxyXG4gIHJldHVybiBsb25nZXN0O1xyXG59O1xyXG5cclxuLyoqXHJcbiAqXHJcbiAqIEBwYXJhbSBjc3ZcclxuICogQHJldHVybnMge3t9fCp9XHJcbiAqL1xyXG5leHBvcnRzLm51bWVyaWNTdWJzZXQgPSBmdW5jdGlvbiAoY3N2KSB7XHJcbiAgcmV0dXJuIGRleC5jc3YuY29sdW1uU2xpY2UoY3N2LCBkZXguY3N2LmdldE51bWVyaWNJbmRpY2VzKGNzdikpO1xyXG59O1xyXG5cclxuZXhwb3J0cy5jYXRlZ29yaWNhbFN1YnNldCA9IGZ1bmN0aW9uIChjc3YpIHtcclxuICByZXR1cm4gZGV4LmNzdi5jb2x1bW5TbGljZShjc3YsIGRleC5jc3YuZ2V0Q2F0ZWdvcmljYWxJbmRpY2VzKGNzdikpO1xyXG59O1xyXG5cclxuLypcclxuIHZhciBkYXRhID1cclxuXHJcbiAqL1xyXG5leHBvcnRzLnRvSnNvbkhpZXJhcmNoeSA9IGZ1bmN0aW9uIChjc3YsIGNpKSB7XHJcbiAgLy8gSWYgMSBhcmd1bWVudCwgdGhlbiBzZXR1cCBhbmQgY2FsbCB3aXRoIDIuXHJcbiAgaWYgKGFyZ3VtZW50cy5sZW5ndGggPT0gMSkge1xyXG4gICAgdmFyIHJlc3VsdCA9IHsnbmFtZSc6ICdyb290JywgY2hpbGRyZW46IGRleC5jc3YudG9Kc29uSGllcmFyY2h5KGNzdiwgMCl9O1xyXG4gICAgZGV4LmNvbnNvbGUubG9nKFwiUkVTVUxUXCIsIHJlc3VsdCk7XHJcbiAgICByZXR1cm4gcmVzdWx0O1xyXG4gIH1cclxuICBlbHNlIGlmIChhcmd1bWVudHMubGVuZ3RoID09IDIpIHtcclxuICAgIHZhciB2YWx1ZU1hcCA9IHt9O1xyXG5cclxuICAgIGZvciAodmFyIHJpID0gMDsgcmkgPCBjc3YuZGF0YS5sZW5ndGg7IHJpKyspIHtcclxuICAgICAgaWYgKHZhbHVlTWFwLmhhc093blByb3BlcnR5KGNzdi5kYXRhW3JpXVtjaV0pKSB7XHJcbiAgICAgICAgdmFsdWVNYXBbY3N2LmRhdGFbcmldW2NpXV0rKztcclxuICAgICAgfVxyXG4gICAgICBlbHNlIHtcclxuICAgICAgICB2YWx1ZU1hcFtjc3YuZGF0YVtyaV1bY2ldXSA9IDE7XHJcbiAgICAgIH1cclxuICAgIH1cclxuXHJcbiAgICBpZiAoY2kgPj0gY3N2LmhlYWRlci5sZW5ndGggLSAxKSB7XHJcbiAgICAgIHJldHVybiBfLmtleXModmFsdWVNYXApLm1hcChmdW5jdGlvbiAoa2V5KSB7XHJcbiAgICAgICAgcmV0dXJuIHsnbmFtZSc6IGtleSwgJ3NpemUnOiB2YWx1ZU1hcFtrZXldfTtcclxuICAgICAgfSk7XHJcbiAgICB9XHJcbiAgICBlbHNlIHtcclxuICAgICAgcmV0dXJuIF8ua2V5cyh2YWx1ZU1hcCkubWFwKGZ1bmN0aW9uIChrZXkpIHtcclxuICAgICAgICByZXR1cm4geyduYW1lJzoga2V5LCAnc2l6ZSc6IHZhbHVlTWFwW2tleV19O1xyXG4gICAgICB9KTtcclxuICAgIH1cclxuICB9XHJcbn07XHJcblxyXG5leHBvcnRzLmdldEdyYXBoID0gZnVuY3Rpb24gKGNzdikge1xyXG5cclxuICB2YXIgbm9kZXMgPSBbXTtcclxuICB2YXIgbGlua3MgPSBbXTtcclxuICB2YXIgbm9kZU51bSA9IDA7XHJcbiAgdmFyIGluZGV4TWFwID0gW107XHJcblxyXG4gIC8vIFJlY29yZCB1bmlxdWVzIGFjcm9zcyB0aGUgZGF0YSwgdHJlYXRpbmcgZWFjaCBjb2x1bW4gYXMgaXQncyBvd24gbmFtZXNwYWNlLlxyXG4gIGNzdi5oZWFkZXIubWFwKGZ1bmN0aW9uIChjb2wsIGNpKSB7XHJcbiAgICBpbmRleE1hcC5wdXNoKHt9KTtcclxuICAgIGNzdi5kYXRhLm1hcChmdW5jdGlvbiAocm93LCByaSkge1xyXG4gICAgICBpZiAoXy5pc1VuZGVmaW5lZChpbmRleE1hcFtjaV1bcm93W2NpXV0pKVxyXG4gICAgICB7XHJcbiAgICAgICAgaW5kZXhNYXBbY2ldW3Jvd1tjaV1dPSBub2RlTnVtO1xyXG4gICAgICAgIG5vZGVzLnB1c2goeyduYW1lJyA6IHJvd1tjaV19KTtcclxuICAgICAgICBub2RlTnVtKys7XHJcbiAgICAgIH1cclxuICAgIH0pO1xyXG4gIH0pO1xyXG5cclxuICBmb3IgKHZhciBjaT0xOyBjaTxjc3YuaGVhZGVyLmxlbmd0aDsgY2krKylcclxuICB7XHJcbiAgICBjc3YuZGF0YS5tYXAoZnVuY3Rpb24gKHJvdywgcmkpIHtcclxuICAgICAgbGlua3MucHVzaCh7ICdzb3VyY2UnIDogaW5kZXhNYXBbY2ktMV1bcm93W2NpLTFdXSwgJ3RhcmdldCcgOiBpbmRleE1hcFtjaV1bcm93W2NpXV0sICd2YWx1ZScgOiAxfSk7XHJcbiAgICB9KTtcclxuICB9XHJcblxyXG4gIC8vZGV4LmNvbnNvbGUubG9nKFwiTk9ERVNcIiwgbm9kZXMsIGxpbmtzLCBpbmRleE1hcCk7XHJcbiAgcmV0dXJuIHsgJ25vZGVzJyA6IG5vZGVzLCAnbGlua3MnIDogbGlua3MgfTtcclxufTtcclxuXHJcbmV4cG9ydHMudG9OZXN0ZWRKc29uID0gZnVuY3Rpb24gKGNzdikge1xyXG4gIGRleC5jb25zb2xlLmxvZyhcIkNNQVBcIiwgZGV4LmNzdi5nZXRDb25uZWN0aW9uTWFwKGNzdikpO1xyXG4gIHZhciByZXN1bHQgPSB7J25hbWUnOiBjc3YuaGVhZGVyWzBdLCAnY2hpbGRyZW4nOiBkZXguY3N2LnRvTmVzdGVkSnNvbkNoaWxkcmVuKGRleC5jc3YuZ2V0Q29ubmVjdGlvbk1hcChjc3YpKX07XHJcbiAgZGV4LmNvbnNvbGUubG9nKFwiUkVTVUxUXCIsIHJlc3VsdCk7XHJcbiAgcmV0dXJuIHJlc3VsdDtcclxufTtcclxuXHJcbmV4cG9ydHMudG9OZXN0ZWRKc29uQ2hpbGRyZW4gPSBmdW5jdGlvbiAoY21hcCkge1xyXG4gIC8vZGV4LmNvbnNvbGUubG9nKFwiQ01BUFwiLCBjbWFwKTtcclxuICB2YXIgY2hpbGRyZW4gPSBbXTtcclxuXHJcbiAgXy5rZXlzKGNtYXApLm1hcChmdW5jdGlvbiAoa2V5KSB7XHJcbiAgICB2YXIgY2hpbGRNYXAgPSBjbWFwW2tleV07XHJcbiAgICBpZiAoXy5rZXlzKGNoaWxkTWFwKS5sZW5ndGggPD0gMCkge1xyXG4gICAgICBjaGlsZHJlbi5wdXNoKHsnbmFtZSc6IGtleSwgJ3NpemUnOiAxMDAwfSk7XHJcbiAgICB9XHJcbiAgICBlbHNlIHtcclxuICAgICAgaWYgKF8ua2V5cyhjaGlsZE1hcCkubGVuZ3RoID09IDEpIHtcclxuICAgICAgICAvL3ZhciBncmFuZENoaWxkTWFwID0gY2hpbGRNYXBbXy5rZXlzKGNoaWxkTWFwKVswXV07XHJcblxyXG4gICAgICAgIC8vZGV4LmNvbnNvbGUubG9nKFwiR0NNQVBcIiwgZ3JhbmRDaGlsZE1hcCk7XHJcbiAgICAgICAgLy9pZiAoXy5rZXlzKGdyYW5kQ2hpbGRNYXApLmxlbmd0aCA8PSAwKSB7XHJcbiAgICAgICAgLy8gIGNoaWxkcmVuLnB1c2goeyduYW1lJzoga2V5LCAnc2l6ZSc6IDEwMH0pO1xyXG4gICAgICAgIC8vfVxyXG4gICAgICAgIC8vZWxzZSB7XHJcbiAgICAgICAgY2hpbGRyZW4ucHVzaCh7J25hbWUnOiBrZXksICdjaGlsZHJlbic6IGRleC5jc3YudG9OZXN0ZWRKc29uQ2hpbGRyZW4oY21hcFtrZXldKX0pO1xyXG4gICAgICAgIC8vfVxyXG4gICAgICB9XHJcbiAgICAgIGVsc2Uge1xyXG4gICAgICAgIGNoaWxkcmVuLnB1c2goeyduYW1lJzoga2V5LCAnY2hpbGRyZW4nOiBkZXguY3N2LnRvTmVzdGVkSnNvbkNoaWxkcmVuKGNtYXBba2V5XSl9KTtcclxuICAgICAgfVxyXG4gICAgfVxyXG4gIH0pXHJcbiAgcmV0dXJuIGNoaWxkcmVuO1xyXG59O1xyXG5cclxuZXhwb3J0cy5nZXRDb25uZWN0aW9uTWFwID0gZnVuY3Rpb24gKGNzdikge1xyXG4gIHZhciByb290TWFwID0ge307XHJcbiAgdmFyIGN1ck1hcCA9IHt9XHJcblxyXG4gIGZvciAodmFyIHJvdyA9IDA7IHJvdyA8IGNzdi5kYXRhLmxlbmd0aDsgcm93KyspIHtcclxuICAgIGN1ck1hcCA9IHJvb3RNYXA7XHJcblxyXG4gICAgZm9yICh2YXIgY29sID0gMDsgY29sIDwgY3N2LmhlYWRlci5sZW5ndGg7IGNvbCsrKSB7XHJcbiAgICAgIGlmICghXy5oYXMoY3VyTWFwLCBjc3YuZGF0YVtyb3ddW2NvbF0pKSB7XHJcbiAgICAgICAgY3VyTWFwW2Nzdi5kYXRhW3Jvd11bY29sXV0gPSB7fTtcclxuICAgICAgfVxyXG4gICAgICBjdXJNYXAgPSBjdXJNYXBbY3N2LmRhdGFbcm93XVtjb2xdXTtcclxuICAgIH1cclxuICB9XHJcblxyXG4gIHJldHVybiByb290TWFwO1xyXG59OyIsIi8qKlxyXG4gKlxyXG4gKiBUaGlzIG1vZHVsZSBwcm92aWRlcyBzdXBwb3J0IGZvciBjcmVhdGluZyB2YXJpb3VzIGRhdGFzZXRzLlxyXG4gKlxyXG4gKiBAbW9kdWxlIGRhdGFnZW5cclxuICpcclxuICovXHJcblxyXG4vKipcclxuICogQ3JlYXRlcyBhIG1hdHJpeCBvZiByYW5kb20gaW50ZWdlcnMgd2l0aGluIHRoZSBzcGVjaWZpZWQgcmFuZ2UuXHJcbiAqXHJcbiAqIEBwYXJhbSBzcGVjIFRoZSBtYXRyaXggc3BlY2lmaWNhdGlvbi4gIEV4OiBcXHtyb3dzOjEwLCBjb2x1bW5zOiA0LCBtaW46IDAsIG1heDoxMDBcXH1cclxuICpcclxuICogQHJldHVybnMge0FycmF5fSBBbiBhcnJheSBjb250YWluaW5nIHNwZWMucm93cyBudW1iZXIgb2Ygcm93cy4gIEVhY2ggcm93IGNvbnNpc3Rpbmcgb2ZcclxuICogYW4gYXJyYXkgY29udGFpbmluZyBzcGVjLmNvbHVtbnMgZWxlbWVudHMuICBFYWNoIGVsZW1lbnQgaXMgYSByYW5kb21seSBnZW5lcmF0ZWQgaW50ZWdlclxyXG4gKiB3aXRoaW4gdGhlIHJhbmdlIFtzcGVjLm1pbiwgc3BlYy5tYXhdXHJcbiAqXHJcbiAqL1xyXG5leHBvcnRzLnJhbmRvbU1hdHJpeCA9IGZ1bmN0aW9uIChzcGVjKSB7XHJcbiAgdmFyIHJpLCBjaTtcclxuXHJcbiAgLy97cm93czoxMCwgY29sdW1uczogNCwgbWluLCAwLCBtYXg6MTAwfSlcclxuICB2YXIgbWF0cml4ID0gW107XHJcbiAgdmFyIHJhbmdlID0gc3BlYy5tYXggLSBzcGVjLm1pbjtcclxuICBmb3IgKHJpID0gMDsgcmkgPCBzcGVjLnJvd3M7IHJpKyspIHtcclxuICAgIHZhciByb3cgPSBbXTtcclxuXHJcbiAgICBmb3IgKGNpID0gMDsgY2kgPCBzcGVjLmNvbHVtbnM7IGNpKyspIHtcclxuICAgICAgcm93LnB1c2goTWF0aC5yYW5kb20oKSAqIHJhbmdlICsgc3BlYy5taW4pO1xyXG4gICAgfVxyXG4gICAgbWF0cml4LnB1c2gocm93KTtcclxuICB9XHJcbiAgcmV0dXJuIG1hdHJpeDtcclxufTtcclxuXHJcbmV4cG9ydHMucmFuZG9tSW5kZXhlZE1hdHJpeCA9IGZ1bmN0aW9uIChzcGVjKSB7XHJcbiAgdmFyIHJpLCBjaTtcclxuXHJcbiAgLy97cm93czoxMCwgY29sdW1uczogNCwgbWluLCAwLCBtYXg6MTAwfSlcclxuICB2YXIgbWF0cml4ID0gW107XHJcbiAgdmFyIHJhbmdlID0gc3BlYy5tYXggLSBzcGVjLm1pbjtcclxuICBmb3IgKHJpID0gMDsgcmkgPCBzcGVjLnJvd3M7IHJpKyspIHtcclxuICAgIHZhciByb3cgPSBbXTtcclxuXHJcbiAgICByb3cucHVzaChyaSsxKTtcclxuICAgIGZvciAoY2kgPSAwOyBjaSA8IHNwZWMuY29sdW1ucyAtIDE7IGNpKyspIHtcclxuICAgICAgcm93LnB1c2goTWF0aC5yYW5kb20oKSAqIHJhbmdlICsgc3BlYy5taW4pO1xyXG4gICAgfVxyXG4gICAgbWF0cml4LnB1c2gocm93KTtcclxuICB9XHJcbiAgcmV0dXJuIG1hdHJpeDtcclxufTtcclxuXHJcbmV4cG9ydHMucmFuZG9tSW50ZWdlck1hdHJpeCA9IGZ1bmN0aW9uIChzcGVjKSB7XHJcbiAgdmFyIHJpLCBjaTtcclxuXHJcbiAgLy97cm93czoxMCwgY29sdW1uczogNCwgbWluLCAwLCBtYXg6MTAwfSlcclxuICB2YXIgbWF0cml4ID0gW107XHJcbiAgdmFyIHJhbmdlID0gc3BlYy5tYXggLSBzcGVjLm1pbjtcclxuICBmb3IgKHJpID0gMDsgcmkgPCBzcGVjLnJvd3M7IHJpKyspIHtcclxuICAgIHZhciByb3cgPSBbXTtcclxuXHJcbiAgICBmb3IgKGNpID0gMDsgY2kgPCBzcGVjLmNvbHVtbnM7IGNpKyspIHtcclxuICAgICAgcm93LnB1c2goTWF0aC5yb3VuZChNYXRoLnJhbmRvbSgpICogcmFuZ2UgKyBzcGVjLm1pbikpO1xyXG4gICAgfVxyXG4gICAgbWF0cml4LnB1c2gocm93KTtcclxuICB9XHJcbiAgcmV0dXJuIG1hdHJpeDtcclxufTtcclxuXHJcbi8qKlxyXG4gKiBDcmVhdGVzIGEgbWF0cml4IG9mIHJhbmRvbSBpbnRlZ2VycyB3aXRoaW4gdGhlIHNwZWNpZmllZCByYW5nZS5cclxuICpcclxuICogQHBhcmFtIHNwZWMgVGhlIG1hdHJpeCBzcGVjaWZpY2F0aW9uLiAgRXg6IFxce3Jvd3M6MTAsIGNvbHVtbnM6NCBcXH1cclxuICpcclxuICogQHJldHVybnMge0FycmF5fSBBbiBhcnJheSBjb250YWluaW5nIHNwZWMucm93cyBudW1iZXIgb2Ygcm93cy4gIEVhY2ggcm93IGNvbnNpc3Rpbmcgb2ZcclxuICogYW4gYXJyYXkgY29udGFpbmluZyBzcGVjLmNvbHVtbnMgZWxlbWVudHMuICBFYWNoIGVsZW1lbnQgaXMgYSByYW5kb21seSBnZW5lcmF0ZWQgaW50ZWdlclxyXG4gKiB3aXRoaW4gdGhlIHJhbmdlIFtzcGVjLm1pbiwgc3BlYy5tYXhdXHJcbiAqXHJcbiAqL1xyXG5leHBvcnRzLmlkZW50aXR5Q3N2ID0gZnVuY3Rpb24gKHNwZWMpIHtcclxuICB2YXIgcmksIGNpO1xyXG4gIHZhciBjc3YgPSB7fTtcclxuICBjc3YuaGVhZGVyID0gZGV4LmRhdGFnZW4uaWRlbnRpdHlIZWFkZXIoc3BlYyk7XHJcbiAgY3N2LmRhdGEgPSBkZXguZGF0YWdlbi5pZGVudGl0eU1hdHJpeChzcGVjKTtcclxuICByZXR1cm4gY3N2O1xyXG59O1xyXG5cclxuLyoqXHJcbiAqIFRoaXMgbWV0aG9kIHdpbGwgcmV0dXJuIGFuIGlkZW50aXR5IGZ1bmN0aW9uIG1lZXRpbmcgdGhlIHN1cHBsaWVkXHJcbiAqIHNwZWNpZmljYXRpb24uXHJcbiAqXHJcbiAqIEBwYXJhbSB7b2JqZWN0fSBzcGVjIC0gVGhlIGlkZW50aXR5TWF0cml4IHNwZWNpZmljYXRpb24uXHJcbiAqIEBwYXJhbSB7bnVtYmVyfSBzcGVjLnJvd3MgLSBUaGUgbnVtYmVyIG9mIHJvd3MgdG8gZ2VuZXJhdGUuXHJcbiAqIEBwYXJhbSB7bnVtYmVyfSBzcGVjLmNvbHVtbnMgLSBUaGUgbnVtYmVyIG9mIGNvbHVtbnMgdG8gZ2VuZXJhdGUuXHJcbiAqIEBleGFtcGxlIHtAbGFuZyBqYXZhc2NyaXB0fVxyXG4gKiAvLyBSZXR1cm5zOiBbWydSMUMxJywgJ1IxQzInIF0sIFsnUjJDMScsICdSMkMyJ10sIFsnUjNDMScsICdSM0MyJ11dXHJcbiAqIGlkZW50aXR5TWF0cml4KHtyb3dzOiAzLCBjb2x1bW5zOiAyfSk7XHJcbiAqIEByZXR1cm5zIHttYXRyaXh9XHJcbiAqXHJcbiAqL1xyXG5leHBvcnRzLmlkZW50aXR5TWF0cml4ID0gZnVuY3Rpb24gKHNwZWMpIHtcclxuICB2YXIgcmksIGNpO1xyXG5cclxuICAvLyB7IHJvd3M6MTAsIGNvbHVtbnM6NCB9KVxyXG4gIHZhciBtYXRyaXggPSBbXTtcclxuICBmb3IgKHJpID0gMDsgcmkgPCBzcGVjLnJvd3M7IHJpKyspIHtcclxuICAgIHZhciByb3cgPSBbXTtcclxuXHJcbiAgICBmb3IgKGNpID0gMDsgY2kgPCBzcGVjLmNvbHVtbnM7IGNpKyspIHtcclxuICAgICAgcm93LnB1c2goXCJSXCIgKyAocmkgKyAxKSArIFwiQ1wiICsgKGNpICsgMSkpO1xyXG4gICAgfVxyXG4gICAgbWF0cml4LnB1c2gocm93KTtcclxuICB9XHJcbiAgcmV0dXJuIG1hdHJpeDtcclxufTtcclxuXHJcbi8qKlxyXG4gKiBSZXR1cm5zIGFuIGlkZW50aXR5IGhlYWRlciBhcnJheS5cclxuICpcclxuICogQHBhcmFtIHNwZWMgLSBUaGUgc3BlY2lmaWNhdGlvbiBmb3IgdGhlIGhlYWRlciBhcnJheS5cclxuICogQHBhcmFtIHNwZWMuY29sdW1ucyAtIFRoZSBudW1iZXIgb2YgY29sdW1ucyB0byBnZW5lcmF0ZS5cclxuICogQGV4YW1wbGVcclxuICogLy8gUmV0dXJuczogWyAnQzEnLCAnQzInLCAnQzMnIF1cclxuICogaWRlbnRpdHlIZWFkZXIoeyBjb2x1bW5zOiAzIH0pO1xyXG4gKiBAcmV0dXJucyB7QXJyYXl9IFJldHVybnMgYW4gYXJyYXkgb2YgdGhlIHNwZWNpZmllZCBjb2x1bW5zLlxyXG4gKlxyXG4gKi9cclxuZXhwb3J0cy5pZGVudGl0eUhlYWRlciA9IGZ1bmN0aW9uIChzcGVjKSB7XHJcbiAgcmV0dXJuIGRleC5yYW5nZSgxLCBzcGVjLmNvbHVtbnMpLm1hcChmdW5jdGlvbiAoaSkge1xyXG4gICAgcmV0dXJuIFwiQ1wiICsgaTtcclxuICB9KTtcclxufTtcclxuIiwiLyoqXHJcbiAqXHJcbiAqIFRoaXMgbW9kdWxlIHByb3ZpZGVzIHJvdXRpbmVzIGRlYWxpbmcgd2l0aCBqc29uIGRhdGEuXHJcbiAqXHJcbiAqIEBtb2R1bGUganNvblxyXG4gKlxyXG4gKi9cclxuXHJcbi8qKlxyXG4gKiBDb252ZXJ0cyBKU09OIGFuZCBhIGhlYWRlciB0byBhIENTViBmaWxlLiAgSXQgaXMgdXNlZCBmb3IgcGFyYWxsZWwgY29vcmRpbmF0ZSBicnVzaFxyXG4gKiBldmVudHMgd2hlcmUgdGhlIHNlbGVjdGVkIGJydXNoIG11c3QgYmUgcHVibGlzaGVkIHRvIGV2ZW50cyBhcyBhIGNzdi5cclxuICpcclxuICogRm9yIGV4YW1wbGUsIGdpdmVuOlxyXG4gKlxyXG4gKiBqc29uICAgPSBbIHsgQTogMSwgQjogMywgQzogNSwgRDogNyB9LFxyXG4gKiAgICAgICAgICAgIHsgQTogMiwgQjogNCwgQzogNiwgRDogOCB9IF07XHJcbiAqIGhlYWRlciA9IFsgJ0EnLCAnQicsICdDJywgJ0QnIF07XHJcbiAqXHJcbiAqIFRoaXMgd2lsbCByZXR1cm4gYSBjc3Ygd2hlcmU6XHJcbiAqXHJcbiAqIGNzdiA9IHsgaGVhZGVyOiBbICdBJywgJ0InLCAnQycsICdEJyBdLFxyXG4gKiAgICAgICAgIGRhdGEgICAgW1sgMSwgNCwgNSwgNyBdLCBbIDIsIDQsIDYsIDggXV07XHJcbiAqXHJcbiAqIEBwYXJhbSBqc29uXHJcbiAqIEBwYXJhbSBoZWFkZXJcclxuICogQHJldHVybnMgeyp9XHJcbiAqL1xyXG5leHBvcnRzLnRvQ3N2ID0gZnVuY3Rpb24gKGpzb24sIGhlYWRlcikge1xyXG4gIHZhciBjc3Y7XHJcbiAgdmFyIHJpLCBjaTtcclxuICB2YXIgZGF0YSA9IFtdO1xyXG5cclxuICAvLyBLZXlzIGFyZSBwcm92aWRlZC5cclxuICBpZiAoYXJndW1lbnRzLmxlbmd0aCA9PSAyKSB7XHJcbiAgICBpZiAoQXJyYXkuaXNBcnJheShqc29uKSkge1xyXG4gICAgICBmb3IgKHJpID0gMDsgcmkgPCBqc29uLmxlbmd0aDsgcmkrKykge1xyXG4gICAgICAgIHZhciByb3cgPSBbXTtcclxuICAgICAgICBmb3IgKGNpID0gMDsgY2kgPCBoZWFkZXIubGVuZ3RoOyBjaSsrKSB7XHJcbiAgICAgICAgICByb3cucHVzaChqc29uW3JpXVtoZWFkZXJbY2ldXSk7XHJcbiAgICAgICAgfVxyXG4gICAgICAgIGRhdGEucHVzaChyb3cpO1xyXG4gICAgICB9XHJcbiAgICB9XHJcbiAgICBlbHNlIHtcclxuICAgICAgdmFyIHJvdyA9IFtdO1xyXG4gICAgICBmb3IgKGNpID0gMDsgY2kgPCBoZWFkZXIubGVuZ3RoOyBjaSsrKSB7XHJcbiAgICAgICAgcm93LnB1c2goanNvbltyaV1baGVhZGVyW2NpXV0pO1xyXG4gICAgICB9XHJcbiAgICAgIGRhdGEucHVzaChyb3cpO1xyXG4gICAgfVxyXG4gICAgcmV0dXJuIGRleC5jc3YuY3N2KGhlYWRlciwgZGF0YSk7XHJcbiAgfVxyXG4gIGVsc2Uge1xyXG4gICAgcmV0dXJuIGRleC5qc29uLnRvQ3N2KGpzb24sIGRleC5qc29uLmtleXMoanNvbikpO1xyXG4gIH1cclxufTtcclxuXHJcbi8qKlxyXG4gKiBSZXR1cm5zIGFsbCBrZXlzIGZvdW5kIGluIGEganNvbiBzdHJ1Y3R1cmUgb3IgYXJyYXkgb2YganNvbiBzdHJ1Y3R1cmVzLlxyXG4gKlxyXG4gKiBAcGFyYW0ganNvbiAgVGhlIGpzb24gc3RydWN0dXJlIG9yIGFycmF5IG9mIGpzb24gc3RydWN0dXJlcy5cclxuICogQHJldHVybnMge0FycmF5fSBBIGxpc3Qgb2Yga2V5cyBmb3VuZCB3aXRoaW4ganNvbi5cclxuICpcclxuICovXHJcbmV4cG9ydHMua2V5cyA9IGZ1bmN0aW9uIChqc29uKSB7XHJcbiAgdmFyIGtleU1hcCA9IHt9O1xyXG4gIHZhciBrZXlzID0gW107XHJcbiAgdmFyIHJpLCBrZXk7XHJcblxyXG4gIGlmIChBcnJheS5pc0FycmF5KGpzb24pKSB7XHJcbiAgICBmb3IgKHJpID0gMDsgcmkgPCBqc29uLmxlbmd0aDsgcmkrKykge1xyXG4gICAgICBmb3IgKGtleSBpbiBqc29uW3JpXSkge1xyXG4gICAgICAgIGtleU1hcFtrZXldID0gdHJ1ZTtcclxuICAgICAgfVxyXG4gICAgfVxyXG4gIH1cclxuICBlbHNlIHtcclxuICAgIGZvciAoa2V5IGluIGpzb24pIHtcclxuICAgICAga2V5TWFwW2tleV0gPSB0cnVlO1xyXG4gICAgfVxyXG4gIH1cclxuXHJcbiAgZm9yIChrZXkgaW4ga2V5TWFwKSB7XHJcbiAgICBrZXlzLnB1c2goa2V5KTtcclxuICB9XHJcblxyXG4gIHJldHVybiBrZXlzO1xyXG59O1xyXG4iLCIvKipcclxuICpcclxuICogVGhpcyBtb2R1bGUgcHJvdmlkZXMgcm91dGluZXMgZGVhbGluZyB3aXRoIG1hdHJpY2VzLlxyXG4gKlxyXG4gKiBAbW9kdWxlIG1hdHJpeFxyXG4gKlxyXG4gKi9cclxuXHJcbi8qKlxyXG4gKlxyXG4gKiBSZXR1cm4gdGhlIHNwZWNpZmllZCBzbGljZSBvZiB0aGUgbWF0cml4LiAgVGhlIG9yaWdpbmFsIG1hdHJpeCBpc1xyXG4gKiBub3QgYWx0ZXJlZC5cclxuICpcclxuICogQHBhcmFtIHttYXRyaXh9IG1hdHJpeCBUaGUgbWF0cml4IHRvIGJlIHNsaWNlZC5cclxuICogQHBhcmFtIHtBcnJheS48bnVtYmVyPn0gY29sdW1ucyAtIEFuIGFycmF5IG9mIGNvbHVtbiBpbmRpY2VzIHRvIGluY2x1ZGUgd2l0aGluIHRoZSBzbGljZS5cclxuICogQHBhcmFtIHtudW1iZXJ9IFtyb3dzXSBJZiBzdXBwbGllZCwgdGhlIHNsaWNlIHdpbGwgY29uc2lzdCBvbmx5IG9mIHRoZSBzcGVjaWZpZWRcclxuICogbnVtYmVyIG9mIHJvd3MuXHJcbiAqXHJcbiAqIEByZXR1cm5zIHttYXRyaXh9XHJcbiAqL1xyXG5leHBvcnRzLnNsaWNlID0gZnVuY3Rpb24gKG1hdHJpeCwgY29sdW1ucywgcm93cykge1xyXG4gIHZhciBtYXRyaXhTbGljZSA9IG5ldyBBcnJheSgwKTtcclxuICAvL2RleC5jb25zb2xlLmxvZyhcIlBSRS1TTElDRSAobWF0cml4U2xpemUpOlwiICsgbWF0cml4U2xpY2UpO1xyXG4gIHZhciByaTtcclxuXHJcbiAgaWYgKGFyZ3VtZW50cy5sZW5ndGggPT09IDMpIHtcclxuICAgIGZvciAocmkgPSAwOyByaSA8IHJvd3MubGVuZ3RoOyByaSsrKSB7XHJcbiAgICAgIG1hdHJpeFNsaWNlLnB1c2goZGV4LmFycmF5LnNsaWNlKG1hdHJpeFtyb3dzW3JpXV0pKTtcclxuICAgIH1cclxuICB9XHJcbiAgZWxzZSB7XHJcbiAgICBmb3IgKHJpID0gMDsgcmkgPCBtYXRyaXgubGVuZ3RoOyByaSsrKSB7XHJcbiAgICAgIC8vZGV4LmNvbnNvbGUubG9nKFwiTUFUUklYLVNMSUNFLUJFRk9SRVtcIiArIHJpICsgXCJdOlwiICsgbWF0cml4U2xpY2UpO1xyXG4gICAgICBtYXRyaXhTbGljZS5wdXNoKGRleC5hcnJheS5zbGljZShtYXRyaXhbcmldLCBjb2x1bW5zKSk7XHJcbiAgICAgIC8vZGV4LmNvbnNvbGUubG9nKFwiTUFUUklYLVNMSUNFLUFGVEVSW1wiICsgcmkgKyBcIl1cIiArIG1hdHJpeFNsaWNlKTtcclxuICAgIH1cclxuICB9XHJcbiAgcmV0dXJuIG1hdHJpeFNsaWNlO1xyXG59O1xyXG5cclxuLyoqXHJcbiAqXHJcbiAqIFJldHVybnMgYSBtYXRyaXggY29uc2lzdGluZyBvZiB1bmlxdWUgdmFsdWVzIHJlbGF0aXZlIHRvIGVhY2hcclxuICogY29sdW1uLlxyXG4gKlxyXG4gKiBAcGFyYW0ge21hdHJpeH0gbWF0cml4IFRoZSBtYXRyaXggdG8gZXZhbHVhdGUuXHJcbiAqXHJcbiAqIEByZXR1cm5zIHtBcnJheS48QXJyYXkuPE9iamVjdD4+fSBUaGUgdW5pcXVlIHZhbHVlcyByZWxhdGl2ZSB0byBlYWNoIGNvbHVtbi4gSW4gdGhlIGZvcm1cclxuICogb2YgW1sgY29sdW1uIDEgdW5pcXVlIHZhbHVlc10sIFtjb2x1bW4gMiB1bmlxdWUgdmFsdWVzXSwgLi4uXV1cclxuICpcclxuICovXHJcbmV4cG9ydHMudW5pcXVlcyA9IGZ1bmN0aW9uIChtYXRyaXgpIHtcclxuICB2YXIgY2k7XHJcbiAgdmFyIHVuaXF1ZXMgPSBbXTtcclxuICB2YXIgdG1hdHJpeCA9IGRleC5tYXRyaXgudHJhbnNwb3NlKG1hdHJpeCk7XHJcbiAgdmFyIG5jb2wgPSB0bWF0cml4Lmxlbmd0aDtcclxuXHJcbiAgZm9yIChjaSA9IDA7IGNpIDwgbmNvbDsgY2kgKz0gMSkge1xyXG4gICAgdW5pcXVlcy5wdXNoKF8udW5pcSh0bWF0cml4W2NpXSkpO1xyXG4gIH1cclxuICByZXR1cm4gdW5pcXVlcztcclxufTtcclxuXHJcbi8qKlxyXG4gKlxyXG4gKiBSZXR1cm5zIGEgdHJhbnNwb3NlZCBtYXRyaXggd2hlcmUgdGhlIHJvd3Mgb2YgdGhlIG5ldyBtYXRyaXggYXJlIHRyYW5zcG9zZWRcclxuICogd2l0aCBpdCdzIGNvbHVtbnMuXHJcbiAqXHJcbiAqIEBwYXJhbSB7bWF0cml4fSBtYXRyaXggLSBUaGUgbWF0cml4IHRvIHRyYW5zcG9zZS5cclxuICpcclxuICogQHJldHVybnMge21hdHJpeH0gVGhlIHRyYW5zcG9zZWQgbWF0cml4LCBsZWF2aW5nIHRoZSBvcmlnaW5hbCBtYXRyaXggdW50b3VjaGVkLlxyXG4gKlxyXG4gKiBAZXhhbXBsZSB7QGxhbmcgamF2YXNjcmlwdH1cclxuICogLy8gUmV0dXJucyBbWydSMUMxJywgJ1IyQzEnLCAnUjNDMSddLCBbJ1IxQzInLCAnUjJDMicsICdSM0MyJyBdXVxyXG4gKiB0cmFuc3Bvc2UoW1snUjFDMScsICdSMUMyJ10sIFsnUjJDMScsICdSMkMyXSwgWydSM0MxJywgJ1IzQzInXV0pO1xyXG4gKlxyXG4gKi9cclxuZXhwb3J0cy50cmFuc3Bvc2UgPSBmdW5jdGlvbiAobWF0cml4KSB7XHJcbiAgdmFyIGNpO1xyXG4gIHZhciBuY29scztcclxuICB2YXIgdHJhbnNwb3NlZE1hdHJpeCA9IFtdO1xyXG4gIC8vZGV4LmNvbnNvbGUubG9nKFwiVHJhbnNwb3Npbmc6XCIsIG1hdHJpeCk7XHJcblxyXG4gIGlmICghbWF0cml4IHx8IG1hdHJpeC5sZW5ndGggPD0gMCB8fCAhbWF0cml4WzBdIHx8IG1hdHJpeFswXS5sZW5ndGggPD0gMCkge1xyXG4gICAgcmV0dXJuIFtdO1xyXG4gIH1cclxuXHJcbiAgbmNvbHMgPSBtYXRyaXhbMF0ubGVuZ3RoO1xyXG5cclxuICBmb3IgKGNpID0gMDsgY2kgPCBuY29sczsgY2krKykge1xyXG4gICAgdHJhbnNwb3NlZE1hdHJpeC5wdXNoKG1hdHJpeC5tYXAoZnVuY3Rpb24gKHJvdykge1xyXG4gICAgICByZXR1cm4gcm93W2NpXTtcclxuICAgIH0pKTtcclxuICB9XHJcblxyXG4gIHJldHVybiB0cmFuc3Bvc2VkTWF0cml4O1xyXG59O1xyXG5cclxuLyoqXHJcbiAqXHJcbiAqIFJldHVybiBhIHNsaWNlIG9mIHRoaXMgbWF0cml4IGJhc2VkIHVwb24gdGhlIHN1cHBsaWVkIGNvbHVtbnMuXHJcbiAqIFRoZSBvcmlnaW5hbCBtYXRyaXggd2lsbCBiZSBsZWZ0IHVudG91Y2hlZC5cclxuICpcclxuICogQHBhcmFtIHttYXRyaXh9IG1hdHJpeCAtIFRoZSBtYXRyaXggdG8gc2xpY2UuXHJcbiAqIEBwYXJhbSB7QXJyYXkuPG51bWJlcj59IGNvbHVtbnMgLSBBbiBhcnJheSBvZiBjb2x1bW4gaW5kZXhlcyB0byBiZSBpbmNsdWRlZCBpbiB0aGUgc2xpY2UuXHJcbiAqXHJcbiAqIEByZXR1cm5zIHsqfVxyXG4gKlxyXG4gKi9cclxuLypcclxuIGV4cG9ydHMuY29sdW1uU2xpY2UgPSBmdW5jdGlvbiAobWF0cml4LCBjb2x1bW5zKSB7XHJcbiAvLyBUT0RPOiBEZXRlcm1pbmUsIGlzIHRoaXMgZGVzdHJ1Y3RpdmU/XHJcbiB2YXIgc2xpY2UgPSBbXTtcclxuIHZhciByaTtcclxuIHZhciB0cmFuc3Bvc2VNYXRyaXg7XHJcblxyXG4gaWYgKGFyZ3VtZW50cy5sZW5ndGggIT0gMikge1xyXG4gcmV0dXJuIG1hdHJpeDtcclxuIH1cclxuXHJcbiB0cmFuc3Bvc2VNYXRyaXggPSBkZXgubWF0cml4LnRyYW5zcG9zZShtYXRyaXgpO1xyXG4gLy9kZXguY29uc29sZS5sb2coXCJ0cmFuc3Bvc2luZ1wiLCBtYXRyaXgsIFwidHJhbnNwb3NlXCIsIHRyYW5zcG9zZWRNYXRyaXgpO1xyXG5cclxuIC8vIFNwZWNpZmljIGNvbHVtbnMgdGFyZ2V0dGVkOlxyXG4gaWYgKEFycmF5LmlzQXJyYXkoY29sdW1ucykpIHtcclxuIGZvciAocmkgPSAwOyByaSA8IGNvbHVtbnMubGVuZ3RoOyByaSArPSAxKSB7XHJcbiBzbGljZS5wdXNoKHRyYW5zcG9zZU1hdHJpeFtjb2x1bW5zW3JpXV0pO1xyXG4gfVxyXG4gfVxyXG4gLy8gU2luZ2xlIGNvbHVtbi5cclxuIGVsc2Uge1xyXG4gc2xpY2UucHVzaCh0cmFuc3Bvc2VNYXRyaXhbY29sdW1uc10pO1xyXG4gfVxyXG5cclxuIC8vIEJhY2sgdG8gcm93L2NvbHVtbiBmb3JtYXQuXHJcbiByZXR1cm4gZGV4Lm1hdHJpeC50cmFuc3Bvc2Uoc2xpY2UpO1xyXG4gfTtcclxuICovXHJcblxyXG4vKipcclxuICpcclxuICogUmV0dXJuIGEgZmxhdHRlbmVkIHZlcnNpb24gb2YgdGhlIG1hdHJpeC5cclxuICpcclxuICogQHBhcmFtIHttYXRyaXh9IG1hdHJpeCAtIFRoZSBtYXRyaXggdG8gZmxhdHRlbi5cclxuICpcclxuICogQHJldHVybnMge0FycmF5LjxPYmplY3Q+fSBBIGZsYXR0ZW5lZCB2ZXJzaW9uIG9mIHRoZSBtYXRyaXguXHJcbiAqXHJcbiAqIEBleGFtcGxlIHtAbGFuZyBqYXZhc2NyaXB0fVxyXG4gKiAvLyBEZWZpbmUgYSBzaW1wbGUgbWF0cml4LlxyXG4gKiB2YXIgbWF0cml4ID0gW1sncjFjMScsICdyMWMyJ10sIFsncjJjMScsICdyMmMyJ11dXHJcbiAqXHJcbiAqIC8vIFJldHVybnM6IFsncjFjMScsICdyMWMyJywgJ3IyYzEnLCAncjJjMiddXHJcbiAqIGZsYXR0ZW4obWF0cml4KTtcclxuICpcclxuICovXHJcbmV4cG9ydHMuZmxhdHRlbiA9IGZ1bmN0aW9uIChtYXRyaXgpIHtcclxuICByZXR1cm4gXy5mbGF0dGVuKG1hdHJpeCk7XHJcbn07XHJcblxyXG4vKipcclxuICpcclxuICogUmV0dXJucyBhbiBhcnJheSBvZiB0aGUgbWluaW11bSBhbmQgbWF4aW11bSB2YWx1ZSBpbiB0aGUgZm9ybSBvZjogW21pbixtYXhdXHJcbiAqIGZyb20gdGhlIHNwZWNpZmllZCBzdWJzZXQgb2YgdGhlIG1hdHJpeC5cclxuICpcclxuICogQHBhcmFtIHttYXRyaXh9IG1hdHJpeCAtIFRoZSBtYXRyaXggdG8gc2Nhbi5cclxuICogQHBhcmFtIHtBcnJheS48bnVtYmVyPnxudW1iZXJdIFtpbmRpY2VzXSAtIFdoZW4gc3VwcGxpZWQsIHdpbGwgY29udHJhaW4gdGhlIGV4dGVudFxyXG4gKiBzZWFyY2ggdG8ganVzdCB0aG9zZSBjb2x1bW5zIHNwZWNpZmllZCBieSB0aGlzIGxpc3Qgb2YgaW5kaWNlcy5cclxuICpcclxuICogQHJldHVybnMge0FycmF5LjxudW1iZXI+fSBBbiBhcnJheSBvZiB0d28gZWxlbWVudHM6IFsgbWluLCBtYXggXVxyXG4gKlxyXG4gKi9cclxuZXhwb3J0cy5leHRlbnQgPSBmdW5jdGlvbiAobWF0cml4LCBpbmRpY2VzKSB7XHJcbiAgdmFyIHZhbHVlcyA9IG1hdHJpeDtcclxuICBpZiAoYXJndW1lbnRzLmxlbmd0aCA9PT0gMikge1xyXG4gICAgdmFsdWVzID0gZGV4Lm1hdHJpeC5mbGF0dGVuKGRleC5tYXRyaXguc2xpY2UobWF0cml4LCBpbmRpY2VzKSk7XHJcbiAgICB2YXIgbWF4ID0gTWF0aC5tYXguYXBwbHkobnVsbCwgdmFsdWVzKTtcclxuICAgIHZhciBtaW4gPSBNYXRoLm1pbi5hcHBseShudWxsLCB2YWx1ZXMpO1xyXG4gICAgcmV0dXJuIFttaW4sIG1heF07XHJcbiAgfVxyXG59O1xyXG5cclxuLyoqXHJcbiAqXHJcbiAqIENvbWJpbmUgZWFjaCBjb2x1bW4gaW4gbWF0cml4MSB3aXRoIGVhY2ggY29sdW1uIGluIG1hdHJpeDIuXHJcbiAqXHJcbiAqIEBwYXJhbSB7bWF0cml4fSBtYXRyaXgxIFRoZSBmaXJzdCBtYXRyaXggdG8gY29tYmluZS5cclxuICogQHBhcmFtIHttYXRyaXh9IG1hdHJpeDIgVGhlIHNlY29uZCBtYXRyaXggdG8gY29tYmluZS5cclxuICpcclxuICogQHJldHVybnMge21hdHJpeH0gVGhlIGNvbWJpbmVkIG1hdHJpeC5cclxuICpcclxuICogQGV4YW1wbGUge0BsYW5nIGphdmFzY3JpcHR9XHJcbiAqIHZhciBtYXRyaXgxID0gW1snbTFyMWMxJywgJ20xcjFjMiddLCBbJ20xcjJjMScsICdtMXIyYzInXV1cclxuICogdmFyIG1hdHJpeDIgPSBbWydtMnIxYzEnLCAnbTJyMWMyJ10sIFsnbTJyMmMxJywgJ20ycjJjMiddXVxyXG4gKlxyXG4gKiAvLyBSZXR1cm5zOiBbWydtMXIxYzEnLCAnbTFyMWMyJywgJ20ycjFjMScsICdtMnIxYzInXSwgWydtMXIyYzEnLCAnbTFyMmMyJywgJ20ycjJjMScsICdtMnIyYzInXV1cclxuICogdmFyIHJlc3VsdCA9IGNvbWJpbmUobWF0cml4MSwgbWF0cml4Mik7XHJcbiAqXHJcbiAqL1xyXG5leHBvcnRzLmNvbWJpbmUgPSBmdW5jdGlvbiAobWF0cml4MSwgbWF0cml4Mikge1xyXG4gIHZhciByZXN1bHQgPSBfLmNsb25lKG1hdHJpeDEpO1xyXG5cclxuICB2YXIgcmk7XHJcblxyXG4gIGZvciAocmkgPSAwOyByaSA8IG1hdHJpeDIubGVuZ3RoOyByaSsrKSB7XHJcbiAgICByZXN1bHRbcmldID0gcmVzdWx0W3JpXS5jb25jYXQobWF0cml4MltyaV0pO1xyXG4gIH1cclxuXHJcbiAgcmV0dXJuIHJlc3VsdDtcclxufTtcclxuXHJcbi8qKlxyXG4gKlxyXG4gKiBSZXR1cm4gYSBjb3B5IG9mIHRoZSBzdXBwbGllZCBtYXRyaXguXHJcbiAqXHJcbiAqIEBwYXJhbSB7bWF0cml4fSBtYXRyaXggVGhlIG1hdHJpeCB0byBjb3B5LlxyXG4gKlxyXG4gKiBAcmV0dXJucyB7QXJyYXl9IEEgY29weSBvZiB0aGUgb3JpZ2luYWwgbWF0cml4LlxyXG4gKlxyXG4gKi9cclxuZXhwb3J0cy5jb3B5ID0gZnVuY3Rpb24gKG1hdHJpeCkge1xyXG4gIHJldHVybiBtYXRyaXgubWFwKGZ1bmN0aW9uIChyb3cpIHtcclxuICAgIHJldHVybiBfLmNsb25lKHJvdyk7XHJcbiAgfSk7XHJcbn07XHJcblxyXG4vKipcclxuICpcclxuICogSW5zZXJ0IGEgbmV3IGNvbHVtbiBhdCBwb3NpdGlvbiAwIHdpdGhpbiB0aGlzIG1hdHJpeCB3aGljaCB3aWxsIGNvbnRhaW5cclxuICogaW50ZWdlciB2YWx1ZXMgc3RhcnRpbmcgYXQgMSwgMiwgMywgLi4uICBUaGlzIGlzIHVzZWZ1bCBpZiB5b3VyIGRhdGFzZXRcclxuICogbGFja3MgYW4gZXhpc3RpbmcgdW5pcXVlIGluZGV4LlxyXG4gKlxyXG4gKiBAcGFyYW0ge21hdHJpeH0gbWF0cml4IC0gVGhlIG1hdHJpeCB0byBpbmRleC5cclxuICogQHJldHVybnMge21hdHJpeH0gQSBjb3B5IG9mIHRoZSBvcmlnaW5hbCBtYXRyaXggd2l0aCB0aGUgaW5kZXggaW5zZXJ0ZWQuXHJcbiAqXHJcbiAqL1xyXG5leHBvcnRzLmFkZEluZGV4ID0gZnVuY3Rpb24gKG1hdHJpeCkge1xyXG4gIHZhciBpbmRleE1hdHJpeCA9IGRleC5tYXRyaXguY29weShtYXRyaXgpO1xyXG5cclxuICBmb3IgKHZhciByaSA9IDA7IHJpIDwgbWF0cml4Lmxlbmd0aDsgcmkrKykge1xyXG4gICAgaW5kZXhNYXRyaXhbcmldLnVuc2hpZnQocmkgKyAxKTtcclxuICB9XHJcblxyXG4gIHJldHVybiBpbmRleE1hdHJpeDtcclxufTtcclxuXHJcbi8qKlxyXG4gKlxyXG4gKiBEZXRlcm1pbmUgd2hldGhlciB0aGUgc3VwcGxpZWQgY29sdW1uTnVtIHdpdGhpbiB0aGUgc3VwcGxpZWQgbWF0cml4IGlzXHJcbiAqIG51bWVyaWMgb3Igbm90LlxyXG4gKlxyXG4gKiBAcGFyYW0ge21hdHJpeH0gbWF0cml4IC0gVGhlIG1hdHJpeCB0byBldmFsdWF0ZS5cclxuICogQHBhcmFtIHtudW1iZXJ9IGNvbHVtbk51bSAtIFRoZSBjb2x1bW4gd2l0aGluIHRoZSBtYXRyaXggdG8gZXZhbHVhdGUuXHJcbiAqXHJcbiAqIEByZXR1cm5zIHtib29sZWFufSBUcnVlIGlmIHRoZSBjb2x1bW4gaXMgbnVtZXJpYywgZmFsc2Ugb3RoZXJ3aXNlLlxyXG4gKlxyXG4gKi9cclxuZXhwb3J0cy5pc0NvbHVtbk51bWVyaWMgPSBmdW5jdGlvbiAobWF0cml4LCBjb2x1bW5OdW0pIHtcclxuICBmb3IgKHZhciBpID0gMDsgaSA8IG1hdHJpeC5sZW5ndGg7IGkrKykge1xyXG4gICAgaWYgKCFfLmlzTnVtYmVyKG1hdHJpeFtpXVtjb2x1bW5OdW1dKSkge1xyXG4gICAgICByZXR1cm4gZmFsc2U7XHJcbiAgICB9XHJcbiAgfVxyXG4gIHJldHVybiB0cnVlO1xyXG59O1xyXG5cclxuLyoqXHJcbiAqXHJcbiAqIFJldHVybiB0aGUgbWF4aW11bSB2YWx1ZSBvZiB0aGUgc3BlY2lmaWVkIGNvbHVtbk51bSB3aXRoaW4gdGhlXHJcbiAqIHN1cHBsaWVkIG1hdHJpeC5cclxuICpcclxuICogQHBhcmFtIG1hdHJpeCBUaGUgbWF0cml4IHRvIGV2YWx1YXRlLlxyXG4gKiBAcGFyYW0gY29sdW1uTnVtIFRoZSBjb2x1bW4gbnVtYmVyIHdpdGhpbiB0aGUgbWF0cml4IHRvIGV2YWx1YXRlLlxyXG4gKiBAcmV0dXJucyB7Kn0gVGhlIG1heGltdW0gdmFsdWUgb2YgdGhlIHNwZWNpZmllZCBjb2x1bW4gd2l0aGluIHRoZVxyXG4gKiBzdXBwbGllZCBtYXRyaXguXHJcbiAqXHJcbiAqL1xyXG5leHBvcnRzLm1heCA9IGZ1bmN0aW9uIChtYXRyaXgsIGNvbHVtbk51bSkge1xyXG4gIHZhciBtYXhWYWx1ZSA9IG1hdHJpeFswXVtjb2x1bW5OdW1dO1xyXG4gIHZhciBpO1xyXG5cclxuICBpZiAoZGV4Lm1hdHJpeC5pc0NvbHVtbk51bWVyaWMobWF0cml4LCBjb2x1bW5OdW0pKSB7XHJcbiAgICBtYXhWYWx1ZSA9IHBhcnNlRmxvYXQobWF0cml4WzBdW2NvbHVtbk51bV0pO1xyXG4gICAgZm9yIChpID0gMTsgaSA8IG1hdHJpeC5sZW5ndGg7IGkrKykge1xyXG4gICAgICBpZiAobWF4VmFsdWUgPCBwYXJzZUZsb2F0KG1hdHJpeFtpXVtjb2x1bW5OdW1dKSkge1xyXG4gICAgICAgIG1heFZhbHVlID0gcGFyc2VGbG9hdChtYXRyaXhbaV1bY29sdW1uTnVtXSk7XHJcbiAgICAgIH1cclxuICAgIH1cclxuICB9XHJcbiAgZWxzZSB7XHJcbiAgICBmb3IgKGkgPSAxOyBpIDwgbWF0cml4Lmxlbmd0aDsgaSsrKSB7XHJcbiAgICAgIGlmIChtYXhWYWx1ZSA8IG1hdHJpeFtpXVtjb2x1bW5OdW1dKSB7XHJcbiAgICAgICAgbWF4VmFsdWUgPSBtYXRyaXhbaV1bY29sdW1uTnVtXTtcclxuICAgICAgfVxyXG4gICAgfVxyXG4gIH1cclxuXHJcbiAgcmV0dXJuIG1heFZhbHVlO1xyXG59O1xyXG5cclxuLyoqXHJcbiAqXHJcbiAqIFJldHVybiB0aGUgbWluaW11bSB2YWx1ZSBvZiB0aGUgc3BlY2lmaWVkIGNvbHVtbk51bSB3aXRoaW4gdGhlXHJcbiAqIHN1cHBsaWVkIG1hdHJpeC5cclxuICpcclxuICogQHBhcmFtIHttYXRyaXh9IG1hdHJpeCAtIFRoZSBtYXRyaXggdG8gZXZhbHVhdGUuXHJcbiAqIEBwYXJhbSB7bnVtYmVyfSBjb2x1bW5OdW0gLSBUaGUgY29sdW1uIG51bWJlciB3aXRoaW4gdGhlIG1hdHJpeCB0byBldmFsdWF0ZS5cclxuICogQHJldHVybnMge251bWJlcn0gVGhlIG1pbmltdW0gdmFsdWUgb2YgdGhlIHNwZWNpZmllZCBjb2x1bW4gd2l0aGluIHRoZVxyXG4gKiBzdXBwbGllZCBtYXRyaXguXHJcbiAqXHJcbiAqL1xyXG5leHBvcnRzLm1pbiA9IGZ1bmN0aW9uIChtYXRyaXgsIGNvbHVtbk51bSkge1xyXG4gIHZhciBtaW5WYWx1ZSA9IG1hdHJpeFswXVtjb2x1bW5OdW1dO1xyXG4gIHZhciBpO1xyXG5cclxuICBpZiAoZGV4Lm1hdHJpeC5pc0NvbHVtbk51bWVyaWMobWF0cml4LCBjb2x1bW5OdW0pKSB7XHJcbiAgICBtaW5WYWx1ZSA9IHBhcnNlRmxvYXQobWF0cml4WzBdW2NvbHVtbk51bV0pO1xyXG4gICAgZm9yIChpID0gMTsgaSA8IG1hdHJpeC5sZW5ndGg7IGkrKykge1xyXG4gICAgICBpZiAobWluVmFsdWUgPiBwYXJzZUZsb2F0KG1hdHJpeFtpXVtjb2x1bW5OdW1dKSkge1xyXG4gICAgICAgIG1pblZhbHVlID0gcGFyc2VGbG9hdChtYXRyaXhbaV1bY29sdW1uTnVtXSk7XHJcbiAgICAgIH1cclxuICAgIH1cclxuICB9XHJcbiAgZWxzZSB7XHJcbiAgICBmb3IgKGkgPSAxOyBpIDwgbWF0cml4Lmxlbmd0aDsgaSsrKSB7XHJcbiAgICAgIGlmIChtaW5WYWx1ZSA+IG1hdHJpeFtpXVtjb2x1bW5OdW1dKSB7XHJcbiAgICAgICAgbWluVmFsdWUgPSBtYXRyaXhbaV1bY29sdW1uTnVtXTtcclxuICAgICAgfVxyXG4gICAgfVxyXG4gIH1cclxuXHJcbiAgcmV0dXJuIG1pblZhbHVlO1xyXG59O1xyXG4iLCIvKipcclxuICpcclxuICogVGhpcyBtb2R1bGUgcHJvdmlkZXMgcm91dGluZXMgZGVhbGluZyB3aXRoIGphdmFzY3JpcHQgb2JqZWN0cy5cclxuICpcclxuICogQG1vZHVsZSBvYmplY3RcclxuICpcclxuICovXHJcblxyXG4vKipcclxuICpcclxuICogUmV0dXJuIHRoZSBsY2NhbCBrZXlzIG9mIHRoaXMgb2JqZWN0IHdpdGhvdXQgdGhlIGluaGVyaXRlZCBvbmVzLlxyXG4gKlxyXG4gKiBAcGFyYW0gb2JqIFRoZSBvYmplY3Qgd2hvc2UgbG9jYWwga2V5cyB3ZSBhcmUgaW50ZXJlc3RlZCBpbi5cclxuICpcclxuICogQHJldHVybnMge0FycmF5fSBBbiBhcnJheSBvZiAwIG9yIG1vcmUgbGNjYWwga2V5cy5cclxuICovXHJcbmV4cG9ydHMua2V5cyA9IGZ1bmN0aW9uIGtleXMob2JqKSB7XHJcbiAgdmFyIGtleXMgPSBbXTtcclxuXHJcbiAgZm9yICh2YXIga2V5IGluIG9iaikge1xyXG4gICAgaWYgKG9iai5oYXNPd25Qcm9wZXJ0eShrZXkpKSB7XHJcbiAgICAgIGtleXMucHVzaChrZXkpO1xyXG4gICAgfVxyXG4gIH1cclxuXHJcbiAgcmV0dXJuIGtleXM7XHJcbn07XHJcblxyXG4vKipcclxuICpcclxuICogQSBwcmV0dHkgZ29vZCwgYnV0IGltcGVyZmVjdCBtZWNoYW5pc20gZm9yIHBlcmZvcm1pbmcgYSBkZWVwXHJcbiAqIGNsb25lIG9mIGFuIG9iamVjdC5cclxuICpcclxuICogQHBhcmFtIG9iaiBUaGUgb2JqZWN0IHRvIGNsb25lLlxyXG4gKiBAcmV0dXJucyB7Kn0gVGhlIGNsb25lZCBvYmplY3QuXHJcbiAqXHJcbiAqL1xyXG5leHBvcnRzLmNsb25lID0gZnVuY3Rpb24gY2xvbmUob2JqKSB7XHJcbiAgdmFyIGksIGF0dHIsIGxlbjtcclxuXHJcbiAgLy8gSGFuZGxlIHRoZSAzIHNpbXBsZSB0eXBlcywgYW5kIG51bGwgb3IgdW5kZWZpbmVkXHJcbiAgaWYgKG51bGwgPT0gb2JqIHx8IFwib2JqZWN0XCIgIT0gdHlwZW9mIG9iailcclxuICAgIHJldHVybiBvYmo7XHJcblxyXG4gIC8vIEhhbmRsZSBEYXRlXHJcbiAgaWYgKG9iaiBpbnN0YW5jZW9mIERhdGUpIHtcclxuICAgIHZhciBjb3B5ID0gbmV3IERhdGUoKTtcclxuICAgIGNvcHkuc2V0VGltZShvYmouZ2V0VGltZSgpKTtcclxuICAgIHJldHVybiBjb3B5O1xyXG4gIH1cclxuXHJcbiAgLy8gSGFuZGxlIEFycmF5XHJcbiAgaWYgKG9iaiBpbnN0YW5jZW9mIEFycmF5KSB7XHJcbiAgICB2YXIgY29weSA9IFtdO1xyXG4gICAgZm9yIChpID0gMCwgbGVuID0gb2JqLmxlbmd0aDsgaSA8IGxlbjsgaSsrKSB7XHJcbiAgICAgIGNvcHlbaV0gPSBkZXgub2JqZWN0LmNsb25lKG9ialtpXSk7XHJcbiAgICB9XHJcbiAgICByZXR1cm4gY29weTtcclxuICB9XHJcblxyXG4gIC8vIERPTSBOb2RlcyBhcmUgbm90aGluZyBidXQgdHJvdWJsZS5cclxuICBpZiAoZGV4Lm9iamVjdC5pc0VsZW1lbnQob2JqKSB8fFxyXG4gICAgZGV4Lm9iamVjdC5pc05vZGUob2JqKSkge1xyXG4gICAgcmV0dXJuIG9iajtcclxuICB9XHJcblxyXG4gIC8vIEhhbmRsZSBPYmplY3RcclxuICBpZiAob2JqIGluc3RhbmNlb2YgT2JqZWN0KSB7XHJcbiAgICB2YXIgY29weSA9IHt9O1xyXG4gICAgLy9qUXVlcnkuZXh0ZW5kKGNvcHksIG9iaik7XHJcbiAgICBmb3IgKGF0dHIgaW4gb2JqKSB7XHJcbiAgICAgIGlmIChvYmouaGFzT3duUHJvcGVydHkoYXR0cikpIHtcclxuICAgICAgICBjb3B5W2F0dHJdID0gZGV4Lm9iamVjdC5jbG9uZShvYmpbYXR0cl0pO1xyXG4gICAgICAgIC8vY29weVthdHRyXSA9IG9ialthdHRyXTtcclxuICAgICAgfVxyXG4gICAgfVxyXG4gICAgcmV0dXJuIGNvcHk7XHJcbiAgfVxyXG5cclxuICB0aHJvdyBuZXcgRXJyb3IoXCJVbmFibGUgdG8gY29weSBvYmohIEl0cyB0eXBlIGlzbid0IHN1cHBvcnRlZC5cIik7XHJcbn07XHJcblxyXG4vKlxyXG4gIFRoaXMgdmVyc2lvbiBjYXVzZXMgZXhwYW5kIHRvIGNvbnRpbnVlIGZvcmV2ZXIuXHJcblxyXG5leHBvcnRzLmlzRW1wdHkgPSBmdW5jdGlvbiBpc0VtcHR5KG9iaikge1xyXG4gIHJldHVybiBfLmlzRW1wdHkob2JqKTtcclxufTtcclxuKi9cclxuXHJcbi8qKlxyXG4gKlxyXG4gKiBLaW5kIG9mIG1pc2xlYWRpbmcuICBUaGlzIHJlYWxseSBzaWduYWxzIHdoZW4gZXhwYW5kIHNob3VsZCBxdWl0XHJcbiAqIGV4cGFuZGluZy4gIEkgbmVlZCB0byBjbGVhbiB0aGlzIHVwLlxyXG4gKlxyXG4gKiBAcGFyYW0gb2JqXHJcbiAqIEByZXR1cm5zIHtib29sZWFufVxyXG4gKi9cclxuZXhwb3J0cy5pc0VtcHR5ID0gZnVuY3Rpb24gaXNFbXB0eShvYmopIHtcclxuICAvL2RleC5jb25zb2xlLmxvZyhcImlzRW1wdHkoXCIgKyBvYmogKyBcIikgdHlwZW9mPVwiICsgKHR5cGVvZiBvYmopKTtcclxuICBpZiAoIW9iaiB8fCBvYmogaW5zdGFuY2VvZiBBcnJheSkge1xyXG4gICAgcmV0dXJuIHRydWU7XHJcbiAgfVxyXG4gIGlmIChcIm9iamVjdFwiID09IHR5cGVvZiBvYmopIHtcclxuICAgIGZvciAodmFyIGtleSBpbiBvYmopIHtcclxuICAgICAgaWYgKG9iai5oYXNPd25Qcm9wZXJ0eShrZXkpKSB7XHJcbiAgICAgICAgLy9kZXguY29uc29sZS5sb2coXCJPQko6IFwiLCBvYmosIFwiIGNvbnRhaW5zIGtleSAnXCIgKyBrZXkgKyBcIidcIik7XHJcbiAgICAgICAgcmV0dXJuIGZhbHNlO1xyXG4gICAgICB9XHJcbiAgICB9XHJcbiAgfVxyXG5cclxuICByZXR1cm4gdHJ1ZTtcclxufVxyXG5cclxuLyoqXHJcbiAqXHJcbiAqIE92ZXJsYXkgdGhlIHRvcCBvYmplY3Qgb24gdG9wIG9mIHRoZSBib3R0b20uICBUaGlzIG1ldGhvZCB3aWxsIGZpcnN0IGNsb25lXHJcbiAqIHRoZSBib3R0b20gb2JqZWN0LiAgVGhlbiBpdCB3aWxsIGRyb3AgdGhlIHZhbHVlcyB3aXRoaW4gdGhlIHRvcCBvYmplY3RcclxuICogaW50byB0aGUgY2xvbmUuXHJcbiAqXHJcbiAqIEBwYXJhbSB7T2JqZWN0fSB0b3AgLSBUaGUgb2JqZWN0IHdobydzIHByb3BlcnRpZXMgd2lsbCBiZSBvbiB0b3AuXHJcbiAqIEBwYXJhbSB7T2JqZWN0fSBib3R0b20gLSBUaGUgb2JqZWN0IHdobydzIHByb3BlcnRpZXMgd2lsbCBiZSBvbiBib3R0b20uXHJcbiAqIEByZXR1cm4ge09iamVjdH0gVGhlIG92ZXJsYWlkIG9iamVjdCB3aGVyZSB0aGUgcHJvcGVydGllcyBpbiB0b3Agb3ZlcnJpZGVcclxuICogICAgICAgICAgICAgICAgICBwcm9wZXJ0aWVzIGluIGJvdHRvbS4gIFRoZSByZXR1cm4gb2JqZWN0IGlzIGEgY2xvbmUgb3JcclxuICogICAgICAgICAgICAgICAgICBjb3B5LlxyXG4gKlxyXG4gKi9cclxuZXhwb3J0cy5vdmVybGF5ID0gZnVuY3Rpb24gb3ZlcmxheSh0b3AsIGJvdHRvbSkge1xyXG4gIC8vIE1ha2UgYSBjbG9uZSBvZiB0aGUgYm90dG9tIG9iamVjdC5cclxuICB2YXIgb3ZlcmxheSA9IGRleC5vYmplY3QuY2xvbmUoYm90dG9tKTtcclxuICB2YXIgcHJvcDtcclxuXHJcbiAgLy8gSWYgd2UgaGF2ZSBwYXJhbWV0ZXJzIGluIHRoZSB0b3Agb2JqZWN0LCBvdmVybGF5IHRoZW0gb24gdG9wXHJcbiAgLy8gb2YgdGhlIGJvdHRvbSBvYmplY3QuXHJcbiAgaWYgKHRvcCAhPT0gJ3VuZGVmaW5lZCcpIHtcclxuICAgIC8vIEl0ZXJhdGUgb3ZlciB0aGUgcHJvcHMgaW4gdG9wLlxyXG4gICAgZm9yIChwcm9wIGluIHRvcCkge1xyXG4gICAgICAvLyBBcnJheXMgYXJlIHNwZWNpYWwgY2FzZXMuIFtBXSBvbiB0b3Agb2YgW0EsQl0gc2hvdWxkIGdpdmUgW0FdLCBub3QgW0EsQl1cclxuICAgICAgaWYgKHR5cGVvZiB0b3BbcHJvcF0gPT0gJ29iamVjdCcgJiYgb3ZlcmxheVtwcm9wXSAhPSBudWxsICYmICEodG9wW3Byb3BdIGluc3RhbmNlb2YgQXJyYXkpKSB7XHJcbiAgICAgICAgLy9jb25zb2xlLmxvZyhcIlBST1A6IFwiICsgcHJvcCArIFwiLCB0b3A9XCIgKyB0b3AgKyBcIiwgb3ZlcmxheT1cIiArIG92ZXJsYXkpO1xyXG4gICAgICAgIG92ZXJsYXlbcHJvcF0gPSBkZXgub2JqZWN0Lm92ZXJsYXkodG9wW3Byb3BdLCBvdmVybGF5W3Byb3BdKTtcclxuICAgICAgfVxyXG4gICAgICAvLyBTaW1wbHkgb3ZlcndyaXRlIGZvciBzaW1wbGUgY2FzZXMgYW5kIGFycmF5cy5cclxuICAgICAgZWxzZSB7XHJcbiAgICAgICAgb3ZlcmxheVtwcm9wXSA9IHRvcFtwcm9wXTtcclxuICAgICAgfVxyXG4gICAgfVxyXG4gIH1cclxuXHJcbiAgLy9jb25zb2xlLmRpcihjb25maWcpO1xyXG4gIHJldHVybiBvdmVybGF5O1xyXG59O1xyXG5cclxuLyoqXHJcbiAqXHJcbiAqIFRoaXMgbWV0aG9kIHJldHVybnMgd2hldGhlciBvciBub3QgdGhlIHN1cHBsaWVkIG9iamVjdCBpcyBhIE5vZGUuXHJcbiAqXHJcbiAqIEBwYXJhbSB7T2JqZWN0fSBvYmogLSBUaGUgb2JqZWN0IHRvIHRlc3QuXHJcbiAqXHJcbiAqIEByZXR1cm5zIHtib29sZWFufSBUcnVlIGlmIG9iaiBpcyBhIE5vZGUsIGZhbHNlIG90aGVyd2lzZS5cclxuICpcclxuICovXHJcbmV4cG9ydHMuaXNOb2RlID0gZnVuY3Rpb24gaXNOb2RlKG9iaikge1xyXG4gIHJldHVybiAoXHJcbiAgICB0eXBlb2YgTm9kZSA9PT0gXCJvYmplY3RcIiA/IG9iaiBpbnN0YW5jZW9mIE5vZGUgOlxyXG4gICAgb2JqICYmIHR5cGVvZiBvYmogPT09IFwib2JqZWN0XCIgJiYgdHlwZW9mIG9iai5ub2RlVHlwZSA9PT0gXCJudW1iZXJcIiAmJiB0eXBlb2Ygb2JqLm5vZGVOYW1lID09PSBcInN0cmluZ1wiXHJcbiAgKTtcclxufTtcclxuXHJcbi8qKlxyXG4gKlxyXG4gKiBUaGlzIG1ldGhvZCByZXR1cm5zIHdoZXRoZXIgb3Igbm90IHRoZSBzdXBwbGllZCBvYmplY3QgaXMgYVxyXG4gKiBET00gbm9kZS5cclxuICpcclxuICogQHBhcmFtIHtPYmplY3R9IG9iaiAtIFRoZSBvYmplY3QgdG8gdGVzdC5cclxuICpcclxuICogQHJldHVybnMge2Jvb2xlYW59IC0gVHJ1ZSBpZiBvYmogaXMgYSBET00gbm9kZSwgZmFsc2Ugb3RoZXJ3aXNlLlxyXG4gKlxyXG4gKi9cclxuZXhwb3J0cy5pc0VsZW1lbnQgPSBmdW5jdGlvbiBpc0VsZW1lbnQob2JqKSB7XHJcbiAgcmV0dXJuIChcclxuICAgIHR5cGVvZiBIVE1MRWxlbWVudCA9PT0gXCJvYmplY3RcIiA/IG9iaiBpbnN0YW5jZW9mIEhUTUxFbGVtZW50IDogLy9ET00yXHJcbiAgICBvYmogJiYgdHlwZW9mIG9iaiA9PT0gXCJvYmplY3RcIiAmJiBvYmoubm9kZVR5cGUgPT09IDEgJiYgdHlwZW9mIG9iai5ub2RlTmFtZSA9PT0gXCJzdHJpbmdcIlxyXG4gICk7XHJcbn07XHJcblxyXG4vKipcclxuICpcclxuICogVGhpcyBtZXRob2QgcmV0dXJucyBhIGJvb2xlYW4gcmVwcmVzZW50aW5nIHdoZXRoZXIgb2JqIGlzIGNvbnRhaW5lZFxyXG4gKiB3aXRoaW4gY29udGFpbmVyLlxyXG4gKlxyXG4gKiBAcGFyYW0ge09iamVjdH0gY29udGFpbmVyIC0gVGhlIGNvbnRhaW5lciB0byB0ZXN0LlxyXG4gKiBAcGFyYW0ge09iamVjdH0gb2JqIC0gVGhlIG9iamVjdCB0byB0ZXN0LlxyXG4gKlxyXG4gKiBAcmV0dXJuIFRydWUgaWYgY29udGFpbmVyIGNvbnRhaW5zIG9iai4gIEZhbHNlIG90aGVyd2lzZS5cclxuICovXHJcbmV4cG9ydHMuY29udGFpbnMgPSBmdW5jdGlvbiBjb250YWlucyhjb250YWluZXIsIG9iaikge1xyXG4gIHZhciBpID0gY29udGFpbmVyLmxlbmd0aDtcclxuICB3aGlsZSAoaS0tKSB7XHJcbiAgICBpZiAoY29udGFpbmVyW2ldID09PSBvYmopIHtcclxuICAgICAgcmV0dXJuIHRydWU7XHJcbiAgICB9XHJcbiAgfVxyXG4gIHJldHVybiBmYWxzZTtcclxufTtcclxuXHJcbi8qKlxyXG4gKlxyXG4gKiBSZXR1cm4gd2hldGhlciBvciBub3QgdGhlIHN1cHBsaWVkIG9iamVjdCBpcyBhIGZ1bmN0aW9uLlxyXG4gKlxyXG4gKiBAcGFyYW0gb2JqIFRoZSBvYmplY3QgdG8gY2hlY2suXHJcbiAqIEByZXR1cm5zIHtib29sZWFufSBUcnVlIGlmIG9iaiBpcyBhIGZ1bmN0aW9uLCBmYWxzZSBvdGhlcndpc2UuXHJcbiAqXHJcbiAqL1xyXG5leHBvcnRzLmlzRnVuY3Rpb24gPSBmdW5jdGlvbiBpc0Z1bmN0aW9uKG9iaikge1xyXG4gIC8vcmV0dXJuIHR5cGVvZiBvYmogPT09ICdmdW5jdGlvbic7XHJcbiAgcmV0dXJuIF8uaXNGdW5jdGlvbihvYmopO1xyXG59O1xyXG5cclxuLyoqXHJcbiAqXHJcbiAqIFZpc2l0IGVhY2ggbG9jYWwgcHJvcGVydHkgd2l0aGluLlxyXG4gKlxyXG4gKiBAcGFyYW0gb2JqXHJcbiAqIEBwYXJhbSBmdW5jXHJcbiAqL1xyXG4vKlxyXG5leHBvcnRzLnZpc2l0ID0gZnVuY3Rpb24gKG9iaiwgZnVuYykge1xyXG4gIHZhciBwcm9wO1xyXG4gIGZ1bmMob2JqKTtcclxuICBmb3IgKHByb3AgaW4gb2JqKSB7XHJcbiAgICBpZiAob2JqLmhhc093blByb3BlcnR5KHByb3ApKSB7XHJcbiAgICAgIGlmICh0eXBlb2Ygb2JqW3Byb3BdID09PSAnb2JqZWN0Jykge1xyXG4gICAgICAgIGRleC5vYmplY3QudmlzaXQob2JqW3Byb3BdLCBmdW5jKTtcclxuICAgICAgfVxyXG4gICAgfVxyXG4gIH1cclxufTtcclxuKi9cclxuXHJcbi8qKlxyXG4gKlxyXG4gKiBAcGFyYW0gbWFwXHJcbiAqIEBwYXJhbSB2YWx1ZXNcclxuICogQHJldHVybnMge2V4cG9ydHN9XHJcbiAqL1xyXG5leHBvcnRzLmNvbm5lY3QgPSBmdW5jdGlvbiBjb25uZWN0KG1hcCwgdmFsdWVzKSB7XHJcbiAgZGV4LmNvbnNvbGUubG9nKFwibWFwOlwiLCBtYXAsIFwidmFsdWVzOlwiLCB2YWx1ZXMpO1xyXG5cclxuICBpZiAoIXZhbHVlcyB8fCB2YWx1ZXMubGVuZ3RoIDw9IDApIHtcclxuICAgIHJldHVybiB0aGlzO1xyXG4gIH1cclxuICBpZiAoIW1hcFt2YWx1ZXNbMF1dKSB7XHJcbiAgICBtYXBbdmFsdWVzWzBdXSA9IHt9O1xyXG4gIH1cclxuICBkZXgub2JqZWN0LmNvbm5lY3QobWFwW3ZhbHVlc1swXV0sIHZhbHVlcy5zbGljZSgxKSk7XHJcblxyXG4gIHJldHVybiB0aGlzO1xyXG59O1xyXG5cclxuLyoqXHJcbiAqXHJcbiAqIEBwYXJhbSBvYmpcclxuICogQHJldHVybnMge2Jvb2xlYW59XHJcbiAqL1xyXG5leHBvcnRzLmlzTnVtZXJpYyA9IGZ1bmN0aW9uIChvYmopIHtcclxuICByZXR1cm4gIWlzTmFOKHBhcnNlRmxvYXQob2JqKSkgJiYgaXNGaW5pdGUob2JqKTtcclxufTtcclxuXHJcbi8qKlxyXG4gKlxyXG4gKiBAcGFyYW0gaGllcmFyY2h5XHJcbiAqIEBwYXJhbSBuYW1lXHJcbiAqIEBwYXJhbSB2YWx1ZVxyXG4gKiBAcGFyYW0gZGVsaW1pdGVyXHJcbiAqIEByZXR1cm5zIHsqfVxyXG4gKi9cclxuZXhwb3J0cy5zZXRIaWVyYXJjaGljYWwgPSBmdW5jdGlvbiAoaGllcmFyY2h5LCBuYW1lLCB2YWx1ZSwgZGVsaW1pdGVyKSB7XHJcbiAgaWYgKGhpZXJhcmNoeSA9PSBudWxsKSB7XHJcbiAgICBoaWVyYXJjaHkgPSB7fTtcclxuICB9XHJcblxyXG4gIGlmICh0eXBlb2YgaGllcmFyY2h5ICE9ICdvYmplY3QnKSB7XHJcbiAgICByZXR1cm4gaGllcmFyY2h5O1xyXG4gIH1cclxuXHJcbiAgLy8gQ3JlYXRlIGFuIGFycmF5IG9mIG5hbWVzIGJ5IHNwbGl0dGluZyBkZWxpbWl0ZXIsIHRoZW4gY2FsbFxyXG4gIC8vIHRoaXMgZnVuY3Rpb24gaW4gdGhlIDMgYXJndW1lbnQgKEFycmF5IG9mIHBhdGhzKSBjb250ZXh0LlxyXG4gIGlmIChhcmd1bWVudHMubGVuZ3RoID09IDQpIHtcclxuICAgIHJldHVybiBkZXgub2JqZWN0LnNldEhpZXJhcmNoaWNhbChoaWVyYXJjaHksXHJcbiAgICAgIG5hbWUuc3BsaXQoZGVsaW1pdGVyKSwgdmFsdWUpO1xyXG4gIH1cclxuXHJcbiAgLy8gQXJyYXkgb2YgcGF0aHMgY29udGV4dC5cclxuICBlbHNlIHtcclxuICAgIC8vIFRoaXMgaXMgdGhlIGxhc3QgdmFyaWFibGUgbmFtZSwganVzdCBzZXQgdGhlIHZhbHVlLlxyXG4gICAgaWYgKG5hbWUubGVuZ3RoID09PSAxKSB7XHJcbiAgICAgIGhpZXJhcmNoeVtuYW1lWzBdXSA9IHZhbHVlO1xyXG4gICAgfVxyXG4gICAgLy8gV2Ugc3RpbGwgaGF2ZSB0byB0cmF2ZXJzZS5cclxuICAgIGVsc2Uge1xyXG4gICAgICAvLyBVbmRlZmluZWQgY29udGFpbmVyIG9iamVjdCwganVzdCBjcmVhdGUgYW4gZW1wdHkuXHJcbiAgICAgIGlmICghKG5hbWVbMF0gaW4gaGllcmFyY2h5KSkge1xyXG4gICAgICAgIGhpZXJhcmNoeVtuYW1lWzBdXSA9IHt9O1xyXG4gICAgICB9XHJcblxyXG4gICAgICAvLyBSZWN1cnNpdmVseSB0cmF2ZXJzZSBkb3duIHRoZSBoaWVyYXJjaHkuXHJcbiAgICAgIGRleC5vYmplY3Quc2V0SGllcmFyY2hpY2FsKGhpZXJhcmNoeVtuYW1lWzBdXSwgbmFtZS5zcGxpY2UoMSksIHZhbHVlKTtcclxuICAgIH1cclxuICB9XHJcblxyXG4gIHJldHVybiBoaWVyYXJjaHk7XHJcbn07XHJcbiJdfQ==

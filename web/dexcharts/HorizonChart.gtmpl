@@ -26,7 +26,6 @@
   println new File("javascript/underscore/latest/underscore-min.js").text
   println new File("javascript/d3/latest/d3.min.js").text
   println new File("javascript/dexjs/latest/dex.js").text
-  println new File("javascript/dexjs/latest/charts/d3/HorizonChart.js").text
 %>
 </script>
 
