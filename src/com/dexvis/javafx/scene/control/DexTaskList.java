@@ -187,6 +187,8 @@ public class DexTaskList extends ListView<DexTaskItem> implements DexConstants
       
       DexPropertySheet dps = task.getPropertySheet();
       
+      System.out.println("Dex Property Sheet: " + dps);
+      
       dps.setOnKeyPressed((event) -> {
         System.out.println("DEX Prop Sheet Event: '" + event + "'");
       });
@@ -198,7 +200,7 @@ public class DexTaskList extends ListView<DexTaskItem> implements DexConstants
     }
     catch(Exception ex)
     {
-      // ex.printStackTrace();
+      ex.printStackTrace();
     }
     
   }
