@@ -1,4 +1,2976 @@
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.dex = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+var parcoords = {};
+
+parcoords.renderQueue = (function(func) {
+  var _queue = [],                // data to be rendered
+    _rate = 10,                   // number of calls per frame
+    _clear = function() {},       // clearing function
+    _i = 0;                       // current iteration
+
+  var rq = function(data) {
+    if (data) rq.data(data);
+    rq.invalidate();
+    _clear();
+    rq.render();
+  };
+
+  rq.render = function() {
+    _i = 0;
+    var valid = true;
+    rq.invalidate = function() { valid = false; };
+
+    function doFrame() {
+      if (!valid) return true;
+      if (_i > _queue.length) return true;
+
+      // Typical d3 behavior is to pass a data item *and* its index. As the
+      // render queue splits the original data set, we'll have to be slightly
+      // more carefull about passing the correct index with the data item.
+      var end = Math.min(_i + _rate, _queue.length);
+      for (var i = _i; i < end; i++) {
+        func(_queue[i], i);
+      }
+      _i += _rate;
+    }
+
+    d3.timer(doFrame);
+  };
+
+  rq.data = function(data) {
+    rq.invalidate();
+    _queue = data.slice(0);
+    return rq;
+  };
+
+  rq.rate = function(value) {
+    if (!arguments.length) return _rate;
+    _rate = value;
+    return rq;
+  };
+
+  rq.remaining = function() {
+    return _queue.length - _i;
+  };
+
+  // clear the canvas
+  rq.clear = function(func) {
+    if (!arguments.length) {
+      _clear();
+      return rq;
+    }
+    _clear = func;
+    return rq;
+  };
+
+  rq.invalidate = function() {};
+
+  return rq;
+});
+
+parcoords.create = function(config) {
+  var __ = {
+    data: [],
+    foregroundQueueRate : 50,
+    brushedQueueRate : 50,
+    highlighted: [],
+    dimensions: {},
+    dimensionTitleRotation: 0,
+    brushed: false,
+    brushedColor: null,
+    alphaOnBrushed: 0.0,
+    mode: "default",
+    rate: 20,
+    width: 600,
+    height: 300,
+    margin: { top: 24, right: 0, bottom: 12, left: 0 },
+    nullValueSeparator: "undefined", // set to "top" or "bottom"
+    nullValueSeparatorPadding: { top: 8, right: 0, bottom: 8, left: 0 },
+    color: "#069",
+    composite: "source-over",
+    alpha: 0.7,
+    bundlingStrength: 0.5,
+    bundleDimension: null,
+    smoothness: 0.0,
+    showControlPoints: false,
+    hideAxis : [],
+    flipAxes: [],
+    animationTime: 1100 // How long it takes to flip the axis when you double click
+  };
+
+  extend(__, config);
+
+  if (config && config.dimensionTitles) {
+    console.warn("dimensionTitles passed in config is deprecated. Add title to dimension object.");
+    d3.entries(config.dimensionTitles).forEach(function(d) {
+      if (__.dimensions[d.key]) {
+        __.dimensions[d.key].title = __.dimensions[d.key].title ? __.dimensions[d.key].title : d.value;
+      } else {
+        __.dimensions[d.key] = {
+          title: d.value
+        };
+      }
+    });
+  }
+  var pc = function(selection) {
+    selection = pc.selection = d3.select(selection);
+
+    __.width = selection[0][0].clientWidth;
+    __.height = selection[0][0].clientHeight;
+
+    // canvas data layers
+    ["marks", "foreground", "brushed", "highlight"].forEach(function(layer) {
+      canvas[layer] = selection
+        .append("canvas")
+        .attr("class", layer)[0][0];
+      ctx[layer] = canvas[layer].getContext("2d");
+    });
+
+    // svg tick and brush layers
+    pc.svg = selection
+      .append("svg")
+      .attr("width", __.width)
+      .attr("height", __.height)
+      .append("svg:g")
+      .attr("transform", "translate(" + __.margin.left + "," + __.margin.top + ")");
+
+    return pc;
+  };
+  var events = d3.dispatch.apply(this,["render", "resize", "highlight", "brush", "brushend", "axesreorder"].concat(d3.keys(__))),
+    w = function() { return __.width - __.margin.right - __.margin.left; },
+    h = function() { return __.height - __.margin.top - __.margin.bottom; },
+    flags = {
+      brushable: false,
+      reorderable: false,
+      axes: false,
+      interactive: false,
+      debug: false
+    },
+    xscale = d3.scale.ordinal(),
+    dragging = {},
+    line = d3.svg.line(),
+    axis = d3.svg.axis().orient("left").ticks(5),
+    g, // groups for axes, brushes
+    ctx = {},
+    canvas = {},
+    clusterCentroids = [];
+
+// side effects for setters
+  var side_effects = d3.dispatch.apply(this,d3.keys(__))
+    .on("composite", function(d) {
+      ctx.foreground.globalCompositeOperation = d.value;
+      ctx.brushed.globalCompositeOperation = d.value;
+    })
+    .on("alpha", function(d) {
+      ctx.foreground.globalAlpha = d.value;
+      ctx.brushed.globalAlpha = d.value;
+    })
+    .on("brushedColor", function (d) {
+      ctx.brushed.strokeStyle = d.value;
+    })
+    .on("width", function(d) { pc.resize(); })
+    .on("height", function(d) { pc.resize(); })
+    .on("margin", function(d) { pc.resize(); })
+    .on("rate", function(d) {
+      brushedQueue.rate(d.value);
+      foregroundQueue.rate(d.value);
+    })
+    .on("dimensions", function(d) {
+      __.dimensions = pc.applyDimensionDefaults(d3.keys(d.value));
+      xscale.domain(pc.getOrderedDimensionKeys());
+      pc.sortDimensions();
+      if (flags.interactive){pc.render().updateAxes();}
+    })
+    .on("bundleDimension", function(d) {
+      if (!d3.keys(__.dimensions).length) pc.detectDimensions();
+      pc.autoscale();
+      if (typeof d.value === "number") {
+        if (d.value < d3.keys(__.dimensions).length) {
+          __.bundleDimension = __.dimensions[d.value];
+        } else if (d.value < __.hideAxis.length) {
+          __.bundleDimension = __.hideAxis[d.value];
+        }
+      } else {
+        __.bundleDimension = d.value;
+      }
+
+      __.clusterCentroids = compute_cluster_centroids(__.bundleDimension);
+      if (flags.interactive){pc.render();}
+    })
+    .on("hideAxis", function(d) {
+      pc.dimensions(pc.applyDimensionDefaults());
+      pc.dimensions(without(__.dimensions, d.value));
+    })
+    .on("flipAxes", function(d) {
+      if (d.value && d.value.length) {
+        d.value.forEach(function(axis) {
+          flipAxisAndUpdatePCP(axis);
+        });
+        pc.updateAxes(0);
+      }
+    });
+
+// expose the state of the chart
+  pc.state = __;
+  pc.flags = flags;
+
+// create getter/setters
+  getset(pc, __, events);
+
+// expose events
+  d3.rebind(pc, events, "on");
+
+// getter/setter with event firing
+  function getset(obj,state,events)  {
+    d3.keys(state).forEach(function(key) {
+      obj[key] = function(x) {
+        if (!arguments.length) {
+          return state[key];
+        }
+        if (key === 'dimensions' && Object.prototype.toString.call(x) === '[object Array]') {
+          console.warn("pc.dimensions([]) is deprecated, use pc.dimensions({})");
+          x = pc.applyDimensionDefaults(x);
+        }
+        var old = state[key];
+        state[key] = x;
+        side_effects[key].call(pc,{"value": x, "previous": old});
+        events[key].call(pc,{"value": x, "previous": old});
+        return obj;
+      };
+    });
+  };
+
+  function extend(target, source) {
+    for (var key in source) {
+      target[key] = source[key];
+    }
+    return target;
+  };
+
+  function without(arr, items) {
+    items.forEach(function (el) {
+      delete arr[el];
+    });
+    return arr;
+  };
+  /** adjusts an axis' default range [h()+1, 1] if a NullValueSeparator is set */
+  function getRange() {
+    if (__.nullValueSeparator=="bottom") {
+      return [h()+1-__.nullValueSeparatorPadding.bottom-__.nullValueSeparatorPadding.top, 1];
+    } else if (__.nullValueSeparator=="top") {
+      return [h()+1, 1+__.nullValueSeparatorPadding.bottom+__.nullValueSeparatorPadding.top];
+    }
+    return [h()+1, 1];
+  };
+
+  pc.autoscale = function() {
+    // yscale
+    var defaultScales = {
+      "date": function(k) {
+        var extent = d3.extent(__.data, function(d) {
+          return d[k] ? d[k].getTime() : null;
+        });
+
+        // special case if single value
+        if (extent[0] === extent[1]) {
+          return d3.scale.ordinal()
+            .domain([extent[0]])
+            .rangePoints(getRange());
+        }
+
+        return d3.time.scale()
+          .domain(extent)
+          .range(getRange());
+      },
+      "number": function(k) {
+        var extent = d3.extent(__.data, function(d) { return +d[k]; });
+
+        // special case if single value
+        if (extent[0] === extent[1]) {
+          return d3.scale.ordinal()
+            .domain([extent[0]])
+            .rangePoints(getRange());
+        }
+
+        return d3.scale.linear()
+          .domain(extent)
+          .range(getRange());
+      },
+      "string": function(k) {
+        var counts = {},
+          domain = [];
+
+        // Let's get the count for each value so that we can sort the domain based
+        // on the number of items for each value.
+        __.data.map(function(p) {
+          if (p[k] === undefined && __.nullValueSeparator!== "undefined"){
+            return; // null values will be drawn beyond the horizontal null value separator!
+          }
+          if (counts[p[k]] === undefined) {
+            counts[p[k]] = 1;
+          } else {
+            counts[p[k]] = counts[p[k]] + 1;
+          }
+        });
+
+        domain = Object.getOwnPropertyNames(counts).sort(function(a, b) {
+          return counts[a] - counts[b];
+        });
+
+        return d3.scale.ordinal()
+          .domain(domain)
+          .rangePoints(getRange());
+      }
+    };
+
+    d3.keys(__.dimensions).forEach(function(k) {
+      if (!__.dimensions[k].yscale){
+        __.dimensions[k].yscale = defaultScales[__.dimensions[k].type](k);
+      }
+    });
+
+    // xscale
+    xscale.rangePoints([0, w()], 1);
+
+    // canvas sizes
+    pc.selection.selectAll("canvas")
+      .style("margin-top", __.margin.top + "px")
+      .style("margin-left", __.margin.left + "px")
+      .attr("width", w()+2)
+      .attr("height", h()+2);
+
+    // default styles, needs to be set when canvas width changes
+    ctx.foreground.strokeStyle = __.color;
+    ctx.foreground.lineWidth = 1.4;
+    ctx.foreground.globalCompositeOperation = __.composite;
+    ctx.foreground.globalAlpha = __.alpha;
+    ctx.brushed.strokeStyle = __.brushedColor;
+    ctx.brushed.lineWidth = 1.4;
+    ctx.brushed.globalCompositeOperation = __.composite;
+    ctx.brushed.globalAlpha = __.alpha;
+    ctx.highlight.lineWidth = 3;
+
+    return this;
+  };
+
+  pc.scale = function(d, domain) {
+    __.dimensions[d].yscale.domain(domain);
+
+    return this;
+  };
+
+  pc.flip = function(d) {
+    //__.dimensions[d].yscale.domain().reverse();                               // does not work
+    __.dimensions[d].yscale.domain(__.dimensions[d].yscale.domain().reverse()); // works
+
+    return this;
+  };
+
+  pc.commonScale = function(global, type) {
+    var t = type || "number";
+    if (typeof global === 'undefined') {
+      global = true;
+    }
+
+    // try to autodetect dimensions and create scales
+    if (!d3.keys(__.dimensions).length) {
+      pc.detectDimensions()
+    }
+    pc.autoscale();
+
+    // scales of the same type
+    var scales = d3.keys(__.dimensions).filter(function(p) {
+      return __.dimensions[p].type == t;
+    });
+
+    if (global) {
+      var extent = d3.extent(scales.map(function(d,i) {
+        return __.dimensions[d].yscale.domain();
+      }).reduce(function(a,b) {
+        return a.concat(b);
+      }));
+
+      scales.forEach(function(d) {
+        __.dimensions[d].yscale.domain(extent);
+      });
+
+    } else {
+      scales.forEach(function(d) {
+        __.dimensions[d].yscale.domain(d3.extent(__.data, function(d) { return +d[k]; }));
+      });
+    }
+
+    // update centroids
+    if (__.bundleDimension !== null) {
+      pc.bundleDimension(__.bundleDimension);
+    }
+
+    return this;
+  };
+  pc.detectDimensions = function() {
+    pc.dimensions(pc.applyDimensionDefaults());
+    return this;
+  };
+
+  pc.applyDimensionDefaults = function(dims) {
+    var types = pc.detectDimensionTypes(__.data);
+    dims = dims ? dims : d3.keys(types);
+    var newDims = {};
+    var currIndex = 0;
+    dims.forEach(function(k) {
+      newDims[k] = __.dimensions[k] ? __.dimensions[k] : {};
+      //Set up defaults
+      newDims[k].orient= newDims[k].orient ? newDims[k].orient : 'left';
+      newDims[k].ticks= newDims[k].ticks != null ? newDims[k].ticks : 5;
+      newDims[k].innerTickSize= newDims[k].innerTickSize != null ? newDims[k].innerTickSize : 6;
+      newDims[k].outerTickSize= newDims[k].outerTickSize != null ? newDims[k].outerTickSize : 0;
+      newDims[k].tickPadding= newDims[k].tickPadding != null ? newDims[k].tickPadding : 3;
+      newDims[k].type= newDims[k].type ? newDims[k].type : types[k];
+
+      newDims[k].index = newDims[k].index != null ? newDims[k].index : currIndex;
+      currIndex++;
+    });
+    return newDims;
+  };
+
+  pc.getOrderedDimensionKeys = function(){
+    return d3.keys(__.dimensions).sort(function(x, y){
+      return d3.ascending(__.dimensions[x].index, __.dimensions[y].index);
+    });
+  };
+
+// a better "typeof" from this post: http://stackoverflow.com/questions/7390426/better-way-to-get-type-of-a-javascript-variable
+  pc.toType = function(v) {
+    return ({}).toString.call(v).match(/\s([a-zA-Z]+)/)[1].toLowerCase();
+  };
+
+// try to coerce to number before returning type
+  pc.toTypeCoerceNumbers = function(v) {
+    if ((parseFloat(v) == v) && (v != null)) {
+      return "number";
+    }
+    return pc.toType(v);
+  };
+
+// attempt to determine types of each dimension based on first row of data
+  pc.detectDimensionTypes = function(data) {
+    var types = {};
+    d3.keys(data[0])
+      .forEach(function(col) {
+        types[isNaN(Number(col)) ? col : parseInt(col)] = pc.toTypeCoerceNumbers(data[0][col]);
+      });
+    return types;
+  };
+  pc.render = function() {
+    // try to autodetect dimensions and create scales
+    if (!d3.keys(__.dimensions).length) {
+      pc.detectDimensions()
+    }
+    pc.autoscale();
+
+    pc.render[__.mode]();
+
+    events.render.call(this);
+    return this;
+  };
+
+  pc.renderBrushed = function() {
+    if (!d3.keys(__.dimensions).length) pc.detectDimensions();
+
+    pc.renderBrushed[__.mode]();
+
+    events.render.call(this);
+    return this;
+  };
+
+  function isBrushed() {
+    if (__.brushed && __.brushed.length !== __.data.length)
+      return true;
+
+    var object = brush.currentMode().brushState();
+
+    for (var key in object) {
+      if (object.hasOwnProperty(key)) {
+        return true;
+      }
+    }
+    return false;
+  };
+
+  pc.render.default = function() {
+    pc.clear('foreground');
+    pc.clear('highlight');
+
+    pc.renderBrushed.default();
+
+    __.data.forEach(path_foreground);
+  };
+
+  var foregroundQueue = parcoords.renderQueue(path_foreground)
+    .rate(__.foregroundQueueRate)
+    .clear(function() {
+      pc.clear('foreground');
+      pc.clear('highlight');
+    });
+
+  pc.render.queue = function() {
+    pc.renderBrushed.queue();
+
+    foregroundQueue(__.data);
+  };
+
+  pc.renderBrushed.default = function() {
+    pc.clear('brushed');
+
+    if (isBrushed()) {
+      __.brushed.forEach(path_brushed);
+    }
+  };
+
+  var brushedQueue = parcoords.renderQueue(path_brushed)
+    .rate(__.brushedQueueRate)
+    .clear(function() {
+      pc.clear('brushed');
+    });
+
+  pc.renderBrushed.queue = function() {
+    if (isBrushed()) {
+      brushedQueue(__.brushed);
+    } else {
+      brushedQueue([]); // This is needed to clear the currently brushed items
+    }
+  };
+  function compute_cluster_centroids(d) {
+
+    var clusterCentroids = d3.map();
+    var clusterCounts = d3.map();
+    // determine clusterCounts
+    __.data.forEach(function(row) {
+      var scaled = __.dimensions[d].yscale(row[d]);
+      if (!clusterCounts.has(scaled)) {
+        clusterCounts.set(scaled, 0);
+      }
+      var count = clusterCounts.get(scaled);
+      clusterCounts.set(scaled, count + 1);
+    });
+
+    __.data.forEach(function(row) {
+      d3.keys(__.dimensions).map(function(p, i) {
+        var scaled = __.dimensions[d].yscale(row[d]);
+        if (!clusterCentroids.has(scaled)) {
+          var map = d3.map();
+          clusterCentroids.set(scaled, map);
+        }
+        if (!clusterCentroids.get(scaled).has(p)) {
+          clusterCentroids.get(scaled).set(p, 0);
+        }
+        var value = clusterCentroids.get(scaled).get(p);
+        value += __.dimensions[p].yscale(row[p]) / clusterCounts.get(scaled);
+        clusterCentroids.get(scaled).set(p, value);
+      });
+    });
+
+    return clusterCentroids;
+
+  }
+
+  function compute_centroids(row) {
+    var centroids = [];
+
+    var p = d3.keys(__.dimensions);
+    var cols = p.length;
+    var a = 0.5;			// center between axes
+    for (var i = 0; i < cols; ++i) {
+      // centroids on 'real' axes
+      var x = position(p[i]);
+      var y = __.dimensions[p[i]].yscale(row[p[i]]);
+      centroids.push($V([x, y]));
+
+      // centroids on 'virtual' axes
+      if (i < cols - 1) {
+        var cx = x + a * (position(p[i+1]) - x);
+        var cy = y + a * (__.dimensions[p[i+1]].yscale(row[p[i+1]]) - y);
+        if (__.bundleDimension !== null) {
+          var leftCentroid = __.clusterCentroids.get(__.dimensions[__.bundleDimension].yscale(row[__.bundleDimension])).get(p[i]);
+          var rightCentroid = __.clusterCentroids.get(__.dimensions[__.bundleDimension].yscale(row[__.bundleDimension])).get(p[i+1]);
+          var centroid = 0.5 * (leftCentroid + rightCentroid);
+          cy = centroid + (1 - __.bundlingStrength) * (cy - centroid);
+        }
+        centroids.push($V([cx, cy]));
+      }
+    }
+
+    return centroids;
+  }
+
+  function compute_control_points(centroids) {
+
+    var cols = centroids.length;
+    var a = __.smoothness;
+    var cps = [];
+
+    cps.push(centroids[0]);
+    cps.push($V([centroids[0].e(1) + a*2*(centroids[1].e(1)-centroids[0].e(1)), centroids[0].e(2)]));
+    for (var col = 1; col < cols - 1; ++col) {
+      var mid = centroids[col];
+      var left = centroids[col - 1];
+      var right = centroids[col + 1];
+
+      var diff = left.subtract(right);
+      cps.push(mid.add(diff.x(a)));
+      cps.push(mid);
+      cps.push(mid.subtract(diff.x(a)));
+    }
+    cps.push($V([centroids[cols-1].e(1) + a*2*(centroids[cols-2].e(1)-centroids[cols-1].e(1)), centroids[cols-1].e(2)]));
+    cps.push(centroids[cols - 1]);
+
+    return cps;
+
+  };pc.shadows = function() {
+    flags.shadows = true;
+    pc.alphaOnBrushed(0.1);
+    pc.render();
+    return this;
+  };
+
+// draw dots with radius r on the axis line where data intersects
+  pc.axisDots = function(r) {
+    var r = r || 0.1;
+    var ctx = pc.ctx.marks;
+    var startAngle = 0;
+    var endAngle = 2 * Math.PI;
+    ctx.globalAlpha = d3.min([ 1 / Math.pow(__.data.length, 1 / 2), 1 ]);
+    __.data.forEach(function(d) {
+      d3.entries(__.dimensions).forEach(function(p, i) {
+        ctx.beginPath();
+        ctx.arc(position(p), __.dimensions[p.key].yscale(d[p]), r, startAngle, endAngle);
+        ctx.stroke();
+        ctx.fill();
+      });
+    });
+    return this;
+  };
+
+// draw single cubic bezier curve
+  function single_curve(d, ctx) {
+
+    var centroids = compute_centroids(d);
+    var cps = compute_control_points(centroids);
+
+    ctx.moveTo(cps[0].e(1), cps[0].e(2));
+    for (var i = 1; i < cps.length; i += 3) {
+      if (__.showControlPoints) {
+        for (var j = 0; j < 3; j++) {
+          ctx.fillRect(cps[i+j].e(1), cps[i+j].e(2), 2, 2);
+        }
+      }
+      ctx.bezierCurveTo(cps[i].e(1), cps[i].e(2), cps[i+1].e(1), cps[i+1].e(2), cps[i+2].e(1), cps[i+2].e(2));
+    }
+  };
+
+// draw single polyline
+  function color_path(d, ctx) {
+    ctx.beginPath();
+    if ((__.bundleDimension !== null && __.bundlingStrength > 0) || __.smoothness > 0) {
+      single_curve(d, ctx);
+    } else {
+      single_path(d, ctx);
+    }
+    ctx.stroke();
+  };
+
+// draw many polylines of the same color
+  function paths(data, ctx) {
+    ctx.clearRect(-1, -1, w() + 2, h() + 2);
+    ctx.beginPath();
+    data.forEach(function(d) {
+      if ((__.bundleDimension !== null && __.bundlingStrength > 0) || __.smoothness > 0) {
+        single_curve(d, ctx);
+      } else {
+        single_path(d, ctx);
+      }
+    });
+    ctx.stroke();
+  };
+
+// returns the y-position just beyond the separating null value line
+  function getNullPosition() {
+    if (__.nullValueSeparator=="bottom") {
+      return h()+1;
+    } else if (__.nullValueSeparator=="top") {
+      return 1;
+    } else {
+      console.log("A value is NULL, but nullValueSeparator is not set; set it to 'bottom' or 'top'.");
+    }
+    return h()+1;
+  };
+
+  function single_path(d, ctx) {
+    d3.entries(__.dimensions).forEach(function(p, i) {  //p isn't really p
+      if (i == 0) {
+        ctx.moveTo(position(p.key), typeof d[p.key] =='undefined' ? getNullPosition() : __.dimensions[p.key].yscale(d[p.key]));
+      } else {
+        ctx.lineTo(position(p.key), typeof d[p.key] =='undefined' ? getNullPosition() : __.dimensions[p.key].yscale(d[p.key]));
+      }
+    });
+  };
+
+  function path_brushed(d, i) {
+    if (__.brushedColor !== null) {
+      ctx.brushed.strokeStyle = d3.functor(__.brushedColor)(d, i);
+    } else {
+      ctx.brushed.strokeStyle = d3.functor(__.color)(d, i);
+    }
+    return color_path(d, ctx.brushed)
+  };
+
+  function path_foreground(d, i) {
+    ctx.foreground.strokeStyle = d3.functor(__.color)(d, i);
+    return color_path(d, ctx.foreground);
+  };
+
+  function path_highlight(d, i) {
+    ctx.highlight.strokeStyle = d3.functor(__.color)(d, i);
+    return color_path(d, ctx.highlight);
+  };
+  pc.clear = function(layer) {
+    ctx[layer].clearRect(0, 0, w() + 2, h() + 2);
+
+    // This will make sure that the foreground items are transparent
+    // without the need for changing the opacity style of the foreground canvas
+    // as this would stop the css styling from working
+    if(layer === "brushed" && isBrushed()) {
+      ctx.brushed.fillStyle = pc.selection.style("background-color");
+      ctx.brushed.globalAlpha = 1 - __.alphaOnBrushed;
+      ctx.brushed.fillRect(0, 0, w() + 2, h() + 2);
+      ctx.brushed.globalAlpha = __.alpha;
+    }
+    return this;
+  };
+  d3.rebind(pc, axis, "ticks", "orient", "tickValues", "tickSubdivide", "tickSize", "tickPadding", "tickFormat");
+
+  function flipAxisAndUpdatePCP(dimension) {
+    var g = pc.svg.selectAll(".dimension");
+
+    pc.flip(dimension);
+
+    d3.select(this.parentElement)
+      .transition()
+      .duration(__.animationTime)
+      .call(axis.scale(__.dimensions[dimension].yscale));
+
+    pc.render();
+  }
+
+  function rotateLabels() {
+    var delta = d3.event.deltaY;
+    delta = delta < 0 ? -5 : delta;
+    delta = delta > 0 ? 5 : delta;
+
+    __.dimensionTitleRotation += delta;
+    pc.svg.selectAll("text.label")
+      .attr("transform", "translate(0,-5) rotate(" + __.dimensionTitleRotation + ")");
+    d3.event.preventDefault();
+  }
+
+  function dimensionLabels(d) {
+    return __.dimensions[d].title ? __.dimensions[d].title : d;  // dimension display names
+  }
+
+  pc.createAxes = function() {
+    if (g) pc.removeAxes();
+
+    // Add a group element for each dimension.
+    g = pc.svg.selectAll(".dimension")
+      .data(pc.getOrderedDimensionKeys(), function(d) {
+        return d;
+      })
+      .enter().append("svg:g")
+      .attr("class", "dimension")
+      .attr("transform", function(d) {
+        return "translate(" + xscale(d) + ")";
+      });
+
+    // Add an axis and title.
+    g.append("svg:g")
+      .attr("class", "axis")
+      .attr("transform", "translate(0,0)")
+      .each(function(d) { d3.select(this).call( pc.applyAxisConfig(axis, __.dimensions[d]) )
+      })
+      .append("svg:text")
+      .attr({
+        "text-anchor": "middle",
+        "y": 0,
+        "transform": "translate(0,-5) rotate(" + __.dimensionTitleRotation + ")",
+        "x": 0,
+        "class": "label"
+      })
+      .text(dimensionLabels)
+      .on("dblclick", flipAxisAndUpdatePCP)
+      .on("wheel", rotateLabels);
+
+    if (__.nullValueSeparator=="top") {
+      pc.svg.append("line")
+        .attr("x1", 0)
+        .attr("y1", 1+__.nullValueSeparatorPadding.top)
+        .attr("x2", w())
+        .attr("y2", 1+__.nullValueSeparatorPadding.top)
+        .attr("stroke-width", 1)
+        .attr("stroke", "#777")
+        .attr("fill", "none")
+        .attr("shape-rendering", "crispEdges");
+    } else if (__.nullValueSeparator=="bottom") {
+      pc.svg.append("line")
+        .attr("x1", 0)
+        .attr("y1", h()+1-__.nullValueSeparatorPadding.bottom)
+        .attr("x2", w())
+        .attr("y2", h()+1-__.nullValueSeparatorPadding.bottom)
+        .attr("stroke-width", 1)
+        .attr("stroke", "#777")
+        .attr("fill", "none")
+        .attr("shape-rendering", "crispEdges");
+    }
+
+    flags.axes= true;
+    return this;
+  };
+
+  pc.removeAxes = function() {
+    g.remove();
+    return this;
+  };
+
+  pc.updateAxes = function(animationTime) {
+    if (typeof animationTime === 'undefined') {
+      animationTime = __.animationTime;
+    }
+
+    var g_data = pc.svg.selectAll(".dimension").data(pc.getOrderedDimensionKeys());
+
+    // Enter
+    g_data.enter().append("svg:g")
+      .attr("class", "dimension")
+      .attr("transform", function(p) { return "translate(" + position(p) + ")"; })
+      .style("opacity", 0)
+      .append("svg:g")
+      .attr("class", "axis")
+      .attr("transform", "translate(0,0)")
+      .each(function(d) { d3.select(this).call( pc.applyAxisConfig(axis, __.dimensions[d]) )
+      })
+      .append("svg:text")
+      .attr({
+        "text-anchor": "middle",
+        "y": 0,
+        "transform": "translate(0,-5) rotate(" + __.dimensionTitleRotation + ")",
+        "x": 0,
+        "class": "label"
+      })
+      .text(dimensionLabels)
+      .on("dblclick", flipAxisAndUpdatePCP)
+      .on("wheel", rotateLabels);
+
+    // Update
+    g_data.attr("opacity", 0);
+    g_data.select(".axis")
+      .transition()
+      .duration(animationTime)
+      .each(function(d) { d3.select(this).call( pc.applyAxisConfig(axis, __.dimensions[d]) )
+      });
+    g_data.select(".label")
+      .transition()
+      .duration(animationTime)
+      .text(dimensionLabels)
+      .attr("transform", "translate(0,-5) rotate(" + __.dimensionTitleRotation + ")");
+
+    // Exit
+    g_data.exit().remove();
+
+    g = pc.svg.selectAll(".dimension");
+    g.transition().duration(animationTime)
+      .attr("transform", function(p) { return "translate(" + position(p) + ")"; })
+      .style("opacity", 1);
+
+    pc.svg.selectAll(".axis")
+      .transition()
+      .duration(animationTime)
+      .each(function(d) { d3.select(this).call( pc.applyAxisConfig(axis, __.dimensions[d]) );
+      });
+
+    if (flags.brushable) pc.brushable();
+    if (flags.reorderable) pc.reorderable();
+    if (pc.brushMode() !== "None") {
+      var mode = pc.brushMode();
+      pc.brushMode("None");
+      pc.brushMode(mode);
+    }
+    return this;
+  };
+
+  pc.applyAxisConfig = function(axis, dimension) {
+    return axis.scale(dimension.yscale)
+      .orient(dimension.orient)
+      .ticks(dimension.ticks)
+      .tickValues(dimension.tickValues)
+      .innerTickSize(dimension.innerTickSize)
+      .outerTickSize(dimension.outerTickSize)
+      .tickPadding(dimension.tickPadding)
+      .tickFormat(dimension.tickFormat)
+  };
+
+// Jason Davies, http://bl.ocks.org/1341281
+  pc.reorderable = function() {
+    if (!g) pc.createAxes();
+
+    g.style("cursor", "move")
+      .call(d3.behavior.drag()
+        .on("dragstart", function(d) {
+          dragging[d] = this.__origin__ = xscale(d);
+        })
+        .on("drag", function(d) {
+          dragging[d] = Math.min(w(), Math.max(0, this.__origin__ += d3.event.dx));
+          pc.sortDimensions();
+          xscale.domain(pc.getOrderedDimensionKeys());
+          pc.render();
+          g.attr("transform", function(d) {
+            return "translate(" + position(d) + ")";
+          });
+        })
+        .on("dragend", function(d) {
+          // Let's see if the order has changed and send out an event if so.
+          var i = 0,
+            j = __.dimensions[d].index,
+            elem = this,
+            parent = this.parentElement;
+
+          while((elem = elem.previousElementSibling) != null) ++i;
+          if (i !== j) {
+            events.axesreorder.call(pc, pc.getOrderedDimensionKeys());
+            // We now also want to reorder the actual dom elements that represent
+            // the axes. That is, the g.dimension elements. If we don't do this,
+            // we get a weird and confusing transition when updateAxes is called.
+            // This is due to the fact that, initially the nth g.dimension element
+            // represents the nth axis. However, after a manual reordering,
+            // without reordering the dom elements, the nth dom elements no longer
+            // necessarily represents the nth axis.
+            //
+            // i is the original index of the dom element
+            // j is the new index of the dom element
+            if (i > j) { // Element moved left
+              parent.insertBefore(this, parent.children[j - 1]);
+            } else {     // Element moved right
+              if ((j + 1) < parent.children.length) {
+                parent.insertBefore(this, parent.children[j + 1]);
+              } else {
+                parent.appendChild(this);
+              }
+            }
+          }
+
+          delete this.__origin__;
+          delete dragging[d];
+          d3.select(this).transition().attr("transform", "translate(" + xscale(d) + ")");
+          pc.render();
+        }));
+    flags.reorderable = true;
+    return this;
+  };
+
+// Reorder dimensions, such that the highest value (visually) is on the left and
+// the lowest on the right. Visual values are determined by the data values in
+// the given row.
+  pc.reorder = function(rowdata) {
+    var firstDim = pc.getOrderedDimensionKeys()[0];
+
+    pc.sortDimensionsByRowData(rowdata);
+    // NOTE: this is relatively cheap given that:
+    // number of dimensions < number of data items
+    // Thus we check equality of order to prevent rerendering when this is the case.
+    var reordered = false;
+    reordered = firstDim !== pc.getOrderedDimensionKeys()[0];
+
+    if (reordered) {
+      xscale.domain(pc.getOrderedDimensionKeys());
+      var highlighted = __.highlighted.slice(0);
+      pc.unhighlight();
+
+      g.transition()
+        .duration(1500)
+        .attr("transform", function(d) {
+          return "translate(" + xscale(d) + ")";
+        });
+      pc.render();
+
+      // pc.highlight() does not check whether highlighted is length zero, so we do that here.
+      if (highlighted.length !== 0) {
+        pc.highlight(highlighted);
+      }
+    }
+  }
+
+  pc.sortDimensionsByRowData = function(rowdata) {
+    var copy = __.dimensions;
+    var positionSortedKeys = d3.keys(__.dimensions).sort(function(a, b) {
+      var pixelDifference = __.dimensions[a].yscale(rowdata[a]) - __.dimensions[b].yscale(rowdata[b]);
+
+      // Array.sort is not necessarily stable, this means that if pixelDifference is zero
+      // the ordering of dimensions might change unexpectedly. This is solved by sorting on
+      // variable name in that case.
+      if (pixelDifference === 0) {
+        return a.localeCompare(b);
+      } // else
+      return pixelDifference;
+    });
+    __.dimensions = {};
+    positionSortedKeys.forEach(function(p, i){
+      __.dimensions[p] = copy[p];
+      __.dimensions[p].index = i;
+    });
+  }
+
+  pc.sortDimensions = function() {
+    var copy = __.dimensions;
+    var positionSortedKeys = d3.keys(__.dimensions).sort(function(a, b) {
+      return position(a) - position(b);
+    });
+    __.dimensions = {};
+    positionSortedKeys.forEach(function(p, i){
+      __.dimensions[p] = copy[p];
+      __.dimensions[p].index = i;
+    })
+  };
+
+// pairs of adjacent dimensions
+  pc.adjacent_pairs = function(arr) {
+    var ret = [];
+    for (var i = 0; i < arr.length-1; i++) {
+      ret.push([arr[i],arr[i+1]]);
+    };
+    return ret;
+  };
+
+  var brush = {
+    modes: {
+      "None": {
+        install: function(pc) {},            // Nothing to be done.
+        uninstall: function(pc) {},          // Nothing to be done.
+        selected: function() { return []; }, // Nothing to return
+        brushState: function() { return {}; }
+      }
+    },
+    mode: "None",
+    predicate: "AND",
+    currentMode: function() {
+      return this.modes[this.mode];
+    }
+  };
+
+// This function can be used for 'live' updates of brushes. That is, during the
+// specification of a brush, this method can be called to update the view.
+//
+// @param newSelection - The new set of data items that is currently contained
+//                       by the brushes
+  function brushUpdated(newSelection) {
+    __.brushed = newSelection;
+    events.brush.call(pc,__.brushed);
+    pc.renderBrushed();
+  }
+
+  function brushPredicate(predicate) {
+    if (!arguments.length) { return brush.predicate; }
+
+    predicate = String(predicate).toUpperCase();
+    if (predicate !== "AND" && predicate !== "OR") {
+      throw "Invalid predicate " + predicate;
+    }
+
+    brush.predicate = predicate;
+    __.brushed = brush.currentMode().selected();
+    pc.renderBrushed();
+    return pc;
+  }
+
+  pc.brushModes = function() {
+    return Object.getOwnPropertyNames(brush.modes);
+  };
+
+  pc.brushMode = function(mode) {
+    if (arguments.length === 0) {
+      return brush.mode;
+    }
+
+    if (pc.brushModes().indexOf(mode) === -1) {
+      throw "pc.brushmode: Unsupported brush mode: " + mode;
+    }
+
+    // Make sure that we don't trigger unnecessary events by checking if the mode
+    // actually changes.
+    if (mode !== brush.mode) {
+      // When changing brush modes, the first thing we need to do is clearing any
+      // brushes from the current mode, if any.
+      if (brush.mode !== "None") {
+        pc.brushReset();
+      }
+
+      // Next, we need to 'uninstall' the current brushMode.
+      brush.modes[brush.mode].uninstall(pc);
+      // Finally, we can install the requested one.
+      brush.mode = mode;
+      brush.modes[brush.mode].install();
+      if (mode === "None") {
+        delete pc.brushPredicate;
+      } else {
+        pc.brushPredicate = brushPredicate;
+      }
+    }
+
+    return pc;
+  };
+
+// brush mode: 1D-Axes
+
+  (function() {
+    var brushes = {};
+
+    function is_brushed(p) {
+      return !brushes[p].empty();
+    }
+
+    // data within extents
+    function selected() {
+      var actives = d3.keys(__.dimensions).filter(is_brushed),
+        extents = actives.map(function(p) { return brushes[p].extent(); });
+
+      // We don't want to return the full data set when there are no axes brushed.
+      // Actually, when there are no axes brushed, by definition, no items are
+      // selected. So, let's avoid the filtering and just return false.
+      //if (actives.length === 0) return false;
+
+      // Resolves broken examples for now. They expect to get the full dataset back from empty brushes
+      if (actives.length === 0) return __.data;
+
+      // test if within range
+      var within = {
+        "date": function(d,p,dimension) {
+          if (typeof __.dimensions[p].yscale.rangePoints === "function") { // if it is ordinal
+            return extents[dimension][0] <= __.dimensions[p].yscale(d[p]) && __.dimensions[p].yscale(d[p]) <= extents[dimension][1]
+          } else {
+            return extents[dimension][0] <= d[p] && d[p] <= extents[dimension][1]
+          }
+        },
+        "number": function(d,p,dimension) {
+          if (typeof __.dimensions[p].yscale.rangePoints === "function") { // if it is ordinal
+            return extents[dimension][0] <= __.dimensions[p].yscale(d[p]) && __.dimensions[p].yscale(d[p]) <= extents[dimension][1]
+          } else {
+            return extents[dimension][0] <= d[p] && d[p] <= extents[dimension][1]
+          }
+        },
+        "string": function(d,p,dimension) {
+          return extents[dimension][0] <= __.dimensions[p].yscale(d[p]) && __.dimensions[p].yscale(d[p]) <= extents[dimension][1]
+        }
+      };
+
+      return __.data
+        .filter(function(d) {
+          switch(brush.predicate) {
+            case "AND":
+              return actives.every(function(p, dimension) {
+                return within[__.dimensions[p].type](d,p,dimension);
+              });
+            case "OR":
+              return actives.some(function(p, dimension) {
+                return within[__.dimensions[p].type](d,p,dimension);
+              });
+            default:
+              throw "Unknown brush predicate " + __.brushPredicate;
+          }
+        });
+    };
+
+    function brushExtents(extents) {
+      if(typeof(extents) === 'undefined')
+      {
+        var extents = {};
+        d3.keys(__.dimensions).forEach(function(d) {
+          var brush = brushes[d];
+          if (brush !== undefined && !brush.empty()) {
+            var extent = brush.extent();
+            extent.sort(d3.ascending);
+            extents[d] = extent;
+          }
+        });
+        return extents;
+      }
+      else
+      {
+        //first get all the brush selections
+        var brushSelections = {};
+        g.selectAll('.brush')
+          .each(function(d) {
+            brushSelections[d] = d3.select(this);
+
+          });
+
+        // loop over each dimension and update appropriately (if it was passed in through extents)
+        d3.keys(__.dimensions).forEach(function(d) {
+          if (extents[d] === undefined){
+            return;
+          }
+
+          var brush = brushes[d];
+          if (brush !== undefined) {
+            //update the extent
+            brush.extent(extents[d]);
+
+            //redraw the brush
+            brushSelections[d]
+              .transition()
+              .duration(0)
+              .call(brush);
+
+            //fire some events
+            brush.event(brushSelections[d]);
+          }
+        });
+
+        //redraw the chart
+        pc.renderBrushed();
+
+        return pc;
+      }
+    }
+
+    function brushFor(axis) {
+      var brush = d3.svg.brush();
+
+      brush
+        .y(__.dimensions[axis].yscale)
+        .on("brushstart", function() {
+          if(d3.event.sourceEvent !== null) {
+            d3.event.sourceEvent.stopPropagation();
+          }
+        })
+        .on("brush", function() {
+          brushUpdated(selected());
+        })
+        .on("brushend", function() {
+          events.brushend.call(pc, __.brushed);
+        });
+
+      brushes[axis] = brush;
+      return brush;
+    };
+
+    function brushReset(dimension) {
+      if (dimension===undefined) {
+        __.brushed = false;
+        if (g) {
+          g.selectAll('.brush')
+            .each(function(d) {
+              d3.select(this)
+                .transition()
+                .duration(0)
+                .call(brushes[d].clear());
+            });
+          pc.renderBrushed();
+        }
+      }
+      else {
+        if (g) {
+          g.selectAll('.brush')
+            .each(function(d) {
+              if (d!=dimension) return;
+              d3.select(this)
+                .transition()
+                .duration(0)
+                .call(brushes[d].clear());
+              brushes[d].event(d3.select(this));
+            });
+          pc.renderBrushed();
+        }
+      }
+      return this;
+    };
+
+    function install() {
+      if (!g) pc.createAxes();
+
+      // Add and store a brush for each axis.
+      g.append("svg:g")
+        .attr("class", "brush")
+        .each(function(d) {
+          d3.select(this).call(brushFor(d));
+        })
+        .selectAll("rect")
+        .style("visibility", null)
+        .attr("x", -15)
+        .attr("width", 30);
+
+      pc.brushExtents = brushExtents;
+      pc.brushReset = brushReset;
+      return pc;
+    };
+
+    brush.modes["1D-axes"] = {
+      install: install,
+      uninstall: function() {
+        g.selectAll(".brush").remove();
+        brushes = {};
+        delete pc.brushExtents;
+        delete pc.brushReset;
+      },
+      selected: selected,
+      brushState: brushExtents
+    }
+  })();
+// brush mode: 2D-strums
+// bl.ocks.org/syntagmatic/5441022
+
+  (function() {
+    var strums = {},
+      strumRect;
+
+    function drawStrum(strum, activePoint) {
+      var svg = pc.selection.select("svg").select("g#strums"),
+        id = strum.dims.i,
+        points = [strum.p1, strum.p2],
+        line = svg.selectAll("line#strum-" + id).data([strum]),
+        circles = svg.selectAll("circle#strum-" + id).data(points),
+        drag = d3.behavior.drag();
+
+      line.enter()
+        .append("line")
+        .attr("id", "strum-" + id)
+        .attr("class", "strum");
+
+      line
+        .attr("x1", function(d) {
+          return d.p1[0]; })
+        .attr("y1", function(d) {
+          return d.p1[1]; })
+        .attr("x2", function(d) {
+          return d.p2[0]; })
+        .attr("y2", function(d) {
+          return d.p2[1]; })
+        .attr("stroke", "black")
+        .attr("stroke-width", 2);
+
+      drag
+        .on("drag", function(d, i) {
+          var ev = d3.event;
+          i = i + 1;
+          strum["p" + i][0] = Math.min(Math.max(strum.minX + 1, ev.x), strum.maxX);
+          strum["p" + i][1] = Math.min(Math.max(strum.minY, ev.y), strum.maxY);
+          drawStrum(strum, i - 1);
+        })
+        .on("dragend", onDragEnd());
+
+      circles.enter()
+        .append("circle")
+        .attr("id", "strum-" + id)
+        .attr("class", "strum");
+
+      circles
+        .attr("cx", function(d) { return d[0]; })
+        .attr("cy", function(d) { return d[1]; })
+        .attr("r", 5)
+        .style("opacity", function(d, i) {
+          return (activePoint !== undefined && i === activePoint) ? 0.8 : 0;
+        })
+        .on("mouseover", function() {
+          d3.select(this).style("opacity", 0.8);
+        })
+        .on("mouseout", function() {
+          d3.select(this).style("opacity", 0);
+        })
+        .call(drag);
+    }
+
+    function dimensionsForPoint(p) {
+      var dims = { i: -1, left: undefined, right: undefined };
+      d3.keys(__.dimensions).some(function(dim, i) {
+        if (xscale(dim) < p[0]) {
+          var next = d3.keys(__.dimensions)[pc.getOrderedDimensionKeys().indexOf(dim)+1];
+          dims.i = i;
+          dims.left = dim;
+          dims.right = next;
+          return false;
+        }
+        return true;
+      });
+
+      if (dims.left === undefined) {
+        // Event on the left side of the first axis.
+        dims.i = 0;
+        dims.left = pc.getOrderedDimensionKeys()[0];
+        dims.right = pc.getOrderedDimensionKeys()[1];
+      } else if (dims.right === undefined) {
+        // Event on the right side of the last axis
+        dims.i = d3.keys(__.dimensions).length - 1;
+        dims.right = dims.left;
+        dims.left = pc.getOrderedDimensionKeys()[d3.keys(__.dimensions).length - 2];
+      }
+
+      return dims;
+    }
+
+    function onDragStart() {
+      // First we need to determine between which two axes the sturm was started.
+      // This will determine the freedom of movement, because a strum can
+      // logically only happen between two axes, so no movement outside these axes
+      // should be allowed.
+      return function() {
+        var p = d3.mouse(strumRect[0][0]),
+          dims,
+          strum;
+
+        p[0] = p[0] - __.margin.left;
+        p[1] = p[1] - __.margin.top;
+
+        dims = dimensionsForPoint(p),
+          strum = {
+            p1: p,
+            dims: dims,
+            minX: xscale(dims.left),
+            maxX: xscale(dims.right),
+            minY: 0,
+            maxY: h()
+          };
+
+        strums[dims.i] = strum;
+        strums.active = dims.i;
+
+        // Make sure that the point is within the bounds
+        strum.p1[0] = Math.min(Math.max(strum.minX, p[0]), strum.maxX);
+        strum.p2 = strum.p1.slice();
+      };
+    }
+
+    function onDrag() {
+      return function() {
+        var ev = d3.event,
+          strum = strums[strums.active];
+
+        // Make sure that the point is within the bounds
+        strum.p2[0] = Math.min(Math.max(strum.minX + 1, ev.x - __.margin.left), strum.maxX);
+        strum.p2[1] = Math.min(Math.max(strum.minY, ev.y - __.margin.top), strum.maxY);
+        drawStrum(strum, 1);
+      };
+    }
+
+    function containmentTest(strum, width) {
+      var p1 = [strum.p1[0] - strum.minX, strum.p1[1] - strum.minX],
+        p2 = [strum.p2[0] - strum.minX, strum.p2[1] - strum.minX],
+        m1 = 1 - width / p1[0],
+        b1 = p1[1] * (1 - m1),
+        m2 = 1 - width / p2[0],
+        b2 = p2[1] * (1 - m2);
+
+      // test if point falls between lines
+      return function(p) {
+        var x = p[0],
+          y = p[1],
+          y1 = m1 * x + b1,
+          y2 = m2 * x + b2;
+
+        if (y > Math.min(y1, y2) && y < Math.max(y1, y2)) {
+          return true;
+        }
+
+        return false;
+      };
+    }
+
+    function selected() {
+      var ids = Object.getOwnPropertyNames(strums),
+        brushed = __.data;
+
+      // Get the ids of the currently active strums.
+      ids = ids.filter(function(d) {
+        return !isNaN(d);
+      });
+
+      function crossesStrum(d, id) {
+        var strum = strums[id],
+          test = containmentTest(strum, strums.width(id)),
+          d1 = strum.dims.left,
+          d2 = strum.dims.right,
+          y1 = __.dimensions[d1].yscale,
+          y2 = __.dimensions[d2].yscale,
+          point = [y1(d[d1]) - strum.minX, y2(d[d2]) - strum.minX];
+        return test(point);
+      }
+
+      if (ids.length === 0) { return brushed; }
+
+      return brushed.filter(function(d) {
+        switch(brush.predicate) {
+          case "AND":
+            return ids.every(function(id) { return crossesStrum(d, id); });
+          case "OR":
+            return ids.some(function(id) { return crossesStrum(d, id); });
+          default:
+            throw "Unknown brush predicate " + __.brushPredicate;
+        }
+      });
+    }
+
+    function removeStrum() {
+      var strum = strums[strums.active],
+        svg = pc.selection.select("svg").select("g#strums");
+
+      delete strums[strums.active];
+      strums.active = undefined;
+      svg.selectAll("line#strum-" + strum.dims.i).remove();
+      svg.selectAll("circle#strum-" + strum.dims.i).remove();
+    }
+
+    function onDragEnd() {
+      return function() {
+        var brushed = __.data,
+          strum = strums[strums.active];
+
+        // Okay, somewhat unexpected, but not totally unsurprising, a mousclick is
+        // considered a drag without move. So we have to deal with that case
+        if (strum && strum.p1[0] === strum.p2[0] && strum.p1[1] === strum.p2[1]) {
+          removeStrum(strums);
+        }
+
+        brushed = selected(strums);
+        strums.active = undefined;
+        __.brushed = brushed;
+        pc.renderBrushed();
+        events.brushend.call(pc, __.brushed);
+      };
+    }
+
+    function brushReset(strums) {
+      return function() {
+        var ids = Object.getOwnPropertyNames(strums).filter(function(d) {
+          return !isNaN(d);
+        });
+
+        ids.forEach(function(d) {
+          strums.active = d;
+          removeStrum(strums);
+        });
+        onDragEnd(strums)();
+      };
+    }
+
+    function install() {
+      var drag = d3.behavior.drag();
+
+      // Map of current strums. Strums are stored per segment of the PC. A segment,
+      // being the area between two axes. The left most area is indexed at 0.
+      strums.active = undefined;
+      // Returns the width of the PC segment where currently a strum is being
+      // placed. NOTE: even though they are evenly spaced in our current
+      // implementation, we keep for when non-even spaced segments are supported as
+      // well.
+      strums.width = function(id) {
+        var strum = strums[id];
+
+        if (strum === undefined) {
+          return undefined;
+        }
+
+        return strum.maxX - strum.minX;
+      };
+
+      pc.on("axesreorder.strums", function() {
+        var ids = Object.getOwnPropertyNames(strums).filter(function(d) {
+          return !isNaN(d);
+        });
+
+        // Checks if the first dimension is directly left of the second dimension.
+        function consecutive(first, second) {
+          var length = d3.keys(__.dimensions).length;
+          return d3.keys(__.dimensions).some(function(d, i) {
+            return (d === first)
+              ? i + i < length && __.dimensions[i + 1] === second
+              : false;
+          });
+        }
+
+        if (ids.length > 0) { // We have some strums, which might need to be removed.
+          ids.forEach(function(d) {
+            var dims = strums[d].dims;
+            strums.active = d;
+            // If the two dimensions of the current strum are not next to each other
+            // any more, than we'll need to remove the strum. Otherwise we keep it.
+            if (!consecutive(dims.left, dims.right)) {
+              removeStrum(strums);
+            }
+          });
+          onDragEnd(strums)();
+        }
+      });
+
+      // Add a new svg group in which we draw the strums.
+      pc.selection.select("svg").append("g")
+        .attr("id", "strums")
+        .attr("transform", "translate(" + __.margin.left + "," + __.margin.top + ")");
+
+      // Install the required brushReset function
+      pc.brushReset = brushReset(strums);
+
+      drag
+        .on("dragstart", onDragStart(strums))
+        .on("drag", onDrag(strums))
+        .on("dragend", onDragEnd(strums));
+
+      // NOTE: The styling needs to be done here and not in the css. This is because
+      //       for 1D brushing, the canvas layers should not listen to
+      //       pointer-events.
+      strumRect = pc.selection.select("svg").insert("rect", "g#strums")
+        .attr("id", "strum-events")
+        .attr("x", __.margin.left)
+        .attr("y", __.margin.top)
+        .attr("width", w())
+        .attr("height", h() + 2)
+        .style("opacity", 0)
+        .call(drag);
+    }
+
+    brush.modes["2D-strums"] = {
+      install: install,
+      uninstall: function() {
+        pc.selection.select("svg").select("g#strums").remove();
+        pc.selection.select("svg").select("rect#strum-events").remove();
+        pc.on("axesreorder.strums", undefined);
+        delete pc.brushReset;
+
+        strumRect = undefined;
+      },
+      selected: selected,
+      brushState: function () { return strums; }
+    };
+
+  }());
+
+// brush mode: 1D-Axes with multiple extents
+// requires d3.svg.multibrush
+
+  (function() {
+    if (typeof d3.svg.multibrush !== 'function') {
+      return;
+    }
+    var brushes = {};
+
+    function is_brushed(p) {
+      return !brushes[p].empty();
+    }
+
+    // data within extents
+    function selected() {
+      var actives = d3.keys(__.dimensions).filter(is_brushed),
+        extents = actives.map(function(p) { return brushes[p].extent(); });
+
+      // We don't want to return the full data set when there are no axes brushed.
+      // Actually, when there are no axes brushed, by definition, no items are
+      // selected. So, let's avoid the filtering and just return false.
+      //if (actives.length === 0) return false;
+
+      // Resolves broken examples for now. They expect to get the full dataset back from empty brushes
+      if (actives.length === 0) return __.data;
+
+      // test if within range
+      var within = {
+        "date": function(d,p,dimension,b) {
+          if (typeof __.dimensions[p].yscale.rangePoints === "function") { // if it is ordinal
+            return b[0] <= __.dimensions[p].yscale(d[p]) && __.dimensions[p].yscale(d[p]) <= b[1]
+          } else {
+            return b[0] <= d[p] && d[p] <= b[1]
+          }
+        },
+        "number": function(d,p,dimension,b) {
+          if (typeof __.dimensions[p].yscale.rangePoints === "function") { // if it is ordinal
+            return b[0] <= __.dimensions[p].yscale(d[p]) && __.dimensions[p].yscale(d[p]) <= b[1]
+          } else {
+            return b[0] <= d[p] && d[p] <= b[1]
+          }
+        },
+        "string": function(d,p,dimension,b) {
+          return b[0] <= __.dimensions[p].yscale(d[p]) && __.dimensions[p].yscale(d[p]) <= b[1]
+        }
+      };
+
+      return __.data
+        .filter(function(d) {
+          switch(brush.predicate) {
+            case "AND":
+              return actives.every(function(p, dimension) {
+                return extents[dimension].some(function(b) {
+                  return within[__.dimensions[p].type](d,p,dimension,b);
+                });
+              });
+            case "OR":
+              return actives.some(function(p, dimension) {
+                return extents[dimension].some(function(b) {
+                  return within[__.dimensions[p].type](d,p,dimension,b);
+                });
+              });
+            default:
+              throw "Unknown brush predicate " + __.brushPredicate;
+          }
+        });
+    };
+
+    function brushExtents() {
+      var extents = {};
+      d3.keys(__.dimensions).forEach(function(d) {
+        var brush = brushes[d];
+        if (brush !== undefined && !brush.empty()) {
+          var extent = brush.extent();
+          extents[d] = extent;
+        }
+      });
+      return extents;
+    }
+
+    function brushFor(axis) {
+      var brush = d3.svg.multibrush();
+
+      brush
+        .y(__.dimensions[axis].yscale)
+        .on("brushstart", function() {
+          if(d3.event.sourceEvent !== null) {
+            d3.event.sourceEvent.stopPropagation();
+          }
+        })
+        .on("brush", function() {
+          brushUpdated(selected());
+        })
+        .on("brushend", function() {
+          // d3.svg.multibrush clears extents just before calling 'brushend'
+          // so we have to update here again.
+          // This fixes issue #103 for now, but should be changed in d3.svg.multibrush
+          // to avoid unnecessary computation.
+          brushUpdated(selected());
+          events.brushend.call(pc, __.brushed);
+        })
+        .extentAdaption(function(selection) {
+          selection
+            .style("visibility", null)
+            .attr("x", -15)
+            .attr("width", 30);
+        })
+        .resizeAdaption(function(selection) {
+          selection
+            .selectAll("rect")
+            .attr("x", -15)
+            .attr("width", 30);
+        });
+
+      brushes[axis] = brush;
+      return brush;
+    }
+
+    function brushReset(dimension) {
+      __.brushed = false;
+      if (g) {
+        g.selectAll('.brush')
+          .each(function(d) {
+            d3.select(this).call(
+              brushes[d].clear()
+            );
+          });
+        pc.renderBrushed();
+      }
+      return this;
+    };
+
+    function install() {
+      if (!g) pc.createAxes();
+
+      // Add and store a brush for each axis.
+      g.append("svg:g")
+        .attr("class", "brush")
+        .each(function(d) {
+          d3.select(this).call(brushFor(d));
+        })
+        .selectAll("rect")
+        .style("visibility", null)
+        .attr("x", -15)
+        .attr("width", 30);
+
+      pc.brushExtents = brushExtents;
+      pc.brushReset = brushReset;
+      return pc;
+    }
+
+    brush.modes["1D-axes-multi"] = {
+      install: install,
+      uninstall: function() {
+        g.selectAll(".brush").remove();
+        brushes = {};
+        delete pc.brushExtents;
+        delete pc.brushReset;
+      },
+      selected: selected,
+      brushState: brushExtents
+    }
+  })();
+// brush mode: angular
+// code based on 2D.strums.js
+
+  (function() {
+    var arcs = {},
+      strumRect;
+
+    function drawStrum(arc, activePoint) {
+      var svg = pc.selection.select("svg").select("g#arcs"),
+        id = arc.dims.i,
+        points = [arc.p2, arc.p3],
+        line = svg.selectAll("line#arc-" + id).data([{p1:arc.p1,p2:arc.p2},{p1:arc.p1,p2:arc.p3}]),
+        circles = svg.selectAll("circle#arc-" + id).data(points),
+        drag = d3.behavior.drag(),
+        path = svg.selectAll("path#arc-" + id).data([arc]);
+
+      path.enter()
+        .append("path")
+        .attr("id", "arc-" + id)
+        .attr("class", "arc")
+        .style("fill", "orange")
+        .style("opacity", 0.5);
+
+      path
+        .attr("d", arc.arc)
+        .attr("transform", "translate(" + arc.p1[0] + "," + arc.p1[1] + ")");
+
+      line.enter()
+        .append("line")
+        .attr("id", "arc-" + id)
+        .attr("class", "arc");
+
+      line
+        .attr("x1", function(d) { return d.p1[0]; })
+        .attr("y1", function(d) { return d.p1[1]; })
+        .attr("x2", function(d) { return d.p2[0]; })
+        .attr("y2", function(d) { return d.p2[1]; })
+        .attr("stroke", "black")
+        .attr("stroke-width", 2);
+
+      drag
+        .on("drag", function(d, i) {
+          var ev = d3.event,
+            angle = 0;
+
+          i = i + 2;
+
+          arc["p" + i][0] = Math.min(Math.max(arc.minX + 1, ev.x), arc.maxX);
+          arc["p" + i][1] = Math.min(Math.max(arc.minY, ev.y), arc.maxY);
+
+          angle = i === 3 ? arcs.startAngle(id) : arcs.endAngle(id);
+
+          if ((arc.startAngle < Math.PI && arc.endAngle < Math.PI && angle < Math.PI) ||
+            (arc.startAngle >= Math.PI && arc.endAngle >= Math.PI && angle >= Math.PI)) {
+
+            if (i === 2) {
+              arc.endAngle = angle;
+              arc.arc.endAngle(angle);
+            } else if (i === 3) {
+              arc.startAngle = angle;
+              arc.arc.startAngle(angle);
+            }
+
+          }
+
+          drawStrum(arc, i - 2);
+        })
+        .on("dragend", onDragEnd());
+
+      circles.enter()
+        .append("circle")
+        .attr("id", "arc-" + id)
+        .attr("class", "arc");
+
+      circles
+        .attr("cx", function(d) { return d[0]; })
+        .attr("cy", function(d) { return d[1]; })
+        .attr("r", 5)
+        .style("opacity", function(d, i) {
+          return (activePoint !== undefined && i === activePoint) ? 0.8 : 0;
+        })
+        .on("mouseover", function() {
+          d3.select(this).style("opacity", 0.8);
+        })
+        .on("mouseout", function() {
+          d3.select(this).style("opacity", 0);
+        })
+        .call(drag);
+    }
+
+    function dimensionsForPoint(p) {
+      var dims = { i: -1, left: undefined, right: undefined };
+      d3.keys(__.dimensions).some(function(dim, i) {
+        if (xscale(dim) < p[0]) {
+          var next = d3.keys(__.dimensions)[pc.getOrderedDimensionKeys().indexOf(dim)+1];
+          dims.i = i;
+          dims.left = dim;
+          dims.right = next;
+          return false;
+        }
+        return true;
+      });
+
+      if (dims.left === undefined) {
+        // Event on the left side of the first axis.
+        dims.i = 0;
+        dims.left = pc.getOrderedDimensionKeys()[0];
+        dims.right = pc.getOrderedDimensionKeys()[1];
+      } else if (dims.right === undefined) {
+        // Event on the right side of the last axis
+        dims.i = d3.keys(__.dimensions).length - 1;
+        dims.right = dims.left;
+        dims.left = pc.getOrderedDimensionKeys()[d3.keys(__.dimensions).length - 2];
+      }
+
+      return dims;
+    }
+
+    function onDragStart() {
+      // First we need to determine between which two axes the arc was started.
+      // This will determine the freedom of movement, because a arc can
+      // logically only happen between two axes, so no movement outside these axes
+      // should be allowed.
+      return function() {
+        var p = d3.mouse(strumRect[0][0]),
+          dims,
+          arc;
+
+        p[0] = p[0] - __.margin.left;
+        p[1] = p[1] - __.margin.top;
+
+        dims = dimensionsForPoint(p),
+          arc = {
+            p1: p,
+            dims: dims,
+            minX: xscale(dims.left),
+            maxX: xscale(dims.right),
+            minY: 0,
+            maxY: h(),
+            startAngle: undefined,
+            endAngle: undefined,
+            arc: d3.svg.arc().innerRadius(0)
+          };
+
+        arcs[dims.i] = arc;
+        arcs.active = dims.i;
+
+        // Make sure that the point is within the bounds
+        arc.p1[0] = Math.min(Math.max(arc.minX, p[0]), arc.maxX);
+        arc.p2 = arc.p1.slice();
+        arc.p3 = arc.p1.slice();
+      };
+    }
+
+    function onDrag() {
+      return function() {
+        var ev = d3.event,
+          arc = arcs[arcs.active];
+
+        // Make sure that the point is within the bounds
+        arc.p2[0] = Math.min(Math.max(arc.minX + 1, ev.x - __.margin.left), arc.maxX);
+        arc.p2[1] = Math.min(Math.max(arc.minY, ev.y - __.margin.top), arc.maxY);
+        arc.p3 = arc.p2.slice();
+//      console.log(arcs.angle(arcs.active));
+//      console.log(signedAngle(arcs.unsignedAngle(arcs.active)));
+        drawStrum(arc, 1);
+      };
+    }
+
+    // some helper functions
+    function hypothenuse(a, b) {
+      return Math.sqrt(a*a + b*b);
+    }
+
+    var rad = (function() {
+      var c = Math.PI / 180;
+      return function(angle) {
+        return angle * c;
+      };
+    })();
+
+    var deg = (function() {
+      var c = 180 / Math.PI;
+      return function(angle) {
+        return angle * c;
+      };
+    })();
+
+    // [0, 2*PI] -> [-PI/2, PI/2]
+    var signedAngle = function(angle) {
+      var ret = angle;
+      if (angle > Math.PI) {
+        ret = angle - 1.5 * Math.PI;
+        ret = angle - 1.5 * Math.PI;
+      } else {
+        ret = angle - 0.5 * Math.PI;
+        ret = angle - 0.5 * Math.PI;
+      }
+      return -ret;
+    }
+
+    /**
+     * angles are stored in radians from in [0, 2*PI], where 0 in 12 o'clock.
+     * However, one can only select lines from 0 to PI, so we compute the
+     * 'signed' angle, where 0 is the horizontal line (3 o'clock), and +/- PI/2
+     * are 12 and 6 o'clock respectively.
+     */
+    function containmentTest(arc) {
+      var startAngle = signedAngle(arc.startAngle);
+      var endAngle = signedAngle(arc.endAngle);
+
+      if (startAngle > endAngle) {
+        var tmp = startAngle;
+        startAngle = endAngle;
+        endAngle = tmp;
+      }
+
+      // test if segment angle is contained in angle interval
+      return function(a) {
+
+        if (a >= startAngle && a <= endAngle) {
+          return true;
+        }
+
+        return false;
+      };
+    }
+
+    function selected() {
+      var ids = Object.getOwnPropertyNames(arcs),
+        brushed = __.data;
+
+      // Get the ids of the currently active arcs.
+      ids = ids.filter(function(d) {
+        return !isNaN(d);
+      });
+
+      function crossesStrum(d, id) {
+        var arc = arcs[id],
+          test = containmentTest(arc),
+          d1 = arc.dims.left,
+          d2 = arc.dims.right,
+          y1 = __.dimensions[d1].yscale,
+          y2 = __.dimensions[d2].yscale,
+          a = arcs.width(id),
+          b = y1(d[d1]) - y2(d[d2]),
+          c = hypothenuse(a, b),
+          angle = Math.asin(b/c);	// rad in [-PI/2, PI/2]
+        return test(angle);
+      }
+
+      if (ids.length === 0) { return brushed; }
+
+      return brushed.filter(function(d) {
+        switch(brush.predicate) {
+          case "AND":
+            return ids.every(function(id) { return crossesStrum(d, id); });
+          case "OR":
+            return ids.some(function(id) { return crossesStrum(d, id); });
+          default:
+            throw "Unknown brush predicate " + __.brushPredicate;
+        }
+      });
+    }
+
+    function removeStrum() {
+      var arc = arcs[arcs.active],
+        svg = pc.selection.select("svg").select("g#arcs");
+
+      delete arcs[arcs.active];
+      arcs.active = undefined;
+      svg.selectAll("line#arc-" + arc.dims.i).remove();
+      svg.selectAll("circle#arc-" + arc.dims.i).remove();
+      svg.selectAll("path#arc-" + arc.dims.i).remove();
+    }
+
+    function onDragEnd() {
+      return function() {
+        var brushed = __.data,
+          arc = arcs[arcs.active];
+
+        // Okay, somewhat unexpected, but not totally unsurprising, a mousclick is
+        // considered a drag without move. So we have to deal with that case
+        if (arc && arc.p1[0] === arc.p2[0] && arc.p1[1] === arc.p2[1]) {
+          removeStrum(arcs);
+        }
+
+        if (arc) {
+          var angle = arcs.startAngle(arcs.active);
+
+          arc.startAngle = angle;
+          arc.endAngle = angle;
+          arc.arc
+            .outerRadius(arcs.length(arcs.active))
+            .startAngle(angle)
+            .endAngle(angle);
+        }
+
+
+        brushed = selected(arcs);
+        arcs.active = undefined;
+        __.brushed = brushed;
+        pc.renderBrushed();
+        events.brushend.call(pc, __.brushed);
+      };
+    }
+
+    function brushReset(arcs) {
+      return function() {
+        var ids = Object.getOwnPropertyNames(arcs).filter(function(d) {
+          return !isNaN(d);
+        });
+
+        ids.forEach(function(d) {
+          arcs.active = d;
+          removeStrum(arcs);
+        });
+        onDragEnd(arcs)();
+      };
+    }
+
+    function install() {
+      var drag = d3.behavior.drag();
+
+      // Map of current arcs. arcs are stored per segment of the PC. A segment,
+      // being the area between two axes. The left most area is indexed at 0.
+      arcs.active = undefined;
+      // Returns the width of the PC segment where currently a arc is being
+      // placed. NOTE: even though they are evenly spaced in our current
+      // implementation, we keep for when non-even spaced segments are supported as
+      // well.
+      arcs.width = function(id) {
+        var arc = arcs[id];
+
+        if (arc === undefined) {
+          return undefined;
+        }
+
+        return arc.maxX - arc.minX;
+      };
+
+      // returns angles in [-PI/2, PI/2]
+      angle = function(p1, p2) {
+        var a = p1[0] - p2[0],
+          b = p1[1] - p2[1],
+          c = hypothenuse(a, b);
+
+        return Math.asin(b/c);
+      }
+
+      // returns angles in [0, 2 * PI]
+      arcs.endAngle = function(id) {
+        var arc = arcs[id];
+        if (arc === undefined) {
+          return undefined;
+        }
+        var sAngle = angle(arc.p1, arc.p2),
+          uAngle = -sAngle + Math.PI / 2;
+
+        if (arc.p1[0] > arc.p2[0]) {
+          uAngle = 2 * Math.PI - uAngle;
+        }
+
+        return uAngle;
+      }
+
+      arcs.startAngle = function(id) {
+        var arc = arcs[id];
+        if (arc === undefined) {
+          return undefined;
+        }
+
+        var sAngle = angle(arc.p1, arc.p3),
+          uAngle = -sAngle + Math.PI / 2;
+
+        if (arc.p1[0] > arc.p3[0]) {
+          uAngle = 2 * Math.PI - uAngle;
+        }
+
+        return uAngle;
+      }
+
+      arcs.length = function(id) {
+        var arc = arcs[id];
+
+        if (arc === undefined) {
+          return undefined;
+        }
+
+        var a = arc.p1[0] - arc.p2[0],
+          b = arc.p1[1] - arc.p2[1],
+          c = hypothenuse(a, b);
+
+        return(c);
+      }
+
+      pc.on("axesreorder.arcs", function() {
+        var ids = Object.getOwnPropertyNames(arcs).filter(function(d) {
+          return !isNaN(d);
+        });
+
+        // Checks if the first dimension is directly left of the second dimension.
+        function consecutive(first, second) {
+          var length = d3.keys(__.dimensions).length;
+          return d3.keys(__.dimensions).some(function(d, i) {
+            return (d === first)
+              ? i + i < length && __.dimensions[i + 1] === second
+              : false;
+          });
+        }
+
+        if (ids.length > 0) { // We have some arcs, which might need to be removed.
+          ids.forEach(function(d) {
+            var dims = arcs[d].dims;
+            arcs.active = d;
+            // If the two dimensions of the current arc are not next to each other
+            // any more, than we'll need to remove the arc. Otherwise we keep it.
+            if (!consecutive(dims.left, dims.right)) {
+              removeStrum(arcs);
+            }
+          });
+          onDragEnd(arcs)();
+        }
+      });
+
+      // Add a new svg group in which we draw the arcs.
+      pc.selection.select("svg").append("g")
+        .attr("id", "arcs")
+        .attr("transform", "translate(" + __.margin.left + "," + __.margin.top + ")");
+
+      // Install the required brushReset function
+      pc.brushReset = brushReset(arcs);
+
+      drag
+        .on("dragstart", onDragStart(arcs))
+        .on("drag", onDrag(arcs))
+        .on("dragend", onDragEnd(arcs));
+
+      // NOTE: The styling needs to be done here and not in the css. This is because
+      //       for 1D brushing, the canvas layers should not listen to
+      //       pointer-events.
+      strumRect = pc.selection.select("svg").insert("rect", "g#arcs")
+        .attr("id", "arc-events")
+        .attr("x", __.margin.left)
+        .attr("y", __.margin.top)
+        .attr("width", w())
+        .attr("height", h() + 2)
+        .style("opacity", 0)
+        .call(drag);
+    }
+
+    brush.modes["angular"] = {
+      install: install,
+      uninstall: function() {
+        pc.selection.select("svg").select("g#arcs").remove();
+        pc.selection.select("svg").select("rect#arc-events").remove();
+        pc.on("axesreorder.arcs", undefined);
+        delete pc.brushReset;
+
+        strumRect = undefined;
+      },
+      selected: selected,
+      brushState: function () { return arcs; }
+    };
+
+  }());
+  pc.interactive = function() {
+    flags.interactive = true;
+    return this;
+  };
+
+// expose a few objects
+  pc.xscale = xscale;
+  pc.ctx = ctx;
+  pc.canvas = canvas;
+  pc.g = function() { return g; };
+
+// rescale for height, width and margins
+// TODO currently assumes chart is brushable, and destroys old brushes
+  pc.resize = function() {
+    // selection size
+    pc.selection.select("svg")
+      .attr("width", __.width)
+      .attr("height", __.height)
+    pc.svg.attr("transform", "translate(" + __.margin.left + "," + __.margin.top + ")");
+
+    // FIXME: the current brush state should pass through
+    if (flags.brushable) pc.brushReset();
+
+    // scales
+    pc.autoscale();
+
+    // axes, destroys old brushes.
+    if (g) pc.createAxes();
+    if (flags.brushable) pc.brushable();
+    if (flags.reorderable) pc.reorderable();
+
+    events.resize.call(this, {width: __.width, height: __.height, margin: __.margin});
+    return this;
+  };
+
+// highlight an array of data
+  pc.highlight = function(data) {
+    if (arguments.length === 0) {
+      return __.highlighted;
+    }
+
+    __.highlighted = data;
+    pc.clear("highlight");
+    d3.selectAll([canvas.foreground, canvas.brushed]).classed("faded", true);
+    data.forEach(path_highlight);
+    events.highlight.call(this, data);
+    return this;
+  };
+
+// clear highlighting
+  pc.unhighlight = function() {
+    __.highlighted = [];
+    pc.clear("highlight");
+    d3.selectAll([canvas.foreground, canvas.brushed]).classed("faded", false);
+    return this;
+  };
+
+// calculate 2d intersection of line a->b with line c->d
+// points are objects with x and y properties
+  pc.intersection =  function(a, b, c, d) {
+    return {
+      x: ((a.x * b.y - a.y * b.x) * (c.x - d.x) - (a.x - b.x) * (c.x * d.y - c.y * d.x)) / ((a.x - b.x) * (c.y - d.y) - (a.y - b.y) * (c.x - d.x)),
+      y: ((a.x * b.y - a.y * b.x) * (c.y - d.y) - (a.y - b.y) * (c.x * d.y - c.y * d.x)) / ((a.x - b.x) * (c.y - d.y) - (a.y - b.y) * (c.x - d.x))
+    };
+  };
+
+  function position(d) {
+    if (xscale.range().length === 0) {
+      xscale.rangePoints([0, w()], 1);
+    }
+    var v = dragging[d];
+    return v == null ? xscale(d) : v;
+  }
+  pc.version = "0.7.0";
+  // this descriptive text should live with other introspective methods
+  pc.toString = function() { return "Parallel Coordinates: " + d3.keys(__.dimensions).length + " dimensions (" + d3.keys(__.data[0]).length + " total) , " + __.data.length + " rows"; };
+
+  return pc;
+};
+
+module.exports = parcoords;
+},{}],2:[function(require,module,exports){
+d3.selection.prototype.first = function() {
+  return d3.select(this[0][0]);
+};
+
+d3.selection.prototype.last = function() {
+  var last = this.size() - 1;
+  return d3.select(this[0][last]);
+};
+},{}],3:[function(require,module,exports){
+d3.svg.multibrush = function() {
+
+  // From d3/scale/scale.js
+  function d3_scaleExtent(domain) {
+    var start = domain[0], stop = domain[domain.length - 1];
+    return start < stop ? [ start, stop ] : [ stop, start ];
+  }
+  function d3_scaleRange(scale) {
+    return scale.rangeExtent ? scale.rangeExtent() : d3_scaleExtent(scale.range());
+  }
+
+  // From d3
+  var d3_document = this.document;
+  function d3_documentElement(node) {
+    return node && (node.ownerDocument || node.document || node).documentElement;
+  }
+  function d3_window(node) {
+    return node && (node.ownerDocument && node.ownerDocument.defaultView || node.document && node || node.defaultView);
+  }
+  if (d3_document) {
+    try {
+      d3_array(d3_document.documentElement.childNodes)[0].nodeType;
+    } catch (e) {
+      d3_array = function(list) {
+        var i = list.length, array = new Array(i);
+        while (i--) array[i] = list[i];
+        return array;
+      };
+    }
+  }
+
+  function d3_eventPreventDefault() {
+    d3.event.preventDefault();
+  }
+
+  function d3_vendorSymbol(object, name) {
+    if (name in object) return name;
+    name = name.charAt(0).toUpperCase() + name.slice(1);
+    for (var i = 0, n = d3_vendorPrefixes.length; i < n; ++i) {
+      var prefixName = d3_vendorPrefixes[i] + name;
+      if (prefixName in object) return prefixName;
+    }
+  }
+  var d3_vendorPrefixes = [ "webkit", "ms", "moz", "Moz", "o", "O" ];
+
+  var d3_event_dragSelect = "onselectstart" in document ? null : d3_vendorSymbol(document.documentElement.style, "userSelect"), d3_event_dragId = 0;
+  function d3_event_dragSuppress(node) {
+    var name = ".dragsuppress-" + ++d3_event_dragId, click = "click" + name, w = d3.select(d3_window(node)).on("touchmove" + name, d3_eventPreventDefault).on("dragstart" + name, d3_eventPreventDefault).on("selectstart" + name, d3_eventPreventDefault);
+    if (d3_event_dragSelect == null) {
+      d3_event_dragSelect = "onselectstart" in node ? false : d3_vendorSymbol(node.style, "userSelect");
+    }
+    if (d3_event_dragSelect) {
+      var style = d3_documentElement(node).style, select = style[d3_event_dragSelect];
+      style[d3_event_dragSelect] = "none";
+    }
+    return function(suppressClick) {
+      w.on(name, null);
+      if (d3_event_dragSelect) style[d3_event_dragSelect] = select;
+      if (suppressClick) {
+        var off = function() {
+          w.on(click, null);
+        };
+        w.on(click, function() {
+          d3_eventPreventDefault();
+          off();
+        }, true);
+        setTimeout(off, 0);
+      }
+    };
+  }
+
+  var event = d3.dispatch("brushstart", "brush", "brushend"),
+    brushElement,
+    x = null, // x-scale, optional
+    y = null, // y-scale, optional
+    xExtent = [[0, 0]], // [x0, x1] in integer pixels
+    yExtent = [[0, 0]], // [y0, y1] in integer pixels
+    xExtentDomain = [], // x-extent in data space
+    yExtentDomain = [], // y-extent in data space
+    xClamp = true, // whether to clamp the x-extent to the range
+    yClamp = true, // whether to clamp the y-extent to the range
+    resizes = d3_svg_brushResizes[0],
+    resizeAdaption = function () {}, // Function to 'call' on new resize selection
+    extentAdaption = function () {}; // Function to 'call' on new extent selection
+
+  event.of = function(thiz, argumentz) {
+    return function(e1) {
+      try {
+        var e0 =
+          e1.sourceEvent = d3.event;
+        e1.target = brush;
+        d3.event = e1;
+        event[e1.type].apply(thiz, argumentz);
+      } finally {
+        d3.event = e0;
+      }
+    };
+  };
+
+  function brush(g) {
+    g.each(function() {
+
+      // Prepare the brush container for events.
+      var g = d3.select(this)
+        .style("pointer-events", "all")
+        .style("-webkit-tap-highlight-color", "rgba(0,0,0,0)")
+        .on("mousedown.brush", brushstart)
+        .on("touchstart.brush", brushstart);
+
+      brushElement = g;
+
+      // An invisible, mouseable area for starting a new brush.
+      var background = g.selectAll(".background")
+        .data([0]);
+
+      background.enter().append("rect")
+        .attr("class", "background")
+        .style("visibility", "hidden")
+        .style("cursor", "crosshair");
+
+      drawExtents(g);
+
+      // When called on a transition, use a transition to update.
+      var gUpdate = d3.transition(g),
+        backgroundUpdate = d3.transition(background),
+        range;
+
+      // Initialize the background to fill the defined range.
+      // If the range isn't defined, you can post-process.
+      if (x) {
+        range = d3_scaleRange(x);
+        backgroundUpdate.attr("x", range[0]).attr("width", range[1] - range[0]);
+        redrawX(gUpdate);
+      }
+      if (y) {
+        range = d3_scaleRange(y);
+        backgroundUpdate.attr("y", range[0]).attr("height", range[1] - range[0]);
+        redrawY(gUpdate);
+      }
+      redraw(gUpdate);
+    });
+  }
+
+  function drawExtents(g) {
+    var ex = xExtent.length > yExtent.length ? xExtent : yExtent,
+      i = ex.length
+    extentArr = ex.map(function(d,i) { return i; }),
+      extentResizes = d3.merge(ex.map(function(d,i) { return resizes.map(function(r) { return [r, i]; }); }));
+
+    if(!g) g = brushElement;
+
+    // The visible brush extent; style this as you like!
+    var extent = g.selectAll(".extent")
+      .data(extentArr, function (d) { return d; });
+
+    extent.exit().remove();
+
+    extent.enter().append("rect")
+      .attr("class", "extent")
+      .style("cursor", "move")
+      .call(extentAdaption);
+
+    // More invisible rects for resizing the extent.
+    var resize = g.selectAll(".resize")
+      .data(extentResizes, function (d) { return d[0] + d[1]; });
+
+    // Remove any superfluous resizers.
+    resize.exit().remove();
+
+    var newResize = resize.enter().append("g")
+      .attr("class", function(d) { return "resize " + d[0]; })
+      .style("cursor", function(d) { return d3_svg_brushCursor[d[0]]; });
+
+    newResize.append("rect")
+      .attr("x", function(d) { return /[ew]$/.test(d[0]) ? -3 : null; })
+      .attr("y", function(d) { return /^[ns]/.test(d[0]) ? -3 : null; })
+      .attr("width", 6)
+      .attr("height", 6)
+      .style("visibility", "hidden");
+
+    newResize.call(resizeAdaption);
+
+    // Show or hide the resizers.
+    resize.style("display", function (d) { return brush.empty(d[1]) ? "none" : null; });
+  }
+
+  brush.event = function(g) {
+    g.each(function() {
+      var event_ = event.of(this, arguments),
+        extent1 = {x: xExtent, y: yExtent, i: xExtentDomain, j: yExtentDomain},
+        extent0 = this.__chart__ || extent1;
+      this.__chart__ = extent1;
+      if (d3_transitionInheritId) {
+        d3.select(this).transition()
+          .each("start.brush", function() {
+            xExtentDomain = extent0.i; // pre-transition state
+            yExtentDomain = extent0.j;
+            xExtent = extent0.x;
+            yExtent = extent0.y;
+            event_({type: "brushstart"});
+          })
+          .tween("brush:brush", function() {
+            // TODO: transitions for all extents
+            var xi = d3_interpolateArray(xExtent[0], extent1.x[0]),
+              yi = d3_interpolateArray(yExtent[0], extent1.y[0]);
+            xExtentDomain[0] = yExtentDomain[0] = null; // transition state
+            return function(t) {
+              xExtent[0] = extent1.x[0] = xi(t);
+              yExtent[0] = extent1.y[0] = yi(t);
+              event_({type: "brush", mode: "resize"});
+            };
+          })
+          .each("end.brush", function() {
+            xExtentDomain = extent1.i; // post-transition state
+            yExtentDomain = extent1.j;
+            event_({type: "brush", mode: "resize"});
+            event_({type: "brushend"});
+          });
+      } else {
+        event_({type: "brushstart"});
+        event_({type: "brush", mode: "resize"});
+        event_({type: "brushend"});
+      }
+    });
+  };
+
+  function redraw(g) {
+    g.selectAll(".resize").attr("transform", function(d) {
+      return "translate(" + xExtent[d[1]][+/e$/.test(d[0])] + "," + yExtent[d[1]][+/^s/.test(d[0])] + ")";
+    });
+  }
+
+  function redrawX(g) {
+    g.selectAll(".extent").attr("x", function (d) { return xExtent[d][0]; });
+    g.selectAll(".extent").attr("width", function(d) { return xExtent[d][1] - xExtent[d][0]; });
+  }
+
+  function redrawY(g) {
+    g.selectAll(".extent").attr("y", function (d) { return yExtent[d][0]; });
+    g.selectAll(".extent").attr("height", function (d) { return yExtent[d][1] - yExtent[d][0]; });
+  }
+
+  function brushstart() {
+    var target = this,
+      eventTarget = d3.select(d3.event.target),
+      event_ = event.of(target, arguments),
+      g = d3.select(target),
+      resizing = eventTarget.datum()[0],
+      resizingX = !/^(n|s)$/.test(resizing) && x,
+      resizingY = !/^(e|w)$/.test(resizing) && y,
+      dragging = eventTarget.classed("extent"),
+      dragRestore = d3_event_dragSuppress(target),
+      center,
+      origin = d3.mouse(target),
+      offset,
+      i;
+
+    var w = d3.select(window)
+      .on("keydown.brush", keydown)
+      .on("keyup.brush", keyup);
+
+    if (d3.event.changedTouches) {
+      w.on("touchmove.brush", brushmove).on("touchend.brush", brushend);
+    } else {
+      w.on("mousemove.brush", brushmove).on("mouseup.brush", brushend);
+    }
+
+    // Interrupt the transition, if any.
+    g.interrupt().selectAll("*").interrupt();
+
+    // If the extent was clicked on, drag rather than brush;
+    // store the point between the mouse and extent origin instead.
+    if (dragging) {
+      i = eventTarget.datum();
+      origin[0] = xExtent[i][0] - origin[0];
+      origin[1] = yExtent[i][0] - origin[1];
+    }
+
+    // If a resizer was clicked on, record which side is to be resized.
+    // Also, set the origin to the opposite side.
+    else if (resizing) {
+      var ex = +/w$/.test(resizing),
+        ey = +/^n/.test(resizing);
+
+      i = eventTarget.datum()[1];
+      offset = [xExtent[i][1 - ex] - origin[0], yExtent[i][1 - ey] - origin[1]];
+      origin[0] = xExtent[i][ex];
+      origin[1] = yExtent[i][ey];
+    }
+
+    else {
+      i = xExtent.length - 1; // Figure out the count of the new extent.
+      xExtent.push([0,0]);
+      yExtent.push([0,0]);
+
+      // If the ALT key is down when starting a brush, the center is at the mouse.
+      if (d3.event.altKey) center = origin.slice();
+    }
+
+    // Propagate the active cursor to the body for the drag duration.
+    g.style("pointer-events", "none");
+    d3.select("body").style("cursor", eventTarget.style("cursor"));
+
+    // Show resizers as long as we're not dragging or resizing.
+    if(!dragging && !resizing) g.selectAll(".resize").style("display", null)
+
+    // Notify listeners.
+    event_({type: "brushstart"});
+    brushmove();
+
+    function keydown() {
+      if (d3.event.keyCode == 32) {
+        if (!dragging) {
+          center = null;
+          origin[0] -= xExtent[i][1];
+          origin[1] -= yExtent[i][1];
+          dragging = 2;
+        }
+        d3.event.preventDefault();
+      }
+    }
+
+    function keyup() {
+      if (d3.event.keyCode == 32 && dragging == 2) {
+        origin[0] += xExtent[i][1];
+        origin[1] += yExtent[i][1];
+        dragging = 0;
+        d3.event.preventDefault();
+      }
+    }
+
+    function brushmove() {
+      var point = d3.mouse(target),
+        moved = false;
+
+      // Preserve the offset for thick resizers.
+      if (offset) {
+        point[0] += offset[0];
+        point[1] += offset[1];
+      }
+
+      if (!dragging) {
+
+        // If needed, determine the center from the current extent.
+        if (d3.event.altKey) {
+          if (!center) center = [(xExtent[i][0] + xExtent[i][1]) / 2, (yExtent[i][0] + yExtent[i][1]) / 2];
+
+          // Update the origin, for when the ALT key is released.
+          origin[0] = xExtent[i][+(point[0] < center[0])];
+          origin[1] = yExtent[i][+(point[1] < center[1])];
+        }
+
+        // When the ALT key is released, we clear the center.
+        else center = null;
+      }
+
+      // Update the brush extent for each dimension.
+      if (resizingX && move1(point, x, 0)) {
+        redrawX(g, i);
+        moved = true;
+      }
+      if (resizingY && move1(point, y, 1)) {
+        redrawY(g, i);
+        moved = true;
+      }
+
+      // Final redraw and notify listeners.
+      if (moved) {
+        redraw(g);
+        event_({type: "brush", mode: dragging ? "move" : "resize"});
+      }
+    }
+
+    function move1(point, scale, j) {
+      var range = d3_scaleRange(scale),
+        r0 = range[0],
+        r1 = range[1],
+        position = origin[j],
+        extent = j ? yExtent[i] : xExtent[i],
+        size = extent[1] - extent[0],
+        min,
+        max;
+
+      // When dragging, reduce the range by the extent size and position.
+      if (dragging) {
+        r0 -= position;
+        r1 -= size + position;
+      }
+
+      // Clamp the point (unless clamp set to false) so that the extent fits within the range extent.
+      min = (j ? yClamp : xClamp) ? Math.max(r0, Math.min(r1, point[j])) : point[j];
+
+      // Compute the new extent bounds.
+      if (dragging) {
+        max = (min += position) + size;
+      } else {
+
+        // If the ALT key is pressed, then preserve the center of the extent.
+        if (center) position = Math.max(r0, Math.min(r1, 2 * center[j] - min));
+
+        // Compute the min and max of the position and point.
+        if (position < min) {
+          max = min;
+          min = position;
+        } else {
+          max = position;
+        }
+      }
+
+      // Update the stored bounds.
+      if (extent[0] != min || extent[1] != max) {
+        if (j) yExtentDomain[i] = null;
+        else xExtentDomain[i] = null;
+        extent[0] = min;
+        extent[1] = max;
+        return true;
+      }
+    }
+
+    function brushend() {
+      brushmove();
+
+      // If the current extent is empty, clear everything.
+      if(x && xExtent[i][0] == xExtent[i][1] ||
+        y && yExtent[i][0] == yExtent[i][1]) {
+        brush.clear();
+      }
+
+      // reset the cursor styles
+      g.style("pointer-events", "all").selectAll(".resize").style("display", function(d) { return brush.empty(d[1]) ? "none" : null; });
+      d3.select("body").style("cursor", null);
+
+      w .on("mousemove.brush", null)
+        .on("mouseup.brush", null)
+        .on("touchmove.brush", null)
+        .on("touchend.brush", null)
+        .on("keydown.brush", null)
+        .on("keyup.brush", null);
+
+      drawExtents();
+
+      dragRestore();
+      event_({type: "brushend"});
+    }
+  }
+
+  brush.x = function(z) {
+    if (!arguments.length) return x;
+    x = z;
+    resizes = d3_svg_brushResizes[!x << 1 | !y]; // fore!
+    return brush;
+  };
+
+  brush.y = function(z) {
+    if (!arguments.length) return y;
+    y = z;
+    resizes = d3_svg_brushResizes[!x << 1 | !y]; // fore!
+    return brush;
+  };
+
+  brush.resizeAdaption = function(z) {
+    if (!arguments.length) return resizeAdaption;
+    resizeAdaption = z;
+    return brush;
+  }
+
+  brush.extentAdaption = function(z) {
+    if (!arguments.length) return extentAdaption;
+    extentAdaption = z;
+    return brush;
+  }
+
+  brush.clamp = function(z) {
+    if (!arguments.length) return x && y ? [xClamp, yClamp] : x ? xClamp : y ? yClamp : null;
+    if (x && y) xClamp = !!z[0], yClamp = !!z[1];
+    else if (x) xClamp = !!z;
+    else if (y) yClamp = !!z;
+    return brush;
+  };
+
+  brush.extent = function(z) {
+    var x0, x1, y0, y1, t;
+    var xOutput, yOutput, xyOutput = [];
+
+    // Invert the pixel extent to data-space.
+    if (!arguments.length) {
+      if (x) {
+        if (xExtentDomain[0]) {
+          xOutput = xExtentDomain;
+        } else {
+          xOutput = xExtent.map(function (d) {
+            if (x.invert) return [ x.invert(d[0]), x.invert(d[1]) ];
+            return d;
+          }).map(function (d) {
+            if (d[1] < d[0]) return [ d[1], d[0] ];
+            return d;
+          }).filter(function (d) { return d[1] - d[0] != 0; });
+        }
+      }
+      if (y) {
+        if (yExtentDomain[0]) {
+          yOutput = yExtentDomain;
+        } else {
+          yOutput = yExtent.map(function (d) {
+            if(y.invert) return [ y.invert(d[0]), y.invert(d[1]) ];
+            return d;
+          }).map(function (d) {
+            if (d[1] < d[0]) return [ d[1], d[0] ];
+            return d;
+          }).filter(function (d) { return d[1] - d[0] != 0; });
+        }
+      }
+      if(x && y) {
+        xOutput.forEach(function (d, i) {
+          xyOutput.push([[d[0], yOutput[i][0]], [d[1], yOutput[i][1]]]);
+        });
+      }
+      return x && y ? xyOutput : x ? xOutput : y && yOutput;
+    }
+
+    // Scale the data-space extent to pixels.
+    if (x) {
+      xOutput = z;
+      if (y) xOutput = xOutput.map(function (d) {
+        return [d[0][0], d[1][0]];
+      });
+      xExtentDomain = xOutput;
+      xOutput = xOutput.map(function (d) {
+        if (x.invert) return [x(d[0]), x(d[1])];
+        return d;
+      }).map(function (d) {
+        if(d[1] < d[0]) return [d[1], d[0]];
+        return d;
+      });
+      xExtent = xOutput;
+      if(!y) yExtent = xOutput.map(function() { return [0,0]; });
+    }
+    if (y) {
+      yOutput = z;
+      if (x) yOutput = yOutput.map(function (d) {
+        return [d[0][1], d[1][1]];
+      });
+      yExtentDomain = yOutput;
+      yOutput = yOutput.map(function (d) {
+        if (y.invert) return [y(d[0]), y(d[1])];
+        return d;
+      }).map(function (d) {
+        if(d[1] < d[0]) return [d[1], d[0]];
+        return d;
+      });
+      yExtent = yOutput;
+      if(!x) xExtent = yOutput.map(function () { return [0,0]; });
+    }
+
+    // Handle the case where the extents are set to empty arrays.
+    if(xExtent.length === 0) xExtent = [[0,0]];
+    if(yExtent.length === 0) yExtent = [[0,0]];
+
+    return brush;
+  };
+
+  brush.clear = function() {
+    xExtent = [[0, 0]], yExtent = [[0, 0]];
+    xExtentDomain = yExtentDomain = [];
+    drawExtents();
+    if(x) redrawX(brushElement);
+    if(y) redrawY(brushElement);
+    return brush;
+  };
+
+  brush.empty = function(i) {
+    if (this.extent().length === 0) {
+      return true;
+    }
+    if(xExtent.length == 1 && yExtent.length == 1) i = 0;
+    if(i !== undefined) {
+      return !!x && xExtent[i][0] == xExtent[i][1]
+        || !!y && yExtent[i][0] == yExtent[i][1];
+    } else {
+      return false;
+    }
+  };
+
+  return d3.rebind(brush, event, "on");
+};
+
+var d3_svg_brushCursor = {
+  n: "ns-resize",
+  e: "ew-resize",
+  s: "ns-resize",
+  w: "ew-resize",
+  nw: "nwse-resize",
+  ne: "nesw-resize",
+  se: "nwse-resize",
+  sw: "nesw-resize"
+};
+
+var d3_svg_brushResizes = [
+  ["n", "e", "s", "w", "nw", "ne", "se", "sw"],
+  ["e", "w"],
+  ["n", "s"],
+  []
+];
+},{}],4:[function(require,module,exports){
 /**
  * pubsub.js
  *
@@ -169,223 +3141,227 @@
     context.PubSub = init();
   }
 }(this));
-},{}],2:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
+"use strict";
+
 /**
  *
  * This module provides routines for dealing with arrays.
  *
- * @module dex/array
+ * @module dex:array
  * @name array
  * @memberOf dex
  *
  */
 
-var array = {};
-module.exports = array;
+module.exports = function array(dex) {
 
-/**
- *
- * Take a slice of an array without modifying the original array.
- *
- * dex.array.slice(array) - Return a copy of the array.
- * dex.array.slice(array, rowRange) - Copy the array, then return a slice
- * within the specified range.
- * dex.array.slice(array, rowRange, maxRows) - Copy the array, then return a slice
- * within the specified range up to, but not exceeding, maxRows rows.
- *
- * @param (array) array - The array to slice.
- * @param (array|number) rowRange - If supplied an array, the range defined by the of rows to slice.
- * @param {number} maxRows - The maximum number of rows to return.
- *
- * @example {@lang javascript}
- * var myArray = [ 1, 2, 3, 4, 5 ];
- *
- * // Returns: [ 3, 4, 5]
- * slice(myArray, 2);
- *
- * // Returns: [ 1, 3, 5 ]
- * slice(myArray, [0, 2, 4]);
- *
- * // I am not sure why you would do this, but in the interest of supporting
- * // the Principle of Least Surprise, this returns the array unchanged.
- * // Returns: [ 1, 2, 3, 4, 5 ]
- * slice(myArray)
- *
- */
-module.exports.slice = function (array, rowRange, maxRows) {
-    var arraySlice = [];
-    var range;
-    var i;
+    return {
+        /**
+         *
+         * Take a slice of an array without modifying the original array.
+         *
+         * dex.array.slice(array) - Return a copy of the array.
+         * dex.array.slice(array, rowRange) - Copy the array, then return a slice
+         * within the specified range.
+         * dex.array.slice(array, rowRange, maxRows) - Copy the array, then return a slice
+         * within the specified range up to, but not exceeding, maxRows rows.
+         *
+         * @param (array) array - The array to slice.
+         * @param (array|number) rowRange - If supplied an array, the range defined by the of rows to slice.
+         * @param {number} maxRows - The maximum number of rows to return.
+         *
+         * @example {@lang javascript}
+         * var myArray = [ 1, 2, 3, 4, 5 ];
+         *
+         * // Returns: [ 3, 4, 5]
+         * slice(myArray, 2);
+         *
+         * // Returns: [ 1, 3, 5 ]
+         * slice(myArray, [0, 2, 4]);
+         *
+         * // I am not sure why you would do this, but in the interest of supporting
+         * // the Principle of Least Surprise, this returns the array unchanged.
+         * // Returns: [ 1, 2, 3, 4, 5 ]
+         * slice(myArray)
+         *
+         */
+        'slice': function (array, rowRange, maxRows) {
+            var arraySlice = [];
+            var range;
+            var i;
 
-    var arrayCopy = dex.array.copy(array);
+            var arrayCopy = dex.array.copy(array);
 
-    // Numeric.
-    // Array.
-    // Object.  Numeric with start and end.
-    if (arguments.length < 2) {
-        return arrayCopy;
-    }
-    else if (arguments.length == 2) {
-        if (Array.isArray(rowRange)) {
-            range = rowRange;
-        }
-        else {
-            range = dex.range(rowRange, arrayCopy.length - rowRange);
-        }
-    }
-    else if (arguments.length > 2) {
-        if (Array.isArray(rowRange)) {
-            range = rowRange;
-        }
-        else {
-            range = dex.range(rowRange, maxRows);
-        }
-    }
+            // Numeric.
+            // Array.
+            // Object.  Numeric with start and end.
+            if (arguments.length === 2) {
+                if (Array.isArray(rowRange)) {
+                    range = rowRange;
+                }
+                else {
+                    range = dex.range(rowRange, arrayCopy.length - rowRange);
+                }
+            }
+            else if (arguments.length < 2) {
+                return arrayCopy;
+            }
+            else {
+                if (Array.isArray(rowRange)) {
+                    range = rowRange;
+                }
+                else {
+                    range = dex.range(rowRange, maxRows);
+                }
+            }
 
-    //dex.console.log("BEFORE: array.slice(range=" + range + "): arraySlice=" + arraySlice);
-    for (i = 0; i < range.length; i++) {
-        arraySlice.push(arrayCopy[range[i]]);
-    }
-    //dex.console.log("AFTER: array.slice(range=" + range + "): arraySlice=" + arraySlice);
-    return arraySlice;
-};
+            //dex.console.log("BEFORE: array.slice(range=" + range + "): arraySlice=" + arraySlice);
+            for (i = 0; i < range.length; i++) {
+                arraySlice.push(arrayCopy[range[i]]);
+            }
+            //dex.console.log("AFTER: array.slice(range=" + range + "): arraySlice=" + arraySlice);
+            return arraySlice;
+        },
 
-/**
- *
- * This method locates the array element whose id tag matches the supplied
- * id.  It returns the index of the first matching array element, or -1 if
- * none was found.
- *
- * @param array The array to search.
- * @param id The id to search on.
- *
- * @returns {number} The index of the first matching array element, or -1
- * if not found.
- *
- */
-/*
- module.exports.indexOfById = function (array, id) {
- return _.findIndex(array, { id: id })
- };
- */
+        /**
+         *
+         * This method locates the array element whose id tag matches the supplied
+         * id.  It returns the index of the first matching array element, or -1 if
+         * none was found.
+         *
+         * @param array The array to search.
+         * @param id The id to search on.
+         *
+         * @returns {number} The index of the first matching array element, or -1
+         * if not found.
+         *
+         */
+        /*
+         module.exports.indexOfById = function (array, id) {
+         return _.findIndex(array, { id: id })
+         };
+         */
 
-/**
- *
- * Is this routine actually used anymore?  Can I deprecate it?  It's long and
- * I don't remember exactly what its doing.
- *
- * @param data
- * @param numValues
- * @returns {*}
- *
- */
-/*
- module.exports.indexBands = function (data, numValues) {
- dex.console.log("BANDS");
- var interval, residual, tickIndices, last, i;
+        /**
+         *
+         * Is this routine actually used anymore?  Can I deprecate it?  It's long and
+         * I don't remember exactly what its doing.
+         *
+         * @param data
+         * @param numValues
+         * @returns {*}
+         *
+         */
+        /*
+         module.exports.indexBands = function (data, numValues) {
+         dex.console.log("BANDS");
+         var interval, residual, tickIndices, last, i;
 
- if (numValues <= 0) {
- tickIndices = [];
- }
- else if (numValues == 1) {
- tickIndices = [Math.floor(numValues / 2)];
- }
- else if (numValues == 2) {
- tickIndices = [0, data.length - 1];
- }
- else {
- // We have at least 2 ticks to display.
- // Calculate the rough interval between ticks.
- interval = Math.max(1, Math.floor(data.length / (numValues - 1)));
+         if (numValues <= 0) {
+         tickIndices = [];
+         }
+         else if (numValues == 1) {
+         tickIndices = [Math.floor(numValues / 2)];
+         }
+         else if (numValues == 2) {
+         tickIndices = [0, data.length - 1];
+         }
+         else {
+         // We have at least 2 ticks to display.
+         // Calculate the rough interval between ticks.
+         interval = Math.max(1, Math.floor(data.length / (numValues - 1)));
 
- // If it's not perfect, record it in the residual.
- residual = Math.floor(data.length % (numValues - 1));
+         // If it's not perfect, record it in the residual.
+         residual = Math.floor(data.length % (numValues - 1));
 
- // Always label our first data point.
- tickIndices = [0];
+         // Always label our first data point.
+         tickIndices = [0];
 
- // Set stop point on the interior ticks.
- last = data.length - interval;
+         // Set stop point on the interior ticks.
+         last = data.length - interval;
 
- dex.console.log("TEST", data, numValues, interval, residual, last);
+         dex.console.log("TEST", data, numValues, interval, residual, last);
 
- // Figure out the interior ticks, gently drift to accommodate
- // the residual.
- for (i = interval; i <= last; i += interval) {
- if (residual > 0) {
- i += 1;
- residual -= 1;
- }
- tickIndices.push(i);
- }
- // Always graph the last tick.
- tickIndices.push(data.length - 1);
- }
- dex.console.log("BANDS");
- return tickIndices;
- };
- */
+         // Figure out the interior ticks, gently drift to accommodate
+         // the residual.
+         for (i = interval; i <= last; i += interval) {
+         if (residual > 0) {
+         i += 1;
+         residual -= 1;
+         }
+         tickIndices.push(i);
+         }
+         // Always graph the last tick.
+         tickIndices.push(data.length - 1);
+         }
+         dex.console.log("BANDS");
+         return tickIndices;
+         };
+         */
 
-/**
- * Return an array consisting of unique elements within the first.
- *
- * @param array The array to extract unique values from.
- *
- * @returns {Array} An array which consists of unique elements within
- * the user supplied array.
- *
- */
+        /**
+         * Return an array consisting of unique elements within the first.
+         *
+         * @param array The array to extract unique values from.
+         *
+         * @returns {Array} An array which consists of unique elements within
+         * the user supplied array.
+         *
+         */
 //module.exports.unique = function (array) {
 //  return _.uniq(array);
 //};
 
-/**
- *
- * Returns an array of the mathematically smallest and largest
- * elements within the array.
- *
- * @param matrix The array to evaluate.
- * @param indices The array indices to be considered in the evaluation.
- *
- * @returns {Array} - An array consisting of [ min, max ] of the array.
- *
- */
-module.exports.extent = function (matrix, indices) {
-    if (!matrix || matrix.length <= 0 || !indices || indices.length <= 0) {
-        return [0, 0];
-    }
-
-    var min = matrix[0][indices[0]];
-    var max = min;
-
-    indices.forEach(function (ci) {
-        matrix.forEach(function (row) {
-            if (min > row[ci]) {
-                min = row[ci];
+        /**
+         *
+         * Returns an array of the mathematically smallest and largest
+         * elements within the array.
+         *
+         * @param matrix The array to evaluate.
+         * @param indices The array indices to be considered in the evaluation.
+         *
+         * @returns {Array} - An array consisting of [ min, max ] of the array.
+         *
+         */
+        'extent': function (matrix, indices) {
+            if (!matrix || matrix.length <= 0 || !indices || indices.length <= 0) {
+                return [0, 0];
             }
-            if (max < row[ci]) {
-                max = row[ci];
-            }
-        })
-    });
-    return [min, max];
-};
 
-/**
- *
- * Return a distinct copy of an array.
- *
- * @param {Array} array The array to copy.
- * @returns {Array} The copy of the array.
- *
- */
-module.exports.copy = function (array) {
-    // Shallow copy
-    return _.clone(array);
-    // Deep copy:
-    //return $.extend(true, {}, array);
+            var min = matrix[0][indices[0]];
+            var max = min;
+
+            indices.forEach(function (ci) {
+                matrix.forEach(function (row) {
+                    if (min > row[ci]) {
+                        min = row[ci];
+                    }
+                    if (max < row[ci]) {
+                        max = row[ci];
+                    }
+                });
+            });
+            return [min, max];
+        },
+
+        /**
+         *
+         * Return a distinct copy of an array.
+         *
+         * @param {Array} array The array to copy.
+         * @returns {Array} The copy of the array.
+         *
+         */
+        'copy': function (array) {
+            // Shallow copy
+            return _.clone(array);
+            // Deep copy:
+            //return $.extend(true, {}, array);
+        }
+    };
 };
-},{}],3:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 /**
  *
  * @name AreaChart
@@ -511,7 +3487,7 @@ var areachart = function (userConfig) {
 
 module.exports = areachart;
 
-},{}],4:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 /**
  *
  * @constructor
@@ -632,7 +3608,7 @@ var barchart = function (userConfig) {
 };
 
 module.exports = barchart;
-},{}],5:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 /**
  *
  * @name LineChart
@@ -785,7 +3761,7 @@ var linechart = function (userConfig) {
 };
 
 module.exports = linechart;
-},{}],6:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 /**
  *
  * @constructor
@@ -910,7 +3886,7 @@ var stackedareachart = function (userConfig) {
 };
 
 module.exports = stackedareachart;
-},{}],7:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 /**
  *
  * @constructor
@@ -1032,7 +4008,7 @@ var stackedbarchart = function (userConfig) {
 }
 
 module.exports = stackedbarchart;
-},{}],8:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 /**
  *
  * This module provides C3 based visualization components.
@@ -1051,7 +4027,7 @@ c3.StackedAreaChart = require("./StackedAreaChart");
 c3.StackedBarChart = require("./StackedBarChart");
 
 module.exports = c3;
-},{"./AreaChart":3,"./BarChart":4,"./LineChart":5,"./StackedAreaChart":6,"./StackedBarChart":7}],9:[function(require,module,exports){
+},{"./AreaChart":6,"./BarChart":7,"./LineChart":8,"./StackedAreaChart":9,"./StackedBarChart":10}],12:[function(require,module,exports){
 /**
  *
  * This module provides visualization components for charting
@@ -1063,17 +4039,17 @@ module.exports = c3;
  * @memberOf dex
  *
  */
-var charts = {};
-
-charts.c3 = require("./c3/c3");
-charts.d3 = require("./d3/d3");
-charts.d3plus = require("./d3plus/d3plus");
-charts.dygraphs = require("./dygraphs/dygraphs");
-charts.google = require("./google/google");
-charts.threejs= require("./threejs/threejs");
-
-module.exports = charts;
-},{"./c3/c3":8,"./d3/d3":36,"./d3plus/d3plus":38,"./dygraphs/dygraphs":40,"./google/google":46,"./threejs/threejs":48}],10:[function(require,module,exports){
+module.exports = function charts() {
+  return {
+    'c3'      : require("./c3/c3"),
+    'd3'      : require("./d3/d3"),
+    'd3plus'  : require("./d3plus/d3plus"),
+    'dygraphs': require("./dygraphs/dygraphs"),
+    'google'  : require("./google/google"),
+    'threejs' : require("./threejs/threejs")
+  };
+};
+},{"./c3/c3":11,"./d3/d3":40,"./d3plus/d3plus":42,"./dygraphs/dygraphs":44,"./google/google":50,"./threejs/threejs":52}],13:[function(require,module,exports){
 /**
  *
  * @constructor
@@ -1251,7 +4227,7 @@ var axis = function (userConfig) {
 };
 
 module.exports = axis;
-},{}],11:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 /**
  *
  * @constructor
@@ -1465,7 +4441,7 @@ var barchart = function (userConfig) {
 };
 
 module.exports = barchart;
-},{}],12:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 var chord = function (userConfig) {
   var chart;
 
@@ -1753,7 +4729,7 @@ var chord = function (userConfig) {
 }
 
 module.exports = chord;
-},{}],13:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 var clusteredforce = function (userConfig) {
 
   var defaults =
@@ -2014,22 +4990,29 @@ var clusteredforce = function (userConfig) {
 };
 
 module.exports = clusteredforce;
-},{}],14:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 var dendrogram = function Dendrogram(userConfig) {
   var defaults =
   {
     // The parent container of this chart.
-    'parent'      : null,
+    'parent': null,
     // Set these  when you need to CSS style components independently.
-    'id'          : 'Dendrogram',
-    'class'       : 'Dendrogram',
-    'resizable'   : true,
-    'connectType' : 'elbow',
+    'id': 'Dendrogram',
+    'class': 'Dendrogram',
+    'resizable': true,
+    'margin': {
+      'top': 10,
+      'bottom': 10,
+      'left': 10,
+      'right': 10
+    },
+    // diagonal, elbow
+    'connectionType': 'diagonal',
     // Our data...
-    'csv'        : {
+    'csv': {
       // Give folks without data something to look at anyhow.
-      'header' : ["X", "Y"],
-      'data'   : [
+      'header': ["X", "Y"],
+      'data': [
         [0, 0],
         [1, 1],
         [2, 4],
@@ -2038,65 +5021,65 @@ var dendrogram = function Dendrogram(userConfig) {
       ]
     },
     // width and height of our chart.
-    'width'      : "100%",
-    'height'     : "100%",
-    'connection' : {
-      'length' : 180,
-      'style'  : {
-        'stroke' : dex.config.stroke()
+    'width': "100%",
+    'height': "100%",
+    'connection': {
+      'length': 180,
+      'style': {
+        'stroke': dex.config.stroke()
       }
     },
-    'transform'  : 'translate(20,0)',
-    'root'       : {
-      'name'     : "ROOT",
-      'category' : "ROOT"
+    //'transform': 'translate(20,0)',
+    'root': {
+      'name': "ROOT",
+      'category': "ROOT"
     },
-    'color'      : d3.scale.category20(),
-    'node'       : {
-      'expanded'  : {
-        'label'  : dex.config.text({
-          'x'              : 8,
-          'y'              : 4,
-          'font.weight'    : 'bold',
-          'fill.fillColor' : 'black',
-          'text'           : function (d) {
+    'color': d3.scale.category20(),
+    'node': {
+      'expanded': {
+        'label': dex.config.text({
+          'x': 8,
+          'y': 4,
+          'font.weight': 'bold',
+          'fill.fillColor': 'black',
+          'text': function (d) {
             return (d.name) ? d.name : d.category;
           }
         }),
-        'circle' : dex.config.circle({
-          'r'    : 4,
-          'fill' : {
-            'fillColor' : 'steelblue'
+        'circle': dex.config.circle({
+          'r': 4,
+          'fill': {
+            'fillColor': 'steelblue'
           }
         })
       },
-      'collapsed' : {
-        'label'  : dex.config.text({
-          'x'           : 8,
-          'y'           : 4,
-          'font.weight' : 'bold',
-          'text'        : function (d) {
+      'collapsed': {
+        'label': dex.config.text({
+          'x': 8,
+          'y': 4,
+          'font.weight': 'bold',
+          'text': function (d) {
             return (d.name) ? d.name : d.category;
           }
         }),
-        'circle' : dex.config.circle({
-          'r'    : 5,
-          'fill' : {
-            'fillColor'   : 'green',
-            'fillOpacity' : .8
+        'circle': dex.config.circle({
+          'r': 5,
+          'fill': {
+            'fillColor': 'green',
+            'fillOpacity': .8
           }
         })
       }
     },
-    'link'       : dex.config.link({
-      'fill'   : {
-        'fillColor' : 'none'
+    'link': dex.config.link({
+      'fill': {
+        'fillColor': 'none'
       },
-      'stroke' : dex.config.stroke({
-        'color'     : 'green',
-        'width'     : 1,
-        'opacity'   : .3,
-        'dasharray' : "5 5"
+      'stroke': dex.config.stroke({
+        'color': 'green',
+        'width': 1,
+        'opacity': .3,
+        'dasharray': "5 5"
       })
     })
   };
@@ -2122,8 +5105,7 @@ var dendrogram = function Dendrogram(userConfig) {
         //.attr("connection.length", 200)
         .update();
     }
-    else
-    {
+    else {
       chart.update();
     }
   };
@@ -2144,13 +5126,27 @@ var dendrogram = function Dendrogram(userConfig) {
 
     var i = 0, root;
 
+    var width = config.width - config.margin.left - config.margin.right;
+    var height = config.height - config.margin.top - config.margin.bottom;
+
     var tree = d3.layout.tree()
-        .size([config.height, config.width]);
+      .size([height, width]);
+
+    var cluster = d3.layout.cluster()
+      .size([height, width]);
+
+    var layout = tree;
 
     var connectionType;
 
-    if (config.connectionType == "elbow")
-    {
+    if (config.connectionType == "extended-elbow") {
+      connectionType = function extendedElbow(d, i) {
+        return "M" + d.source.y + "," + d.source.x
+          + "H" + (d.source.y + 50)
+          + "V" + d.target.x + "H" + d.target.y;
+      }
+    }
+    else if (config.connectionType == "elbow") {
       connectionType = function elbow(d, i) {
         return "M" + d.source.y + "," + d.source.x
           + "V" + d.target.x + "H" + d.target.y;
@@ -2164,10 +5160,13 @@ var dendrogram = function Dendrogram(userConfig) {
     }
 
     var chartContainer = d3.select(config.parent)
-        .append("g")
-        .attr("id", config["id"])
-        .attr("class", config["class"])
-        .attr("transform", config.transform);
+      .append("g")
+      .attr("transform", "translate(" + config.margin.left +
+        ", " + config.margin.right + ")")
+      .append("g")
+      .attr("id", config["id"])
+      .attr("class", config["class"])
+      .attr("transform", config.transform);
 
     var gradient = chartContainer.append("defs")
       .append("linearGradient")
@@ -2190,13 +5189,13 @@ var dendrogram = function Dendrogram(userConfig) {
 
     json =
     {
-      "name"     : config.root.name,
-      "category" : config.root.category,
-      "children" : dex.csv.toHierarchicalJson(csv)
+      "name": config.root.name,
+      "category": config.root.category,
+      "children": dex.csv.toHierarchicalJson(csv)
     };
 
     root = json;
-    root.x0 = config.height / 2;
+    root.x0 = height / 2;
     root.y0 = 0;
 
     function toggleAll(d) {
@@ -2221,137 +5220,166 @@ var dendrogram = function Dendrogram(userConfig) {
       var depthY = new Array();
 
       // Compute the new tree layout.
-      var nodes = tree.nodes(root).reverse();
+      var nodes = layout.nodes(root).reverse();
 
       // Allow manually set lengths to be used instead of fixed length connectors
       var fixedLength = true;
-      if (String(config.connection.length).indexOf(",") > -1)
-      {
+      if (String(config.connection.length).indexOf(",") > -1) {
         fixedLength = false;
         depthY = String(config.connection.length).split(",")
+      }
+      else if (String(config.connection.length) === "fit-text") {
+        //dex.console.log("COMPACT");
+        var preText = d3.select(config.parent + " g").append("text");
+        //var charWidth = charText.node().getBBox().width;
+
+        //charText.call(dex.config.configureText);
+        fixedLength = false;
+        var depthMap = {};
+        nodes.forEach(function (d) {
+          preText.text(d.name);
+          // Find start for each connection.
+          var textLen = preText.node().getBBox().width;
+          //dex.console.log("D", d, textLen);
+          if (depthMap[d.depth]) {
+            if (depthMap[d.depth] < textLen) {
+              depthMap[d.depth] = textLen;
+            }
+          }
+          else {
+            depthMap[d.depth] = textLen;
+          }
+        });
+        //dex.console.log("LENGTHS", depthMap);
+        depthY = [0];
+        var textPadding = 40;
+        var textOffset = textPadding;
+        for (i = 0; depthMap[i]; i++) {
+          depthY.push(depthMap[i] + textOffset);
+          textOffset += depthMap[i] + textPadding;
+        }
+        preText.remove();
       }
 
       // Set y offsets based on single fixed length or manual settings
       nodes.forEach(function (d) {
-        if (fixedLength)
-        {
+        if (fixedLength) {
           d.y = d.depth * config.connection.length;
         }
-        else
-        {
+        else {
           d.y = +depthY[d.depth];
         }
       });
 
       // Update the nodes…
       var node = chartContainer.selectAll("g.node")
-          .data(nodes, function (d) {
-            return d.id || (d.id = ++i);
-          });
+        .data(nodes, function (d) {
+          return d.id || (d.id = ++i);
+        });
 
       // Enter any new nodes at the parent's previous position.
       var nodeEnter = node.enter().append("svg:g")
-          .attr("class", "node")
-          .attr("transform", function (d) {
-            return "translate(" + source.y0 + "," + source.x0 + ")";
-          })
-          .on("click", function (d) {
-            toggle(d);
-            update(d);
-          });
+        .attr("class", "node")
+        .attr("transform", function (d) {
+          return "translate(" + source.y0 + "," + source.x0 + ")";
+        })
+        .on("click", function (d) {
+          toggle(d);
+          update(d);
+        });
 
       // Come back here...
       nodeEnter.append("svg:circle")
-          .each(function (d) {
-            //dex.console.log("CALLING", this, d, i);
-            var nodeConfig = (d._children) ?
-                config.node.collapsed.circle : config.node.expanded.circle;
-            d3.select(this).call(dex.config.configureCircle, nodeConfig);
-          })
-          .attr("r", 1e-6);
+        .each(function (d) {
+          //dex.console.log("CALLING", this, d, i);
+          var nodeConfig = (d._children) ?
+            config.node.collapsed.circle : config.node.expanded.circle;
+          d3.select(this).call(dex.config.configureCircle, nodeConfig);
+        })
+        .attr("r", 1e-6);
 
       // Add text nodes configured like we want them.
       nodeEnter.append("text")
-          .each(function (d) {
-            var nodeConfig = (d._children) ?
-                config.node.collapsed.label : config.node.expanded.label;
-            d3.select(this).call(dex.config.configureText, nodeConfig);
-          })
+        .each(function (d) {
+          var nodeConfig = (d._children) ?
+            config.node.collapsed.label : config.node.expanded.label;
+          d3.select(this).call(dex.config.configureText, nodeConfig);
+        })
         //.text(function(d) { return (d.name) ? d.name : d.category;})
-          .style("fill-opacity", 1e-6);
+        .style("fill-opacity", 1e-6);
 
       // Transition nodes to their new position.
       var nodeUpdate = node.transition()
-          .duration(duration)
-          .attr("transform", function (d) {
-            return "translate(" + d.y + "," + d.x + ")";
-          });
+        .duration(duration)
+        .attr("transform", function (d) {
+          return "translate(" + d.y + "," + d.x + ")";
+        });
 
       nodeUpdate.selectAll("circle")
-          .each(
+        .each(
           function (d) {
             var nodeConfig = (d._children) ?
-                config.node.collapsed.circle : config.node.expanded.circle;
+              config.node.collapsed.circle : config.node.expanded.circle;
             d3.select(this).transition().call(dex.config.configureCircle, nodeConfig);
           });
 
       nodeUpdate.select("text")
-          .each(
+        .each(
           function (d) {
             var nodeConfig = (d._children) ?
-                config.node.collapsed.label : config.node.expanded.label;
+              config.node.collapsed.label : config.node.expanded.label;
             d3.select(this).call(dex.config.configureText, nodeConfig);
           })
-          .style("fill-opacity", 1);
+        .style("fill-opacity", 1);
 
       // Transition exiting nodes to the parent's new position.
       var nodeExit = node.exit().transition()
-          .duration(duration)
-          .attr("transform", function (d) {
-            return "translate(" + (source.y) + "," + (source.x) + ")";
-          })
-          .remove();
+        .duration(duration)
+        .attr("transform", function (d) {
+          return "translate(" + (source.y) + "," + (source.x) + ")";
+        })
+        .remove();
 
       nodeExit.select("circle")
-          .attr("r", 1e-6);
+        .attr("r", 1e-6);
 
       nodeExit.select("text")
-          .style("fill-opacity", 1e-6);
+        .style("fill-opacity", 1e-6);
 
       // Update the links…
       var link = chartContainer.selectAll("path.link")
-          .data(tree.links(nodes), function (d) {
-            return d.target.id;
-          });
+        .data(layout.links(nodes), function (d) {
+          return d.target.id;
+        });
 
       // Enter any new links at the parent's previous position.
       link.enter().insert("svg:path", "g")
-          .attr("class", "link")
-          .call(dex.config.configureLink, config.link)
+        .attr("class", "link")
+        .call(dex.config.configureLink, config.link)
         //.style("fill", config.link.fill)
         //.style("fill-opacity", config.link.fillOpacity)
-          .attr("d", function (d) {
-            var o = {x : source.x0, y : source.y0};
-            return connectionType({source : o, target : o});
-          })
-          .transition()
-          .duration(duration)
-          .attr("d", connectionType)
-        ;
+        .attr("d", function (d) {
+          var o = {x: source.x0, y: source.y0};
+          return connectionType({source: o, target: o});
+        })
+        .transition()
+        .duration(duration)
+        .attr("d", connectionType)
+      ;
 
       // Transition links to their new position.
       link.transition()
-          .duration(duration)
-          .attr("d", connectionType);
+        .duration(duration)
+        .attr("d", connectionType);
 
       // Transition exiting nodes to the parent's new position.
       link.exit().transition()
-          .duration(duration)
-          .attr("d", function (d) {
-            var o = {x : source.x, y : source.y};
-            return connectionType({source : o, target : o});
-          })
-          .remove();
+        .duration(duration)
+        .attr("d", function (d) {
+          var o = {x: source.x, y: source.y};
+          return connectionType({source: o, target: o});
+        })
+        .remove();
 
       // Stash the old positions for transition.
       nodes.forEach(function (d) {
@@ -2369,20 +5397,29 @@ var dendrogram = function Dendrogram(userConfig) {
       else {
         d.children = d._children;
         d._children = null;
+        d.children.forEach(function (child) { collapse(child);});
+        //dex.console.log(d.children);
+      }
+    }
+
+    function collapse(d) {
+      if (d.children) {
+        d._children = d.children;
+        d.children = null;
       }
     }
   };
 
   $(document).ready(function () {
     // Make the entire chart draggable.
-    $(chart.config.parent).draggable();
+    //$(chart.config.parent).draggable();
   });
 
   return chart;
 };
 
 module.exports = dendrogram;
-},{}],15:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 var force = function (userConfig) {
   var chart;
 
@@ -2545,7 +5582,7 @@ var force = function (userConfig) {
 
 module.exports = force;
 
-},{}],16:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 var heatmap = function(userConfig) {
   var defaults =
   {
@@ -2727,7 +5764,7 @@ var heatmap = function(userConfig) {
 
 module.exports = heatmap;
 
-},{}],17:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 var horizonchart = function (userConfig) {
 
   var defaults =
@@ -3049,7 +6086,7 @@ var horizonchart = function (userConfig) {
 })();
 
 module.exports = horizonchart;
-},{}],18:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 var horizontallegend = function (userConfig) {
   var defaults = {
     'parent'     : null,
@@ -3157,7 +6194,7 @@ var horizontallegend = function (userConfig) {
 };
 
 module.exports = horizontallegend;
-},{}],19:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 var linechart = function (userConfig) {
   var defaults =
   {
@@ -3438,7 +6475,7 @@ var linechart = function (userConfig) {
 };
 
 module.exports = linechart;
-},{}],20:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 var motionbarchart = function (userConfig) {
   var defaultColor = d3.scale.category10();
 
@@ -3885,7 +6922,7 @@ var motionbarchart = function (userConfig) {
 };
 
 module.exports = motionbarchart;
-},{}],21:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 var motionchart = function (userConfig) {
   var defaultColor = d3.scale.category10();
 
@@ -4369,7 +7406,7 @@ var motionchart = function (userConfig) {
 };
 
 module.exports = motionchart;
-},{}],22:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 var motioncirclechart = function (userConfig) {
   var defaultColor = d3.scale.category10();
 
@@ -4815,7 +7852,7 @@ var motioncirclechart = function (userConfig) {
 };
 
 module.exports = motioncirclechart;
-},{}],23:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 var motionlinechart = function (userConfig) {
   var defaultColor = d3.scale.category10();
 
@@ -5316,7 +8353,7 @@ var motionlinechart = function (userConfig) {
 };
 
 module.exports = motionlinechart;
-},{}],24:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 var orbitallayout = function (userConfig) {
   var chart;
 
@@ -5665,8 +8702,187 @@ var orbitallayout = function (userConfig) {
 };
 
 module.exports = orbitallayout;
-},{}],25:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 var parallelcoordinates = function (userConfig) {
+  var chart;
+
+  defaults = {
+    'id': "ParallelCoordinates",
+    'class': "ParallelCoordinates",
+    'parent': null,
+    'width': "100%",
+    'height': "100%",
+    'resizable': true,
+    'color': d3.scale.category20(),
+    'title': 'Parallel Coordinates',
+    'csv': {
+      'header': ["X", "Y"],
+      'data': [
+        [0, 0],
+        [1, 1],
+        [2, 4],
+        [3, 9],
+        [4, 16]
+      ]
+    },
+    'margin': {'top': 35, 'bottom': 30, 'left': 10, 'right': 0},
+    'brush': {
+      'mode': '1D-axes'
+    },
+    'bundlingStrength': .5,
+    'smoothness': .1,
+    'alphaOnBrushed': .75,
+    'alpha': 1,
+    'mode': 'queue',
+    'foregroundQueueRate': 50,
+    'brushedQueueRate': 50,
+    'heading.label': dex.config.text({
+      'anchor': 'middle',
+      'font.size': 22,
+      'fill.fillColor' : 'steelblue',
+      'dy': "-4",
+    }),
+    'axis.label': dex.config.text({
+      'anchor': 'end',
+      'font.size': 12,
+      'fill.fillColor' : 'black',
+      'dy': ".35em",
+    }),
+    'firstAxis.label': dex.config.text({
+      'anchor': 'end',
+      'font.size': 12,
+      'fill.fillColor' : 'black',
+      'dy': ".35em",
+    }),
+    'lastAxis.label': dex.config.text({
+      'anchor': 'start',
+      'font.size': 12,
+      'fill.fillColor' : 'black',
+      'dy': ".35em",
+      'dx' : 16
+    })
+  };
+
+  var iChart;
+  chart = new dex.component(userConfig, defaults);
+
+  chart.render = function render() {
+    var chart = this;
+    var config = chart.config;
+    var csv = config.csv;
+    var i;
+    d3.selectAll("#" + chart.config.id).remove();
+
+    window.onresize = this.resize;
+
+    var jsonData = dex.csv.toJson(csv);
+
+    iChart = dex.pc.create()(config.parent)
+      .data(jsonData)
+      //.hideAxis(["name"])
+      .color(function (d, i) {
+        return config.color(d[csv.header[0]]);
+      })
+      .alpha(config.alpha)
+      .alphaOnBrushed(config.alphaOnBrushed)
+      .composite("darken")
+      .margin(config.margin)
+      .mode(config.mode)
+      .bundlingStrength(config.bundlingStrength)
+      .smoothness(config.smoothness)
+      .foregroundQueueRate(config.foregroundQueueRate)
+      .brushedQueueRate(config.brushedQueueRate)
+      .reorderable()
+      .interactive()
+      .shadows()
+      .bundleDimension(csv.header[0])
+      .render()
+      .brushMode(config.brush.mode);
+
+    iChart.on("brush", function (selected) {
+      // Convert json data of form: [{h1:r1c1, h2:r1c2, ...},
+      // {h1:r2c1, h2:r2c2, ... } ]
+      // to csv form.
+      chart.publish({
+        "type": "select",
+        "selected": dex.csv.json2Csv(selected)
+      });
+    });
+
+    iChart.on("resize", function() {
+      iChart.autoscale();
+    });
+
+    //parcoords.svg.selectAll("text")
+    //  .style("font", "12px sans-serif");
+
+    // Apply some window dressing:
+    var axis = d3.selectAll(config.parent + " svg g g.dimension g.axis");
+    dex.console.log("AXIS", axis);
+
+    if (config.axis.label) {
+      axis.selectAll(".tick text")
+        .call(dex.config.configureText, config.axis.label);
+    }
+
+    if (config.firstAxis.label) {
+      axis.first().selectAll(".tick text")
+        .call(dex.config.configureText, config.firstAxis.label);
+    }
+
+    if (config.lastAxis.label) {
+      axis.last().selectAll(".tick text")
+        .call(dex.config.configureText, config.lastAxis.label);
+    }
+
+    if (config.heading.label) {
+      axis.selectAll(".label")
+        .call(dex.config.configureText, config.heading.label);
+    }
+  };
+
+  chart.resize = function resize() {
+    if (chart.config.resizable) {
+      /*
+      var width = d3.select(chart.config.parent).property("clientWidth");
+      var height = d3.select(chart.config.parent).property("clientHeight");
+      chart
+        .attr("width", width - chart.config.margin.left - chart.config.margin.right)
+        .attr("height", height - chart.config.margin.top - chart.config.margin.bottom)
+        .attr("transform", "translate(" + chart.config.margin.left + "," +
+          chart.config.margin.top + ")");
+      */
+      iChart.autoscale();
+    }
+  };
+
+  chart.update = function update() {
+    var chart = this;
+    var config = chart.config;
+    var csv = config.csv;
+
+    var jsonData = dex.csv.toJson(csv);
+  };
+
+
+  $(document).ready(function () {
+    /*
+     $(document).tooltip({
+     items: "path",
+     content: function () {
+     return $(this).find("tooltip-content").text();
+     },
+     track: true
+     });
+     */
+  });
+
+  return chart;
+};
+
+module.exports = parallelcoordinates;
+},{}],29:[function(require,module,exports){
+var parallelcoordinates2 = function (userConfig) {
   var chart;
 
   defaults =
@@ -5863,8 +9079,6 @@ var parallelcoordinates = function (userConfig) {
     // Holds selected paths.
     var foreground;
     // Will hold our column names.
-
-
 
     var numericColumns =
       dex.csv.getNumericColumnNames(csv);
@@ -6122,33 +9336,33 @@ var parallelcoordinates = function (userConfig) {
     d3.selectAll("g .brush").remove();
 
     dimensions.append("g")
-     .attr("class", "axis")
-     .each(function (d, i) {
+      .attr("class", "axis")
+      .each(function (d, i) {
 
-     var axisScale = dex.config.createScale(dex.config.scale(config.axis.scale));
-     var axis = d3.svg.axis()
-     .scale(axisScale);
+        var axisScale = dex.config.createScale(dex.config.scale(config.axis.scale));
+        var axis = d3.svg.axis()
+          .scale(axisScale);
 
-     var myConfig = dex.object.clone(config.axis);
-     // If the last label, turn it to the right.
-     if (i == config.csv.header.length - 1) {
-     myConfig.orient = 'right';
-     myConfig.label.dx = function (d, i) {
-     return Math.max(chart.config.axis.label.font.size(d, i) / 2, 8);
-     }
-     }
-     // Configure and apply the axis.
-     dex.config.configureAxis(axis, myConfig, i);
-     d3.select(this).call(axis.scale(y[d]));
+        var myConfig = dex.object.clone(config.axis);
+        // If the last label, turn it to the right.
+        if (i == config.csv.header.length - 1) {
+          myConfig.orient = 'right';
+          myConfig.label.dx = function (d, i) {
+            return Math.max(chart.config.axis.label.font.size(d, i) / 2, 8);
+          }
+        }
+        // Configure and apply the axis.
+        dex.config.configureAxis(axis, myConfig, i);
+        d3.select(this).call(axis.scale(y[d]));
 
-     // Now that the axis has rendered, adjust the tick labels based on our spec.
-     var tickLabels = d3.select(this)
-     .selectAll('.tick')
-     .selectAll("text")
-     .call(dex.config.configureText, myConfig.label, i);
-     })
-     .append("text")
-     .call(dex.config.configureText, config.verticalLabel);
+        // Now that the axis has rendered, adjust the tick labels based on our spec.
+        var tickLabels = d3.select(this)
+          .selectAll('.tick')
+          .selectAll("text")
+          .call(dex.config.configureText, myConfig.label, i);
+      })
+      .append("text")
+      .call(dex.config.configureText, config.verticalLabel);
 
     // Add and store a brush for each axis.
     dimensions.append("g")
@@ -6218,7 +9432,8 @@ var parallelcoordinates = function (userConfig) {
       //dex.console.log("Selected: ", dex.json.toCsv(activeData, dimensions));
       chart.publish({
         "type": "select",
-        "selected": dex.json.toCsv(activeData, dimensions)});
+        "selected": dex.json.toCsv(activeData, dimensions)
+      });
     }
 
   };
@@ -6237,8 +9452,8 @@ var parallelcoordinates = function (userConfig) {
   return chart;
 };
 
-module.exports = parallelcoordinates;
-},{}],26:[function(require,module,exports){
+module.exports = parallelcoordinates2;
+},{}],30:[function(require,module,exports){
 var piechart = function (userConfig) {
   var chart = new dex.component(userConfig,
     {
@@ -6360,7 +9575,7 @@ var piechart = function (userConfig) {
 };
 
 module.exports = piechart;
-},{}],27:[function(require,module,exports){
+},{}],31:[function(require,module,exports){
 var radarchart = function (userConfig) {
     var chart;
 
@@ -6774,7 +9989,7 @@ var radarchart = function (userConfig) {
 
 module.exports = radarchart;
 
-},{}],28:[function(require,module,exports){
+},{}],32:[function(require,module,exports){
 var radialtree = function (userConfig) {
   var chart;
 
@@ -6996,7 +10211,7 @@ var radialtree = function (userConfig) {
 module.exports = radialtree;
 
 
-},{}],29:[function(require,module,exports){
+},{}],33:[function(require,module,exports){
 var sankey = function (userConfig) {
     var defaultColor = d3.scale.category20c();
 
@@ -7926,7 +11141,7 @@ d3.sankey = function () {
 };
 
 module.exports = sankey;
-},{}],30:[function(require,module,exports){
+},{}],34:[function(require,module,exports){
 var sankeyparticles = function (userConfig) {
   var chart;
 
@@ -8476,7 +11691,7 @@ var sankeyparticles = function (userConfig) {
 };
 
 module.exports = sankeyparticles;
-},{}],31:[function(require,module,exports){
+},{}],35:[function(require,module,exports){
 var scatterplot = function (userConfig) {
   var chart = new dex.component(userConfig,
     {
@@ -8683,7 +11898,7 @@ var scatterplot = function (userConfig) {
 };
 
 module.exports = scatterplot;
-},{}],32:[function(require,module,exports){
+},{}],36:[function(require,module,exports){
 var sunburst = function (userConfig) {
   var chart;
 
@@ -8868,7 +12083,7 @@ var sunburst = function (userConfig) {
 };
 
 module.exports = sunburst;
-},{}],33:[function(require,module,exports){
+},{}],37:[function(require,module,exports){
 var titledtreemap = function (userConfig) {
   var chart;
 
@@ -9238,7 +12453,7 @@ var titledtreemap = function (userConfig) {
 
 module.exports = titledtreemap;
 
-},{}],34:[function(require,module,exports){
+},{}],38:[function(require,module,exports){
 var treemap = function (userConfig) {
     var chart;
 
@@ -9438,7 +12653,7 @@ var treemap = function (userConfig) {
 };
 
 module.exports = treemap;
-},{}],35:[function(require,module,exports){
+},{}],39:[function(require,module,exports){
 var verticallegend = function (userConfig) {
 
   var defaults = {
@@ -9657,7 +12872,7 @@ var verticallegend = function (userConfig) {
 };
 
 module.exports = verticallegend;
-},{}],36:[function(require,module,exports){
+},{}],40:[function(require,module,exports){
 /**
  *
  * This module provides D3 based visualization components.
@@ -9692,6 +12907,7 @@ d3.MotionCircleChart = require("./MotionCircleChart");
 d3.MotionLineChart = require("./MotionLineChart");
 d3.OrbitalLayout = require("./OrbitalLayout");
 d3.ParallelCoordinates = require("./ParallelCoordinates");
+d3.ParallelCoordinates2 = require("./ParallelCoordinates2");
 d3.PieChart = require("./PieChart");
 d3.RadarChart = require("./RadarChart");
 d3.RadialTree = require("./RadialTree");
@@ -9707,112 +12923,112 @@ d3.VerticalLegend = require("./VerticalLegend");
 //d3.map = require("./map/map");
 
 module.exports = d3;
-},{"./Axis":10,"./BarChart":11,"./Chord":12,"./ClusteredForce":13,"./Dendrogram":14,"./Force":15,"./HeatMap":16,"./HorizonChart":17,"./HorizontalLegend":18,"./LineChart":19,"./MotionBarChart":20,"./MotionChart":21,"./MotionCircleChart":22,"./MotionLineChart":23,"./OrbitalLayout":24,"./ParallelCoordinates":25,"./PieChart":26,"./RadarChart":27,"./RadialTree":28,"./Sankey":29,"./SankeyParticles":30,"./ScatterPlot":31,"./Sunburst":32,"./TitledTreemap":33,"./Treemap":34,"./VerticalLegend":35}],37:[function(require,module,exports){
+},{"./Axis":13,"./BarChart":14,"./Chord":15,"./ClusteredForce":16,"./Dendrogram":17,"./Force":18,"./HeatMap":19,"./HorizonChart":20,"./HorizontalLegend":21,"./LineChart":22,"./MotionBarChart":23,"./MotionChart":24,"./MotionCircleChart":25,"./MotionLineChart":26,"./OrbitalLayout":27,"./ParallelCoordinates":28,"./ParallelCoordinates2":29,"./PieChart":30,"./RadarChart":31,"./RadialTree":32,"./Sankey":33,"./SankeyParticles":34,"./ScatterPlot":35,"./Sunburst":36,"./TitledTreemap":37,"./Treemap":38,"./VerticalLegend":39}],41:[function(require,module,exports){
 var network = function (userConfig) {
-    var chart;
+  var chart;
 
-    var defaults =
-    {
-        // The parent container of this chart.
-        'parent': '#RingNetwork',
-        // Set these when you need to CSS style components independently.
-        'id': 'RingNetwork',
-        'class': 'RingNetwork',
-        'resizable': true,
-        // Our data...
-        'csv': {
-            // Give folks without data something to look at anyhow.
-            'header': ["NAME", "GENDER", "VEHICLE"],
-            'data': [
-                ["JIM", "M", "CAR"],
-                ["JOE", "M", "CAR"],
-                ["PAT", "M", "TRUCK"],
-                ["SALLY", "F", "TRUCK"]
-            ]
-        },
-        'connect': 'first',
-        'type' : 'rings',
-        //'connect' : 'all',
-        'width': "100%",
-        'height': "100%",
-        'transform': "translate(0 0)",
-    };
+  var defaults =
+  {
+    // The parent container of this chart.
+    'parent': '#RingNetwork',
+    // Set these when you need to CSS style components independently.
+    'id': 'RingNetwork',
+    'class': 'RingNetwork',
+    'resizable': true,
+    // Our data...
+    'csv': {
+      // Give folks without data something to look at anyhow.
+      'header': ["NAME", "GENDER", "VEHICLE"],
+      'data': [
+        ["JIM", "M", "CAR"],
+        ["JOE", "M", "CAR"],
+        ["PAT", "M", "TRUCK"],
+        ["SALLY", "F", "TRUCK"]
+      ]
+    },
+    'connect': 'last',
+    'type': 'rings',
+    //'connect' : 'all',
+    'width': "100%",
+    'height': "100%",
+    'transform': "translate(0 0)",
+  };
 
-    var chart = new dex.component(userConfig, defaults);
+  var chart = new dex.component(userConfig, defaults);
 
-    chart.render = function render() {
-        window.onresize = this.resize;
-        chart.resize();
-    };
+  chart.render = function render() {
+    window.onresize = this.resize;
+    chart.resize();
+  };
 
-    chart.resize = function resize() {
-        if (chart.config.resizable) {
-            var width = d3.select(chart.config.parent).property("clientWidth");
-            var height = d3.select(chart.config.parent).property("clientHeight");
-            dex.console.log(chart.config.id + ": resize(" + width + "," + height + ")");
-            chart.attr("width", width).attr("height", height).update();
+  chart.resize = function resize() {
+    if (chart.config.resizable) {
+      var width = d3.select(chart.config.parent).property("clientWidth");
+      var height = d3.select(chart.config.parent).property("clientHeight");
+      dex.console.log(chart.config.id + ": resize(" + width + "," + height + ")");
+      chart.attr("width", width).attr("height", height).update();
+    }
+    else {
+      chart.update();
+    }
+  };
+
+  chart.update = function () {
+    var chart = this;
+    var config = chart.config;
+    var csv = config.csv;
+
+    var connections = [];
+
+    var rootMap = {};
+    var cmap = {};
+
+    // Connect everything in the row to the first column.
+    //if (config.connect == 'first') {
+    // TODO: Support other connection models here.
+    for (var ri = 0; ri < csv.data.length; ri++) {
+      if (_.isUndefined(rootMap[csv.data[ri][0]])) {
+        connections.push({'source': csv.header[0], 'target': csv.data[ri][0]});
+        rootMap[csv.data[ri][0]] = 1;
+      }
+
+      for (var ci = 1; ci < csv.header.length; ci++) {
+        var src = csv.data[ri][0];
+        var dest = csv.data[ri][ci];
+
+        if (_.isUndefined(cmap[src + " -> " + dest])) {
+          connections.push({'source': src, 'target': dest});
+          cmap[src + " -> " + dest] = 1;
         }
-        else {
-            chart.update();
-        }
-    };
+      }
+    }
 
-    chart.update = function () {
-        var chart = this;
-        var config = chart.config;
-        var csv = config.csv;
+    //dex.console.log("Connections", connections);
 
-        var connections = [];
+    // instantiate d3plus
+    var viz = d3plus.viz()
+      .container(config.parent)
+      .type(config.type)
+      .edges(connections)
+      .focus(csv.header[0]);
 
-        // Connect everything in the row to the first column.
-        if (config.connect == 'first') {
-            for (var ri = 0; ri < csv.data.length; ri++) {
-                for (var ci = 1; ci < csv.header.length; ci++) {
-                    connections.push({'source': csv.data[ri][0], 'target': csv.data[ri][ci]});
-                }
-            }
-        }
-        // Connect everything in the row to everything else in the row.
-        else {
-            for (var ri = 0; ri < csv.data.length; ri++) {
-                for (var ci = 1; ci < csv.header.length; ci++) {
-                    connections.push({'source': csv.data[ri][ci - 1], 'target': csv.data[ri][ci]});
-                }
-                connections.push({'source': csv.data[ri][csv.header.length - 1], 'target': csv.data[ri][0]});
-            }
-        }
+    if (config.edges) {
+      viz.edges(config.edges);
+    }
 
-        //dex.console.log("Connections", connections);
+    viz.draw();
+  };
 
-        // instantiate d3plus
-        var viz = d3plus.viz()
-            .container(config.parent)
-            .type(config.type)
-            .edges(connections);
+  $(document).ready(function () {
+    // Make the entire chart draggable.
+    //$(chart.config.parent).draggable();
+  });
 
-        if (config.edges)
-        {
-            viz.edges(config.edges);
-        }
-
-        if (config.focus)
-        {
-            viz.focus(config.focus);
-        }
-
-        viz.draw();             // finally, draw the visualization!
-    };
-
-    $(document).ready(function () {
-        // Make the entire chart draggable.
-        //$(chart.config.parent).draggable();
-    });
-
-    return chart;
+  return chart;
 };
 
 module.exports = network;
-},{}],38:[function(require,module,exports){
+},{}],42:[function(require,module,exports){
 /**
  *
  * This module provides d3plus based visualizations.
@@ -9827,7 +13043,7 @@ var d3plus = {};
 d3plus.Network = require("./Network");
 
 module.exports = d3plus;
-},{"./Network":37}],39:[function(require,module,exports){
+},{"./Network":41}],43:[function(require,module,exports){
 /**
  * This will construct a new DygraphsLineChart with the user supplied userConfig applied.
  * @param userConfig - A user supplied configuration of the form:
@@ -9897,7 +13113,7 @@ var linechart = function (userConfig) {
 };
 
 module.exports = linechart;
-},{}],40:[function(require,module,exports){
+},{}],44:[function(require,module,exports){
 /**
  *
  * This module provides a dygraphs linechart component.
@@ -9913,7 +13129,7 @@ var dygraphs = {};
 dygraphs.LineChart = require("./LineChart");
 
 module.exports = dygraphs;
-},{"./LineChart":39}],41:[function(require,module,exports){
+},{"./LineChart":43}],45:[function(require,module,exports){
 var diffbarchart = function (userConfig) {
 
   var defaults = {
@@ -10052,7 +13268,7 @@ var diffbarchart = function (userConfig) {
 };
 
 module.exports = diffbarchart;
-},{}],42:[function(require,module,exports){
+},{}],46:[function(require,module,exports){
 var diffpiechart = function (userConfig) {
 
   var defaults = {
@@ -10175,7 +13391,7 @@ var diffpiechart = function (userConfig) {
 };
 
 module.exports = diffpiechart;
-},{}],43:[function(require,module,exports){
+},{}],47:[function(require,module,exports){
 /**
  *
  * @param userConfig A user supplied configuration object which will override the defaults.
@@ -10268,7 +13484,7 @@ var piechart = function (userConfig) {
 };
 
 module.exports = piechart;
-},{}],44:[function(require,module,exports){
+},{}],48:[function(require,module,exports){
 /**
  *
  * @param userConfig A user supplied configuration object which will override the defaults.
@@ -10375,7 +13591,7 @@ var timeline = function (userConfig) {
 };
 
 module.exports = timeline;
-},{}],45:[function(require,module,exports){
+},{}],49:[function(require,module,exports){
 /**
  *
  * @param userConfig A user supplied configuration object which will override the defaults.
@@ -10470,7 +13686,7 @@ var wordtree = function (userConfig) {
 };
 
 module.exports = wordtree;
-},{}],46:[function(require,module,exports){
+},{}],50:[function(require,module,exports){
 /**
  *
  * This module provides routines for dealing with arrays.
@@ -10489,7 +13705,7 @@ google.Timeline = require("./Timeline");
 google.WordTree = require("./WordTree");
 
 module.exports = google;
-},{"./DiffBarChart":41,"./DiffPieChart":42,"./PieChart":43,"./Timeline":44,"./WordTree":45}],47:[function(require,module,exports){
+},{"./DiffBarChart":45,"./DiffPieChart":46,"./PieChart":47,"./Timeline":48,"./WordTree":49}],51:[function(require,module,exports){
 var scatterplot = function (userConfig) {
   var defaults = {
     // The parent container of this chart.
@@ -10855,7 +14071,7 @@ var scatterplot = function (userConfig) {
 };
 
 module.exports = scatterplot;
-},{}],48:[function(require,module,exports){
+},{}],52:[function(require,module,exports){
 /**
  *
  * This module provides ThreeJS/WebGL based visualization components.
@@ -10870,7 +14086,9 @@ var threejs = {};
 threejs.ScatterPlot = require("./ScatterPlot");
 
 module.exports = threejs;
-},{"./ScatterPlot":47}],49:[function(require,module,exports){
+},{"./ScatterPlot":51}],53:[function(require,module,exports){
+"use strict";
+
 /**
  *
  * This module provides routines for dealing with colors.
@@ -10881,248 +14099,253 @@ module.exports = threejs;
  *
  */
 
-/**
- *
- * This routine converts a rgb(red, green, blue) color to it's
- * equivalent #ffffff hexadecimal form.
- *
- * @param color The color we wish to convert to hex.
- * @returns {*}
- */
-exports.toHex = function (color) {
-  if (color.substr(0, 1) === '#') {
-    return color;
-  }
-  //console.log("COLOR: " + color)
-  var digits = /rgb\((\d+),(\d+),(\d+)\)/.exec(color);
-  //console.log("DIGITS: " + digits);
-  var red = parseInt(digits[1]);
-  var green = parseInt(digits[2]);
-  var blue = parseInt(digits[3]);
+module.exports = function color(dex) {
 
-  var rgb = blue | (green << 8) | (red << 16);
-  return '#' + rgb.toString(16);
-};
-
-/**
- *
- * This routine returns the requested named color scheme with
- * the requested number of colors.
- *
- * @param colorScheme The named color schemes: cat10, cat20, cat20b, cat20c, HiContrast or
- * any of the named colors from colorbrewer.
- * @param numColors The number of colors being requested.
- *
- * @returns {*} The array of colors.
- */
-exports.colorScheme = function (colorScheme, numColors) {
-  if (colorScheme === "cat10" || colorScheme == "1") {
-    return d3.scale.category10();
-  }
-  else if (colorScheme === "cat20" || colorScheme == "2") {
-    return d3.scale.category20();
-  }
-  else if (colorScheme === "cat20b" || colorScheme == "3") {
-    return d3.scale.category20b();
-  }
-  else if (colorScheme === "cat20c" || colorScheme == "4") {
-    return d3.scale.category20c();
-  }
-  else if (colorScheme == "HiContrast") {
-    return d3.scale.ordinal().range(colorbrewer[colorScheme][9]);
-  }
-  else if (colorScheme in colorbrewer) {
-    //console.log("LENGTH: " + len);
-    var c;
-    var effColors = Math.pow(2, Math.ceil(Math.log(numColors) / Math.log(2)));
-    //console.log("EFF LENGTH: " + len);
-
-    // Find the best cmap:
-    if (effColors > 128) {
-      effColors = 256;
-    }
-
-    for (c = effColors; c >= 2; c--) {
-      if (colorbrewer[colorScheme][c]) {
-        return d3.scale.ordinal().range(colorbrewer[colorScheme][c]);
+  return {
+    /**
+     *
+     * This routine converts a rgb(red, green, blue) color to it's
+     * equivalent #ffffff hexadecimal form.
+     *
+     * @param color The color we wish to convert to hex.
+     * @returns {*}
+     */
+    'toHex': function (color) {
+      if (color.substr(0, 1) === '#') {
+        return color;
       }
-    }
-    for (c = effColors; c <= 256; c++) {
-      if (colorbrewer[colorScheme][c]) {
-        return d3.scale.ordinal().range(colorbrewer[colorScheme][c]);
+      //console.log("COLOR: " + color)
+      var digits = /rgb\((\d+),(\d+),(\d+)\)/.exec(color);
+      //console.log("DIGITS: " + digits);
+      var red = parseInt(digits[1]);
+      var green = parseInt(digits[2]);
+      var blue = parseInt(digits[3]);
+
+      var rgb = blue | (green << 8) | (red << 16);
+      return '#' + rgb.toString(16);
+    },
+
+    /**
+     *
+     * This routine returns the requested named color scheme with
+     * the requested number of colors.
+     *
+     * @param colorScheme The named color schemes: cat10, cat20, cat20b, cat20c, HiContrast or
+     * any of the named colors from colorbrewer.
+     * @param numColors The number of colors being requested.
+     *
+     * @returns {*} The array of colors.
+     */
+    'colorScheme': function (colorScheme, numColors) {
+      if (colorScheme === "cat10" || colorScheme == "1") {
+        return d3.scale.category10();
       }
+      else if (colorScheme === "cat20" || colorScheme == "2") {
+        return d3.scale.category20();
+      }
+      else if (colorScheme === "cat20b" || colorScheme == "3") {
+        return d3.scale.category20b();
+      }
+      else if (colorScheme === "cat20c" || colorScheme == "4") {
+        return d3.scale.category20c();
+      }
+      else if (colorScheme == "HiContrast") {
+        return d3.scale.ordinal().range(colorbrewer[colorScheme][9]);
+      }
+      else if (colorScheme in colorbrewer) {
+        //console.log("LENGTH: " + len);
+        var c;
+        var effColors = Math.pow(2, Math.ceil(Math.log(numColors) / Math.log(2)));
+        //console.log("EFF LENGTH: " + len);
+
+        // Find the best cmap:
+        if (effColors > 128) {
+          effColors = 256;
+        }
+
+        for (c = effColors; c >= 2; c--) {
+          if (colorbrewer[colorScheme][c]) {
+            return d3.scale.ordinal().range(colorbrewer[colorScheme][c]);
+          }
+        }
+        for (c = effColors; c <= 256; c++) {
+          if (colorbrewer[colorScheme][c]) {
+            return d3.scale.ordinal().range(colorbrewer[colorScheme][c]);
+          }
+        }
+        return d3.scale.category20();
+      }
+      else {
+        return d3.scale.category20();
+      }
+    },
+
+    /**
+     *
+     * Given a color, lighten or darken it by the requested percent.
+     *
+     * @param color The color to modify.
+     * @param percent A floating point number in the range of [-1.0, 1.0].  Negative
+     * values will lighten the color, positive values will darken it.
+     *
+     * @returns {string} The lightened or darkened color in the form of #ffffff.
+     *
+     */
+    'shadeColor': function (color, percent) {
+      var f = parseInt(color.slice(1), 16), t = percent < 0 ? 0 : 255,
+        p = percent < 0 ? percent * -1 : percent,
+        R = f >> 16, G = f >> 8 & 0x00FF, B = f & 0x0000FF;
+      return "#" + (0x1000000 + (Math.round((t - R) * p) + R) * 0x10000 + (Math.round((t - G) * p) + G) *
+        0x100 + (Math.round((t - B) * p) + B)).toString(16).slice(1);
+    },
+
+    /**
+     *
+     * Given two colors, blend them together.
+     *
+     * @param color1
+     * @param color2
+     * @param percent
+     * @returns {string}
+     *
+     */
+    'blendColors': function (color1, color2, percent) {
+      var f = parseInt(color1.slice(1), 16), t = parseInt(color2.slice(1), 16),
+        R1 = f >> 16, G1 = f >> 8 & 0x00FF,
+        B1 = f & 0x0000FF, R2 = t >> 16,
+        G2 = t >> 8 & 0x00FF, B2 = t & 0x0000FF;
+
+      return "#" + (0x1000000 + (Math.round((R2 - R1) * percent) + R1) * 0x10000 +
+        (Math.round((G2 - G1) * percent) + G1) * 0x100 +
+        (Math.round((B2 - B1) * percent) + B1)).toString(16).slice(1);
+    },
+
+    /**
+     *
+     * @param color
+     * @param percent
+     * @returns {string}
+     */
+    'shadeRGBColor': function (color, percent) {
+      var f = color.split(","), t = percent < 0 ? 0 : 255,
+        p = percent < 0 ? percent * -1 : percent, R = parseInt(f[0].slice(4)),
+        G = parseInt(f[1]), B = parseInt(f[2]);
+      return "rgb(" + (Math.round((t - R) * p) + R) + "," +
+        (Math.round((t - G) * p) + G) + "," +
+        (Math.round((t - B) * p) + B) + ")";
+    },
+
+    /**
+     *
+     * @param color1
+     * @param color2
+     * @param percent
+     * @returns {string}
+     */
+    'blendRGBColors': function (color1, color2, percent) {
+      var f = color1.split(","), t = color2.split(","), R = parseInt(f[0].slice(4)),
+        G = parseInt(f[1]), B = parseInt(f[2]);
+      return "rgb(" + (Math.round((parseInt(t[0].slice(4)) - R) * p) + R) + "," +
+        (Math.round((parseInt(t[1]) - G) * percent) + G) + "," +
+        (Math.round((parseInt(t[2]) - B) * percent) + B) + ")";
+    },
+
+    /**
+     *
+     * @param color
+     * @param percent
+     * @returns {*}
+     */
+    'shade': function (color, percent) {
+      if (color.length > 7) return shadeRGBColor(color, percent);
+      else return shadeColor2(color, percent);
+    },
+
+    /**
+     *
+     * @param color1
+     * @param color2
+     * @param percent
+     */
+    'blend': function (color1, color2, percent) {
+      if (color1.length > 7) return blendRGBColors(color1, color2, percent);
+      else return blendColors(color1, color2, percent);
+    },
+
+    /**
+     *
+     * Given a color and a percent to lighten or darken it.
+     *
+     * @param color The base color.
+     * @param percent The pecentage to lighten (negative) or darken (positive) the color.
+     *
+     * @returns {string} The computed color.
+     *
+     */
+    /*
+     exports.shadeColor = function (color, percent) {
+     var R = parseInt(color.substring(1, 3), 16)
+     var G = parseInt(color.substring(3, 5), 16)
+     var B = parseInt(color.substring(5, 7), 16);
+
+     R = parseInt(R * (100 + percent) / 100);
+     G = parseInt(G * (100 + percent) / 100);
+     B = parseInt(B * (100 + percent) / 100);
+
+     R = (R < 255) ? R : 255;
+     G = (G < 255) ? G : 255;
+     B = (B < 255) ? B : 255;
+
+     var RR = ((R.toString(16).length == 1) ? "0" + R.toString(16) : R.toString(16));
+     var GG = ((G.toString(16).length == 1) ? "0" + G.toString(16) : G.toString(16));
+     var BB = ((B.toString(16).length == 1) ? "0" + B.toString(16) : B.toString(16));
+
+     return "#" + RR + GG + BB;
+     };
+     */
+
+    'gradient': function (baseColor) {
+      if (baseColor.charAt(0) == 'r') {
+        baseColor = colorToHex(baseColor);
+      }
+      var gradientId;
+      gradientId = "gradient" + baseColor.substring(1)
+      console.log("GradientId: " + gradientId);
+      console.log("BaseColor : " + baseColor);
+
+      //var lightColor = shadeColor(baseColor, -10)
+      var darkColor = shadeColor(baseColor, -20)
+
+      var grad = d3.select("#gradients").selectAll("#" + gradientId)
+        .data([gradientId])
+        .enter()
+        .append("radialGradient")
+        .attr("class", "colorGradient")
+        .attr("id", gradientId)
+        .attr("gradientUnits", "objectBoundingBox")
+        .attr("fx", "30%")
+        .attr("fy", "30%")
+
+      grad.append("stop")
+        .attr("offset", "0%")
+        .attr("style", "stop-color:#FFFFFF")
+
+      // Middle
+      grad.append("stop")
+        .attr("offset", "40%")
+        .attr("style", "stop-color:" + baseColor)
+
+      // Outer Edges
+      grad.append("stop")
+        .attr("offset", "100%")
+        .attr("style", "stop-color:" + darkColor)
+
+      return "url(#" + gradientId + ")";
     }
-    return d3.scale.category20();
-  }
-  else {
-    return d3.scale.category20();
-  }
+  };
 };
 
-/**
- *
- * Given a color, lighten or darken it by the requested percent.
- *
- * @param color The color to modify.
- * @param percent A floating point number in the range of [-1.0, 1.0].  Negative
- * values will lighten the color, positive values will darken it.
- *
- * @returns {string} The lightened or darkened color in the form of #ffffff.
- *
- */
-exports.shadeColor = function (color, percent) {
-  var f = parseInt(color.slice(1), 16), t = percent < 0 ? 0 : 255,
-    p = percent < 0 ? percent * -1 : percent,
-    R = f >> 16, G = f >> 8 & 0x00FF, B = f & 0x0000FF;
-  return "#" + (0x1000000 + (Math.round((t - R) * p) + R) * 0x10000 + (Math.round((t - G) * p) + G) *
-    0x100 + (Math.round((t - B) * p) + B)).toString(16).slice(1);
-};
-
-/**
- *
- * Given two colors, blend them together.
- *
- * @param color1
- * @param color2
- * @param percent
- * @returns {string}
- *
- */
-exports.blendColors = function(color1, color2, percent) {
-  var f = parseInt(color1.slice(1), 16), t = parseInt(color2.slice(1), 16),
-    R1 = f >> 16, G1 = f >> 8 & 0x00FF,
-    B1 = f & 0x0000FF, R2 = t >> 16,
-    G2 = t >> 8 & 0x00FF, B2 = t & 0x0000FF;
-
-  return "#" + (0x1000000 + (Math.round((R2 - R1) * percent) + R1) * 0x10000 +
-    (Math.round((G2 - G1) * percent) + G1) * 0x100 +
-    (Math.round((B2 - B1) * percent) + B1)).toString(16).slice(1);
-};
-
-/**
- *
- * @param color
- * @param percent
- * @returns {string}
- */
-exports.shadeRGBColor = function (color, percent) {
-  var f = color.split(","), t = percent < 0 ? 0 : 255,
-    p = percent < 0 ? percent * -1 : percent, R = parseInt(f[0].slice(4)),
-    G = parseInt(f[1]), B = parseInt(f[2]);
-  return "rgb(" + (Math.round((t - R) * p) + R) + "," +
-    (Math.round((t - G) * p) + G) + "," +
-    (Math.round((t - B) * p) + B) + ")";
-};
-
-/**
- *
- * @param color1
- * @param color2
- * @param percent
- * @returns {string}
- */
-exports.blendRGBColors = function(color1, color2, percent) {
-  var f = color1.split(","), t = color2.split(","), R = parseInt(f[0].slice(4)),
-    G = parseInt(f[1]), B = parseInt(f[2]);
-  return "rgb(" + (Math.round((parseInt(t[0].slice(4)) - R) * p) + R) + "," +
-    (Math.round((parseInt(t[1]) - G) * percent) + G) + "," +
-    (Math.round((parseInt(t[2]) - B) * percent) + B) + ")";
-};
-
-/**
- *
- * @param color
- * @param percent
- * @returns {*}
- */
-exports.shade = function(color, percent) {
-  if (color.length > 7) return shadeRGBColor(color, percent);
-  else return shadeColor2(color, percent);
-};
-
-/**
- *
- * @param color1
- * @param color2
- * @param percent
- */
-exports.blend = function (color1, color2, percent) {
-  if (color1.length > 7) return blendRGBColors(color1, color2, percent);
-  else return blendColors(color1, color2, percent);
-};
-
-/**
- *
- * Given a color and a percent to lighten or darken it.
- *
- * @param color The base color.
- * @param percent The pecentage to lighten (negative) or darken (positive) the color.
- *
- * @returns {string} The computed color.
- *
- */
-/*
- exports.shadeColor = function (color, percent) {
- var R = parseInt(color.substring(1, 3), 16)
- var G = parseInt(color.substring(3, 5), 16)
- var B = parseInt(color.substring(5, 7), 16);
-
- R = parseInt(R * (100 + percent) / 100);
- G = parseInt(G * (100 + percent) / 100);
- B = parseInt(B * (100 + percent) / 100);
-
- R = (R < 255) ? R : 255;
- G = (G < 255) ? G : 255;
- B = (B < 255) ? B : 255;
-
- var RR = ((R.toString(16).length == 1) ? "0" + R.toString(16) : R.toString(16));
- var GG = ((G.toString(16).length == 1) ? "0" + G.toString(16) : G.toString(16));
- var BB = ((B.toString(16).length == 1) ? "0" + B.toString(16) : B.toString(16));
-
- return "#" + RR + GG + BB;
- };
- */
-
-exports.gradient = function (baseColor) {
-  if (baseColor.charAt(0) == 'r') {
-    baseColor = colorToHex(baseColor);
-  }
-  var gradientId;
-  gradientId = "gradient" + baseColor.substring(1)
-  console.log("GradientId: " + gradientId);
-  console.log("BaseColor : " + baseColor);
-
-  //var lightColor = shadeColor(baseColor, -10)
-  var darkColor = shadeColor(baseColor, -20)
-
-  var grad = d3.select("#gradients").selectAll("#" + gradientId)
-    .data([gradientId])
-    .enter()
-    .append("radialGradient")
-    .attr("class", "colorGradient")
-    .attr("id", gradientId)
-    .attr("gradientUnits", "objectBoundingBox")
-    .attr("fx", "30%")
-    .attr("fy", "30%")
-
-  grad.append("stop")
-    .attr("offset", "0%")
-    .attr("style", "stop-color:#FFFFFF")
-
-  // Middle
-  grad.append("stop")
-    .attr("offset", "40%")
-    .attr("style", "stop-color:" + baseColor)
-
-  // Outer Edges
-  grad.append("stop")
-    .attr("offset", "100%")
-    .attr("style", "stop-color:" + darkColor)
-
-  return "url(#" + gradientId + ")";
-};
-
-},{}],50:[function(require,module,exports){
+},{}],54:[function(require,module,exports){
 /**
  *
  * This module provides base capabilities which are available to all dex components.
@@ -11468,188 +14691,220 @@ exports.gradient = function (baseColor) {
  * @param defaultConfig A map containing the default configuration for this component.
  *
  */
-module.exports = function (userConfig, defaultConfig) {
-  userConfig = userConfig || {};
-  defaultConfig = defaultConfig || {};
+module.exports = function (dex) {
+  return function (userConfig, defaultConfig) {
+    userConfig = userConfig || {};
+    defaultConfig = defaultConfig || {};
 
-  this.debug = false;
+    this.debug = false;
 
-  // Allows component construction from other components.
-  if (userConfig.hasOwnProperty('config')) {
-    this.config = dex.config.expandAndOverlay(userConfig.config, defaultConfig);
-  }
-  // Else, we have a configuration.
-  else {
-    this.config = dex.config.expandAndOverlay(userConfig, defaultConfig);
-  }
-
-  dex.console.log("dex.component Configuration", this.config);
-
-  if (!this.config.channel) {
-    this.config.channel = (this.config.parent || "#parent") + "/" +
-    (this.config.id || "unknown-id");
-  }
-
-  /**
-   * This method provides getter/setter access for the configuration of a
-   * DexComponent.
-   *
-   * Names can express hierarchy.  An attribute named 'a' may have a
-   * child attribute named 'b'.  In this case, the name of attribute
-   * 'a' is simply 'a'.  The name of attribute 'b' would be 'a.b'.
-   *
-   * attr(name) Retrieve retrieve the current value of the attribute with
-   * matching name.
-   *
-   * attr(name, value) Set the attribute with the matching name to the
-   * specified value.
-   *
-   * @method dex.component.attr
-   *
-   * @param name The name of the attribute.
-   * @param value The value of the attribute.
-   *
-   * @example {@lang javascript}
-   * // Set an attribute named "foo" to "bar"
-   * myComponent.attr("foo", "bar");
-   *
-   * // Returns "bar"
-   * myComponent.attr("foo");
-   *
-   * // Set an attribute named "foo" which belongs to an object named
-   * // nested which in turn belongs to myComponent.
-   * myComponent.attr("nested.foo", "bar");
-   *
-   * // Returns "bar"
-   * myComponent.attr("nested.foo");
-   *
-   * // Does nothing, returns myComponent
-   * myComponent.attr();
-   *
-   * @returns {string|component} If only name is provided, attr will return the value of
-   * the requested attribute.  If both name and value are provided, then
-   * the attribute corresponding to the name will be set to the supplied
-   * value and the component itself will be returned.
-   */
-  this.attr = function (name, value) {
-    if (arguments.length == 0) {
-      return this.config;
+    // Allows component construction from other components.
+    if (userConfig.hasOwnProperty('config')) {
+      this.config = dex.config.expandAndOverlay(userConfig.config, defaultConfig);
     }
-    else if (arguments.length == 1) {
-      // REM: Need to getHierarchical
-      return this.config[name];
+    // Else, we have a configuration.
+    else {
+      this.config = dex.config.expandAndOverlay(userConfig, defaultConfig);
     }
-    else if (arguments.length == 2) {
-      //console.log("Setting Hieararchical: " + name + "=" + value);
-      //console.dir(this.config);
 
-      // This will handle the setting of a single attribute
-      dex.object.setHierarchical(this.config, name, value, '.');
+    dex.console.log("dex.component Configuration", this.config);
+
+    if (!this.config.channel) {
+      this.config.channel = (this.config.parent || "#parent") + "/" +
+        (this.config.id || "unknown-id");
     }
-    return this;
-  };
 
-  /**
-   * Subscribe this component to the events of type eventTYpe
-   * generated by the source this.  When events are received,
-   * invoke the callback.
-   *
-   * @method dex.this.subscribe
-   *
-   * @param {component} source - The source component
-   * @param {string} eventType - The name of the event we are subscribing to.
-   * @param callback - The function to be invoked when this event is
-   * received.
-   *
-   * @returns {handle|false} False if function is called incorrectly.
-   * Otherwise, the function returns a handle which can later be used
-   * to unsubscribe to the events.
-   *
-   */
-  this.subscribe = function (source, eventType, callback) {
-    if (arguments.length == 3) {
-      var channel = source.config.channel + '/' + eventType;
+    /**
+     * This method provides getter/setter access for the configuration of a
+     * DexComponent.
+     *
+     * Names can express hierarchy.  An attribute named 'a' may have a
+     * child attribute named 'b'.  In this case, the name of attribute
+     * 'a' is simply 'a'.  The name of attribute 'b' would be 'a.b'.
+     *
+     * attr(name) Retrieve retrieve the current value of the attribute with
+     * matching name.
+     *
+     * attr(name, value) Set the attribute with the matching name to the
+     * specified value.
+     *
+     * @method dex.component.attr
+     *
+     * @param name The name of the attribute.
+     * @param value The value of the attribute.
+     *
+     * @example {@lang javascript}
+     * // Set an attribute named "foo" to "bar"
+     * myComponent.attr("foo", "bar");
+     *
+     * // Returns "bar"
+     * myComponent.attr("foo");
+     *
+     * // Set an attribute named "foo" which belongs to an object named
+     * // nested which in turn belongs to myComponent.
+     * myComponent.attr("nested.foo", "bar");
+     *
+     * // Returns "bar"
+     * myComponent.attr("nested.foo");
+     *
+     * // Does nothing, returns myComponent
+     * myComponent.attr();
+     *
+     * @returns {string|component} If only name is provided, attr will return the value of
+     * the requested attribute.  If both name and value are provided, then
+     * the attribute corresponding to the name will be set to the supplied
+     * value and the component itself will be returned.
+     */
+    this.attr = function (name, value) {
+      if (arguments.length == 0) {
+        return this.config;
+      }
+      else if (arguments.length == 1) {
+        // REM: Need to getHierarchical
+        return this.config[name];
+      }
+      else if (arguments.length == 2) {
+        //console.log("Setting Hieararchical: " + name + "=" + value);
+        //console.dir(this.config);
 
-      dex.console.log("subscribe to " + channel);
-      if (arguments.length < 3) {
-        dex.console.log("failed");
+        // This will handle the setting of a single attribute
+        dex.object.setHierarchical(this.config, name, value, '.');
+      }
+      return this;
+    };
+
+    /**
+     * Subscribe this component to the events of type eventTYpe
+     * generated by the source this.  When events are received,
+     * invoke the callback.
+     *
+     * @method dex.this.subscribe
+     *
+     * @param {component} source - The source component
+     * @param {string} eventType - The name of the event we are subscribing to.
+     * @param callback - The function to be invoked when this event is
+     * received.
+     *
+     * @returns {handle|false} False if function is called incorrectly.
+     * Otherwise, the function returns a handle which can later be used
+     * to unsubscribe to the events.
+     *
+     */
+    this.subscribe = function (source, eventType, callback) {
+      if (arguments.length == 3) {
+        var channel = source.config.channel + '/' + eventType;
+
+        dex.console.log("subscribe to " + channel);
+        if (arguments.length < 3) {
+          dex.console.log("failed");
+          return false;
+        }
+        return dex.bus.subscribe(channel, callback);
+      }
+      else {
         return false;
       }
-      return dex.bus.subscribe(channel, callback);
-    }
-    else {
-      return false;
-    }
-  };
+    };
 
-  /**
-   *
-   * Unsubscribe this component.
-   *
-   * @method dex.component.unsubscribe
-   *
-   * @param handle - The handle attained via subscribe.
-   *
-   */
-  this.unsubscribe = function (handle) {
-    dex.bus.unsubscribe(handle);
-  };
+    /**
+     *
+     * Unsubscribe this component.
+     *
+     * @method dex.component.unsubscribe
+     *
+     * @param handle - The handle attained via subscribe.
+     *
+     */
+    this.unsubscribe = function (handle) {
+      dex.bus.unsubscribe(handle);
+    };
 
-  /**
-   *
-   * Publish an event to the component's subscribers.
-   *
-   * @method dex.component.publish
-   *
-   * @param event - The event to publish.  An event can be any object, however,
-   * it must define a property named "type".
-   * @param event.type - The type of the event we are publishing.
-   *
-   */
-  this.publish = function (event) {
-    var channel;
+    /**
+     *
+     * Publish an event to the component's subscribers.
+     *
+     * @method dex.component.publish
+     *
+     * @param event - The event to publish.  An event can be any object, however,
+     * it must define a property named "type".
+     * @param event.type - The type of the event we are publishing.
+     *
+     */
+    this.publish = function (event) {
+      var channel;
 
-    if (!event || !event.type) {
-      dex.console.warn("publish of event to " + this.channel + " failed.");
-      dex.bus.publish("error", {
-        type          : "error",
-        "description" : "Error publishing event: '" + event + "' to '" + this.channel + "'"
+      if (!event || !event.type) {
+        dex.console.warn("publish of event to " + this.channel + " failed.");
+        dex.bus.publish("error", {
+          type: "error",
+          "description": "Error publishing event: '" + event + "' to '" + this.channel + "'"
+        });
+      }
+      else {
+        channel = this.config.channel + '/' + event.type;
+        dex.console.log("publish to " + channel);
+        dex.bus.publish(channel, event);
+      }
+    };
+
+    /**
+     *
+     * A default no-op implementation of render.  Subclasses should
+     * override this method with one which provides an initial rendering
+     * of their specific component.  This is a great place to put
+     * one-time only initialization logic.
+     *
+     * @method dex.component.render
+     *
+     */
+    this.render = function () {
+      console.log("Unimplemented routine: render()");
+    };
+
+    /**
+     *
+     * A default no-op implementation of update.  This will update the
+     * current component relative to any new setting or data changes.
+     *
+     * @method dex.component.update
+     *
+     */
+    this.update = function () {
+      console.log("Unimplemented routine: update()");
+      return this;
+    };
+
+    this.configure = function (config) {
+      dex.console.log("Configuration", "new", config, "current", this.config);
+      this.config = dex.config.expandAndOverlay(config, this.config);
+      dex.console.log("New Configuration", this.config);
+      return this;
+    };
+
+    this.load = function (location) {
+      var config = {};
+
+      $(location + " div").each(function (i) {
+        dex.console.log("Loading Setting: '" + $(this).attr('id') + "'='" +
+          $(this).attr('value') + "'");
+        config[$(this).attr('id')] = $(this).attr('value');
       });
-    }
-    else {
-      channel = this.config.channel + '/' + event.type;
-      dex.console.log("publish to " + channel);
-      dex.bus.publish(channel, event);
-    }
-  };
 
-  /**
-   *
-   * A default no-op implementation of render.  Subclasses should
-   * override this method with one which provides an initial rendering
-   * of their specific component.  This is a great place to put
-   * one-time only initialization logic.
-   *
-   * @method dex.component.render
-   *
-   */
-  this.render = function () {
-    console.log("Unimplemented routine: render()");
-  };
+      dex.console.log("Loaded Configuration:", config);
+      return this.configure(config);
+    };
 
-  /**
-   *
-   * A default no-op implementation of update.  This will update the
-   * current component relative to any new setting or data changes.
-   *
-   * @method dex.component.update
-   *
-   */
-  this.update = function () {
-    console.log("Unimplemented routine: update()");
+    this.save = function (location, config) {
+      dex.console.log("Saving Configuration To: " + location, config);
+      $(location).children().remove();
+      _.keys(config).forEach(function (key) {
+        $(location).append("<div id='" + key + "' value='" + config[key] + "'></div>");
+      });
+      return this;
+    };
   };
 };
-},{}],51:[function(require,module,exports){
+},{}],55:[function(require,module,exports){
 /**
  *
  * Config module.
@@ -11659,15 +14914,19 @@ module.exports = function (userConfig, defaultConfig) {
  *
  */
 
-/**
- *
- * This routine supports a shorthand notation allowing the
- * user to specify deeply nested configuration options without
- * having to deal with nested json structures.
- *
- * Options like:
- *
- * {
+module.exports = function config(dex) {
+
+  return {
+
+    /**
+     *
+     * This routine supports a shorthand notation allowing the
+     * user to specify deeply nested configuration options without
+     * having to deal with nested json structures.
+     *
+     * Options like:
+     *
+     * {
  *   'cell' : {
  *     'rect' : {
  *       'width' : 10,
@@ -11678,1258 +14937,1258 @@ module.exports = function (userConfig, defaultConfig) {
  *     }
  *   }
  * }
- *
- * Can now be described more succinctly and more readably as:
- *
- * {
+     *
+     * Can now be described more succinctly and more readably as:
+     *
+     * {
  *   'cell.rect.width'            : 10,
  *   'cell.rect.height'           : 20,
  *   'cell.rect.events.mouseover' : function(d) { console.log("Mouseover: " + d); }
  * }
- *
- * Or a hybrid strategy can be used:
- *
- * {
+     *
+     * Or a hybrid strategy can be used:
+     *
+     * {
  *   'cell.rect' : {
  *     'width' : 10,
  *     'height' : 20,
  *     'events.mouseover' : function(d) { console.log("Mouseover: " + d); }
  *   }
  * }
- *
- * @param {object} config The configuration to expand.
- * @returns {*} The expanded configuration.  The original configuration
- *   is left untouched.
- *
- */
-exports.expand = function expand(config) {
-  var name, ci;
-  var expanded = {};
+     *
+     * @param {object} config The configuration to expand.
+     * @returns {*} The expanded configuration.  The original configuration
+     *   is left untouched.
+     *
+     */
+    'expand': function expand(config) {
+      var name, ci;
+      var expanded = {};
 
-  // We have nothing, return nothing.
-  if (!config) {
-    return config;
-  }
-
-  //dex.console.log("dex.config.expand(config=", config);
-
-  for (var name in config) {
-    if (config.hasOwnProperty(name)) {
-      // Name contains hierarchy:
-      if (name && name.indexOf('.') > -1) {
-        expanded[name] = config[name];
-        dex.object.setHierarchical(expanded, name,
-          dex.object.clone(expanded[name]), '.');
-        delete expanded[name];
+      // We have nothing, return nothing.
+      if (!config) {
+        return config;
       }
-      // Simple name
-      else {
-        // If the target is an object with no children, clone it.
-        if (dex.object.isEmpty(config[name])) {
-          //dex.console.log("SET PRIMITIVE: " + name + "=" + config[name]);
-          expanded[name] = dex.object.clone(config[name]);
-          //expanded[name] = config[name];
+
+      //dex.console.log("dex.config.expand(config=", config);
+
+      for (var name in config) {
+        if (config.hasOwnProperty(name)) {
+          // Name contains hierarchy:
+          if (name && name.indexOf('.') > -1) {
+            expanded[name] = config[name];
+            dex.object.setHierarchical(expanded, name,
+              dex.object.clone(expanded[name]), '.');
+            delete expanded[name];
+          }
+          // Simple name
+          else {
+            // If the target is an object with no children, clone it.
+            if (dex.object.isEmpty(config[name])) {
+              //dex.console.log("SET PRIMITIVE: " + name + "=" + config[name]);
+              expanded[name] = dex.object.clone(config[name]);
+              //expanded[name] = config[name];
+            }
+            else {
+              //dex.console.log("SET OBJECT: " + name + " to the expansion of", config[name]);
+              expanded[name] = dex.config.expand(config[name]);
+            }
+          }
         }
-        else {
-          //dex.console.log("SET OBJECT: " + name + " to the expansion of", config[name]);
-          expanded[name] = dex.config.expand(config[name]);
+      }
+
+      //dex.console.log("CONFIG", config, "EXPANDED", expanded);
+      return expanded;
+    },
+
+    /**
+     *
+     * This routine will expand hiearchically delimited names such as
+     * foo.bar into a structure { foo : { bar : value}}.  It will delete
+     * the hierarchical name and overwrite the value into the proper
+     * location leaving any previous object properties undisturbed.
+     *
+     * @param {Object} config The configuration which we will expand.
+     *
+     */
+
+    /*
+     exports.expand_deprecate = function expand(config) {
+     var name,
+     ci,
+     expanded;
+
+     // We have nothing, return nothing.
+     if (!config) {
+     return config;
+     }
+
+     //dex.console.log("dex.config.expand(config=", config);
+
+     // Make a clone of the previous configuration.
+     expanded = dex.object.clone(config);
+
+     // Iterate over the property names.
+     for (name in config) {
+     // If this is our property the process it, otherwise ignore.
+     if (config.hasOwnProperty(name)) {
+     // The property name is non-null.
+     if (name) {
+     // Determine character index.
+     ci = name.indexOf('.');
+     }
+     else {
+     // Default to -1
+     ci = -1;
+     }
+
+     // if Character index is > -1, we have a hierarchical name.
+     // Otherwise do nothing, copying was already handled in the
+     // cloning activity.
+     if (ci > -1) {
+     // Set it...
+     dex.object.setHierarchical(expanded, name,
+     dex.object.clone(expanded[name]), '.');
+     // Delete the old name.
+     delete expanded[name];
+     }
+     }
+     }
+
+     //dex.console.log("CONFIG", config, "EXPANDED", expanded);
+     return expanded;
+     };
+     */
+
+    /**
+     *
+     * This routine will take two hierarchies, top and bottom, and expand dot ('.')
+     * delimited names such as: 'foo.bar.biz.baz' into a structure:
+     * { 'foo' : { 'bar' : { 'biz' : 'baz' }}}
+     * It will then overlay the top hierarchy onto the bottom one.  This is useful
+     * for configuring objects based upon a default configuration while allowing
+     * the client to conveniently override these defaults as needed.
+     *
+     * @param {object} top - The top object hierarchy.
+     * @param {object} bottom - The bottom, base object hierarchy.
+     * @returns {object} - A new object representing the expanded top object
+     * hierarchy overlaid on top of the expanded bottom object hierarchy.
+     *
+     */
+    'expandAndOverlay': function expandAndOverlay(top, bottom) {
+      //dex.console.log(
+      //dex.config.getCallerString(arguments.callee.caller),
+      //"TOP", top,
+      //"BOTTOM", bottom,
+      //"EXPANDED TOP", dex.config.expand(top),
+      //"EXPANDED BOTTOM", dex.config.expand(bottom));
+      return dex.object.overlay(dex.config.expand(top),
+        dex.config.expand(bottom));
+    },
+
+    /**
+     *
+     * Return the configuration for a font after the user's customizations
+     * have been applied.
+     *
+     * @param {d3font_spec} custom - The user customizations.
+     * @returns {d3font_spec} - An object containing the font's specifications
+     * after the user's customizations have been applied.
+     *
+     */
+    'font': function font(custom) {
+      var defaults =
+      {
+        'decoration': 'none',
+        'family': 'sans-serif',
+        'letterSpacing': 'normal',
+        'size': 14,
+        'style': 'normal',
+        'weight': 'normal',
+        'wordSpacing': 'normal',
+        'variant': 'normal'
+      };
+
+      var fontSpec = dex.config.expandAndOverlay(custom, defaults);
+      return fontSpec;
+    },
+
+    /**
+     *
+     * Configure the given font with the supplied font specification.
+     *
+     * @param {object} node - The node to be configured.
+     * @param {d3font_spec} fontSpec - The font specification to be applied.
+     *
+     * @returns {*} The node after having the font specification applied.
+     *
+     */
+    'configureFont': function configureFont(node, fontSpec, i) {
+      //dex.console.log("CONFIG-FONT: " + i);
+      if (fontSpec) {
+        dex.config.setAttr(node, 'font-family', fontSpec.family, i);
+        dex.config.setAttr(node, 'font-size', fontSpec.size, i);
+        dex.config.setAttr(node, 'font-weight', fontSpec.weight, i);
+        dex.config.setAttr(node, 'font-style', fontSpec.style, i);
+        dex.config.setAttr(node, 'text-decoration', fontSpec.decoration, i);
+
+        dex.config.setAttr(node, 'word-spacing', fontSpec.wordSpacing, i);
+        dex.config.setAttr(node, 'letter-spacing', fontSpec.letterSpacing, i);
+        dex.config.setAttr(node, 'variant', fontSpec.variant, i);
+      }
+      return node;
+    },
+
+    /**
+     *
+     * Construct a text speficiation.
+     *
+     * @param {d3text_spec} custom - The user's adjustments to the default text
+     * specification.
+     *
+     * @returns {d3text_spec} A revised text specification after having applied
+     * the user's modfiications.
+     *
+     */
+    'text': function text(custom) {
+      var defaults =
+      {
+        'font': dex.config.font(),
+        'x': 0,
+        'y': 0,
+        'textLength': undefined,
+        'lengthAdjust': undefined,
+        'transform': '',
+        'glyphOrientationVertical': undefined,
+        'text': undefined,
+        'dx': 0,
+        'dy': 0,
+        'writingMode': undefined,
+        'anchor': 'start',
+        'fill': dex.config.fill(),
+        'format': undefined,
+        'events': dex.config.events()
+      };
+
+      var textSpec = dex.config.expandAndOverlay(custom, defaults);
+      return textSpec;
+    },
+
+    /**
+     *
+     * This routine will dynamically configure an SVG text entity based upon the
+     * supplied configuration.
+     *
+     * @param {object} node The SVG text node to be configured.
+     * @param {d3text_spec} textSpec The text specification for this node.
+     *
+     * @returns {*} The node after having applied the text specification.
+     *
+     */
+    'configureText': function configureText(node, textSpec, i) {
+      //dex.console.log("CONFIG-TEXT: " + i);
+      if (textSpec) {
+        dex.config.setAttr(node, "x", textSpec.x, i);
+        dex.config.setAttr(node, "y", textSpec.y, i);
+        dex.config.setAttr(node, "dx", textSpec.dx, i);
+        dex.config.setAttr(node, "dy", textSpec.dy, i);
+        dex.config.setStyle(node, "text-anchor", textSpec.anchor, i);
+        dex.config.configureFont(node, textSpec.font, i);
+        dex.config.setAttr(node, 'textLength', textSpec.textLength, i);
+        dex.config.setAttr(node, 'lengthAdjust', textSpec.lengthAdjust, i);
+        dex.config.setAttr(node, 'transform', textSpec.transform, i);
+        dex.config.setAttr(node, 'glyph-orientation-vertical',
+          textSpec.glyphOrientationVertical, i);
+        dex.config.setAttr(node, 'writing-mode', textSpec.writingMode, i);
+        dex.config.callIfDefined(node, 'text', textSpec.text, i);
+        dex.config.configureFill(node, textSpec.fill, i);
+        dex.config.configureEvents(node, textSpec.events, i);
+      }
+      return node;
+    },
+
+    /**
+     *
+     * Construct a stroke specification.
+     *
+     * @param {d3text_spec} strokeSpec - The user's customizations to the specification.
+     *
+     * @returns {d3text_spec} The stroke specification after having applied the user's
+     * configuration.
+     *
+     */
+    'stroke': function stroke(strokeSpec) {
+      var defaults =
+      {
+        'width': 1,
+        'color': "black",
+        'opacity': 1,
+        'dasharray': '',
+        'transform': ''
+      };
+
+      var config = dex.config.expandAndOverlay(strokeSpec, defaults);
+      return config;
+    },
+
+    /**
+     *
+     * Apply a stroke specification to a node.
+     *
+     * @param {object} node - The node to be configured.
+     * @param {d3stroke_spec} strokeSpec - The stroke specification to be applied.
+     * @returns The newly configured node.
+     */
+    'configureStroke': function configureStroke(node, strokeSpec, i) {
+      if (strokeSpec) {
+        dex.config.setAttr(node, "stroke", strokeSpec.color, i);
+        dex.config.setStyle(node, 'stroke-width', strokeSpec.width, i);
+        dex.config.setStyle(node, 'stroke-opacity', strokeSpec.opacity, i);
+        dex.config.setStyle(node, 'stroke-dasharray', strokeSpec.dasharray, i);
+        dex.config.setAttr(node, 'transform', strokeSpec.transform, i);
+      }
+      return node;
+    },
+    /**
+     *
+     * Construct a fill specification which allow the user to override any
+     * its settings.
+     *
+     * @param {d3fill_spec} custom - The user's customizations.
+     * @returns {d3fill_spec} A fill specification which has applied the user's
+     * customizations.
+     *
+     */
+    'fill': function fill(custom) {
+      var defaults =
+      {
+        'fillColor': "grey",
+        'fillOpacity': 1
+      };
+
+      var config = dex.config.expandAndOverlay(custom, defaults);
+      return config;
+    },
+
+    /**
+     *
+     * Apply a fill specification to a node.
+     *
+     * @param {object} node - The node to be configured.
+     * @param {d3fill_spec} config - The fill specification.
+     *
+     * @returns {object} The node after having applied the fill specification.
+     *
+     */
+    'configureFill': function configureFill(node, config, i) {
+      if (config) {
+        dex.config.setStyle(node, 'fill', config.fillColor, i);
+        dex.config.setStyle(node, 'fill-opacity', config.fillOpacity, i);
+      }
+      return node;
+    },
+
+    /**
+     *
+     * Construct a link specification which allows the user to override any
+     * of the settings.
+     *
+     * @param {d3link_spec} custom - The users customizations.
+     *
+     * @returns {d3link_spec} A link specification generated by combining the
+     * default with the user's customizations.
+     *
+     */
+    'link': function link(custom) {
+      var defaults =
+      {
+        'fill': dex.config.fill(),
+        'stroke': dex.config.stroke(),
+        'transform': '',
+        'd': undefined,
+        'events': dex.config.events()
+      };
+
+      var config = dex.config.expandAndOverlay(custom, defaults);
+      return config;
+    },
+
+    /**
+     *
+     * Apply a link specification to a node.
+     *
+     * @param {object} node - The node to apply the specification to.
+     * @param {d3link_spec} config - The link specification.
+     *
+     * @returns {object} The node after having applied the specification.
+     *
+     */
+    'configureLink': function configureLink(node, config, i) {
+      if (config) {
+        dex.config.configureStroke(node, config.stroke, i);
+        dex.config.configureFill(node, config.fill, i);
+        dex.config.setAttr(node, 'transform', config.transform, i);
+        dex.config.setAttr(node, 'd', config.d, i);
+        dex.config.configureEvents(node, config.events, i);
+      }
+      return node;
+    },
+
+    /**
+     *
+     * Construct a rectangle specification which allows the user to override any
+     * of the settings.
+     *
+     * @param {d3rect_spec} custom - The users customizations.
+     *
+     * @returns {d3rect_spec} A rectangle specification generated by combining the
+     * default with the user's customizations.
+     *
+     */
+    'rectangle': function rectangle(custom) {
+      var config =
+      {
+        'width': 50,
+        'height': 50,
+        'x': 0,
+        'y': 0,
+        'rx': 0,
+        'ry': 0,
+        'stroke': dex.config.stroke(),
+        'opacity': 1,
+        'color': d3.scale.category20(),
+        'transform': undefined,
+        'events': dex.config.events()
+      };
+      if (custom) {
+        config = dex.object.overlay(custom, config);
+      }
+      return config;
+    },
+
+    'configureRectangle': function configureRectangle(node, config, i) {
+      if (config) {
+        dex.config.setAttr(node, 'width', config.width, i);
+        dex.config.setAttr(node, 'height', config.height, i);
+        dex.config.setAttr(node, 'x', config.x, i);
+        dex.config.setAttr(node, 'y', config.y, i);
+        dex.config.setAttr(node, 'rx', config.rx, i);
+        dex.config.setAttr(node, 'ry', config.ry, i);
+        dex.config.setAttr(node, 'opacity', config.opacity, i);
+        dex.config.setAttr(node, 'fill', config.color, i);
+        dex.config.setAttr(node, 'transform', config.transform, i);
+        dex.config.configureStroke(node, config.stroke, i);
+        dex.config.configureEvents(node, config.events, i);
+      }
+      return node;
+    },
+
+    /**
+     *
+     * Construct an events specification which allows the user to override any
+     * of the settings.
+     *
+     * @param {d3events_spec} custom - The users customizations.
+     *
+     * @returns {d3events_spec} An events specification generated by combining the
+     * default with the user's customizations.
+     *
+     */
+    'events': function events(custom) {
+      var defaults =
+      {
+        'mouseover': function (d) {
+          //console.log("Default mouseover");
+        }
+      };
+      var config = defaults;
+
+      if (custom) {
+        config = dex.object.overlay(custom, defaults);
+      }
+      return config;
+    },
+
+    'configureEvents': function configureEvents(node, config, i) {
+      //dex.console.log("Configure Events", config, i);
+      if (config) {
+        for (var key in config) {
+          //dex.console.log("KEY", key, "VALUE", config[key]);
+          dex.config.setEventHandler(node, key, config[key], i);
         }
       }
-    }
-  }
 
-  //dex.console.log("CONFIG", config, "EXPANDED", expanded);
-  return expanded;
-};
+      return node;
+    },
 
-/**
- *
- * This routine will expand hiearchically delimited names such as
- * foo.bar into a structure { foo : { bar : value}}.  It will delete
- * the hierarchical name and overwrite the value into the proper
- * location leaving any previous object properties undisturbed.
- *
- * @param {Object} config The configuration which we will expand.
- *
- */
+    /**
+     *
+     * Construct an line specification which allows the user to override any
+     * of the settings.
+     *
+     * @param {d3line_spec} custom - The users customizations.
+     *
+     * @returns {d3line_spec} A line specification generated by combining the
+     * default with the user's customizations.
+     *
+     */
+    'line': function line(custom) {
+      var defaults =
+      {
+        'start': dex.config.point(),
+        'end': dex.config.point(),
+        'stroke': dex.config.stroke(),
+        'fill': dex.config.fill(),
+        'interpolate': undefined
+      };
+      var config = dex.config.expandAndOverlay(custom, defaults);
+      return config;
+    },
 
-/*
- exports.expand_deprecate = function expand(config) {
- var name,
- ci,
- expanded;
+    'configureLine': function configureLine(node, config, i) {
+      if (config) {
+        dex.config.setAttr(node, 'x1', config.start.x, i);
+        dex.config.setAttr(node, 'y1', config.start.y, i);
+        dex.config.setAttr(node, 'x2', config.end.x, i);
+        dex.config.setAttr(node, 'y2', config.end.y, i);
+        dex.config.configureStroke(node, config.stroke, i);
+        dex.config.configureFill(node, config.fill, i);
+        if (config.interpolate) {
+          //dex.console.log("interpolate", node, config, i);
+          node.interpolate(config.interpolate);
+          // I think this is closer to correct....but breaks the motion line chart
+          //node.interpolate(dex.config.optionValue(config.interpolate, i));
+        }
+      }
+      return node;
+    },
 
- // We have nothing, return nothing.
- if (!config) {
- return config;
- }
+    /**
+     *
+     * Construct an path specification which allows the user to override any
+     * of the settings.
+     *
+     * @param {d3path_spec} custom - The users customizations.
+     *
+     * @returns {d3path_spec} A path specification generated by combining the
+     * default with the user's customizations.
+     *
+     */
+    'path': function path(custom) {
+      var defaults =
+      {
+        'fill': dex.config.fill(),
+        'stroke': dex.config.stroke()
+      };
+      var config = dex.config.expandAndOverlay(custom, defaults);
+      return config;
+    },
 
- //dex.console.log("dex.config.expand(config=", config);
+    'configurePath': function configurePath(node, config, i) {
+      if (config) {
+        dex.config.configureFill(node, config.fill, i);
+        dex.config.configureStroke(node, config.stroke, i);
+      }
+      return node;
+    },
 
- // Make a clone of the previous configuration.
- expanded = dex.object.clone(config);
+    'getCallers': function getCallers(caller) {
+      var callers = [];
+      var currentCaller = caller;
+      for (; currentCaller; currentCaller = currentCaller.caller) {
+        if (currentCaller.name) {
+          callers.push(currentCaller.name);
+        }
+      }
 
- // Iterate over the property names.
- for (name in config) {
- // If this is our property the process it, otherwise ignore.
- if (config.hasOwnProperty(name)) {
- // The property name is non-null.
- if (name) {
- // Determine character index.
- ci = name.indexOf('.');
- }
- else {
- // Default to -1
- ci = -1;
- }
+      return callers.reverse();
+    },
 
- // if Character index is > -1, we have a hierarchical name.
- // Otherwise do nothing, copying was already handled in the
- // cloning activity.
- if (ci > -1) {
- // Set it...
- dex.object.setHierarchical(expanded, name,
- dex.object.clone(expanded[name]), '.');
- // Delete the old name.
- delete expanded[name];
- }
- }
- }
+    'getCallerString': function getCallerString(caller) {
+      return dex.config.getCallers(caller).join("->");
+    },
 
- //dex.console.log("CONFIG", config, "EXPANDED", expanded);
- return expanded;
- };
- */
+    'setEventHandler': function setEventHandler(node, eventType, eventHandler, i) {
+      var callerStr = dex.config.getCallerString(arguments.callee.caller);
 
-/**
- *
- * This routine will take two hierarchies, top and bottom, and expand dot ('.')
- * delimited names such as: 'foo.bar.biz.baz' into a structure:
- * { 'foo' : { 'bar' : { 'biz' : 'baz' }}}
- * It will then overlay the top hierarchy onto the bottom one.  This is useful
- * for configuring objects based upon a default configuration while allowing
- * the client to conveniently override these defaults as needed.
- *
- * @param {object} top - The top object hierarchy.
- * @param {object} bottom - The bottom, base object hierarchy.
- * @returns {object} - A new object representing the expanded top object
- * hierarchy overlaid on top of the expanded bottom object hierarchy.
- *
- */
-exports.expandAndOverlay = function expandAndOverlay(top, bottom) {
-  //dex.console.log(
-  //dex.config.getCallerString(arguments.callee.caller),
-  //"TOP", top,
-  //"BOTTOM", bottom,
-  //"EXPANDED TOP", dex.config.expand(top),
-  //"EXPANDED BOTTOM", dex.config.expand(bottom));
-  return dex.object.overlay(dex.config.expand(top),
-    dex.config.expand(bottom));
-};
-
-/**
- *
- * Return the configuration for a font after the user's customizations
- * have been applied.
- *
- * @param {d3font_spec} custom - The user customizations.
- * @returns {d3font_spec} - An object containing the font's specifications
- * after the user's customizations have been applied.
- *
- */
-exports.font = function font(custom) {
-  var defaults =
-  {
-    'decoration'    : 'none',
-    'family'        : 'sans-serif',
-    'letterSpacing' : 'normal',
-    'size'          : 14,
-    'style'         : 'normal',
-    'weight'        : 'normal',
-    'wordSpacing'   : 'normal',
-    'variant'       : 'normal'
-  };
-
-  var fontSpec = dex.config.expandAndOverlay(custom, defaults);
-  return fontSpec;
-};
-
-/**
- *
- * Configure the given font with the supplied font specification.
- *
- * @param {object} node - The node to be configured.
- * @param {d3font_spec} fontSpec - The font specification to be applied.
- *
- * @returns {*} The node after having the font specification applied.
- *
- */
-exports.configureFont = function configureFont(node, fontSpec, i) {
-  //dex.console.log("CONFIG-FONT: " + i);
-  if (fontSpec) {
-    dex.config.setAttr(node, 'font-family', fontSpec.family, i);
-    dex.config.setAttr(node, 'font-size', fontSpec.size, i);
-    dex.config.setAttr(node, 'font-weight', fontSpec.weight, i);
-    dex.config.setAttr(node, 'font-style', fontSpec.style, i);
-    dex.config.setAttr(node, 'text-decoration', fontSpec.decoration, i);
-
-    dex.config.setAttr(node, 'word-spacing', fontSpec.wordSpacing, i);
-    dex.config.setAttr(node, 'letter-spacing', fontSpec.letterSpacing, i);
-    dex.config.setAttr(node, 'variant', fontSpec.variant, i);
-  }
-  return node;
-};
-
-/**
- *
- * Construct a text speficiation.
- *
- * @param {d3text_spec} custom - The user's adjustments to the default text
- * specification.
- *
- * @returns {d3text_spec} A revised text specification after having applied
- * the user's modfiications.
- *
- */
-exports.text = function text(custom) {
-  var defaults =
-  {
-    'font'                     : dex.config.font(),
-    'x'                        : 0,
-    'y'                        : 0,
-    'textLength'               : undefined,
-    'lengthAdjust'             : undefined,
-    'transform'                : '',
-    'glyphOrientationVertical' : undefined,
-    'text'                     : undefined,
-    'dx'                       : 0,
-    'dy'                       : 0,
-    'writingMode'              : undefined,
-    'anchor'                   : 'start',
-    'fill'                     : dex.config.fill(),
-    'format'                   : undefined,
-    'events'                   : dex.config.events()
-  };
-
-  var textSpec = dex.config.expandAndOverlay(custom, defaults);
-  return textSpec;
-};
-
-/**
- *
- * This routine will dynamically configure an SVG text entity based upon the
- * supplied configuration.
- *
- * @param {object} node The SVG text node to be configured.
- * @param {d3text_spec} textSpec The text specification for this node.
- *
- * @returns {*} The node after having applied the text specification.
- *
- */
-exports.configureText = function configureText(node, textSpec, i) {
-  //dex.console.log("CONFIG-TEXT: " + i);
-  if (textSpec) {
-    dex.config.setAttr(node, "x", textSpec.x, i);
-    dex.config.setAttr(node, "y", textSpec.y, i);
-    dex.config.setAttr(node, "dx", textSpec.dx, i);
-    dex.config.setAttr(node, "dy", textSpec.dy, i);
-    dex.config.setStyle(node, "text-anchor", textSpec.anchor, i);
-    dex.config.configureFont(node, textSpec.font, i);
-    dex.config.setAttr(node, 'textLength', textSpec.textLength, i);
-    dex.config.setAttr(node, 'lengthAdjust', textSpec.lengthAdjust, i);
-    dex.config.setAttr(node, 'transform', textSpec.transform, i);
-    dex.config.setAttr(node, 'glyph-orientation-vertical',
-      textSpec.glyphOrientationVertical, i);
-    dex.config.setAttr(node, 'writing-mode', textSpec.writingMode, i);
-    dex.config.callIfDefined(node, 'text', textSpec.text, i);
-    dex.config.configureFill(node, textSpec.fill, i);
-    dex.config.configureEvents(node, textSpec.events, i);
-  }
-  return node;
-};
-
-/**
- *
- * Construct a stroke specification.
- *
- * @param {d3text_spec} strokeSpec - The user's customizations to the specification.
- *
- * @returns {d3text_spec} The stroke specification after having applied the user's
- * configuration.
- *
- */
-exports.stroke = function stroke(strokeSpec) {
-  var defaults =
-  {
-    'width'     : 1,
-    'color'     : "black",
-    'opacity'   : 1,
-    'dasharray' : '',
-    'transform' : ''
-  };
-
-  var config = dex.config.expandAndOverlay(strokeSpec, defaults);
-  return config;
-};
-
-/**
- *
- * Apply a stroke specification to a node.
- *
- * @param {object} node - The node to be configured.
- * @param {d3stroke_spec} strokeSpec - The stroke specification to be applied.
- * @returns The newly configured node.
- */
-exports.configureStroke = function configureStroke(node, strokeSpec, i) {
-  if (strokeSpec) {
-    dex.config.setAttr(node, "stroke", strokeSpec.color, i);
-    dex.config.setStyle(node, 'stroke-width', strokeSpec.width, i);
-    dex.config.setStyle(node, 'stroke-opacity', strokeSpec.opacity, i);
-    dex.config.setStyle(node, 'stroke-dasharray', strokeSpec.dasharray, i);
-    dex.config.setAttr(node, 'transform', strokeSpec.transform, i);
-  }
-  return node;
-};
-/**
- *
- * Construct a fill specification which allow the user to override any
- * its settings.
- *
- * @param {d3fill_spec} custom - The user's customizations.
- * @returns {d3fill_spec} A fill specification which has applied the user's
- * customizations.
- *
- */
-exports.fill = function fill(custom) {
-  var defaults =
-  {
-    'fillColor'   : "grey",
-    'fillOpacity' : 1
-  };
-
-  var config = dex.config.expandAndOverlay(custom, defaults);
-  return config;
-};
-
-/**
- *
- * Apply a fill specification to a node.
- *
- * @param {object} node - The node to be configured.
- * @param {d3fill_spec} config - The fill specification.
- *
- * @returns {object} The node after having applied the fill specification.
- *
- */
-exports.configureFill = function configureFill(node, config, i) {
-  if (config) {
-    dex.config.setStyle(node, 'fill', config.fillColor, i);
-    dex.config.setStyle(node, 'fill-opacity', config.fillOpacity, i);
-  }
-  return node;
-};
-
-/**
- *
- * Construct a link specification which allows the user to override any
- * of the settings.
- *
- * @param {d3link_spec} custom - The users customizations.
- *
- * @returns {d3link_spec} A link specification generated by combining the
- * default with the user's customizations.
- *
- */
-exports.link = function link(custom) {
-  var defaults =
-  {
-    'fill'      : dex.config.fill(),
-    'stroke'    : dex.config.stroke(),
-    'transform' : '',
-    'd'         : undefined,
-    'events'    : dex.config.events()
-  };
-
-  var config = dex.config.expandAndOverlay(custom, defaults);
-  return config;
-};
-
-/**
- *
- * Apply a link specification to a node.
- *
- * @param {object} node - The node to apply the specification to.
- * @param {d3link_spec} config - The link specification.
- *
- * @returns {object} The node after having applied the specification.
- *
- */
-exports.configureLink = function configureLink(node, config, i) {
-  if (config) {
-    dex.config.configureStroke(node, config.stroke, i);
-    dex.config.configureFill(node, config.fill, i);
-    dex.config.setAttr(node, 'transform', config.transform, i);
-    dex.config.setAttr(node, 'd', config.d, i);
-    dex.config.configureEvents(node, config.events, i);
-  }
-  return node;
-}
-
-/**
- *
- * Construct a rectangle specification which allows the user to override any
- * of the settings.
- *
- * @param {d3rect_spec} custom - The users customizations.
- *
- * @returns {d3rect_spec} A rectangle specification generated by combining the
- * default with the user's customizations.
- *
- */
-exports.rectangle = function rectangle(custom) {
-  var config =
-  {
-    'width'     : 50,
-    'height'    : 50,
-    'x'         : 0,
-    'y'         : 0,
-    'rx'        : 0,
-    'ry'        : 0,
-    'stroke'    : dex.config.stroke(),
-    'opacity'   : 1,
-    'color'     : d3.scale.category20(),
-    'transform' : undefined,
-    'events'    : dex.config.events()
-  };
-  if (custom) {
-    config = dex.object.overlay(custom, config);
-  }
-  return config;
-};
-
-exports.configureRectangle = function configureRectangle(node, config, i) {
-  if (config) {
-    dex.config.setAttr(node, 'width', config.width, i);
-    dex.config.setAttr(node, 'height', config.height, i);
-    dex.config.setAttr(node, 'x', config.x, i);
-    dex.config.setAttr(node, 'y', config.y, i);
-    dex.config.setAttr(node, 'rx', config.rx, i);
-    dex.config.setAttr(node, 'ry', config.ry, i);
-    dex.config.setAttr(node, 'opacity', config.opacity, i);
-    dex.config.setAttr(node, 'fill', config.color, i);
-    dex.config.setAttr(node, 'transform', config.transform, i);
-    dex.config.configureStroke(node, config.stroke, i);
-    dex.config.configureEvents(node, config.events, i);
-  }
-  return node;
-};
-
-/**
- *
- * Construct an events specification which allows the user to override any
- * of the settings.
- *
- * @param {d3events_spec} custom - The users customizations.
- *
- * @returns {d3events_spec} An events specification generated by combining the
- * default with the user's customizations.
- *
- */
-exports.events = function events(custom) {
-  var defaults =
-  {
-    'mouseover' : function (d) {
-      //console.log("Default mouseover");
-    }
-  };
-  var config = defaults;
-
-  if (custom) {
-    config = dex.object.overlay(custom, defaults);
-  }
-  return config;
-};
-
-exports.configureEvents = function configureEvents(node, config, i) {
-  //dex.console.log("Configure Events", config, i);
-  if (config) {
-    for (var key in config) {
-      //dex.console.log("KEY", key, "VALUE", config[key]);
-      dex.config.setEventHandler(node, key, config[key], i);
-    }
-  }
-
-  return node;
-};
-
-/**
- *
- * Construct an line specification which allows the user to override any
- * of the settings.
- *
- * @param {d3line_spec} custom - The users customizations.
- *
- * @returns {d3line_spec} A line specification generated by combining the
- * default with the user's customizations.
- *
- */
-exports.line = function line(custom) {
-  var defaults =
-  {
-    'start'       : dex.config.point(),
-    'end'         : dex.config.point(),
-    'stroke'      : dex.config.stroke(),
-    'fill'        : dex.config.fill(),
-    'interpolate' : undefined
-  };
-  var config = dex.config.expandAndOverlay(custom, defaults);
-  return config;
-};
-
-exports.configureLine = function configureLine(node, config, i) {
-  if (config) {
-    dex.config.setAttr(node, 'x1', config.start.x, i);
-    dex.config.setAttr(node, 'y1', config.start.y, i);
-    dex.config.setAttr(node, 'x2', config.end.x, i);
-    dex.config.setAttr(node, 'y2', config.end.y, i);
-    dex.config.configureStroke(node, config.stroke, i);
-    dex.config.configureFill(node, config.fill, i);
-    if (config.interpolate) {
-      //dex.console.log("interpolate", node, config, i);
-      node.interpolate(config.interpolate);
-      // I think this is closer to correct....but breaks the motion line chart
-      //node.interpolate(dex.config.optionValue(config.interpolate, i));
-    }
-  }
-  return node;
-};
-
-/**
- *
- * Construct an path specification which allows the user to override any
- * of the settings.
- *
- * @param {d3path_spec} custom - The users customizations.
- *
- * @returns {d3path_spec} A path specification generated by combining the
- * default with the user's customizations.
- *
- */
-exports.path = function path(custom) {
-  var defaults =
-  {
-    'fill'   : dex.config.fill(),
-    'stroke' : dex.config.stroke()
-  };
-  var config = dex.config.expandAndOverlay(custom, defaults);
-  return config;
-};
-
-exports.configurePath = function configurePath(node, config, i) {
-  if (config) {
-    dex.config.configureFill(node, config.fill, i);
-    dex.config.configureStroke(node, config.stroke, i);
-  }
-  return node;
-};
-
-exports.getCallers = function getCallers(caller) {
-  var callers = [];
-  var currentCaller = caller;
-  for (; currentCaller; currentCaller = currentCaller.caller) {
-    if (currentCaller.name) {
-      callers.push(currentCaller.name);
-    }
-  }
-
-  return callers.reverse();
-}
-
-exports.getCallerString = function getCallerString(caller) {
-  return dex.config.getCallers(caller).join("->");
-}
-
-exports.setEventHandler = function setEventHandler(node, eventType, eventHandler, i) {
-  var callerStr = dex.config.getCallerString(arguments.callee.caller);
-
-  //dex.console.debug(callerStr + ": setEventHandler(node=" + node + ", eventType=" + eventType + ", eventHandler=" + eventHandler);
-  if (!node) {
-    dex.console.warn(callerStr + ": dex.config.setEventHandler(eventType='" + eventType + "eventHandler=" + eventHandler + ") : node is null.");
-    return node;
-  }
-  if (!dex.object.isFunction(node.on)) {
-    dex.console.warn(callerStr + ": dex.config.setEventHandler(eventType='" + eventType + "', eventHandler='" + eventHandler +
-    "') : target node is missing function: node.on(eventType,eventHandler).  Node dump:", node);
-    return node;
-  }
-  if (typeof eventHandler != 'undefined') {
-    dex.console.debug(callerStr + ": Set Event Handler: '" + eventType + "'='" + eventHandler + "'");
-    node.on(eventType, eventHandler);
-  }
-  else {
-    dex.console.debug(callerStr += ": Undefined Event Handler: '" + eventType + "'='" + eventHandler + "'");
-  }
-  return node;
-};
-
-exports.setAttr = function setAttr(node, name, value, i) {
-  var callerStr = dex.config.getCallerString(arguments.callee.caller);
-  if (!node) {
-    dex.console.warn(callerStr + ": dex.config.setAttr(name='" + name + "value=" + value + ") : node is null.");
-    return node;
-  }
-  if (!dex.object.isFunction(node.attr)) {
-    dex.console.warn(callerStr + ": dex.config.setAttr(name='" + name + "', value='" + value +
-    "') : target node is missing function: node.attr.  Node dump:", node);
-    return node;
-  }
-  if (typeof value != 'undefined') {
-    dex.console.debug(callerStr + ": Set Attr: '" + name + "'='" + value + "'");
-    node.attr(name, dex.config.optionValue(value, i));
-  }
-  else {
-    dex.console.debug(callerStr += ": Undefined Attr: '" + name + "'='" + value + "'");
-  }
-  return node;
-};
-
-exports.setStyle = function setStyle(node, name, value, i) {
-  var callerStr = dex.config.getCallerString(arguments.callee.caller);
-  if (!node) {
-    dex.console.warn(callerStr + ": dex.config.setAttr(name='" + name + "value=" + value + ") : node is null.");
-    return node;
-  }
-  if (!dex.object.isFunction(node.style)) {
-    dex.console.warn(callerStr + ": dex.config.setStyle(name='" + name + "', value='" + value +
-    "') : target node is missing function: node.style.  Node Dump:", node);
-    return node;
-  }
-  if (typeof value !== 'undefined' && node && dex.object.isFunction(node.style)) {
-    dex.console.debug(callerStr + ": Set Style: name='" + name + "', Value Dump:",
-      dex.config.optionValue(value, i));
-    node.style(name, dex.config.optionValue(value, i));
-  }
-  else {
-    dex.console.debug(callerStr + ": Undefined Style: name='" + name + "', Value Dump:", value);
-  }
-  return node;
-};
-
-exports.optionValue = function optionValue(option, i) {
-  //dex.console.log("OPTION-I: " + i);
-
-  // Curry value i:
-  if (typeof i !== 'undefined') {
-    return function (d) {
-      //dex.console.log("OPTION", option, "D", d, "I", i);
-      if (dex.object.isFunction(option)) {
-        return option(d, i);
+      //dex.console.debug(callerStr + ": setEventHandler(node=" + node + ", eventType=" + eventType + ", eventHandler=" + eventHandler);
+      if (!node) {
+        dex.console.debug(callerStr + ": dex.config.setEventHandler(eventType='" + eventType + "eventHandler=" + eventHandler + ") : node is null.");
+        return node;
+      }
+      if (!dex.object.isFunction(node.on)) {
+        dex.console.debug(callerStr + ": dex.config.setEventHandler(eventType='" + eventType + "', eventHandler='" + eventHandler +
+          "') : target node is missing function: node.on(eventType,eventHandler).  Node dump:", node);
+        return node;
+      }
+      if (typeof eventHandler != 'undefined') {
+        dex.console.debug(callerStr + ": Set Event Handler: '" + eventType + "'='" + eventHandler + "'");
+        node.on(eventType, eventHandler);
       }
       else {
-        return option;
+        dex.console.debug(callerStr += ": Undefined Event Handler: '" + eventType + "'='" + eventHandler + "'");
       }
-    };
-  }
-  else {
-    return function (d, i) {
-      //dex.console.log("OPTION", option, "D", d, "I", i);
-      if (dex.object.isFunction(option)) {
-        return option(d, i);
+      return node;
+    },
+
+    'setAttr': function setAttr(node, name, value, i) {
+      var callerStr = dex.config.getCallerString(arguments.callee.caller);
+      if (!node) {
+        dex.console.debug(callerStr + ": dex.config.setAttr(name='" + name + "value=" + value + ") : node is null.");
+        return node;
+      }
+      if (!dex.object.isFunction(node.attr)) {
+        dex.console.debug(callerStr + ": dex.config.setAttr(name='" + name + "', value='" + value +
+          "') : target node is missing function: node.attr.  Node dump:", node);
+        return node;
+      }
+      if (typeof value != 'undefined') {
+        dex.console.debug(callerStr + ": Set Attr: '" + name + "'='" + value + "'");
+        node.attr(name, dex.config.optionValue(value, i));
       }
       else {
-        return option;
+        dex.console.debug(callerStr += ": Undefined Attr: '" + name + "'='" + value + "'");
       }
-    };
-  }
-};
+      return node;
+    },
 
-/**
- *
- * Is this correct?  It looks suspect to me.
- *
- * @param node
- * @param fn
- * @param value
- * @param i
- * @returns {*}
- */
-exports.callIfDefined = function callIfDefined(node, fn, value, i) {
-  //dex.console.log("CALL-IF-DEFINED: fn=" + fn + ", value=" + value + ", I=" + i);
-  if (typeof value === 'undefined') {
-    //dex.console.log("Skipping: " + fn + "()");
-  }
-  else {
-    //dex.console.log("Calling: '" + fn + "(" + value + ")");
-    return node[fn](dex.config.optionValue(value, i));
-  }
+    'setStyle': function setStyle(node, name, value, i) {
+      var callerStr = dex.config.getCallerString(arguments.callee.caller);
+      if (!node) {
+        dex.console.warn(callerStr + ": dex.config.setAttr(name='" + name + "value=" + value + ") : node is null.");
+        return node;
+      }
+      if (!dex.object.isFunction(node.style)) {
+        dex.console.debug(callerStr + ": dex.config.setStyle(name='" + name + "', value='" + value +
+          "') : target node is missing function: node.style.  Node Dump:", node);
+        return node;
+      }
+      if (typeof value !== 'undefined' && node && dex.object.isFunction(node.style)) {
+        dex.console.debug(callerStr + ": Set Style: name='" + name + "', Value Dump:",
+          dex.config.optionValue(value, i));
+        node.style(name, dex.config.optionValue(value, i));
+      }
+      else {
+        dex.console.debug(callerStr + ": Undefined Style: name='" + name + "', Value Dump:", value);
+      }
+      return node;
+    },
 
-  return node;
-};
+    'optionValue': function optionValue(option, i) {
+      //dex.console.log("OPTION-I: " + i);
 
-/**
- *
- * Construct an point specification which allows the user to override any
- * of the settings.
- *
- * @param {d3point_spec} custom - The users customizations.
- *
- * @returns {d3point_spec} A point specification generated by combining the
- * default with the user's customizations.
- *
- */
-exports.point = function point(custom) {
-  var config =
-  {
-    'x' : undefined,
-    'y' : undefined
-  };
-  if (custom) {
-    config = dex.object.overlay(custom, config);
-  }
-  return config;
-};
+      // Curry value i:
+      if (typeof i !== 'undefined') {
+        return function (d) {
+          //dex.console.log("OPTION", option, "D", d, "I", i);
+          if (dex.object.isFunction(option)) {
+            return option(d, i);
+          }
+          else {
+            return option;
+          }
+        };
+      }
+      else {
+        return function (d, i) {
+          //dex.console.log("OPTION", option, "D", d, "I", i);
+          if (dex.object.isFunction(option)) {
+            return option(d, i);
+          }
+          else {
+            return option;
+          }
+        };
+      }
+    },
 
-exports.configurePoint = function configurePoint(node, config, i) {
-  if (config) {
-    node
-      .attr('x', dex.config.optionValue(config.center.cx, i))
-      .attr('y', dex.config.optionValue(config.center.cy, i));
-  }
-  return node;
-};
+    /**
+     *
+     * Is this correct?  It looks suspect to me.
+     *
+     * @param node
+     * @param fn
+     * @param value
+     * @param i
+     * @returns {*}
+     */
+    'callIfDefined': function callIfDefined(node, fn, value, i) {
+      //dex.console.log("CALL-IF-DEFINED: fn=" + fn + ", value=" + value + ", I=" + i);
+      if (typeof value === 'undefined') {
+        //dex.console.log("Skipping: " + fn + "()");
+      }
+      else {
+        //dex.console.log("Calling: '" + fn + "(" + value + ")");
+        return node[fn](dex.config.optionValue(value, i));
+      }
+
+      return node;
+    },
+
+    /**
+     *
+     * Construct an point specification which allows the user to override any
+     * of the settings.
+     *
+     * @param {d3point_spec} custom - The users customizations.
+     *
+     * @returns {d3point_spec} A point specification generated by combining the
+     * default with the user's customizations.
+     *
+     */
+    'point': function point(custom) {
+      var config =
+      {
+        'x': undefined,
+        'y': undefined
+      };
+      if (custom) {
+        config = dex.object.overlay(custom, config);
+      }
+      return config;
+    },
+
+    'configurePoint': function configurePoint(node, config, i) {
+      if (config) {
+        node
+          .attr('x', dex.config.optionValue(config.center.cx, i))
+          .attr('y', dex.config.optionValue(config.center.cy, i));
+      }
+      return node;
+    },
 
 // Configures: opacity, color, stroke.
-exports.configureShapeStyle = function configureShapeStyle(node, config, i) {
-  if (config) {
-    node
-      .call(dex.config.configureStroke, config.stroke, i)
-      .attr('opacity', config.opacity)
-      .style('fill', config.color);
-  }
-  return node;
-};
-
-/**
- *
- * Construct an circle specification which allows the user to override any
- * of the settings.
- *
- * @param {d3circle_spec} custom - The users customizations.
- *
- * @returns {d3circle_spec} A circle specification generated by combining the
- * default with the user's customizations.
- *
- */
-exports.circle = function circle(custom) {
-  var config =
-  {
-    'cx'        : 0,
-    'cy'        : 0,
-    'r'         : 10,
-    'fill'      : dex.config.fill(),
-    'stroke'    : dex.config.stroke(),
-    'transform' : '',
-    'title'     : '',
-    'events'    : dex.config.events()
-  };
-  if (custom) {
-    config = dex.object.overlay(custom, config);
-  }
-  return config;
-};
-
-exports.configureCircle = function configureCircle(node, config, i) {
-  if (config) {
-    dex.config.setAttr(node, "r", config.r, i);
-    dex.config.setAttr(node, "cx", config.cx, i);
-    dex.config.setAttr(node, "cy", config.cy, i);
-    dex.config.setAttr(node, "transform", config.transform, i);
-    dex.config.setAttr(node, "title", config.title, i);
-    dex.config.configureStroke(node, config.stroke, i);
-    dex.config.configureFill(node, config.fill, i);
-    dex.config.configureEvents(node, config.events, i);
-  }
-  return node;
-};
-
-/*
- exports.configureAxis_deprecated = function configureAxis_deprecated(config) {
- var axis;
-
- if (config) {
- var axis = d3.svg.axis()
- .ticks(config.tick.count)
- .tickSubdivide(config.tick.subdivide)
- .tickSize(config.tick.size.major, config.tick.size.minor,
- config.tick.size.end)
- .tickPadding(config.tick.padding);
-
- // REM: Horrible way of doing this.  Need a function which
- // is more generic and smarter to short circuit stuff like
- // this.  But...for now it does what I want.
- if (!dex.object.isFunction(config.tick.format)) {
- axis.tickFormat(config.tick.format);
- }
-
- axis
- .orient(config.orient)
- .scale(config.scale);
- }
- else {
- axis = d3.svg.axis();
- }
- //axis.scale = config.scale;
- return axis;
- };
- */
-
-/**
- *
- * Construct an tick specification which allows the user to override any
- * of the settings.
- *
- * @param {d3tick_spec} custom - The users customizations.
- *
- * @returns {d3tick_spec} A tick specification generated by combining the
- * default with the user's customizations.
- *
- */
-exports.tick = function tick(custom) {
-  var config =
-  {
-    'count'     : 5,
-    //'tickValues'  : undefined,
-    'subdivide' : 3,
-    'size'      : {
-      'major' : 5,
-      'minor' : 3,
-      'end'   : 5
+    'configureShapeStyle': function configureShapeStyle(node, config, i) {
+      if (config) {
+        node
+          .call(dex.config.configureStroke, config.stroke, i)
+          .attr('opacity', config.opacity)
+          .style('fill', config.color);
+      }
+      return node;
     },
-    'padding'   : 5,
-    'format'    : d3.format(",d"),
-    'label'     : dex.config.text()
-  };
-  if (custom) {
-    config = dex.object.overlay(custom, config);
-  }
-  return config;
-};
 
-/*
- exports.xaxis_deprecate = function (custom) {
- var config =
- {
- 'scale'  : d3.scale.linear(),
- 'orient' : "bottom",
- 'tick'   : this.tick(),
- 'label'  : dex.config.text()
- };
- if (custom) {
- config = dex.object.overlay(custom, config);
- }
- return config;
- };
+    /**
+     *
+     * Construct an circle specification which allows the user to override any
+     * of the settings.
+     *
+     * @param {d3circle_spec} custom - The users customizations.
+     *
+     * @returns {d3circle_spec} A circle specification generated by combining the
+     * default with the user's customizations.
+     *
+     */
+    'circle': function circle(custom) {
+      var config =
+      {
+        'cx': 0,
+        'cy': 0,
+        'r': 10,
+        'fill': dex.config.fill(),
+        'stroke': dex.config.stroke(),
+        'transform': '',
+        'title': '',
+        'events': dex.config.events()
+      };
+      if (custom) {
+        config = dex.object.overlay(custom, config);
+      }
+      return config;
+    },
 
- exports.yaxis_deprecate = function (custom) {
- var config =
- {
- 'scale'  : d3.scale.linear(),
- 'orient' : 'left',
- 'tick'   : this.tick(),
- 'label'  : dex.config.text({'transform' : 'rotate(-90)'})
- };
- if (custom) {
- config = dex.object.overlay(custom, config);
- }
- return config;
- };
- */
+    'configureCircle': function configureCircle(node, config, i) {
+      if (config) {
+        dex.config.setAttr(node, "r", config.r, i);
+        dex.config.setAttr(node, "cx", config.cx, i);
+        dex.config.setAttr(node, "cy", config.cy, i);
+        dex.config.setAttr(node, "transform", config.transform, i);
+        dex.config.setAttr(node, "title", config.title, i);
+        dex.config.configureStroke(node, config.stroke, i);
+        dex.config.configureFill(node, config.fill, i);
+        dex.config.configureEvents(node, config.events, i);
+      }
+      return node;
+    },
 
-exports.callConditionally = function callConditionally(fn, value, i) {
-  //dex.console.log("- FN:" + fn);
-  //dex.console.log("- VALUE:" + value);
-  if (value !== undefined) {
-    //dex.console.log("- CALLING: " + fn + " of " + value);
-    if (i !== undefined) {
-      fn(value, i);
-    }
-    else {
-      fn(value);
-    }
-  }
-  else {
-  }
-};
+    /*
+     exports.configureAxis_deprecated = function configureAxis_deprecated(config) {
+     var axis;
 
-/**
- *
- * Configure the input parameters for configuring an axis.
- * Certain defaults are imposed should the "custom" variable
- * not specify that parameter.
- *
- * @param custom The user supplied axis configuration.
- *
- * @returns {d3axis_spec} The axis specification with
- * user supplied overrides applied.
- *
- */
-exports.axis = function axis(custom) {
-  var defaults =
-  {
-    'scale'         : dex.config.scale({'type' : 'linear'}),
-    'orient'        : 'bottom',
-    'ticks'         : undefined,
-    'tickValues'    : undefined,
-    'tickSize'      : undefined,
-    'innerTickSize' : undefined,
-    'outerTickSize' : undefined,
-    'tickPadding'   : undefined,
-    'tickFormat'    : undefined
-    //'label'         : dex.config.text()
-  };
+     if (config) {
+     var axis = d3.svg.axis()
+     .ticks(config.tick.count)
+     .tickSubdivide(config.tick.subdivide)
+     .tickSize(config.tick.size.major, config.tick.size.minor,
+     config.tick.size.end)
+     .tickPadding(config.tick.padding);
 
-  var axisSpec = dex.config.expandAndOverlay(custom, defaults);
-  return axisSpec;
-};
+     // REM: Horrible way of doing this.  Need a function which
+     // is more generic and smarter to short circuit stuff like
+     // this.  But...for now it does what I want.
+     if (!dex.object.isFunction(config.tick.format)) {
+     axis.tickFormat(config.tick.format);
+     }
 
-/**
- *
- * Create an axis with the specified configuration.
- *
- * @param axis The axis to configure.
- * @param config The user specified axis configuration.
- *
- * @returns {*} The newly configured axis.
- */
-exports.configureAxis = function configureAxis(axis, config, i) {
-  //dex.console.log("CONFAXIS: " + i);
-  if (config) {
-    [
-      'scale',
-      'orient',
-      'ticks',
-      'tickValues',
-      'tickSize',
-      'innerTickSize',
-      'outerTickSize',
-      'tickPadding',
-      'tickFormat'
-    ].forEach(function (fn) {
-        //dex.console.log("Calling: " + fn);
-        dex.config.callConditionally(axis[fn], config[fn], i);
-      });
-  }
-  return axis;
-};
+     axis
+     .orient(config.orient)
+     .scale(config.scale);
+     }
+     else {
+     axis = d3.svg.axis();
+     }
+     //axis.scale = config.scale;
+     return axis;
+     };
+     */
 
-exports.createAxis = function createAxis(userConfig, i) {
-  var config = dex.config.axis(userConfig);
-  return dex.config.configureAxis(d3.svg.axis(), config, i);
-};
+    /**
+     *
+     * Construct an tick specification which allows the user to override any
+     * of the settings.
+     *
+     * @param {d3tick_spec} custom - The users customizations.
+     *
+     * @returns {d3tick_spec} A tick specification generated by combining the
+     * default with the user's customizations.
+     *
+     */
+    'tick': function tick(custom) {
+      var config =
+      {
+        'count': 5,
+        //'tickValues'  : undefined,
+        'subdivide': 3,
+        'size': {
+          'major': 5,
+          'minor': 3,
+          'end': 5
+        },
+        'padding': 5,
+        'format': d3.format(",d"),
+        'label': dex.config.text()
+      };
+      if (custom) {
+        config = dex.object.overlay(custom, config);
+      }
+      return config;
+    },
 
-/**
- *
- * Construct a {d3axis_spec} based on reasonable defaults with
- * user customizations applied on top.
- *
- * @param custom The user customizations.
- *
- * @returns {d3scale_spec} The scale specification with
- * user supplied overrides applied.
- *
- */
-exports.scale = function scale(custom) {
-  var fmap =
-  {
-    'linear'   : dex.config.linearScale,
-    'sqrt'     : dex.config.sqrtScale,
-    'pow'      : dex.config.powScale,
-    'time'     : dex.config.timeScale,
-    'log'      : dex.config.logScale,
-    'ordinal'  : dex.config.ordinalScale,
-    'quantile' : dex.config.quantileScale,
-    'quantize' : dex.config.quantizeScale,
-    'identity' : dex.config.identityScale
-  };
+    /*
+     exports.xaxis_deprecate = function (custom) {
+     var config =
+     {
+     'scale'  : d3.scale.linear(),
+     'orient' : "bottom",
+     'tick'   : this.tick(),
+     'label'  : dex.config.text()
+     };
+     if (custom) {
+     config = dex.object.overlay(custom, config);
+     }
+     return config;
+     };
 
-  var defaults =
-  {
-    'type' : 'linear'
-  };
+     exports.yaxis_deprecate = function (custom) {
+     var config =
+     {
+     'scale'  : d3.scale.linear(),
+     'orient' : 'left',
+     'tick'   : this.tick(),
+     'label'  : dex.config.text({'transform' : 'rotate(-90)'})
+     };
+     if (custom) {
+     config = dex.object.overlay(custom, config);
+     }
+     return config;
+     };
+     */
 
-  var config = dex.config.expandAndOverlay(custom, defaults);
-
-  return fmap[config.type](config);
-}
-
-/**
- *
- * Given a scale specification, create, configure, and return a
- * scale which meets that specification.
- *
- * @param {d3scale_spec} scaleSpec
- * @returns {Object} Returns a d3.scale with the supplied specification.
- *
- */
-exports.createScale = function createScale(scaleSpec) {
-  var scale;
-
-  var fmap =
-  {
-    'linear'   : d3.scale.linear,
-    'sqrt'     : d3.scale.sqrt,
-    'pow'      : d3.scale.pow,
-    'time'     : d3.time.scale,
-    'log'      : d3.scale.log,
-    'ordinal'  : d3.scale.ordinal,
-    'quantile' : d3.scale.quantile,
-    'quantize' : d3.scale.quantize,
-    'identity' : d3.scale.identity
-  };
-
-  if (scaleSpec) {
-    scale = fmap[scaleSpec.type]();
-
-    // Since we create a non-parameterized scale, here we parameterize it based upon
-    // the supplied specification
-    dex.config.configureScale(scale, scaleSpec);
-  }
-  else {
-    scale = d3.scale.linear();
-  }
-
-  return scale;
-}
-
-/**
- *
- * Construct a linear {d3scale_spec} based on reasonable
- * defaults with user customizations applied on top.
- *
- * @param custom The user customizations.
- *
- * @returns {d3scale_spec} The linear scale specification with
- * user supplied overrides applied.
- *
- */
-exports.linearScale = function linearScale(custom) {
-  var defaults =
-  {
-    'type'        : 'linear',
-    'domain'      : [0, 100],
-    'range'       : [0, 800],
-    'rangeRound'  : undefined,
-    'interpolate' : undefined,
-    'clamp'       : undefined,
-    'nice'        : undefined
-  };
-
-  var linearScaleSpec = dex.config.expandAndOverlay(custom, defaults);
-  return linearScaleSpec;
-};
-
-/**
- *
- * Construct a power {d3scale_spec} based on reasonable
- * defaults with user customizations applied on top.
- *
- * @param custom The user customizations.
- *
- * @returns {d3scale_spec} The power scale specification with
- * user supplied overrides applied.
- *
- */
-exports.powScale = function powScale(custom) {
-  var defaults =
-  {
-    'type'        : 'pow',
-    'domain'      : [0, 100],
-    'range'       : [0, 800],
-    'rangeRound'  : undefined,
-    'interpolate' : undefined,
-    'clamp'       : undefined,
-    'nice'        : undefined
-  };
-
-  var config = dex.config.expandAndOverlay(custom, defaults);
-  return config;
-};
-
-/**
- *
- * Construct a sqrt {d3scale_spec} based on reasonable
- * defaults with user customizations applied on top.
- *
- * @param custom The user customizations.
- *
- * @returns {d3scale_spec} The sqrt scale specification with
- * user supplied overrides applied.
- *
- */
-exports.sqrtScale = function sqrtScale(custom) {
-  var defaults =
-  {
-    'type'        : 'sqrt',
-    'domain'      : [0, 100],
-    'range'       : [0, 800],
-    'rangeRound'  : undefined,
-    'interpolate' : undefined,
-    'clamp'       : undefined,
-    'nice'        : undefined
-  };
-
-  var config = dex.config.expandAndOverlay(custom, defaults);
-  return config;
-};
-
-/**
- *
- * Construct a log {d3scale_spec} based on reasonable
- * defaults with user customizations applied on top.
- *
- * @param custom The user customizations.
- *
- * @returns {d3scale_spec} The log scale specification with
- * user supplied overrides applied.
- *
- */
-exports.logScale = function logScale(custom) {
-  var defaults =
-  {
-    'type'        : 'log',
-    'domain'      : [0, 100],
-    'range'       : [0, 800],
-    'rangeRound'  : undefined,
-    'interpolate' : undefined,
-    'clamp'       : undefined,
-    'nice'        : undefined
-  };
-
-  var logSpec = dex.config.expandAndOverlay(custom, defaults);
-  return logSpec;
-};
-
-/**
- *
- * Construct a ordinal {d3scale_spec} based on reasonable
- * defaults with user customizations applied on top.
- *
- * @param custom - The user customizations.
- * @param {object} [custom.rangeRoundBands] -
- * @param {object} [custom.rangeBands] -
- * @param {object} [custom.rangePoints] - rangePoints(interval [, padding]) : Sets the output range from the specified continuous
- * interval. The array interval contains two elements representing the minimum and maximum
- * numeric value. This interval is subdivided into n evenly-spaced points, where n is the
- * number of (unique) values in the input domain. The first and last point may be offset
- * from the edge of the interval according to the specified padding, which defaults to zero.
- * The padding is expressed as a multiple of the spacing between points. A reasonable value
- * is 1.0, such that the first and last point will be offset from the minimum and maximum
- * value by half the distance between points.
- * @param {object} [custom.rangeBands] -
- *
- * @returns {d3scale_spec} The ordinal scale specification with
- * user supplied overrides applied.
- *
- */
-exports.ordinalScale = function ordinalScale(custom) {
-  var defaults =
-  {
-    'type'            : 'ordinal',
-    'domain'          : undefined,
-    'range'           : undefined,
-    'rangeRoundBands' : undefined,
-    'rangePoints'     : undefined,
-    'rangeBands'      : undefined
-  };
-
-  var ordinalSpec = dex.config.expandAndOverlay(custom, defaults);
-  return ordinalSpec;
-};
-
-exports.timeScale = function timeScale(custom) {
-  var defaults =
-  {
-    'type'        : 'time',
-    'domain'      : undefined,
-    'range'       : undefined,
-    'rangeRound'  : undefined,
-    'interpolate' : undefined,
-    'clamp'       : undefined,
-    'ticks'       : undefined,
-    'tickFormat'  : undefined
-  };
-
-  var config = dex.config.expandAndOverlay(custom, defaults);
-  return config;
-};
-
-exports.quantileScale = function quantileScale(custom) {
-  var defaults =
-  {
-    'type'   : 'quantile',
-    'domain' : undefined,
-    'range'  : undefined
-  };
-
-  var config = dex.config.expandAndOverlay(custom, defaults);
-  return config;
-};
-
-exports.quantizeScale = function quantizeScale(custom) {
-  var defaults =
-  {
-    'type'   : 'quantize',
-    'domain' : undefined,
-    'range'  : undefined
-  };
-
-  var config = dex.config.expandAndOverlay(custom, defaults);
-  return config;
-};
-
-exports.identityScale = function identityScale(custom) {
-  var defaults =
-  {
-    'type'   : 'identity',
-    'domain' : undefined,
-    'range'  : undefined
-  };
-
-  var config = dex.config.expandAndOverlay(custom, defaults);
-  return config;
-};
-
-exports.thresholdScale = function thresholdScale(custom) {
-  var defaults =
-  {
-    'type'   : 'threshold',
-    'domain' : undefined,
-    'range'  : undefined
-  };
-
-  var config = dex.config.expandAndOverlay(custom, defaults);
-  return config;
-};
-
-exports.configureScale = function configureScale(scale, config) {
-  if (config) {
-    for (var property in config) {
-      dex.console.trace("ConfigureScale Property: '" + property + "'");
-      if (config.hasOwnProperty(property) && property !== 'type' && config[property] !== undefined) {
-        dex.console.trace("Property: '" + property + "'");
-        dex.config.callConditionally(scale[property], config[property]);
+    'callConditionally': function callConditionally(fn, value, i) {
+      //dex.console.log("- FN:" + fn);
+      //dex.console.log("- VALUE:" + value);
+      if (value !== undefined) {
+        //dex.console.log("- CALLING: " + fn + " of " + value);
+        if (i !== undefined) {
+          fn(value, i);
+        }
+        else {
+          fn(value);
+        }
       }
       else {
-        dex.console.debug("Missing Property: '" + property + "'");
       }
+    },
+
+    /**
+     *
+     * Configure the input parameters for configuring an axis.
+     * Certain defaults are imposed should the "custom" variable
+     * not specify that parameter.
+     *
+     * @param custom The user supplied axis configuration.
+     *
+     * @returns {d3axis_spec} The axis specification with
+     * user supplied overrides applied.
+     *
+     */
+    'axis': function axis(custom) {
+      var defaults =
+      {
+        'scale': dex.config.scale({'type': 'linear'}),
+        'orient': 'bottom',
+        'ticks': undefined,
+        'tickValues': undefined,
+        'tickSize': undefined,
+        'innerTickSize': undefined,
+        'outerTickSize': undefined,
+        'tickPadding': undefined,
+        'tickFormat': undefined
+        //'label'         : dex.config.text()
+      };
+
+      var axisSpec = dex.config.expandAndOverlay(custom, defaults);
+      return axisSpec;
+    },
+
+    /**
+     *
+     * Create an axis with the specified configuration.
+     *
+     * @param axis The axis to configure.
+     * @param config The user specified axis configuration.
+     *
+     * @returns {*} The newly configured axis.
+     */
+    'configureAxis': function configureAxis(axis, config, i) {
+      //dex.console.log("CONFAXIS: " + i);
+      if (config) {
+        [
+          'scale',
+          'orient',
+          'ticks',
+          'tickValues',
+          'tickSize',
+          'innerTickSize',
+          'outerTickSize',
+          'tickPadding',
+          'tickFormat'
+        ].forEach(function (fn) {
+          //dex.console.log("Calling: " + fn);
+          dex.config.callConditionally(axis[fn], config[fn], i);
+        });
+      }
+      return axis;
+    },
+
+    'createAxis': function createAxis(userConfig, i) {
+      var config = dex.config.axis(userConfig);
+      return dex.config.configureAxis(d3.svg.axis(), config, i);
+    },
+
+    /**
+     *
+     * Construct a {d3axis_spec} based on reasonable defaults with
+     * user customizations applied on top.
+     *
+     * @param custom The user customizations.
+     *
+     * @returns {d3scale_spec} The scale specification with
+     * user supplied overrides applied.
+     *
+     */
+    'scale': function scale(custom) {
+      var fmap =
+      {
+        'linear': dex.config.linearScale,
+        'sqrt': dex.config.sqrtScale,
+        'pow': dex.config.powScale,
+        'time': dex.config.timeScale,
+        'log': dex.config.logScale,
+        'ordinal': dex.config.ordinalScale,
+        'quantile': dex.config.quantileScale,
+        'quantize': dex.config.quantizeScale,
+        'identity': dex.config.identityScale
+      };
+
+      var defaults =
+      {
+        'type': 'linear'
+      };
+
+      var config = dex.config.expandAndOverlay(custom, defaults);
+
+      return fmap[config.type](config);
+    },
+
+    /**
+     *
+     * Given a scale specification, create, configure, and return a
+     * scale which meets that specification.
+     *
+     * @param {d3scale_spec} scaleSpec
+     * @returns {Object} Returns a d3.scale with the supplied specification.
+     *
+     */
+    'createScale': function createScale(scaleSpec) {
+      var scale;
+
+      var fmap =
+      {
+        'linear': d3.scale.linear,
+        'sqrt': d3.scale.sqrt,
+        'pow': d3.scale.pow,
+        'time': d3.time.scale,
+        'log': d3.scale.log,
+        'ordinal': d3.scale.ordinal,
+        'quantile': d3.scale.quantile,
+        'quantize': d3.scale.quantize,
+        'identity': d3.scale.identity
+      };
+
+      if (scaleSpec) {
+        scale = fmap[scaleSpec.type]();
+
+        // Since we create a non-parameterized scale, here we parameterize it based upon
+        // the supplied specification
+        dex.config.configureScale(scale, scaleSpec);
+      }
+      else {
+        scale = d3.scale.linear();
+      }
+
+      return scale;
+    },
+
+    /**
+     *
+     * Construct a linear {d3scale_spec} based on reasonable
+     * defaults with user customizations applied on top.
+     *
+     * @param custom The user customizations.
+     *
+     * @returns {d3scale_spec} The linear scale specification with
+     * user supplied overrides applied.
+     *
+     */
+    'linearScale': function linearScale(custom) {
+      var defaults =
+      {
+        'type': 'linear',
+        'domain': [0, 100],
+        'range': [0, 800],
+        'rangeRound': undefined,
+        'interpolate': undefined,
+        'clamp': undefined,
+        'nice': undefined
+      };
+
+      var linearScaleSpec = dex.config.expandAndOverlay(custom, defaults);
+      return linearScaleSpec;
+    },
+
+    /**
+     *
+     * Construct a power {d3scale_spec} based on reasonable
+     * defaults with user customizations applied on top.
+     *
+     * @param custom The user customizations.
+     *
+     * @returns {d3scale_spec} The power scale specification with
+     * user supplied overrides applied.
+     *
+     */
+    'powScale': function powScale(custom) {
+      var defaults =
+      {
+        'type': 'pow',
+        'domain': [0, 100],
+        'range': [0, 800],
+        'rangeRound': undefined,
+        'interpolate': undefined,
+        'clamp': undefined,
+        'nice': undefined
+      };
+
+      var config = dex.config.expandAndOverlay(custom, defaults);
+      return config;
+    },
+
+    /**
+     *
+     * Construct a sqrt {d3scale_spec} based on reasonable
+     * defaults with user customizations applied on top.
+     *
+     * @param custom The user customizations.
+     *
+     * @returns {d3scale_spec} The sqrt scale specification with
+     * user supplied overrides applied.
+     *
+     */
+    'sqrtScale': function sqrtScale(custom) {
+      var defaults =
+      {
+        'type': 'sqrt',
+        'domain': [0, 100],
+        'range': [0, 800],
+        'rangeRound': undefined,
+        'interpolate': undefined,
+        'clamp': undefined,
+        'nice': undefined
+      };
+
+      var config = dex.config.expandAndOverlay(custom, defaults);
+      return config;
+    },
+
+    /**
+     *
+     * Construct a log {d3scale_spec} based on reasonable
+     * defaults with user customizations applied on top.
+     *
+     * @param custom The user customizations.
+     *
+     * @returns {d3scale_spec} The log scale specification with
+     * user supplied overrides applied.
+     *
+     */
+    'logScale': function logScale(custom) {
+      var defaults =
+      {
+        'type': 'log',
+        'domain': [0, 100],
+        'range': [0, 800],
+        'rangeRound': undefined,
+        'interpolate': undefined,
+        'clamp': undefined,
+        'nice': undefined
+      };
+
+      var logSpec = dex.config.expandAndOverlay(custom, defaults);
+      return logSpec;
+    },
+
+    /**
+     *
+     * Construct a ordinal {d3scale_spec} based on reasonable
+     * defaults with user customizations applied on top.
+     *
+     * @param custom - The user customizations.
+     * @param {object} [custom.rangeRoundBands] -
+     * @param {object} [custom.rangeBands] -
+     * @param {object} [custom.rangePoints] - rangePoints(interval [, padding]) : Sets the output range from the specified continuous
+     * interval. The array interval contains two elements representing the minimum and maximum
+     * numeric value. This interval is subdivided into n evenly-spaced points, where n is the
+     * number of (unique) values in the input domain. The first and last point may be offset
+     * from the edge of the interval according to the specified padding, which defaults to zero.
+     * The padding is expressed as a multiple of the spacing between points. A reasonable value
+     * is 1.0, such that the first and last point will be offset from the minimum and maximum
+     * value by half the distance between points.
+     * @param {object} [custom.rangeBands] -
+     *
+     * @returns {d3scale_spec} The ordinal scale specification with
+     * user supplied overrides applied.
+     *
+     */
+    'ordinalScale': function ordinalScale(custom) {
+      var defaults =
+      {
+        'type': 'ordinal',
+        'domain': undefined,
+        'range': undefined,
+        'rangeRoundBands': undefined,
+        'rangePoints': undefined,
+        'rangeBands': undefined
+      };
+
+      var ordinalSpec = dex.config.expandAndOverlay(custom, defaults);
+      return ordinalSpec;
+    },
+
+    'timeScale': function timeScale(custom) {
+      var defaults =
+      {
+        'type': 'time',
+        'domain': undefined,
+        'range': undefined,
+        'rangeRound': undefined,
+        'interpolate': undefined,
+        'clamp': undefined,
+        'ticks': undefined,
+        'tickFormat': undefined
+      };
+
+      var config = dex.config.expandAndOverlay(custom, defaults);
+      return config;
+    },
+
+    'quantileScale': function quantileScale(custom) {
+      var defaults =
+      {
+        'type': 'quantile',
+        'domain': undefined,
+        'range': undefined
+      };
+
+      var config = dex.config.expandAndOverlay(custom, defaults);
+      return config;
+    },
+
+    'quantizeScale': function quantizeScale(custom) {
+      var defaults =
+      {
+        'type': 'quantize',
+        'domain': undefined,
+        'range': undefined
+      };
+
+      var config = dex.config.expandAndOverlay(custom, defaults);
+      return config;
+    },
+
+    'identityScale': function identityScale(custom) {
+      var defaults =
+      {
+        'type': 'identity',
+        'domain': undefined,
+        'range': undefined
+      };
+
+      var config = dex.config.expandAndOverlay(custom, defaults);
+      return config;
+    },
+
+    'thresholdScale': function thresholdScale(custom) {
+      var defaults =
+      {
+        'type': 'threshold',
+        'domain': undefined,
+        'range': undefined
+      };
+
+      var config = dex.config.expandAndOverlay(custom, defaults);
+      return config;
+    },
+
+    'configureScale': function configureScale(scale, config) {
+      if (config) {
+        for (var property in config) {
+          dex.console.trace("ConfigureScale Property: '" + property + "'");
+          if (config.hasOwnProperty(property) && property !== 'type' && config[property] !== undefined) {
+            dex.console.trace("Property: '" + property + "'");
+            dex.config.callConditionally(scale[property], config[property]);
+          }
+          else {
+            dex.console.debug("Missing Property: '" + property + "'");
+          }
+        }
+      }
+
+      return scale;
     }
-  }
-
-  return scale;
+  };
 };
-
-//module.exports = config;
-},{}],52:[function(require,module,exports){
+},{}],56:[function(require,module,exports){
 /**
  *
  * This module provides console logging capabilities.
@@ -12940,24 +16199,24 @@ exports.configureScale = function configureScale(scale, config) {
  *
  */
 
-/**
- *
- * @type {{TRACE: number, DEBUG: number, NORMAL: number, WARN: number, FATAL: number, NONE: number}}
- */
-var logLevels = {
-  'TRACE'  : 5,
-  'DEBUG'  : 4,
-  'NORMAL' : 3,
-  'WARN'   : 2,
-  'FATAL'  : 1,
-  'NONE'   : 0
-};
+module.exports = function (dex) {
 
-exports.logLevels = logLevels;
+  /**
+   *
+   * @type {{TRACE: number, DEBUG: number, NORMAL: number, WARN: number, FATAL: number, NONE: number}}
+   */
+  dex.logLevels = {
+    'TRACE': 5,
+    'DEBUG': 4,
+    'NORMAL': 3,
+    'WARN': 2,
+    'FATAL': 1,
+    'NONE': 0
+  };
 
-var logLevel = logLevels.NORMAL;
+  dex.logLevel = dex.logLevels.NORMAL;
 
-exports.logLevel = logLevel;
+  return {
 
 ////
 //
@@ -12965,109 +16224,110 @@ exports.logLevel = logLevel;
 //
 ////
 
-/**
- * Log this message if the current log level is greater than or equal
- * to dex.console.logLevel.
- *
- * @param msgLevel The log level for this message.
- * @param msg One or more messages to be logged.  Strings will simply
- * use console.log while objects will use console.dir.
- *
- * @returns {dex.console}
- */
-exports.logWithLevel = function (msgLevel, msg) {
+    /**
+     * Log this message if the current log level is greater than or equal
+     * to dex.console.logLevel.
+     *
+     * @param msgLevel The log level for this message.
+     * @param msg One or more messages to be logged.  Strings will simply
+     * use console.log while objects will use console.dir.
+     *
+     * @returns {dex.console}
+     */
+    'logWithLevel': function (msgLevel, msg) {
 //  console.log(dex.console.logLevel());
 //  console.log(msgLevel);
 //  console.dir(msg);
 
-  if (dex.console.logLevel() >= msgLevel) {
-    for (i = 0; i < msg.length; i++) {
-      if (typeof msg[i] == 'object') {
-        console.dir(msg[i]);
+      if (dex.logLevel >= msgLevel) {
+        for (i = 0; i < msg.length; i++) {
+          if (typeof msg[i] == 'object') {
+            console.dir(msg[i]);
+          }
+          else {
+            console.log(msg[i]);
+          }
+        }
       }
-      else {
-        console.log(msg[i]);
-      }
+      return this;
+    },
+
+    /**
+     * Write one or more TRACE level messages.
+     *
+     * @param msg One or more TRACE messages to log.
+     *
+     * @returns {dex.console|*}
+     */
+    'trace': function () {
+      return dex.console.logWithLevel(dex.logLevels.TRACE, arguments)
+    },
+
+    /**
+     * Write one or more DEBUG level messages.
+     *
+     * @param msg One or more DEBUG messages to log.
+     *
+     * @returns {dex.console|*}
+     */
+    'debug': function () {
+      return dex.console.logWithLevel(dex.logLevels.DEBUG, arguments)
+    },
+
+    /**
+     * Write one or more NORMAL level messages.
+     *
+     * @param msg One or more NORMAL messages to log.
+     *
+     * @returns {dex.console|*}
+     *
+     */
+    'log': function () {
+      //console.log("caller is " + arguments.callee.caller.toString());
+      return dex.console.logWithLevel(dex.logLevels.NORMAL, arguments)
+    },
+
+    /**
+     * Write one or more WARN level messages.
+     *
+     * @param msg One or more WARN messages to log.
+     *
+     * @returns {dex.console|*}
+     *
+     */
+    'warn': function () {
+      return dex.console.logWithLevel(dex.logLevels.WARN, arguments)
+    },
+
+    /**
+     * Write one or more FATAL level messages.
+     *
+     * @param msg One or more FATAL messages to log.
+     *
+     * @returns {dex.console|*}
+     */
+    'fatal': function () {
+      return dex.console.logWithLevel(dex.logLevels.FATAL, arguments)
+    },
+
+    /**
+     * This function returns the current log level.
+     *
+     * @returns The current log level.
+     *
+     */
+    'logLevel': function (_) {
+      if (!arguments.length) return dex.logLevel;
+      dex.logLevel = dex.logLevels[_];
+      return dex.logLevel;
+    },
+
+    'logLevels': function () {
+      return dex.logLevels;
     }
-  }
-  return this;
-}
-
-/**
- * Write one or more TRACE level messages.
- *
- * @param msg One or more TRACE messages to log.
- *
- * @returns {dex.console|*}
- */
-exports.trace = function () {
-  return dex.console.logWithLevel(logLevels.TRACE, arguments)
+  };
 };
-
-/**
- * Write one or more DEBUG level messages.
- *
- * @param msg One or more DEBUG messages to log.
- *
- * @returns {dex.console|*}
- */
-exports.debug = function () {
-  return dex.console.logWithLevel(logLevels.DEBUG, arguments)
-};
-
-/**
- * Write one or more NORMAL level messages.
- *
- * @param msg One or more NORMAL messages to log.
- *
- * @returns {dex.console|*}
- *
- */
-exports.log = function () {
-  //console.log("caller is " + arguments.callee.caller.toString());
-  return dex.console.logWithLevel(logLevels.NORMAL, arguments)
-};
-
-/**
- * Write one or more WARN level messages.
- *
- * @param msg One or more WARN messages to log.
- *
- * @returns {dex.console|*}
- *
- */
-exports.warn = function () {
-  return dex.console.logWithLevel(logLevels.WARN, arguments)
-};
-
-/**
- * Write one or more FATAL level messages.
- *
- * @param msg One or more FATAL messages to log.
- *
- * @returns {dex.console|*}
- */
-exports.fatal = function () {
-  return dex.console.logWithLevel(logLevels.FATAL, arguments)
-};
-
-/**
- * This function returns the current log level.
- *
- * @returns The current log level.
- *
- */
-exports.logLevel = function (_) {
-  if (!arguments.length) return logLevel;
-  logLevel = logLevels[_];
-  return logLevel;
-};
-
-exports.logLevels = function () {
-  return logLevels;
-};
-
-},{}],53:[function(require,module,exports){
+},{}],57:[function(require,module,exports){
 /**
  *
  * This module provides support for dealing with csv structures.  This
@@ -13079,212 +16339,232 @@ exports.logLevels = function () {
  *
  */
 
-/**
- *
- * @param header
- * @param data
- * @returns {{header: *, data: *}}
- */
-exports.csv = function (header, data) {
-  var csv =
-  {
-    "header": header,
-    "data": data
-  };
+module.exports = function csv(dex) {
 
-  return csv;
-};
-
-/**
- *
- * @param csv
- * @returns {{header: *, data: {header, data}}}
- */
-exports.transpose = function (csv) {
   return {
-    "header": csv.header,
-    "data": dex.matrix.transpose(csv.data)
-  };
-};
+    /**
+     *
+     * @param header
+     * @param data
+     * @returns {{header: *, data: *}}
+     */
+    'csv': function (header, data) {
+      var csv =
+      {
+        "header": header,
+        "data": data
+      };
 
-/**
- * Given a CSV, create a connection matrix suitable for feeding into a chord
- * diagram.  Ex, given CSV:
- *
- * @param csv
- * @returns {{header: Array, connections: Array}|*}
- *
- */
-exports.getConnectionMatrix = function (csv) {
-  var matrix = [];
-  var ri, ci;
-  var row;
-  var cid;
-  var header = [];
-  var nameToIndex = {};
-  var connectionMatrix;
-  var uniques;
-  var nameIndices = [];
-  var src, dest;
+      return csv;
+    },
 
-  // Create a list of unique values to relate to one another.
-  uniques = dex.matrix.uniques(csv.data);
-  // Flatten them into our header.
-  header = dex.matrix.flatten(uniques);
+    /**
+     *
+     * @param csv
+     * @returns {{header: *, data: {header, data}}}
+     */
+    'transpose': function (csv) {
+      return {
+        "header": csv.header,
+        "data": dex.matrix.transpose(csv.data)
+      };
+    },
 
-  // Create a map of names to header index for each column.
-  nameToIndex = new Array(uniques.length);
-  for (ri = 0, cid = 0; ri < uniques.length; ri++) {
-    nameToIndex[ri] =
-    {};
-    for (ci = 0; ci < uniques[ri].length; ci++) {
-      nameToIndex[ri][header[cid]] = cid;
-      cid += 1;
-    }
-  }
+    /**
+     * Given a CSV, create a connection matrix suitable for feeding into a chord
+     * diagram.  Ex, given CSV:
+     *
+     * @param csv
+     * @returns {{header: Array, connections: Array}|*}
+     *
+     */
+    'getConnectionMatrix': function (csv) {
+      var matrix = [];
+      var ri, ci;
+      var row;
+      var cid;
+      var header = [];
+      var nameToIndex = {};
+      var connectionMatrix;
+      var uniques;
+      var nameIndices = [];
+      var src, dest;
 
-  // Create a N x N matrix of zero values.
-  matrix = new Array(header.length);
-  for (ri = 0; ri < header.length; ri++) {
-    row = new Array(header.length);
-    for (ci = 0; ci < header.length; ci++) {
-      row[ci] = 0;
-    }
-    matrix[ri] = row;
-  }
-  //dex.console.log("nameToIndex", nameToIndex, "matrix", matrix);
+      // Create a list of unique values to relate to one another.
+      uniques = dex.matrix.uniques(csv.data);
+      // Flatten them into our header.
+      header = dex.matrix.flatten(uniques);
 
-  for (ri = 0; ri < csv.data.length; ri++) {
-    for (ci = 1; ci < csv.header.length; ci++) {
-      src = nameToIndex[ci - 1][csv.data[ri][ci - 1]];
-      dest = nameToIndex[ci][csv.data[ri][ci]];
+      // Create a map of names to header index for each column.
+      nameToIndex = new Array(uniques.length);
+      for (ri = 0, cid = 0; ri < uniques.length; ri++) {
+        nameToIndex[ri] =
+        {};
+        for (ci = 0; ci < uniques[ri].length; ci++) {
+          nameToIndex[ri][header[cid]] = cid;
+          cid += 1;
+        }
+      }
 
-      //dex.console.log(csv.data[ri][ci-1] + "<->" + csv.data[ri][ci], src + "<->" + dest);
-      matrix[src][dest] = 1;
-      matrix[dest][src] = 1;
-    }
-  }
+      // Create a N x N matrix of zero values.
+      matrix = new Array(header.length);
+      for (ri = 0; ri < header.length; ri++) {
+        row = new Array(header.length);
+        for (ci = 0; ci < header.length; ci++) {
+          row[ci] = 0;
+        }
+        matrix[ri] = row;
+      }
+      //dex.console.log("nameToIndex", nameToIndex, "matrix", matrix);
 
-  connectionMatrix = {"header": header, "connections": matrix};
-  //dex.console.log("Connection Matrix", connectionMatrix);
-  return connectionMatrix;
-};
+      for (ri = 0; ri < csv.data.length; ri++) {
+        for (ci = 1; ci < csv.header.length; ci++) {
+          src = nameToIndex[ci - 1][csv.data[ri][ci - 1]];
+          dest = nameToIndex[ci][csv.data[ri][ci]];
 
-/**
- *
- * @param csv
- * @param keyIndex
- * @returns {{}}
- */
-exports.createMap = function (csv, keyIndex) {
-  var ri, ci, rowMap, map =
-  {};
+          //dex.console.log(csv.data[ri][ci-1] + "<->" + csv.data[ri][ci], src + "<->" + dest);
+          matrix[src][dest] = 1;
+          matrix[dest][src] = 1;
+        }
+      }
 
-  for (ri = 0; ri < csv.data.length; ri += 1) {
-    if (csv.data[ri].length === csv.header.length) {
-      rowMap =
+      connectionMatrix = {"header": header, "connections": matrix};
+      //dex.console.log("Connection Matrix", connectionMatrix);
+      return connectionMatrix;
+    },
+
+    /**
+     *
+     * @param csv
+     * @param keyIndex
+     * @returns {{}}
+     */
+    'createMap': function (csv, keyIndex) {
+      var ri, ci, rowMap, map =
       {};
 
-      for (ci = 0; ci < csv.header.length; ci += 1) {
-        rowMap[csv.header[ci]] = csv.data[ri][ci];
+      for (ri = 0; ri < csv.data.length; ri += 1) {
+        if (csv.data[ri].length === csv.header.length) {
+          rowMap =
+          {};
+
+          for (ci = 0; ci < csv.header.length; ci += 1) {
+            rowMap[csv.header[ci]] = csv.data[ri][ci];
+          }
+          map[csv.data[ri][keyIndex]] = rowMap;
+        }
       }
-      map[csv.data[ri][keyIndex]] = rowMap;
-    }
-  }
-  return map;
-};
+      return map;
+    },
 
-/**
- *
- * @param csv
- * @param rowIndex
- * @param columnIndex
- * @returns {*}
- */
-exports.toJson = function (csv, rowIndex, columnIndex) {
-  var jsonData = [];
-  var ri, ci, jsonRow;
-
-  if (arguments.length >= 3) {
-    jsonRow = {};
-    jsonRow[csv.header[columnIndex]] = csv.data[rowIndex][columnIndex];
-    return jsonRow;
-  }
-  else if (arguments.length === 2) {
-    var jsonRow =
-    {};
-    for (ci = 0; ci < csv.header.length; ci += 1) {
-      jsonRow[csv.header[ci]] = csv.data[rowIndex][ci];
-    }
-    return jsonRow;
-  }
-  else if (arguments.length === 1) {
-    for (ri = 0; ri < csv.data.length; ri++) {
-      var jsonRow =
-      {};
-      for (ci = 0; ci < csv.header.length; ci++) {
-        jsonRow[csv.header[ci]] = csv.data[ri][ci];
-        //dex.console.log(csv.header[ci] + "=" + csv.data[ri][ci], jsonRow);
+    'json2Csv' : function(json) {
+      var csv = { 'header' : [], 'data' : [] };
+      if (_.isUndefined(json) || json.length <= 0) {
+        return csv;
       }
-      jsonData.push(jsonRow);
-    }
-  }
-  return jsonData;
-};
+      csv.header = _.keys(json[0]);
+      json.forEach(function(jsonRow) {
+        var row = [];
+        csv.header.forEach(function (columnName) {
+          row.push(jsonRow[columnName]);
+        });
+        csv.data.push(row);
+      });
 
-/**
- *
- * @param csv
- * @returns {{}}
- */
-exports.toColumnArrayJson = function (csv) {
-  var json = {};
-  var ri, ci, jsonRow;
+      return csv;
+    },
 
-  if (arguments.length === 1) {
-    for (ci = 0; ci < csv.header.length; ci++) {
-      json[csv.header[ci]] = [];
-    }
+    /**
+     *
+     * @param csv
+     * @param rowIndex
+     * @param columnIndex
+     * @returns {*}
+     */
+    'toJson': function (csv, rowIndex, columnIndex) {
+      var jsonData = [];
+      var ri, ci, jsonRow;
 
-    for (ri = 0; ri < csv.data.length; ri++) {
-      for (ci = 0; ci < csv.header.length; ci++) {
-        json[csv.header[ci]].push(csv.data[ri][ci]);
+      if (arguments.length >= 3) {
+        jsonRow = {};
+        jsonRow[csv.header[columnIndex]] = csv.data[rowIndex][columnIndex];
+        return jsonRow;
       }
-    }
-  }
+      else if (arguments.length === 2) {
+        var jsonRow =
+        {};
+        for (ci = 0; ci < csv.header.length; ci += 1) {
+          jsonRow[csv.header[ci]] = csv.data[rowIndex][ci];
+        }
+        return jsonRow;
+      }
+      else if (arguments.length === 1) {
+        for (ri = 0; ri < csv.data.length; ri++) {
+          var jsonRow =
+          {};
+          for (ci = 0; ci < csv.header.length; ci++) {
+            jsonRow[csv.header[ci]] = csv.data[ri][ci];
+            //dex.console.log(csv.header[ci] + "=" + csv.data[ri][ci], jsonRow);
+          }
+          jsonData.push(jsonRow);
+        }
+      }
+      return jsonData;
+    },
 
-  return json;
-};
+    /**
+     *
+     * @param csv
+     * @returns {{}}
+     */
+    'toColumnArrayJson': function (csv) {
+      var json = {};
+      var ri, ci, jsonRow;
 
-/**
- *
- * @param csv
- * @returns {{header: *, data: *}}
- *
- */
-exports.copy = function (csv) {
-  var copy = {
-    'header': dex.array.copy(csv.header),
-    'data': dex.matrix.copy(csv.data)
-  };
-  return copy;
-};
+      if (arguments.length === 1) {
+        for (ci = 0; ci < csv.header.length; ci++) {
+          json[csv.header[ci]] = [];
+        }
 
-/**
- *
- * A utility transform for dealing with some of D3's more finiky formats.
- *
- * csv =
- * {
+        for (ri = 0; ri < csv.data.length; ri++) {
+          for (ci = 0; ci < csv.header.length; ci++) {
+            json[csv.header[ci]].push(csv.data[ri][ci]);
+          }
+        }
+      }
+
+      return json;
+    },
+
+    /**
+     *
+     * @param csv
+     * @returns {{header: *, data: *}}
+     *
+     */
+    'copy': function (csv) {
+      var copy = {
+        'header': dex.array.copy(csv.header),
+        'data': dex.matrix.copy(csv.data)
+      };
+      return copy;
+    },
+
+    /**
+     *
+     * A utility transform for dealing with some of D3's more finiky formats.
+     *
+     * csv =
+     * {
  * 	 header : {C1,C2,C3},
  *   data   : [
  *     [A,B,C],
  *     [A,B,D]
  *   ]
  * }
- * into:
- * json =
- * {
+     * into:
+     * json =
+     * {
  * 	"name"     : rootName,
  *  "category" : category,
  *  "children" :
@@ -13318,612 +16598,609 @@ exports.copy = function (csv) {
  *     ]
  *  ]
  * }
- *
- * @param {Object} csv
- */
-exports.toHierarchicalJson = function (csv) {
-  var connections = dex.csv.connections(csv);
-  return getChildren(connections, 0);
+     *
+     * @param {Object} csv
+     */
+    'toHierarchicalJson': function (csv) {
+      var connections = dex.csv.connections(csv);
+      return getChildren(connections, 0);
 
-  function getChildren(connections, depth) {
-    //dex.console.log("connections:", connections, "depth="+depth);
-    var kids = [], cname;
+      function getChildren(connections, depth) {
+        //dex.console.log("connections:", connections, "depth="+depth);
+        var kids = [], cname;
 
-    if (typeof connections === 'undefined') {
-      return kids;
-    }
+        if (typeof connections === 'undefined') {
+          return kids;
+        }
 
-    for (cname in connections) {
-      //dex.console.log("CNAME", cname);
-      if (connections.hasOwnProperty(cname)) {
-        kids.push(createChild(cname, csv.header[depth],
-          getChildren(connections[cname], depth + 1)));
+        for (cname in connections) {
+          //dex.console.log("CNAME", cname);
+          if (connections.hasOwnProperty(cname)) {
+            kids.push(createChild(cname, csv.header[depth],
+              getChildren(connections[cname], depth + 1)));
+          }
+        }
+
+        return kids;
       }
-    }
 
-    return kids;
-  }
+      function createChild(name, category, children) {
+        var child =
+        {
+          "name": name,
+          "category": category,
+          "children": children
+        };
+        return child;
+      }
+    },
 
-  function createChild(name, category, children) {
-    var child =
-    {
-      "name": name,
-      "category": category,
-      "children": children
-    };
-    return child;
-  }
-};
-
-/**
- *
- * Transforms:
- * csv =
- * {
+    /**
+     *
+     * Transforms:
+     * csv =
+     * {
  * 	 header : {C1,C2,C3},
  *   data   : [
  *     [A,B,C],
  *     [A,B,D]
  *   ]
  * }
- * into:
- * connections =
- * { A:{B:{C:{},D:{}}}}
- *
- * @param {Object} csv
- *
- */
-exports.connections = function (csv) {
-  var connections =
-  {};
-  var ri;
+     * into:
+     * connections =
+     * { A:{B:{C:{},D:{}}}}
+     *
+     * @param {Object} csv
+     *
+     */
+    'connections': function (csv) {
+      var connections =
+      {};
+      var ri;
 
-  for (ri = 0; ri < csv.data.length; ri++) {
-    dex.object.connect(connections, csv.data[ri]);
-  }
-
-  //dex.console.log("connections:", connections);
-  return connections;
-};
-
-/**
- *
- * @param csv
- * @param keyIndex
- * @returns {{}}
- *
- */
-exports.createRowMap = function (csv, keyIndex) {
-  var map =
-  {};
-  var ri;
-
-  for (ri = 0; ri < csv.data.length; ri++) {
-    if (csv.data[ri].length == csv.header.length) {
-      map[csv.data[ri][keyIndex]] = csv.data[ri];
-    }
-  }
-  return map;
-};
-
-/**
- *
- * @param csv
- * @param columns
- * @returns {{}}
- */
-exports.columnSlice = function (csv, columns) {
-  var slice = {};
-  slice.header = dex.array.slice(csv.header, columns);
-  slice.data = dex.matrix.slice(csv.data, columns);
-
-  return slice;
-};
-
-/**
- *
- * @param csv
- * @returns {Array}
- */
-exports.getNumericColumnNames = function (csv) {
-  var possibleNumeric =
-  {};
-  var i, j, ri, ci;
-  var numericColumns = [];
-
-  for (i = 0; i < csv.header.length; i++) {
-    possibleNumeric[csv.header[i]] = true;
-  }
-
-  // Iterate thru the data, skip the header.
-  for (ri = 0; ri < csv.data.length; ri++) {
-    for (ci = 0; ci < csv.data[ri].length && ci < csv.header.length; ci++) {
-      if (possibleNumeric[csv.header[ci]] && !dex.object.isNumeric(csv.data[ri][ci])) {
-        possibleNumeric[csv.header[ci]] = false;
+      for (ri = 0; ri < csv.data.length; ri++) {
+        dex.object.connect(connections, csv.data[ri]);
       }
-    }
-  }
 
-  for (ci = 0; ci < csv.header.length; ci++) {
-    if (possibleNumeric[csv.header[ci]]) {
-      numericColumns.push(csv.header[ci]);
-    }
-  }
+      //dex.console.log("connections:", connections);
+      return connections;
+    },
 
-  return numericColumns;
-};
+    /**
+     *
+     * @param csv
+     * @param keyIndex
+     * @returns {{}}
+     *
+     */
+    'createRowMap': function (csv, keyIndex) {
+      var map =
+      {};
+      var ri;
 
-/**
- *
- * @param csv
- * @returns {Array}
- */
-exports.guessTypes = function (csv) {
-  var i = 0;
-  var testResults = [];
-  csv.header.forEach(function (hdr) {
-    testResults.push({})
-  });
-  var numCols = csv.header.length;
+      for (ri = 0; ri < csv.data.length; ri++) {
+        if (csv.data[ri].length == csv.header.length) {
+          map[csv.data[ri][keyIndex]] = csv.data[ri];
+        }
+      }
+      return map;
+    },
 
-  csv.data.forEach(function (row) {
-    for (i = 0; i < numCols; i++) {
+    /**
+     *
+     * @param csv
+     * @param columns
+     * @returns {{}}
+     */
+    'columnSlice': function (csv, columns) {
+      var slice = {};
+      slice.header = dex.array.slice(csv.header, columns);
+      slice.data = dex.matrix.slice(csv.data, columns);
 
-      if (!testResults[i]["notDate"]) {
-        var date = new Date(row[i]);
-        if (isNaN(date.getTime())) {
-          dex.console.log("not date" + i);
-          testResults[i]["notDate"] = true;
+      return slice;
+    },
+
+    /**
+     *
+     * @param csv
+     * @returns {Array}
+     */
+    'getNumericColumnNames': function (csv) {
+      var possibleNumeric =
+      {};
+      var i, j, ri, ci;
+      var numericColumns = [];
+
+      for (i = 0; i < csv.header.length; i++) {
+        possibleNumeric[csv.header[i]] = true;
+      }
+
+      // Iterate thru the data, skip the header.
+      for (ri = 0; ri < csv.data.length; ri++) {
+        for (ci = 0; ci < csv.data[ri].length && ci < csv.header.length; ci++) {
+          if (possibleNumeric[csv.header[ci]] && !dex.object.isNumeric(csv.data[ri][ci])) {
+            possibleNumeric[csv.header[ci]] = false;
+          }
         }
       }
 
-      if (!testResults[i]["notNumber"]) {
-        if (isNaN(row[i])) {
-          testResults[i]["notNumber"] = true;
+      for (ci = 0; ci < csv.header.length; ci++) {
+        if (possibleNumeric[csv.header[ci]]) {
+          numericColumns.push(csv.header[ci]);
         }
       }
-    }
-  });
 
-  var types = [];
+      return numericColumns;
+    },
 
-  for (i = 0; i < numCols; i++) {
-    var results = testResults[i];
-    if (!results.notDate && results.notNumber) {
-      types.push('date');
-    }
-    else if (!results.notNumber) {
-      types.push('number');
-    }
-    else {
-      types.push('string');
-    }
-  }
+    /**
+     *
+     * @param csv
+     * @returns {Array}
+     */
+    'guessTypes': function (csv) {
+      var i = 0;
+      var testResults = [];
+      csv.header.forEach(function (hdr) {
+        testResults.push({})
+      });
+      var numCols = csv.header.length;
 
-  return types;
-}
+      csv.data.forEach(function (row) {
+        for (i = 0; i < numCols; i++) {
 
-/**
- *
- * @param csv
- * @returns {*}
- */
-exports.strictTypes = function strictTypes(csv) {
-  var types = dex.csv.guessTypes(csv);
+          if (!testResults[i]["notDate"]) {
+            var date = new Date(row[i]);
+            if (isNaN(date.getTime())) {
+              dex.console.log("not date" + i);
+              testResults[i]["notDate"] = true;
+            }
+          }
 
-  for (var i = 0; i < types.length; i++) {
-    if (types[i] == 'date') {
-      csv.data.forEach(function (row, ri) {
-        dex.console.log("row[" + ri + "]=" + row[ri]);
-        csv.data[ri][i] = new Date(csv.data[ri][i]);
+          if (!testResults[i]["notNumber"]) {
+            if (isNaN(row[i])) {
+              testResults[i]["notNumber"] = true;
+            }
+          }
+        }
+      });
+
+      var types = [];
+
+      for (i = 0; i < numCols; i++) {
+        var results = testResults[i];
+        if (!results.notDate && results.notNumber) {
+          types.push('date');
+        }
+        else if (!results.notNumber) {
+          types.push('number');
+        }
+        else {
+          types.push('string');
+        }
+      }
+
+      return types;
+    },
+
+    /**
+     *
+     * @param csv
+     * @returns {*}
+     */
+    'strictTypes': function strictTypes(csv) {
+      var types = dex.csv.guessTypes(csv);
+
+      for (var i = 0; i < types.length; i++) {
+        if (types[i] == 'date') {
+          csv.data.forEach(function (row, ri) {
+            dex.console.log("row[" + ri + "]=" + row[ri]);
+            csv.data[ri][i] = new Date(csv.data[ri][i]);
+          })
+        }
+        else {
+          if (types[i] == 'number') {
+            csv.data.forEach(function (row, ri) {
+              dex.console.log("row[" + ri + "]=" + row[ri]);
+              csv.data[ri][i] = new Double(csv.data[ri][i]);
+            })
+          }
+        }
+      }
+
+      return csv;
+    },
+
+    /**
+     *
+     * This routine will return a frames structure based on a csv and
+     * an index.  It will first identify all unique values within the
+     * selected column, then sort them into an array of frame indexes.
+     * From there, it will return an array of csv where the elements
+     * contain the specified frame index at the cooresponding location.
+     * This routine supports things such as time/value filtering for
+     * things like a time or slicing dimension for various charts.
+     * IE: No need to write a motion bubble chart, simply combine a
+     * vcr-player with a regular bubble chart connected to play/rewind
+     * events and motion will follow.
+     *
+     * @param csv
+     * @param columnIndex
+     * @returns {{frameIndices: Array.<T>, frames: Array}}
+     */
+    'getFramesByIndex': function (csv, columnIndex) {
+      var types = dex.csv.guessTypes(csv);
+      //dex.console.log("TYPES", types);
+      var frameIndices;
+
+      if (types[columnIndex] == "number") {
+        frameIndices = _.uniq(csv.data.map(function (row) {
+          return row[columnIndex]
+        })).sort(function (a, b) {
+          return a - b
+        });
+      }
+      else if (types[columnIndex] == "date") {
+        frameIndices = _.uniq(csv.data.map(function (row) {
+          return row[columnIndex]
+        })).sort(function (a, b) {
+          a = new Date(a);
+          b = new Date(b);
+          return a > b ? 1 : a < b ? -1 : 0;
+        });
+      }
+      else {
+        frameIndices = _.uniq(csv.data.map(function (row) {
+          return row[columnIndex]
+        })).sort();
+      }
+      //dex.console.log("FRAME-INDICES", frameIndices)
+      var header = dex.array.copy(csv.header);
+      var frameIndexName = header.splice(columnIndex, 1);
+      var frames = [];
+
+      for (var fi = 0; fi < frameIndices.length; fi++) {
+        var frame = {header: header};
+        var frameData = [];
+
+        for (var ri = 0; ri < csv.data.length; ri++) {
+          if (csv.data[ri][columnIndex] == frameIndices[fi]) {
+            var frameRow = dex.array.copy(csv.data[ri]);
+            frameRow.splice(columnIndex, 1);
+            frameData.push(frameRow);
+          }
+        }
+        frame["data"] = frameData;
+        frames.push(frame);
+      }
+
+      return {
+        'frameIndices': frameIndices,
+        'frames': frames
+      }
+    },
+
+    /**
+     *
+     * @param csv
+     * @returns {Array}
+     */
+    'getNumericIndices': function (csv) {
+      var possibleNumeric =
+      {};
+      var i, j;
+      var numericIndices = [];
+
+      for (i = 0; i < csv.header.length; i++) {
+        possibleNumeric[csv.header[i]] = true;
+      }
+
+      // Iterate thru the data, skip the header.
+      for (i = 1; i < csv.data.length; i++) {
+        for (j = 0; j < csv.data[i].length && j < csv.header.length; j++) {
+          if (possibleNumeric[csv.header[j]] && !dex.object.isNumeric(csv.data[i][j])) {
+            console.log("csv.header[" + j + "]=" + csv.header[j] + " is not numeric due to csv.data[" + i + "]["
+              + j + "]=" + csv.data[i][j]);
+            possibleNumeric[csv.header[j]] = false;
+          }
+        }
+      }
+
+      for (i = 0; i < csv.header.length; i++) {
+        if (possibleNumeric[csv.header[i]]) {
+          numericIndices.push(i);
+        }
+      }
+
+      return numericIndices;
+    },
+
+    'getCategoricalIndices': function (csv) {
+      var possibleNumeric =
+      {};
+      var i, j;
+      var categoricalIndices = [];
+
+      for (i = 0; i < csv.header.length; i++) {
+        possibleNumeric[csv.header[i]] = true;
+      }
+
+      // Iterate thru the data, skip the header.
+      for (i = 1; i < csv.data.length; i++) {
+        for (j = 0; j < csv.data[i].length && j < csv.header.length; j++) {
+          if (possibleNumeric[csv.header[j]] && !dex.object.isNumeric(csv.data[i][j])) {
+            console.log("csv.header[" + j + "]=" + csv.header[j] + " is not numeric due to csv.data[" + i + "]["
+              + j + "]=" + csv.data[i][j]);
+            possibleNumeric[csv.header[j]] = false;
+          }
+        }
+      }
+
+      for (i = 0; i < csv.header.length; i++) {
+        if (!possibleNumeric[csv.header[i]]) {
+          categoricalIndices.push(i);
+        }
+      }
+
+      return categoricalIndices;
+    },
+
+    /**
+     *
+     * @param csv
+     * @param columnNum
+     * @returns {boolean}
+     */
+    'isColumnNumeric': function (csv, columnNum) {
+      var i;
+
+      for (i = 0; i < csv.data.length; i++) {
+        if (!dex.object.isNumeric(csv.data[i][columnNum])) {
+          return false;
+        }
+      }
+      return true;
+    },
+
+    /**
+     *
+     * @param csv
+     * @param columns
+     * @returns {*}
+     */
+    'group': function (csv, columns) {
+      var ri, ci;
+      var groups = {};
+      var returnGroups = [];
+      var values;
+      var key;
+      var otherColumns;
+      var otherHeaders;
+      var groupName;
+
+      if (arguments < 2) {
+        return csv;
+      }
+
+      function compare(a, b) {
+        var si, h;
+
+        for (si = 0; si < columns.length; si++) {
+          h = csv.header[columns[si]]
+          if (a[h] < b[h]) {
+            return -1;
+          }
+          else if (a[h] > b[h]) {
+            return 1
+          }
+        }
+
+        return 0;
+      }
+
+      //otherColumns = dex.array.difference(dex.range(0, csv.header.length), columns);
+      //otherHeaders = dex.array.slice(csv.header, otherColumns);
+
+      for (ri = 0; ri < csv.data.length; ri += 1) {
+        values = dex.array.slice(csv.data[ri], columns);
+        key = values.join(':::');
+
+        if (groups[key]) {
+          group = groups[key];
+        }
+        else {
+          //group = { 'csv' : dex.csv.csv(otherHeaders, []) };
+          group =
+          {
+            'key': key,
+            'values': [],
+            'csv': dex.csv.csv(csv.header, [])
+          };
+          for (ci = 0; ci < values.length; ci++) {
+            group.values.push({'name': csv.header[columns[ci]], 'value': values[ci]});
+          }
+          groups[key] = group;
+        }
+        //group.csv.data.push(dex.array.slice(csv.data[ri], otherColumns));
+        group.csv.data.push(csv.data[ri]);
+        //groups[key] = group;
+      }
+
+      for (groupName in groups) {
+        if (groups.hasOwnProperty(groupName)) {
+          returnGroups.push(groups[groupName]);
+        }
+      }
+
+      return returnGroups.sort(compare);
+    },
+
+    /**
+     *
+     * @param csv
+     * @param func
+     */
+    'visitCells': function (csv, func) {
+      var ci, ri;
+
+      for (ri = 0; ri < csv.data.length; ri++) {
+        for (ci = 0; ci < csv.header.length; ci++) {
+          func(ci, ri, csv.data[ri][ci]);
+        }
+      }
+    },
+
+    /**
+     *
+     * @param csv
+     * @returns {number}
+     */
+    'longestWord': function (csv) {
+      var longest = 0;
+      for (var row = 0; row < csv.data.length; row++) {
+        for (var col = 0; col < csv.data[row].length; col++) {
+          if (longest < csv.data[row][col].length) {
+            longest = csv.data[row][col].length;
+          }
+        }
+      }
+      return longest;
+    },
+
+    /**
+     *
+     * @param csv
+     * @returns {{}|*}
+     */
+    'numericSubset': function (csv) {
+      return dex.csv.columnSlice(csv, dex.csv.getNumericIndices(csv));
+    },
+
+    'categoricalSubset': function (csv) {
+      return dex.csv.columnSlice(csv, dex.csv.getCategoricalIndices(csv));
+    },
+
+    /*
+     var data =
+
+     */
+    'toJsonHierarchy': function (csv, ci) {
+      // If 1 argument, then setup and call with 2.
+      if (arguments.length == 1) {
+        var result = {'name': 'root', children: dex.csv.toJsonHierarchy(csv, 0)};
+        dex.console.log("RESULT", result);
+        return result;
+      }
+      else if (arguments.length == 2) {
+        var valueMap = {};
+
+        for (var ri = 0; ri < csv.data.length; ri++) {
+          if (valueMap.hasOwnProperty(csv.data[ri][ci])) {
+            valueMap[csv.data[ri][ci]]++;
+          }
+          else {
+            valueMap[csv.data[ri][ci]] = 1;
+          }
+        }
+
+        if (ci >= csv.header.length - 1) {
+          return _.keys(valueMap).map(function (key) {
+            return {'name': key, 'size': valueMap[key]};
+          });
+        }
+        else {
+          return _.keys(valueMap).map(function (key) {
+            return {'name': key, 'size': valueMap[key]};
+          });
+        }
+      }
+    },
+
+    'getGraph': function (csv) {
+
+      var nodes = [];
+      var links = [];
+      var nodeNum = 0;
+      var indexMap = [];
+
+      // Record uniques across the data, treating each column as it's own namespace.
+      csv.header.map(function (col, ci) {
+        indexMap.push({});
+        csv.data.map(function (row, ri) {
+          if (_.isUndefined(indexMap[ci][row[ci]])) {
+            indexMap[ci][row[ci]] = nodeNum;
+            nodes.push({'name': row[ci]});
+            nodeNum++;
+          }
+        });
+      });
+
+      for (var ci = 1; ci < csv.header.length; ci++) {
+        csv.data.map(function (row, ri) {
+          links.push({'source': indexMap[ci - 1][row[ci - 1]], 'target': indexMap[ci][row[ci]], 'value': 1});
+        });
+      }
+
+      //dex.console.log("NODES", nodes, links, indexMap);
+      return {'nodes': nodes, 'links': links};
+    },
+
+    'toNestedJson': function (csv) {
+      dex.console.log("CMAP", dex.csv.getConnectionMap(csv));
+      var result = {'name': csv.header[0], 'children': dex.csv.toNestedJsonChildren(dex.csv.getConnectionMap(csv))};
+      dex.console.log("RESULT", result);
+      return result;
+    },
+
+    'toNestedJsonChildren': function (cmap) {
+      //dex.console.log("CMAP", cmap);
+      var children = [];
+
+      _.keys(cmap).map(function (key) {
+        var childMap = cmap[key];
+        if (_.keys(childMap).length <= 0) {
+          children.push({'name': key, 'size': 1000});
+        }
+        else {
+          if (_.keys(childMap).length == 1) {
+            //var grandChildMap = childMap[_.keys(childMap)[0]];
+
+            //dex.console.log("GCMAP", grandChildMap);
+            //if (_.keys(grandChildMap).length <= 0) {
+            //  children.push({'name': key, 'size': 100});
+            //}
+            //else {
+            children.push({'name': key, 'children': dex.csv.toNestedJsonChildren(cmap[key])});
+            //}
+          }
+          else {
+            children.push({'name': key, 'children': dex.csv.toNestedJsonChildren(cmap[key])});
+          }
+        }
       })
-    }
-    else {
-      if (types[i] == 'number') {
-        csv.data.forEach(function (row, ri) {
-          dex.console.log("row[" + ri + "]=" + row[ri]);
-          csv.data[ri][i] = new Double(csv.data[ri][i]);
-        })
+      return children;
+    },
+
+    'getConnectionMap': function (csv) {
+      var rootMap = {};
+      var curMap = {}
+
+      for (var row = 0; row < csv.data.length; row++) {
+        curMap = rootMap;
+
+        for (var col = 0; col < csv.header.length; col++) {
+          if (!_.has(curMap, csv.data[row][col])) {
+            curMap[csv.data[row][col]] = {};
+          }
+          curMap = curMap[csv.data[row][col]];
+        }
       }
-    }
-  }
 
-  return csv;
+      return rootMap;
+    }
+  };
 };
-
-/**
- *
- * This routine will return a frames structure based on a csv and
- * an index.  It will first identify all unique values within the
- * selected column, then sort them into an array of frame indexes.
- * From there, it will return an array of csv where the elements
- * contain the specified frame index at the cooresponding location.
- * This routine supports things such as time/value filtering for
- * things like a time or slicing dimension for various charts.
- * IE: No need to write a motion bubble chart, simply combine a
- * vcr-player with a regular bubble chart connected to play/rewind
- * events and motion will follow.
- *
- * @param csv
- * @param columnIndex
- * @returns {{frameIndices: Array.<T>, frames: Array}}
- */
-exports.getFramesByIndex = function(csv, columnIndex) {
-  var types = dex.csv.guessTypes(csv);
-  //dex.console.log("TYPES", types);
-  var frameIndices;
-
-  if (types[columnIndex] == "number")
-  {
-    frameIndices = _.uniq(csv.data.map(function (row) {
-      return row[columnIndex]
-    })).sort(function(a, b){return a-b});
-  }
-  else if (types[columnIndex] == "date")
-  {
-    frameIndices = _.uniq(csv.data.map(function (row) {
-      return row[columnIndex]
-    })).sort(function(a, b){
-      a = new Date(a);
-      b = new Date(b);
-      return a>b ? 1 : a<b ? -1 : 0;
-    });
-  }
-  else {
-    frameIndices = _.uniq(csv.data.map(function (row) {
-      return row[columnIndex]
-    })).sort();
-  }
-  //dex.console.log("FRAME-INDICES", frameIndices)
-  var header = dex.array.copy(csv.header);
-  var frameIndexName = header.splice(columnIndex, 1);
-  var frames = [];
-
-  for (var fi=0; fi<frameIndices.length; fi++)
-  {
-    var frame = { header : header };
-    var frameData = [];
-
-    for (var ri=0; ri<csv.data.length; ri++)
-    {
-      if (csv.data[ri][columnIndex] == frameIndices[fi])
-      {
-        var frameRow = dex.array.copy(csv.data[ri]);
-        frameRow.splice(columnIndex, 1);
-        frameData.push(frameRow);
-      }
-    }
-    frame["data"] = frameData;
-    frames.push(frame);
-  }
-
-  return {
-    'frameIndices' : frameIndices,
-    'frames' : frames
-  }
-};
-
-/**
- *
- * @param csv
- * @returns {Array}
- */
-exports.getNumericIndices = function (csv) {
-  var possibleNumeric =
-  {};
-  var i, j;
-  var numericIndices = [];
-
-  for (i = 0; i < csv.header.length; i++) {
-    possibleNumeric[csv.header[i]] = true;
-  }
-
-  // Iterate thru the data, skip the header.
-  for (i = 1; i < csv.data.length; i++) {
-    for (j = 0; j < csv.data[i].length && j < csv.header.length; j++) {
-      if (possibleNumeric[csv.header[j]] && !dex.object.isNumeric(csv.data[i][j])) {
-        console.log("csv.header[" + j + "]=" + csv.header[j] + " is not numeric due to csv.data[" + i + "]["
-          + j + "]=" + csv.data[i][j]);
-        possibleNumeric[csv.header[j]] = false;
-      }
-    }
-  }
-
-  for (i = 0; i < csv.header.length; i++) {
-    if (possibleNumeric[csv.header[i]]) {
-      numericIndices.push(i);
-    }
-  }
-
-  return numericIndices;
-};
-
-exports.getCategoricalIndices = function (csv) {
-  var possibleNumeric =
-  {};
-  var i, j;
-  var categoricalIndices = [];
-
-  for (i = 0; i < csv.header.length; i++) {
-    possibleNumeric[csv.header[i]] = true;
-  }
-
-  // Iterate thru the data, skip the header.
-  for (i = 1; i < csv.data.length; i++) {
-    for (j = 0; j < csv.data[i].length && j < csv.header.length; j++) {
-      if (possibleNumeric[csv.header[j]] && !dex.object.isNumeric(csv.data[i][j])) {
-        console.log("csv.header[" + j + "]=" + csv.header[j] + " is not numeric due to csv.data[" + i + "]["
-          + j + "]=" + csv.data[i][j]);
-        possibleNumeric[csv.header[j]] = false;
-      }
-    }
-  }
-
-  for (i = 0; i < csv.header.length; i++) {
-    if (!possibleNumeric[csv.header[i]]) {
-      categoricalIndices.push(i);
-    }
-  }
-
-  return categoricalIndices;
-};
-
-/**
- *
- * @param csv
- * @param columnNum
- * @returns {boolean}
- */
-exports.isColumnNumeric = function (csv, columnNum) {
-  var i;
-
-  for (i = 0; i < csv.data.length; i++) {
-    if (!dex.object.isNumeric(csv.data[i][columnNum])) {
-      return false;
-    }
-  }
-  return true;
-};
-
-/**
- *
- * @param csv
- * @param columns
- * @returns {*}
- */
-exports.group = function (csv, columns) {
-  var ri, ci;
-  var groups = {};
-  var returnGroups = [];
-  var values;
-  var key;
-  var otherColumns;
-  var otherHeaders;
-  var groupName;
-
-  if (arguments < 2) {
-    return csv;
-  }
-
-  function compare(a, b) {
-    var si, h;
-
-    for (si = 0; si < columns.length; si++) {
-      h = csv.header[columns[si]]
-      if (a[h] < b[h]) {
-        return -1;
-      }
-      else if (a[h] > b[h]) {
-        return 1
-      }
-    }
-
-    return 0;
-  }
-
-  //otherColumns = dex.array.difference(dex.range(0, csv.header.length), columns);
-  //otherHeaders = dex.array.slice(csv.header, otherColumns);
-
-  for (ri = 0; ri < csv.data.length; ri += 1) {
-    values = dex.array.slice(csv.data[ri], columns);
-    key = values.join(':::');
-
-    if (groups[key]) {
-      group = groups[key];
-    }
-    else {
-      //group = { 'csv' : dex.csv.csv(otherHeaders, []) };
-      group =
-      {
-        'key': key,
-        'values': [],
-        'csv': dex.csv.csv(csv.header, [])
-      };
-      for (ci = 0; ci < values.length; ci++) {
-        group.values.push({'name': csv.header[columns[ci]], 'value': values[ci]});
-      }
-      groups[key] = group;
-    }
-    //group.csv.data.push(dex.array.slice(csv.data[ri], otherColumns));
-    group.csv.data.push(csv.data[ri]);
-    //groups[key] = group;
-  }
-
-  for (groupName in groups) {
-    if (groups.hasOwnProperty(groupName)) {
-      returnGroups.push(groups[groupName]);
-    }
-  }
-
-  return returnGroups.sort(compare);
-};
-
-/**
- *
- * @param csv
- * @param func
- */
-exports.visitCells = function (csv, func) {
-  var ci, ri;
-
-  for (ri = 0; ri < csv.data.length; ri++) {
-    for (ci = 0; ci < csv.header.length; ci++) {
-      func(ci, ri, csv.data[ri][ci]);
-    }
-  }
-};
-
-/**
- *
- * @param csv
- * @returns {number}
- */
-exports.longestWord = function (csv) {
-  var longest = 0;
-  for (var row = 0; row < csv.data.length; row++) {
-    for (var col = 0; col < csv.data[row].length; col++) {
-      if (longest < csv.data[row][col].length) {
-        longest = csv.data[row][col].length;
-      }
-    }
-  }
-  return longest;
-};
-
-/**
- *
- * @param csv
- * @returns {{}|*}
- */
-exports.numericSubset = function (csv) {
-  return dex.csv.columnSlice(csv, dex.csv.getNumericIndices(csv));
-};
-
-exports.categoricalSubset = function (csv) {
-  return dex.csv.columnSlice(csv, dex.csv.getCategoricalIndices(csv));
-};
-
-/*
- var data =
-
- */
-exports.toJsonHierarchy = function (csv, ci) {
-  // If 1 argument, then setup and call with 2.
-  if (arguments.length == 1) {
-    var result = {'name': 'root', children: dex.csv.toJsonHierarchy(csv, 0)};
-    dex.console.log("RESULT", result);
-    return result;
-  }
-  else if (arguments.length == 2) {
-    var valueMap = {};
-
-    for (var ri = 0; ri < csv.data.length; ri++) {
-      if (valueMap.hasOwnProperty(csv.data[ri][ci])) {
-        valueMap[csv.data[ri][ci]]++;
-      }
-      else {
-        valueMap[csv.data[ri][ci]] = 1;
-      }
-    }
-
-    if (ci >= csv.header.length - 1) {
-      return _.keys(valueMap).map(function (key) {
-        return {'name': key, 'size': valueMap[key]};
-      });
-    }
-    else {
-      return _.keys(valueMap).map(function (key) {
-        return {'name': key, 'size': valueMap[key]};
-      });
-    }
-  }
-};
-
-exports.getGraph = function (csv) {
-
-  var nodes = [];
-  var links = [];
-  var nodeNum = 0;
-  var indexMap = [];
-
-  // Record uniques across the data, treating each column as it's own namespace.
-  csv.header.map(function (col, ci) {
-    indexMap.push({});
-    csv.data.map(function (row, ri) {
-      if (_.isUndefined(indexMap[ci][row[ci]]))
-      {
-        indexMap[ci][row[ci]]= nodeNum;
-        nodes.push({'name' : row[ci]});
-        nodeNum++;
-      }
-    });
-  });
-
-  for (var ci=1; ci<csv.header.length; ci++)
-  {
-    csv.data.map(function (row, ri) {
-      links.push({ 'source' : indexMap[ci-1][row[ci-1]], 'target' : indexMap[ci][row[ci]], 'value' : 1});
-    });
-  }
-
-  //dex.console.log("NODES", nodes, links, indexMap);
-  return { 'nodes' : nodes, 'links' : links };
-};
-
-exports.toNestedJson = function (csv) {
-  dex.console.log("CMAP", dex.csv.getConnectionMap(csv));
-  var result = {'name': csv.header[0], 'children': dex.csv.toNestedJsonChildren(dex.csv.getConnectionMap(csv))};
-  dex.console.log("RESULT", result);
-  return result;
-};
-
-exports.toNestedJsonChildren = function (cmap) {
-  //dex.console.log("CMAP", cmap);
-  var children = [];
-
-  _.keys(cmap).map(function (key) {
-    var childMap = cmap[key];
-    if (_.keys(childMap).length <= 0) {
-      children.push({'name': key, 'size': 1000});
-    }
-    else {
-      if (_.keys(childMap).length == 1) {
-        //var grandChildMap = childMap[_.keys(childMap)[0]];
-
-        //dex.console.log("GCMAP", grandChildMap);
-        //if (_.keys(grandChildMap).length <= 0) {
-        //  children.push({'name': key, 'size': 100});
-        //}
-        //else {
-        children.push({'name': key, 'children': dex.csv.toNestedJsonChildren(cmap[key])});
-        //}
-      }
-      else {
-        children.push({'name': key, 'children': dex.csv.toNestedJsonChildren(cmap[key])});
-      }
-    }
-  })
-  return children;
-};
-
-exports.getConnectionMap = function (csv) {
-  var rootMap = {};
-  var curMap = {}
-
-  for (var row = 0; row < csv.data.length; row++) {
-    curMap = rootMap;
-
-    for (var col = 0; col < csv.header.length; col++) {
-      if (!_.has(curMap, csv.data[row][col])) {
-        curMap[csv.data[row][col]] = {};
-      }
-      curMap = curMap[csv.data[row][col]];
-    }
-  }
-
-  return rootMap;
-};
-},{}],54:[function(require,module,exports){
+},{}],58:[function(require,module,exports){
 /**
  *
  * This module provides support for creating various datasets.
@@ -13934,133 +17211,140 @@ exports.getConnectionMap = function (csv) {
  *
  */
 
-/**
- * Creates a matrix of random integers within the specified range.
- *
- * @param spec The matrix specification.  Ex: \{rows:10, columns: 4, min: 0, max:100\}
- *
- * @returns {Array} An array containing spec.rows number of rows.  Each row consisting of
- * an array containing spec.columns elements.  Each element is a randomly generated integer
- * within the range [spec.min, spec.max]
- *
- */
-exports.randomMatrix = function (spec) {
-  var ri, ci;
+module.exports = function datagen(dex) {
 
-  //{rows:10, columns: 4, min, 0, max:100})
-  var matrix = [];
-  var range = spec.max - spec.min;
-  for (ri = 0; ri < spec.rows; ri++) {
-    var row = [];
+  return {
+    /**
+     * Creates a matrix of random integers within the specified range.
+     *
+     * @param spec The matrix specification.  Ex: \{rows:10, columns: 4, min: 0, max:100\}
+     *
+     * @returns {Array} An array containing spec.rows number of rows.  Each row consisting of
+     * an array containing spec.columns elements.  Each element is a randomly generated integer
+     * within the range [spec.min, spec.max]
+     *
+     */
+    'randomMatrix': function (spec) {
+      var ri, ci;
 
-    for (ci = 0; ci < spec.columns; ci++) {
-      row.push(Math.random() * range + spec.min);
+      //{rows:10, columns: 4, min, 0, max:100})
+      var matrix = [];
+      var range = spec.max - spec.min;
+      for (ri = 0; ri < spec.rows; ri++) {
+        var row = [];
+
+        for (ci = 0; ci < spec.columns; ci++) {
+          row.push(Math.random() * range + spec.min);
+        }
+        matrix.push(row);
+      }
+      return matrix;
+    },
+
+    'randomIndexedMatrix': function (spec) {
+      var ri, ci;
+
+      //{rows:10, columns: 4, min, 0, max:100})
+      var matrix = [];
+      var range = spec.max - spec.min;
+      for (ri = 0; ri < spec.rows; ri++) {
+        var row = [];
+
+        row.push(ri + 1);
+        for (ci = 0; ci < spec.columns - 1; ci++) {
+          row.push(Math.random() * range + spec.min);
+        }
+        matrix.push(row);
+      }
+      return matrix;
+    },
+
+    'randomIntegerMatrix': function (spec) {
+      var ri, ci;
+
+      //{rows:10, columns: 4, min, 0, max:100})
+      var matrix = [];
+      var range = spec.max - spec.min;
+      for (ri = 0; ri < spec.rows; ri++) {
+        var row = [];
+
+        for (ci = 0; ci < spec.columns; ci++) {
+          row.push(Math.round(Math.random() * range + spec.min));
+        }
+        matrix.push(row);
+      }
+      return matrix;
+    },
+
+    /**
+     * Creates a matrix of random integers within the specified range.
+     *
+     * @param spec The matrix specification.  Ex: \{rows:10, columns:4 \}
+     *
+     * @returns {Array} An array containing spec.rows number of rows.  Each row consisting of
+     * an array containing spec.columns elements.  Each element is a randomly generated integer
+     * within the range [spec.min, spec.max]
+     *
+     */
+    'identityCsv': function (spec) {
+      var ri, ci;
+      var csv = {};
+      csv.header = dex.datagen.identityHeader(spec);
+      csv.data = dex.datagen.identityMatrix(spec);
+      return csv;
+    },
+
+    /**
+     * This method will return an identity function meeting the supplied
+     * specification.
+     *
+     * @param {object} spec - The identityMatrix specification.
+     * @param {number} spec.rows - The number of rows to generate.
+     * @param {number} spec.columns - The number of columns to generate.
+     * @example {@lang javascript}
+     * // Returns: [['R1C1', 'R1C2' ], ['R2C1', 'R2C2'], ['R3C1', 'R3C2']]
+     * identityMatrix({rows: 3, columns: 2});
+     * @returns {matrix}
+     *
+     */
+    'identityMatrix': function (spec) {
+      var ri, ci;
+
+      // { rows:10, columns:4 })
+      var matrix = [];
+      for (ri = 0; ri < spec.rows; ri++) {
+        var row = [];
+
+        for (ci = 0; ci < spec.columns; ci++) {
+          row.push("R" + (ri + 1) + "C" + (ci + 1));
+        }
+        matrix.push(row);
+      }
+      return matrix;
+    },
+
+    /**
+     * Returns an identity header array.
+     *
+     * @param spec - The specification for the header array.
+     * @param spec.columns - The number of columns to generate.
+     * @example
+     * // Returns: [ 'C1', 'C2', 'C3' ]
+     * identityHeader({ columns: 3 });
+     * @returns {Array} Returns an array of the specified columns.
+     *
+     */
+    'identityHeader': function (spec) {
+      return dex.range(1, spec.columns).map(function (i) {
+        return "C" + i;
+      });
     }
-    matrix.push(row);
-  }
-  return matrix;
+  };
 };
 
-exports.randomIndexedMatrix = function (spec) {
-  var ri, ci;
+},{}],59:[function(require,module,exports){
+// Allow user to override, but define this by default:
 
-  //{rows:10, columns: 4, min, 0, max:100})
-  var matrix = [];
-  var range = spec.max - spec.min;
-  for (ri = 0; ri < spec.rows; ri++) {
-    var row = [];
-
-    row.push(ri+1);
-    for (ci = 0; ci < spec.columns - 1; ci++) {
-      row.push(Math.random() * range + spec.min);
-    }
-    matrix.push(row);
-  }
-  return matrix;
-};
-
-exports.randomIntegerMatrix = function (spec) {
-  var ri, ci;
-
-  //{rows:10, columns: 4, min, 0, max:100})
-  var matrix = [];
-  var range = spec.max - spec.min;
-  for (ri = 0; ri < spec.rows; ri++) {
-    var row = [];
-
-    for (ci = 0; ci < spec.columns; ci++) {
-      row.push(Math.round(Math.random() * range + spec.min));
-    }
-    matrix.push(row);
-  }
-  return matrix;
-};
-
-/**
- * Creates a matrix of random integers within the specified range.
- *
- * @param spec The matrix specification.  Ex: \{rows:10, columns:4 \}
- *
- * @returns {Array} An array containing spec.rows number of rows.  Each row consisting of
- * an array containing spec.columns elements.  Each element is a randomly generated integer
- * within the range [spec.min, spec.max]
- *
- */
-exports.identityCsv = function (spec) {
-  var ri, ci;
-  var csv = {};
-  csv.header = dex.datagen.identityHeader(spec);
-  csv.data = dex.datagen.identityMatrix(spec);
-  return csv;
-};
-
-/**
- * This method will return an identity function meeting the supplied
- * specification.
- *
- * @param {object} spec - The identityMatrix specification.
- * @param {number} spec.rows - The number of rows to generate.
- * @param {number} spec.columns - The number of columns to generate.
- * @example {@lang javascript}
- * // Returns: [['R1C1', 'R1C2' ], ['R2C1', 'R2C2'], ['R3C1', 'R3C2']]
- * identityMatrix({rows: 3, columns: 2});
- * @returns {matrix}
- *
- */
-exports.identityMatrix = function (spec) {
-  var ri, ci;
-
-  // { rows:10, columns:4 })
-  var matrix = [];
-  for (ri = 0; ri < spec.rows; ri++) {
-    var row = [];
-
-    for (ci = 0; ci < spec.columns; ci++) {
-      row.push("R" + (ri + 1) + "C" + (ci + 1));
-    }
-    matrix.push(row);
-  }
-  return matrix;
-};
-
-/**
- * Returns an identity header array.
- *
- * @param spec - The specification for the header array.
- * @param spec.columns - The number of columns to generate.
- * @example
- * // Returns: [ 'C1', 'C2', 'C3' ]
- * identityHeader({ columns: 3 });
- * @returns {Array} Returns an array of the specified columns.
- *
- */
-exports.identityHeader = function (spec) {
-  return dex.range(1, spec.columns).map(function (i) {
-    return "C" + i;
-  });
-};
-
-},{}],55:[function(require,module,exports){
 /**
  *
  * The main dexjs module.
@@ -14070,7 +17354,7 @@ exports.identityHeader = function (spec) {
  *
  * @requires d3
  * @requires jquery
- * @requires jquery-ui
+ * @requires jqueryui
  * @requires underscore
  *
  */
@@ -14084,7 +17368,7 @@ var dex = {};
  * @type {string}
  *
  */
-dex.version = "0.7";
+dex.version = "0.8.0.8";
 
 /**
  * This routine will return an array [ start, ..., start + len ] using an increment of 1.
@@ -14128,6 +17412,12 @@ dex.copy = function(obj) {
  */
 dex.bus = require("../lib/pubsub");
 
+require('../lib/d3.svg.multibrush');
+require('../lib/d3.selection');
+
+dex.pc = require('../lib/d3.parcoords');
+dex.util = require('./util/util')(dex);
+
 /**
  *
  * A module for dealing with arrays.
@@ -14136,7 +17426,7 @@ dex.bus = require("../lib/pubsub");
  * @type {module:dex.array}
  *
  */
-dex.array = require('./array/array');
+dex.array = require('./array/array')(dex);
 
 /**
  * A module for dealing with colors.
@@ -14145,7 +17435,7 @@ dex.array = require('./array/array');
  * @type {module:dex.color}
  *
  */
-dex.color = require("./color/color");
+dex.color = require("./color/color")(dex);
 
 /**
  *
@@ -14155,7 +17445,7 @@ dex.color = require("./color/color");
  * @type {module:dex.config}
  *
  */
-dex.config = require("./config/config");
+dex.config = require("./config/config")(dex);
 
 /**
  *
@@ -14165,7 +17455,7 @@ dex.config = require("./config/config");
  * @type {module:dex.console}
  *
  */
-dex.console = require("./console/console");
+dex.console = require("./console/console")(dex);
 
 /**
  *
@@ -14175,7 +17465,7 @@ dex.console = require("./console/console");
  * @type {module:dex.csv}
  *
  */
-dex.csv = require("./csv/csv");
+dex.csv = require("./csv/csv")(dex);
 
 /**
  *
@@ -14185,7 +17475,7 @@ dex.csv = require("./csv/csv");
  * @type {module:dex.datagen}
  *
  */
-dex.datagen = require("./datagen/datagen");
+dex.datagen = require("./datagen/datagen")(dex);
 
 /**
  *
@@ -14195,7 +17485,7 @@ dex.datagen = require("./datagen/datagen");
  * @type {module:dex.json}
  *
  */
-dex.json = require("./json/json");
+dex.json = require("./json/json")(dex);
 
 /**
  * A module for dealing with matrices.
@@ -14204,12 +17494,12 @@ dex.json = require("./json/json");
  * @type {module:dex/matrix}
  *
  */
-dex.matrix = require("./matrix/matrix");
+dex.matrix = require("./matrix/matrix")(dex);
 
 /**
  * @module dex/object
  */
-dex.object = require("./object/object");
+dex.object = require("./object/object")(dex);
 
 /**
  *
@@ -14219,7 +17509,7 @@ dex.object = require("./object/object");
  * @type {module:ui}
  *
  */
-dex.ui = require("./ui/ui");
+dex.ui = require("./ui/ui")(dex);
 
 /**
  *
@@ -14229,7 +17519,7 @@ dex.ui = require("./ui/ui");
  * @type {module:component}
  *
  */
-dex.component = require("./component/component");
+dex.component = require("./component/component")(dex);
 
 /**
  *
@@ -14239,10 +17529,10 @@ dex.component = require("./component/component");
  * @type {module:charts}
  *
  */
-dex.charts = require("./charts/charts");
+dex.charts = require("./charts/charts")(dex);
 
 module.exports = dex;
-},{"../lib/pubsub":1,"./array/array":2,"./charts/charts":9,"./color/color":49,"./component/component":50,"./config/config":51,"./console/console":52,"./csv/csv":53,"./datagen/datagen":54,"./json/json":56,"./matrix/matrix":57,"./object/object":58,"./ui/ui":68}],56:[function(require,module,exports){
+},{"../lib/d3.parcoords":1,"../lib/d3.selection":2,"../lib/d3.svg.multibrush":3,"../lib/pubsub":4,"./array/array":5,"./charts/charts":12,"./color/color":53,"./component/component":54,"./config/config":55,"./console/console":56,"./csv/csv":57,"./datagen/datagen":58,"./json/json":60,"./matrix/matrix":61,"./object/object":62,"./ui/ui":72,"./util/util":73}],60:[function(require,module,exports){
 /**
  *
  * This module provides routines dealing with json data.
@@ -14253,88 +17543,93 @@ module.exports = dex;
  *
  */
 
-/**
- * Converts JSON and a header to a CSV file.  It is used for parallel coordinate brush
- * events where the selected brush must be published to events as a csv.
- *
- * For example, given:
- *
- * json   = [ { A: 1, B: 3, C: 5, D: 7 },
- *            { A: 2, B: 4, C: 6, D: 8 } ];
- * header = [ 'A', 'B', 'C', 'D' ];
- *
- * This will return a csv where:
- *
- * csv = { header: [ 'A', 'B', 'C', 'D' ],
+module.exports = function json(dex) {
+
+  return {
+    /**
+     * Converts JSON and a header to a CSV file.  It is used for parallel coordinate brush
+     * events where the selected brush must be published to events as a csv.
+     *
+     * For example, given:
+     *
+     * json   = [ { A: 1, B: 3, C: 5, D: 7 },
+     *            { A: 2, B: 4, C: 6, D: 8 } ];
+     * header = [ 'A', 'B', 'C', 'D' ];
+     *
+     * This will return a csv where:
+     *
+     * csv = { header: [ 'A', 'B', 'C', 'D' ],
  *         data    [[ 1, 4, 5, 7 ], [ 2, 4, 6, 8 ]];
  *
- * @param json
- * @param header
- * @returns {*}
- */
-exports.toCsv = function (json, header) {
-  var csv;
-  var ri, ci;
-  var data = [];
+     * @param json
+     * @param header
+     * @returns {*}
+     */
+    'toCsv': function (json, header) {
+      var csv;
+      var ri, ci;
+      var data = [];
 
-  // Keys are provided.
-  if (arguments.length == 2) {
-    if (Array.isArray(json)) {
-      for (ri = 0; ri < json.length; ri++) {
-        var row = [];
-        for (ci = 0; ci < header.length; ci++) {
-          row.push(json[ri][header[ci]]);
+      // Keys are provided.
+      if (arguments.length == 2) {
+        if (Array.isArray(json)) {
+          for (ri = 0; ri < json.length; ri++) {
+            var row = [];
+            for (ci = 0; ci < header.length; ci++) {
+              row.push(json[ri][header[ci]]);
+            }
+            data.push(row);
+          }
         }
-        data.push(row);
+        else {
+          var row = [];
+          for (ci = 0; ci < header.length; ci++) {
+            row.push(json[ri][header[ci]]);
+          }
+          data.push(row);
+        }
+        return dex.csv.csv(header, data);
       }
-    }
-    else {
-      var row = [];
-      for (ci = 0; ci < header.length; ci++) {
-        row.push(json[ri][header[ci]]);
+      else {
+        return dex.json.toCsv(json, dex.json.keys(json));
       }
-      data.push(row);
+    },
+
+    /**
+     * Returns all keys found in a json structure or array of json structures.
+     *
+     * @param json  The json structure or array of json structures.
+     * @returns {Array} A list of keys found within json.
+     *
+     */
+    'keys': function (json) {
+      var keyMap = {};
+      var keys = [];
+      var ri, key;
+
+      if (Array.isArray(json)) {
+        for (ri = 0; ri < json.length; ri++) {
+          for (key in json[ri]) {
+            keyMap[key] = true;
+          }
+        }
+      }
+      else {
+        for (key in json) {
+          keyMap[key] = true;
+        }
+      }
+
+      for (key in keyMap) {
+        keys.push(key);
+      }
+
+      return keys;
     }
-    return dex.csv.csv(header, data);
-  }
-  else {
-    return dex.json.toCsv(json, dex.json.keys(json));
-  }
+  };
 };
 
-/**
- * Returns all keys found in a json structure or array of json structures.
- *
- * @param json  The json structure or array of json structures.
- * @returns {Array} A list of keys found within json.
- *
- */
-exports.keys = function (json) {
-  var keyMap = {};
-  var keys = [];
-  var ri, key;
-
-  if (Array.isArray(json)) {
-    for (ri = 0; ri < json.length; ri++) {
-      for (key in json[ri]) {
-        keyMap[key] = true;
-      }
-    }
-  }
-  else {
-    for (key in json) {
-      keyMap[key] = true;
-    }
-  }
-
-  for (key in keyMap) {
-    keys.push(key);
-  }
-
-  return keys;
-};
-
-},{}],57:[function(require,module,exports){
+},{}],61:[function(require,module,exports){
 /**
  *
  * This module provides routines dealing with matrices.
@@ -14345,332 +17640,337 @@ exports.keys = function (json) {
  *
  */
 
-/**
- *
- * Return the specified slice of the matrix.  The original matrix is
- * not altered.
- *
- * @param {matrix} matrix The matrix to be sliced.
- * @param {Array.<number>} columns - An array of column indices to include within the slice.
- * @param {number} [rows] If supplied, the slice will consist only of the specified
- * number of rows.
- *
- * @returns {matrix}
- */
-exports.slice = function (matrix, columns, rows) {
-  var matrixSlice = new Array(0);
-  //dex.console.log("PRE-SLICE (matrixSlize):" + matrixSlice);
-  var ri;
+module.exports = function matrix(dex) {
 
-  if (arguments.length === 3) {
-    for (ri = 0; ri < rows.length; ri++) {
-      matrixSlice.push(dex.array.slice(matrix[rows[ri]]));
-    }
-  }
-  else {
-    for (ri = 0; ri < matrix.length; ri++) {
-      //dex.console.log("MATRIX-SLICE-BEFORE[" + ri + "]:" + matrixSlice);
-      matrixSlice.push(dex.array.slice(matrix[ri], columns));
-      //dex.console.log("MATRIX-SLICE-AFTER[" + ri + "]" + matrixSlice);
-    }
-  }
-  return matrixSlice;
-};
+  return {
+    /**
+     *
+     * Return the specified slice of the matrix.  The original matrix is
+     * not altered.
+     *
+     * @param {matrix} matrix The matrix to be sliced.
+     * @param {Array.<number>} columns - An array of column indices to include within the slice.
+     * @param {number} [rows] If supplied, the slice will consist only of the specified
+     * number of rows.
+     *
+     * @returns {matrix}
+     */
+    'slice': function (matrix, columns, rows) {
+      var matrixSlice = new Array(0);
+      //dex.console.log("PRE-SLICE (matrixSlize):" + matrixSlice);
+      var ri;
 
-/**
- *
- * Returns a matrix consisting of unique values relative to each
- * column.
- *
- * @param {matrix} matrix The matrix to evaluate.
- *
- * @returns {Array.<Array.<Object>>} The unique values relative to each column. In the form
- * of [[ column 1 unique values], [column 2 unique values], ...]]
- *
- */
-exports.uniques = function (matrix) {
-  var ci;
-  var uniques = [];
-  var tmatrix = dex.matrix.transpose(matrix);
-  var ncol = tmatrix.length;
+      if (arguments.length === 3) {
+        for (ri = 0; ri < rows.length; ri++) {
+          matrixSlice.push(dex.array.slice(matrix[rows[ri]]));
+        }
+      }
+      else {
+        for (ri = 0; ri < matrix.length; ri++) {
+          //dex.console.log("MATRIX-SLICE-BEFORE[" + ri + "]:" + matrixSlice);
+          matrixSlice.push(dex.array.slice(matrix[ri], columns));
+          //dex.console.log("MATRIX-SLICE-AFTER[" + ri + "]" + matrixSlice);
+        }
+      }
+      return matrixSlice;
+    },
 
-  for (ci = 0; ci < ncol; ci += 1) {
-    uniques.push(_.uniq(tmatrix[ci]));
-  }
-  return uniques;
-};
+    /**
+     *
+     * Returns a matrix consisting of unique values relative to each
+     * column.
+     *
+     * @param {matrix} matrix The matrix to evaluate.
+     *
+     * @returns {Array.<Array.<Object>>} The unique values relative to each column. In the form
+     * of [[ column 1 unique values], [column 2 unique values], ...]]
+     *
+     */
+    'uniques': function (matrix) {
+      var ci;
+      var uniques = [];
+      var tmatrix = dex.matrix.transpose(matrix);
+      var ncol = tmatrix.length;
 
-/**
- *
- * Returns a transposed matrix where the rows of the new matrix are transposed
- * with it's columns.
- *
- * @param {matrix} matrix - The matrix to transpose.
- *
- * @returns {matrix} The transposed matrix, leaving the original matrix untouched.
- *
- * @example {@lang javascript}
- * // Returns [['R1C1', 'R2C1', 'R3C1'], ['R1C2', 'R2C2', 'R3C2' ]]
- * transpose([['R1C1', 'R1C2'], ['R2C1', 'R2C2], ['R3C1', 'R3C2']]);
- *
- */
-exports.transpose = function (matrix) {
-  var ci;
-  var ncols;
-  var transposedMatrix = [];
-  //dex.console.log("Transposing:", matrix);
+      for (ci = 0; ci < ncol; ci += 1) {
+        uniques.push(_.uniq(tmatrix[ci]));
+      }
+      return uniques;
+    },
 
-  if (!matrix || matrix.length <= 0 || !matrix[0] || matrix[0].length <= 0) {
-    return [];
-  }
+    /**
+     *
+     * Returns a transposed matrix where the rows of the new matrix are transposed
+     * with it's columns.
+     *
+     * @param {matrix} matrix - The matrix to transpose.
+     *
+     * @returns {matrix} The transposed matrix, leaving the original matrix untouched.
+     *
+     * @example {@lang javascript}
+     * // Returns [['R1C1', 'R2C1', 'R3C1'], ['R1C2', 'R2C2', 'R3C2' ]]
+     * transpose([['R1C1', 'R1C2'], ['R2C1', 'R2C2], ['R3C1', 'R3C2']]);
+     *
+     */
+    'transpose': function (matrix) {
+      var ci;
+      var ncols;
+      var transposedMatrix = [];
+      //dex.console.log("Transposing:", matrix);
 
-  ncols = matrix[0].length;
+      if (!matrix || matrix.length <= 0 || !matrix[0] || matrix[0].length <= 0) {
+        return [];
+      }
 
-  for (ci = 0; ci < ncols; ci++) {
-    transposedMatrix.push(matrix.map(function (row) {
-      return row[ci];
-    }));
-  }
+      ncols = matrix[0].length;
 
-  return transposedMatrix;
-};
+      for (ci = 0; ci < ncols; ci++) {
+        transposedMatrix.push(matrix.map(function (row) {
+          return row[ci];
+        }));
+      }
 
-/**
- *
- * Return a slice of this matrix based upon the supplied columns.
- * The original matrix will be left untouched.
- *
- * @param {matrix} matrix - The matrix to slice.
- * @param {Array.<number>} columns - An array of column indexes to be included in the slice.
- *
- * @returns {*}
- *
- */
-/*
- exports.columnSlice = function (matrix, columns) {
- // TODO: Determine, is this destructive?
- var slice = [];
- var ri;
- var transposeMatrix;
+      return transposedMatrix;
+    },
 
- if (arguments.length != 2) {
- return matrix;
- }
+    /**
+     *
+     * Return a slice of this matrix based upon the supplied columns.
+     * The original matrix will be left untouched.
+     *
+     * @param {matrix} matrix - The matrix to slice.
+     * @param {Array.<number>} columns - An array of column indexes to be included in the slice.
+     *
+     * @returns {*}
+     *
+     */
+    /*
+     'columnSlice' : function (matrix, columns) {
+     // TODO: Determine, is this destructive?
+     var slice = [];
+     var ri;
+     var transposeMatrix;
 
- transposeMatrix = dex.matrix.transpose(matrix);
- //dex.console.log("transposing", matrix, "transpose", transposedMatrix);
+     if (arguments.length != 2) {
+     return matrix;
+     }
 
- // Specific columns targetted:
- if (Array.isArray(columns)) {
- for (ri = 0; ri < columns.length; ri += 1) {
- slice.push(transposeMatrix[columns[ri]]);
- }
- }
- // Single column.
- else {
- slice.push(transposeMatrix[columns]);
- }
+     transposeMatrix = dex.matrix.transpose(matrix);
+     //dex.console.log("transposing", matrix, "transpose", transposedMatrix);
 
- // Back to row/column format.
- return dex.matrix.transpose(slice);
- };
- */
+     // Specific columns targetted:
+     if (Array.isArray(columns)) {
+     for (ri = 0; ri < columns.length; ri += 1) {
+     slice.push(transposeMatrix[columns[ri]]);
+     }
+     }
+     // Single column.
+     else {
+     slice.push(transposeMatrix[columns]);
+     }
 
-/**
- *
- * Return a flattened version of the matrix.
- *
- * @param {matrix} matrix - The matrix to flatten.
- *
- * @returns {Array.<Object>} A flattened version of the matrix.
- *
- * @example {@lang javascript}
- * // Define a simple matrix.
- * var matrix = [['r1c1', 'r1c2'], ['r2c1', 'r2c2']]
- *
- * // Returns: ['r1c1', 'r1c2', 'r2c1', 'r2c2']
- * flatten(matrix);
- *
- */
-exports.flatten = function (matrix) {
-  return _.flatten(matrix);
-};
+     // Back to row/column format.
+     return dex.matrix.transpose(slice);
+     };
+     */
 
-/**
- *
- * Returns an array of the minimum and maximum value in the form of: [min,max]
- * from the specified subset of the matrix.
- *
- * @param {matrix} matrix - The matrix to scan.
- * @param {Array.<number>|number] [indices] - When supplied, will contrain the extent
+    /**
+     *
+     * Return a flattened version of the matrix.
+     *
+     * @param {matrix} matrix - The matrix to flatten.
+     *
+     * @returns {Array.<Object>} A flattened version of the matrix.
+     *
+     * @example {@lang javascript}
+     * // Define a simple matrix.
+     * var matrix = [['r1c1', 'r1c2'], ['r2c1', 'r2c2']]
+     *
+     * // Returns: ['r1c1', 'r1c2', 'r2c1', 'r2c2']
+     * flatten(matrix);
+     *
+     */
+    'flatten': function (matrix) {
+      return _.flatten(matrix);
+    },
+
+    /**
+     *
+     * Returns an array of the minimum and maximum value in the form of: [min,max]
+     * from the specified subset of the matrix.
+     *
+     * @param {matrix} matrix - The matrix to scan.
+     * @param {Array.<number>|number] [indices] - When supplied, will contrain the extent
  * search to just those columns specified by this list of indices.
  *
- * @returns {Array.<number>} An array of two elements: [ min, max ]
- *
- */
-exports.extent = function (matrix, indices) {
-  var values = matrix;
-  if (arguments.length === 2) {
-    values = dex.matrix.flatten(dex.matrix.slice(matrix, indices));
-    var max = Math.max.apply(null, values);
-    var min = Math.min.apply(null, values);
-    return [min, max];
-  }
-};
-
-/**
- *
- * Combine each column in matrix1 with each column in matrix2.
- *
- * @param {matrix} matrix1 The first matrix to combine.
- * @param {matrix} matrix2 The second matrix to combine.
- *
- * @returns {matrix} The combined matrix.
- *
- * @example {@lang javascript}
- * var matrix1 = [['m1r1c1', 'm1r1c2'], ['m1r2c1', 'm1r2c2']]
- * var matrix2 = [['m2r1c1', 'm2r1c2'], ['m2r2c1', 'm2r2c2']]
- *
- * // Returns: [['m1r1c1', 'm1r1c2', 'm2r1c1', 'm2r1c2'], ['m1r2c1', 'm1r2c2', 'm2r2c1', 'm2r2c2']]
- * var result = combine(matrix1, matrix2);
- *
- */
-exports.combine = function (matrix1, matrix2) {
-  var result = _.clone(matrix1);
-
-  var ri;
-
-  for (ri = 0; ri < matrix2.length; ri++) {
-    result[ri] = result[ri].concat(matrix2[ri]);
-  }
-
-  return result;
-};
-
-/**
- *
- * Return a copy of the supplied matrix.
- *
- * @param {matrix} matrix The matrix to copy.
- *
- * @returns {Array} A copy of the original matrix.
- *
- */
-exports.copy = function (matrix) {
-  return matrix.map(function (row) {
-    return _.clone(row);
-  });
-};
-
-/**
- *
- * Insert a new column at position 0 within this matrix which will contain
- * integer values starting at 1, 2, 3, ...  This is useful if your dataset
- * lacks an existing unique index.
- *
- * @param {matrix} matrix - The matrix to index.
- * @returns {matrix} A copy of the original matrix with the index inserted.
- *
- */
-exports.addIndex = function (matrix) {
-  var indexMatrix = dex.matrix.copy(matrix);
-
-  for (var ri = 0; ri < matrix.length; ri++) {
-    indexMatrix[ri].unshift(ri + 1);
-  }
-
-  return indexMatrix;
-};
-
-/**
- *
- * Determine whether the supplied columnNum within the supplied matrix is
- * numeric or not.
- *
- * @param {matrix} matrix - The matrix to evaluate.
- * @param {number} columnNum - The column within the matrix to evaluate.
- *
- * @returns {boolean} True if the column is numeric, false otherwise.
- *
- */
-exports.isColumnNumeric = function (matrix, columnNum) {
-  for (var i = 0; i < matrix.length; i++) {
-    if (!_.isNumber(matrix[i][columnNum])) {
-      return false;
-    }
-  }
-  return true;
-};
-
-/**
- *
- * Return the maximum value of the specified columnNum within the
- * supplied matrix.
- *
- * @param matrix The matrix to evaluate.
- * @param columnNum The column number within the matrix to evaluate.
- * @returns {*} The maximum value of the specified column within the
- * supplied matrix.
- *
- */
-exports.max = function (matrix, columnNum) {
-  var maxValue = matrix[0][columnNum];
-  var i;
-
-  if (dex.matrix.isColumnNumeric(matrix, columnNum)) {
-    maxValue = parseFloat(matrix[0][columnNum]);
-    for (i = 1; i < matrix.length; i++) {
-      if (maxValue < parseFloat(matrix[i][columnNum])) {
-        maxValue = parseFloat(matrix[i][columnNum]);
+     * @returns {Array.<number>} An array of two elements: [ min, max ]
+     *
+     */
+    'extent': function (matrix, indices) {
+      var values = matrix;
+      if (arguments.length === 2) {
+        values = dex.matrix.flatten(dex.matrix.slice(matrix, indices));
+        var max = Math.max.apply(null, values);
+        var min = Math.min.apply(null, values);
+        return [min, max];
       }
-    }
-  }
-  else {
-    for (i = 1; i < matrix.length; i++) {
-      if (maxValue < matrix[i][columnNum]) {
-        maxValue = matrix[i][columnNum];
-      }
-    }
-  }
+    },
 
-  return maxValue;
+    /**
+     *
+     * Combine each column in matrix1 with each column in matrix2.
+     *
+     * @param {matrix} matrix1 The first matrix to combine.
+     * @param {matrix} matrix2 The second matrix to combine.
+     *
+     * @returns {matrix} The combined matrix.
+     *
+     * @example {@lang javascript}
+     * var matrix1 = [['m1r1c1', 'm1r1c2'], ['m1r2c1', 'm1r2c2']]
+     * var matrix2 = [['m2r1c1', 'm2r1c2'], ['m2r2c1', 'm2r2c2']]
+     *
+     * // Returns: [['m1r1c1', 'm1r1c2', 'm2r1c1', 'm2r1c2'], ['m1r2c1', 'm1r2c2', 'm2r2c1', 'm2r2c2']]
+     * var result = combine(matrix1, matrix2);
+     *
+     */
+    'combine': function (matrix1, matrix2) {
+      var result = _.clone(matrix1);
+
+      var ri;
+
+      for (ri = 0; ri < matrix2.length; ri++) {
+        result[ri] = result[ri].concat(matrix2[ri]);
+      }
+
+      return result;
+    },
+
+    /**
+     *
+     * Return a copy of the supplied matrix.
+     *
+     * @param {matrix} matrix The matrix to copy.
+     *
+     * @returns {Array} A copy of the original matrix.
+     *
+     */
+    'copy': function (matrix) {
+      return matrix.map(function (row) {
+        return _.clone(row);
+      });
+    },
+
+    /**
+     *
+     * Insert a new column at position 0 within this matrix which will contain
+     * integer values starting at 1, 2, 3, ...  This is useful if your dataset
+     * lacks an existing unique index.
+     *
+     * @param {matrix} matrix - The matrix to index.
+     * @returns {matrix} A copy of the original matrix with the index inserted.
+     *
+     */
+    'addIndex': function (matrix) {
+      var indexMatrix = dex.matrix.copy(matrix);
+
+      for (var ri = 0; ri < matrix.length; ri++) {
+        indexMatrix[ri].unshift(ri + 1);
+      }
+
+      return indexMatrix;
+    },
+
+    /**
+     *
+     * Determine whether the supplied columnNum within the supplied matrix is
+     * numeric or not.
+     *
+     * @param {matrix} matrix - The matrix to evaluate.
+     * @param {number} columnNum - The column within the matrix to evaluate.
+     *
+     * @returns {boolean} True if the column is numeric, false otherwise.
+     *
+     */
+    'isColumnNumeric': function (matrix, columnNum) {
+      for (var i = 0; i < matrix.length; i++) {
+        if (!_.isNumber(matrix[i][columnNum])) {
+          return false;
+        }
+      }
+      return true;
+    },
+
+    /**
+     *
+     * Return the maximum value of the specified columnNum within the
+     * supplied matrix.
+     *
+     * @param matrix The matrix to evaluate.
+     * @param columnNum The column number within the matrix to evaluate.
+     * @returns {*} The maximum value of the specified column within the
+     * supplied matrix.
+     *
+     */
+    'max': function (matrix, columnNum) {
+      var maxValue = matrix[0][columnNum];
+      var i;
+
+      if (dex.matrix.isColumnNumeric(matrix, columnNum)) {
+        maxValue = parseFloat(matrix[0][columnNum]);
+        for (i = 1; i < matrix.length; i++) {
+          if (maxValue < parseFloat(matrix[i][columnNum])) {
+            maxValue = parseFloat(matrix[i][columnNum]);
+          }
+        }
+      }
+      else {
+        for (i = 1; i < matrix.length; i++) {
+          if (maxValue < matrix[i][columnNum]) {
+            maxValue = matrix[i][columnNum];
+          }
+        }
+      }
+
+      return maxValue;
+    },
+
+    /**
+     *
+     * Return the minimum value of the specified columnNum within the
+     * supplied matrix.
+     *
+     * @param {matrix} matrix - The matrix to evaluate.
+     * @param {number} columnNum - The column number within the matrix to evaluate.
+     * @returns {number} The minimum value of the specified column within the
+     * supplied matrix.
+     *
+     */
+    'min': function (matrix, columnNum) {
+      var minValue = matrix[0][columnNum];
+      var i;
+
+      if (dex.matrix.isColumnNumeric(matrix, columnNum)) {
+        minValue = parseFloat(matrix[0][columnNum]);
+        for (i = 1; i < matrix.length; i++) {
+          if (minValue > parseFloat(matrix[i][columnNum])) {
+            minValue = parseFloat(matrix[i][columnNum]);
+          }
+        }
+      }
+      else {
+        for (i = 1; i < matrix.length; i++) {
+          if (minValue > matrix[i][columnNum]) {
+            minValue = matrix[i][columnNum];
+          }
+        }
+      }
+
+      return minValue;
+    }
+  };
 };
 
-/**
- *
- * Return the minimum value of the specified columnNum within the
- * supplied matrix.
- *
- * @param {matrix} matrix - The matrix to evaluate.
- * @param {number} columnNum - The column number within the matrix to evaluate.
- * @returns {number} The minimum value of the specified column within the
- * supplied matrix.
- *
- */
-exports.min = function (matrix, columnNum) {
-  var minValue = matrix[0][columnNum];
-  var i;
-
-  if (dex.matrix.isColumnNumeric(matrix, columnNum)) {
-    minValue = parseFloat(matrix[0][columnNum]);
-    for (i = 1; i < matrix.length; i++) {
-      if (minValue > parseFloat(matrix[i][columnNum])) {
-        minValue = parseFloat(matrix[i][columnNum]);
-      }
-    }
-  }
-  else {
-    for (i = 1; i < matrix.length; i++) {
-      if (minValue > matrix[i][columnNum]) {
-        minValue = matrix[i][columnNum];
-      }
-    }
-  }
-
-  return minValue;
-};
-
-},{}],58:[function(require,module,exports){
+},{}],62:[function(require,module,exports){
 /**
  *
  * This module provides routines dealing with javascript objects.
@@ -14681,314 +17981,320 @@ exports.min = function (matrix, columnNum) {
  *
  */
 
-/**
- *
- * Return the lccal keys of this object without the inherited ones.
- *
- * @param obj The object whose local keys we are interested in.
- *
- * @returns {Array} An array of 0 or more lccal keys.
- */
-exports.keys = function keys(obj) {
-  var keys = [];
+module.exports = function object(dex) {
 
-  for (var key in obj) {
-    if (obj.hasOwnProperty(key)) {
-      keys.push(key);
-    }
-  }
+  return {
+    /**
+     *
+     * Return the lccal keys of this object without the inherited ones.
+     *
+     * @param obj The object whose local keys we are interested in.
+     *
+     * @returns {Array} An array of 0 or more lccal keys.
+     */
+    'keys': function keys(obj) {
+      var keys = [];
 
-  return keys;
-};
-
-/**
- *
- * A pretty good, but imperfect mechanism for performing a deep
- * clone of an object.
- *
- * @param obj The object to clone.
- * @returns {*} The cloned object.
- *
- */
-exports.clone = function clone(obj) {
-  var i, attr, len;
-
-  // Handle the 3 simple types, and null or undefined
-  if (null == obj || "object" != typeof obj)
-    return obj;
-
-  // Handle Date
-  if (obj instanceof Date) {
-    var copy = new Date();
-    copy.setTime(obj.getTime());
-    return copy;
-  }
-
-  // Handle Array
-  if (obj instanceof Array) {
-    var copy = [];
-    for (i = 0, len = obj.length; i < len; i++) {
-      copy[i] = dex.object.clone(obj[i]);
-    }
-    return copy;
-  }
-
-  // DOM Nodes are nothing but trouble.
-  if (dex.object.isElement(obj) ||
-    dex.object.isNode(obj)) {
-    return obj;
-  }
-
-  // Handle Object
-  if (obj instanceof Object) {
-    var copy = {};
-    //jQuery.extend(copy, obj);
-    for (attr in obj) {
-      if (obj.hasOwnProperty(attr)) {
-        copy[attr] = dex.object.clone(obj[attr]);
-        //copy[attr] = obj[attr];
+      for (var key in obj) {
+        if (obj.hasOwnProperty(key)) {
+          keys.push(key);
+        }
       }
-    }
-    return copy;
-  }
 
-  throw new Error("Unable to copy obj! Its type isn't supported.");
-};
+      return keys;
+    },
 
-/*
-  This version causes expand to continue forever.
+    /**
+     *
+     * A pretty good, but imperfect mechanism for performing a deep
+     * clone of an object.
+     *
+     * @param obj The object to clone.
+     * @returns {*} The cloned object.
+     *
+     */
+    'clone': function clone(obj) {
+      var i, attr, len;
 
-exports.isEmpty = function isEmpty(obj) {
-  return _.isEmpty(obj);
-};
-*/
+      // Handle the 3 simple types, and null or undefined
+      if (null == obj || "object" != typeof obj)
+        return obj;
 
-/**
- *
- * Kind of misleading.  This really signals when expand should quit
- * expanding.  I need to clean this up.
- *
- * @param obj
- * @returns {boolean}
- */
-exports.isEmpty = function isEmpty(obj) {
-  //dex.console.log("isEmpty(" + obj + ") typeof=" + (typeof obj));
-  if (!obj || obj instanceof Array) {
-    return true;
-  }
-  if ("object" == typeof obj) {
-    for (var key in obj) {
-      if (obj.hasOwnProperty(key)) {
-        //dex.console.log("OBJ: ", obj, " contains key '" + key + "'");
-        return false;
+      // Handle Date
+      if (obj instanceof Date) {
+        var copy = new Date();
+        copy.setTime(obj.getTime());
+        return copy;
       }
-    }
-  }
 
-  return true;
-}
-
-/**
- *
- * Overlay the top object on top of the bottom.  This method will first clone
- * the bottom object.  Then it will drop the values within the top object
- * into the clone.
- *
- * @param {Object} top - The object who's properties will be on top.
- * @param {Object} bottom - The object who's properties will be on bottom.
- * @return {Object} The overlaid object where the properties in top override
- *                  properties in bottom.  The return object is a clone or
- *                  copy.
- *
- */
-exports.overlay = function overlay(top, bottom) {
-  // Make a clone of the bottom object.
-  var overlay = dex.object.clone(bottom);
-  var prop;
-
-  // If we have parameters in the top object, overlay them on top
-  // of the bottom object.
-  if (top !== 'undefined') {
-    // Iterate over the props in top.
-    for (prop in top) {
-      // Arrays are special cases. [A] on top of [A,B] should give [A], not [A,B]
-      if (typeof top[prop] == 'object' && overlay[prop] != null && !(top[prop] instanceof Array)) {
-        //console.log("PROP: " + prop + ", top=" + top + ", overlay=" + overlay);
-        overlay[prop] = dex.object.overlay(top[prop], overlay[prop]);
+      // Handle Array
+      if (obj instanceof Array) {
+        var copy = [];
+        for (i = 0, len = obj.length; i < len; i++) {
+          copy[i] = dex.object.clone(obj[i]);
+        }
+        return copy;
       }
-      // Simply overwrite for simple cases and arrays.
-      else {
-        overlay[prop] = top[prop];
+
+      // DOM Nodes are nothing but trouble.
+      if (dex.object.isElement(obj) ||
+        dex.object.isNode(obj)) {
+        return obj;
       }
-    }
-  }
 
-  //console.dir(config);
-  return overlay;
-};
+      // Handle Object
+      if (obj instanceof Object) {
+        var copy = {};
+        //jQuery.extend(copy, obj);
+        for (attr in obj) {
+          if (obj.hasOwnProperty(attr)) {
+            copy[attr] = dex.object.clone(obj[attr]);
+            //copy[attr] = obj[attr];
+          }
+        }
+        return copy;
+      }
 
-/**
- *
- * This method returns whether or not the supplied object is a Node.
- *
- * @param {Object} obj - The object to test.
- *
- * @returns {boolean} True if obj is a Node, false otherwise.
- *
- */
-exports.isNode = function isNode(obj) {
-  return (
-    typeof Node === "object" ? obj instanceof Node :
-    obj && typeof obj === "object" && typeof obj.nodeType === "number" && typeof obj.nodeName === "string"
-  );
-};
+      throw new Error("Unable to copy obj! Its type isn't supported.");
+    },
 
-/**
- *
- * This method returns whether or not the supplied object is a
- * DOM node.
- *
- * @param {Object} obj - The object to test.
- *
- * @returns {boolean} - True if obj is a DOM node, false otherwise.
- *
- */
-exports.isElement = function isElement(obj) {
-  return (
-    typeof HTMLElement === "object" ? obj instanceof HTMLElement : //DOM2
-    obj && typeof obj === "object" && obj.nodeType === 1 && typeof obj.nodeName === "string"
-  );
-};
+    /*
+     This version causes expand to continue forever.
 
-/**
- *
- * This method returns a boolean representing whether obj is contained
- * within container.
- *
- * @param {Object} container - The container to test.
- * @param {Object} obj - The object to test.
- *
- * @return True if container contains obj.  False otherwise.
- */
-exports.contains = function contains(container, obj) {
-  var i = container.length;
-  while (i--) {
-    if (container[i] === obj) {
+     'isEmpty' : function isEmpty(obj) {
+     return _.isEmpty(obj);
+     };
+     */
+
+    /**
+     *
+     * Kind of misleading.  This really signals when expand should quit
+     * expanding.  I need to clean this up.
+     *
+     * @param obj
+     * @returns {boolean}
+     */
+    'isEmpty': function isEmpty(obj) {
+      //dex.console.log("isEmpty(" + obj + ") typeof=" + (typeof obj));
+      if (!obj || obj instanceof Array) {
+        return true;
+      }
+      if ("object" == typeof obj) {
+        for (var key in obj) {
+          if (obj.hasOwnProperty(key)) {
+            //dex.console.log("OBJ: ", obj, " contains key '" + key + "'");
+            return false;
+          }
+        }
+      }
+
       return true;
-    }
-  }
-  return false;
-};
+    },
 
-/**
- *
- * Return whether or not the supplied object is a function.
- *
- * @param obj The object to check.
- * @returns {boolean} True if obj is a function, false otherwise.
- *
- */
-exports.isFunction = function isFunction(obj) {
-  //return typeof obj === 'function';
-  return _.isFunction(obj);
-};
+    /**
+     *
+     * Overlay the top object on top of the bottom.  This method will first clone
+     * the bottom object.  Then it will drop the values within the top object
+     * into the clone.
+     *
+     * @param {Object} top - The object who's properties will be on top.
+     * @param {Object} bottom - The object who's properties will be on bottom.
+     * @return {Object} The overlaid object where the properties in top override
+     *                  properties in bottom.  The return object is a clone or
+     *                  copy.
+     *
+     */
+    'overlay': function overlay(top, bottom) {
+      // Make a clone of the bottom object.
+      var overlay = dex.object.clone(bottom);
+      var prop;
 
-/**
- *
- * Visit each local property within.
- *
- * @param obj
- * @param func
- */
-/*
-exports.visit = function (obj, func) {
-  var prop;
-  func(obj);
-  for (prop in obj) {
-    if (obj.hasOwnProperty(prop)) {
-      if (typeof obj[prop] === 'object') {
-        dex.object.visit(obj[prop], func);
-      }
-    }
-  }
-};
-*/
-
-/**
- *
- * @param map
- * @param values
- * @returns {exports}
- */
-exports.connect = function connect(map, values) {
-  dex.console.log("map:", map, "values:", values);
-
-  if (!values || values.length <= 0) {
-    return this;
-  }
-  if (!map[values[0]]) {
-    map[values[0]] = {};
-  }
-  dex.object.connect(map[values[0]], values.slice(1));
-
-  return this;
-};
-
-/**
- *
- * @param obj
- * @returns {boolean}
- */
-exports.isNumeric = function (obj) {
-  return !isNaN(parseFloat(obj)) && isFinite(obj);
-};
-
-/**
- *
- * @param hierarchy
- * @param name
- * @param value
- * @param delimiter
- * @returns {*}
- */
-exports.setHierarchical = function (hierarchy, name, value, delimiter) {
-  if (hierarchy == null) {
-    hierarchy = {};
-  }
-
-  if (typeof hierarchy != 'object') {
-    return hierarchy;
-  }
-
-  // Create an array of names by splitting delimiter, then call
-  // this function in the 3 argument (Array of paths) context.
-  if (arguments.length == 4) {
-    return dex.object.setHierarchical(hierarchy,
-      name.split(delimiter), value);
-  }
-
-  // Array of paths context.
-  else {
-    // This is the last variable name, just set the value.
-    if (name.length === 1) {
-      hierarchy[name[0]] = value;
-    }
-    // We still have to traverse.
-    else {
-      // Undefined container object, just create an empty.
-      if (!(name[0] in hierarchy)) {
-        hierarchy[name[0]] = {};
+      // If we have parameters in the top object, overlay them on top
+      // of the bottom object.
+      if (top !== 'undefined') {
+        // Iterate over the props in top.
+        for (prop in top) {
+          // Arrays are special cases. [A] on top of [A,B] should give [A], not [A,B]
+          if (typeof top[prop] == 'object' && overlay[prop] != null && !(top[prop] instanceof Array)) {
+            //console.log("PROP: " + prop + ", top=" + top + ", overlay=" + overlay);
+            overlay[prop] = dex.object.overlay(top[prop], overlay[prop]);
+          }
+          // Simply overwrite for simple cases and arrays.
+          else {
+            overlay[prop] = top[prop];
+          }
+        }
       }
 
-      // Recursively traverse down the hierarchy.
-      dex.object.setHierarchical(hierarchy[name[0]], name.splice(1), value);
-    }
-  }
+      //console.dir(config);
+      return overlay;
+    },
 
-  return hierarchy;
+    /**
+     *
+     * This method returns whether or not the supplied object is a Node.
+     *
+     * @param {Object} obj - The object to test.
+     *
+     * @returns {boolean} True if obj is a Node, false otherwise.
+     *
+     */
+    'isNode': function isNode(obj) {
+      return (
+        typeof Node === "object" ? obj instanceof Node :
+        obj && typeof obj === "object" && typeof obj.nodeType === "number" && typeof obj.nodeName === "string"
+      );
+    },
+
+    /**
+     *
+     * This method returns whether or not the supplied object is a
+     * DOM node.
+     *
+     * @param {Object} obj - The object to test.
+     *
+     * @returns {boolean} - True if obj is a DOM node, false otherwise.
+     *
+     */
+    'isElement': function isElement(obj) {
+      return (
+        typeof HTMLElement === "object" ? obj instanceof HTMLElement : //DOM2
+        obj && typeof obj === "object" && obj.nodeType === 1 && typeof obj.nodeName === "string"
+      );
+    },
+
+    /**
+     *
+     * This method returns a boolean representing whether obj is contained
+     * within container.
+     *
+     * @param {Object} container - The container to test.
+     * @param {Object} obj - The object to test.
+     *
+     * @return True if container contains obj.  False otherwise.
+     */
+    'contains': function contains(container, obj) {
+      var i = container.length;
+      while (i--) {
+        if (container[i] === obj) {
+          return true;
+        }
+      }
+      return false;
+    },
+
+    /**
+     *
+     * Return whether or not the supplied object is a function.
+     *
+     * @param obj The object to check.
+     * @returns {boolean} True if obj is a function, false otherwise.
+     *
+     */
+    'isFunction': function isFunction(obj) {
+      //return typeof obj === 'function';
+      return _.isFunction(obj);
+    },
+
+    /**
+     *
+     * Visit each local property within.
+     *
+     * @param obj
+     * @param func
+     */
+    /*
+     'visit' : function (obj, func) {
+     var prop;
+     func(obj);
+     for (prop in obj) {
+     if (obj.hasOwnProperty(prop)) {
+     if (typeof obj[prop] === 'object') {
+     dex.object.visit(obj[prop], func);
+     }
+     }
+     }
+     }
+     */
+
+    /**
+     *
+     * @param map
+     * @param values
+     * @returns {exports}
+     */
+    'connect': function connect(map, values) {
+      //dex.console.log("map:", map, "values:", values);
+
+      if (!values || values.length <= 0) {
+        return this;
+      }
+      if (!map[values[0]]) {
+        map[values[0]] = {};
+      }
+      dex.object.connect(map[values[0]], values.slice(1));
+
+      return this;
+    },
+
+    /**
+     *
+     * @param obj
+     * @returns {boolean}
+     */
+    'isNumeric': function (obj) {
+      return !isNaN(parseFloat(obj)) && isFinite(obj);
+    },
+
+    /**
+     *
+     * @param hierarchy
+     * @param name
+     * @param value
+     * @param delimiter
+     * @returns {*}
+     */
+    'setHierarchical': function (hierarchy, name, value, delimiter) {
+      if (hierarchy == null) {
+        hierarchy = {};
+      }
+
+      if (typeof hierarchy != 'object') {
+        return hierarchy;
+      }
+
+      // Create an array of names by splitting delimiter, then call
+      // this function in the 3 argument (Array of paths) context.
+      if (arguments.length == 4) {
+        return dex.object.setHierarchical(hierarchy,
+          name.split(delimiter), value);
+      }
+
+      // Array of paths context.
+      else {
+        // This is the last variable name, just set the value.
+        if (name.length === 1) {
+          hierarchy[name[0]] = value;
+        }
+        // We still have to traverse.
+        else {
+          // Undefined container object, just create an empty.
+          if (!(name[0] in hierarchy)) {
+            hierarchy[name[0]] = {};
+          }
+
+          // Recursively traverse down the hierarchy.
+          dex.object.setHierarchical(hierarchy[name[0]], name.splice(1), value);
+        }
+      }
+
+      return hierarchy;
+    }
+  };
 };
 
-},{}],59:[function(require,module,exports){
+
+},{}],63:[function(require,module,exports){
 /**
  *
  * This class creates and attaches a SqlQuery user interface onto the
@@ -15087,7 +18393,7 @@ var sqlquery = function (userConfig) {
 };
 
 module.exports = sqlquery;
-},{}],60:[function(require,module,exports){
+},{}],64:[function(require,module,exports){
 /**
  *
  * @constructor
@@ -15187,7 +18493,7 @@ var table = function (userConfig) {
 };
 
 module.exports = table;
-},{}],61:[function(require,module,exports){
+},{}],65:[function(require,module,exports){
 var typestable = function (userConfig) {
 
   var defaults =
@@ -15268,7 +18574,7 @@ var typestable = function (userConfig) {
 };
 
 module.exports = typestable;
-},{}],62:[function(require,module,exports){
+},{}],66:[function(require,module,exports){
 var configurationbox = function (userConfig) {
 
   var defaults =
@@ -15354,7 +18660,7 @@ var configurationbox = function (userConfig) {
 };
 
 module.exports = configurationbox;
-},{}],63:[function(require,module,exports){
+},{}],67:[function(require,module,exports){
 var player = function (userConfig) {
 
   var defaults = {
@@ -15500,7 +18806,7 @@ var player = function (userConfig) {
 };
 
 module.exports = player;
-},{}],64:[function(require,module,exports){
+},{}],68:[function(require,module,exports){
 var selectable = function (userConfig) {
 
   var defaults =
@@ -15597,7 +18903,7 @@ var selectable = function (userConfig) {
 };
 
 module.exports = selectable;
-},{}],65:[function(require,module,exports){
+},{}],69:[function(require,module,exports){
 var slider = function (userConfig) {
 
   var defaults = {
@@ -15689,7 +18995,7 @@ var slider = function (userConfig) {
 };
 
 module.exports = slider;
-},{}],66:[function(require,module,exports){
+},{}],70:[function(require,module,exports){
 var tabs = function (userConfig) {
   var defaults = {
     // The parent container of this chart.
@@ -15793,7 +19099,7 @@ var tabs = function (userConfig) {
 };
 
 module.exports = tabs;
-},{}],67:[function(require,module,exports){
+},{}],71:[function(require,module,exports){
 /**
  *
  * This module provides ui components based upon jquery-ui.
@@ -15803,16 +19109,17 @@ module.exports = tabs;
  * @memberOf dex.ui
  *
  */
-var jqueryui = {};
 
-jqueryui.ConfigurationBox = require("./ConfigurationBox");
-jqueryui.Player = require("./Player");
-jqueryui.Selectable = require("./Selectable");
-jqueryui.Slider = require("./Slider");
-jqueryui.Tabs = require("./Tabs");
-
-module.exports = jqueryui;
-},{"./ConfigurationBox":62,"./Player":63,"./Selectable":64,"./Slider":65,"./Tabs":66}],68:[function(require,module,exports){
+module.exports = function jqueryui(dex) {
+  return {
+    'ConfigurationBox': require("./ConfigurationBox"),
+    'Player': require("./Player"),
+    'Selectable': require("./Selectable"),
+    'Slider': require("./Slider"),
+    'Tabs': require("./Tabs")
+  };
+};
+},{"./ConfigurationBox":66,"./Player":67,"./Selectable":68,"./Slider":69,"./Tabs":70}],72:[function(require,module,exports){
 /**
  *
  * This module provides ui components from a variety of sources.
@@ -15822,7 +19129,6 @@ module.exports = jqueryui;
  * @memberOf dex
  *
  */
-var ui = {};
 
 /**
  *
@@ -15832,11 +19138,44 @@ var ui = {};
  * @type {module:jqueryui}
  *
  */
-ui.jqueryui = require("./jqueryui/jqueryui");
-ui.SqlQuery = require("./SqlQuery");
-ui.Table = require("./Table");
-ui.TypesTable = require("./TypesTable");
+module.exports = function ui(dex) {
 
-module.exports = ui;
-},{"./SqlQuery":59,"./Table":60,"./TypesTable":61,"./jqueryui/jqueryui":67}]},{},[55])(55)
+  return {
+    'jqueryui'  : require("./jqueryui/jqueryui")(dex),
+    'SqlQuery'  : require("./SqlQuery"),
+    'Table'     : require("./Table"),
+    'TypesTable': require("./TypesTable")
+  };
+};
+},{"./SqlQuery":63,"./Table":64,"./TypesTable":65,"./jqueryui/jqueryui":71}],73:[function(require,module,exports){
+"use strict";
+
+/**
+ *
+ * This module provides utility routines.
+ *
+ * @module dex:util
+ * @name util
+ * @memberOf dex
+ *
+ */
+
+module.exports = function util(dex) {
+
+  return {
+    // Things pertaining to charts.
+    'chart' : {
+      // Chart creation hooks:
+      'factory': {
+        // Kai S Chang aka: @syntagmatic's d3 parallel coordinates
+        'd3' : {
+          //'parcoords': function (config) {
+          //  return require('../../lib/d3.parcoords')()(config.parent);
+          //}
+        }
+      }
+    }
+  };
+};
+},{}]},{},[59])(59)
 });
