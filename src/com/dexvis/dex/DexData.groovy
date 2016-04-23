@@ -15,7 +15,7 @@ public class DexData {
   // Header and data:
   def List<String>       header
   def List<List<String>> data
-  
+  def List<String> types;
   /**
    * 
    * Construct an empty instance of DexData.
@@ -38,26 +38,46 @@ public class DexData {
   {
     this(header, new ArrayList<List<String>>())
   }
-  
+
   /**
-   * 
+   *
    * Given a header and some data, construct a DexData structure to match.
-   * 
+   *
    * @param header The header.
    * @param data The data.
-   * 
+   *
    */
   def DexData(List<String> header, List<List<String>> data)
   {
+    this(header, data, new ArrayList<List<String>>())
+  }
+
+  /**
+   * 
+   * Given a header, some data, and a list of types, construct a DexData structure to match.
+   * 
+   * @param header The header.
+   * @param data The data.
+   * @param types The type of each header.
+   * 
+   */
+  def DexData(List<String> header, List<List<String>> data, List<String> types)
+  {
     this.header = header.collect()
     this.data = new ArrayList<List<String>>()
+    this.types = new ArrayList<List<String>>()
     
     data.each {
       row ->
       this.data << row.collect()
     }
+    
+    types.each {
+      row ->
+      this.types << row
+    }
   }
-  
+
   /**
    *
    * Given a header and some data, construct a DexData structure to match.
@@ -589,6 +609,24 @@ public class DexData {
     return types
   }
   
+  public String toCsvString()
+  {
+    return toCsvString("csv")
+  }
+  
+  public String toCsvString(String name)
+  {
+    def csvHeader = "[" + header.collect { return "\"$it\"" }.join(',') + "]"
+    def csvData = []
+
+    data.eachWithIndex
+    {
+      row, ri ->
+      csvData << "[" + row.collect { return "\"$it\"" }.join(',') + "]"
+    }
+    return "var " + name + " = { 'header' : $csvHeader,\n 'data' : [" + csvData.join(',\n') + "] };";
+  }
+  
   static main(args)
   {
     def dexData = new DexData(["COUNTRY", "2000", "2001"],
@@ -599,7 +637,7 @@ public class DexData {
     
     //def a = [ "a", "b", "c" ].eachWithIndex { it, i -> "$i $it" }.join(",")
     //println a
-    
+
     println dexData.getMaxLengths();
     
     println dexData.getMapList()
