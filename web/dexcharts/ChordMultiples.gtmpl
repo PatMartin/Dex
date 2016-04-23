@@ -34,18 +34,9 @@ body {
 <script>
 
 <%
-  def headerStr = "[" + header.collect { return "\"$it\"" }.join(',') + "]"
-  def dataRows = []
-  data.eachWithIndex
-  {
-    row, ri ->
-    dataRows << "[" + row.collect { return "\"$it\"" }.join(',') + "]"
-  }
-  println "var csv = { 'header' : $headerStr,\n 'data' : [" + dataRows.join(',\n') + "] };";
+  println dexData.toCsvString()
 %>
 
-//dex.console.log("CSV", csv);
-//dex.console.log("GROUPS", dex.csv.group(csv, [0]));
 var groups = dex.csv.group(csv, [0]);
 dex.console.log("GROUPS", groups);
 
@@ -63,14 +54,14 @@ for (gi=0; gi<groups.length; gi++)
 
   chords.push(new dex.charts.d3.Chord(
   {
-    'parent'             : '#ChartArea' + gi,
-    'id' : 'Chord' + gi,
-    'title.text'         : groups[gi].key,
-    'resizable' : true,
-    'color'         : d3.scale.category20(),
-    'width' : width,
-    'height' : height,
-    'csv' : dex.csv.columnSlice(groups[gi].csv, dex.range(1, groups[gi].csv.header.length-1)),
+    'parent'     : '#ChartArea' + gi,
+    'id'         : 'Chord' + gi,
+    'title.text' : groups[gi].key,
+    'resizable'  : true,
+    'color'      : d3.scale.category20(),
+    'width'      : width,
+    'height'     : height,
+    'csv'        : dex.csv.columnSlice(groups[gi].csv, dex.range(1, groups[gi].csv.header.length-1)),
     'label.font.size' : 10
   }));
 

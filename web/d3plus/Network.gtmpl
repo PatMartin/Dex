@@ -7,11 +7,6 @@
     width : 100%;
     min-width : 100%;
   }
-  
-<%
-  println new File("javascript/jqueryui/latest/jquery-ui.min.css").text
-  println new File("javascript/jqueryui/latest/jquery-ui.theme.min.css").text
-%>
 </style>
 <html>
   <head>
@@ -21,65 +16,29 @@
   <div id="config" style="visibility: hidden">
   </div>
   <div id="ChartDiv"></div>
+<script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<script src="http://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
+<script src="http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
+<script src="http://cdnjs.cloudflare.com/ajax/libs/d3/3.5.16/d3.min.js"></script>
+<script src="http://cdnjs.cloudflare.com/ajax/libs/d3plus/1.9.3/d3plus.full.min.js"></script>
 <script>
 <%
-  println new File("javascript/jquery/latest/jquery-2.1.3.min.js").text
-  println new File("javascript/jqueryui/latest/jquery-ui.min.js").text
-  println new File("javascript/underscore/latest/underscore-min.js").text
-  println new File("javascript/d3/latest/d3.min.js").text
   println new File("javascript/dexjs/latest/dex.js").text
-  println new File("javascript/d3plus/latest/d3plus.min.js").text
-%>
-</script>
-<script>
-<%
-  def header = "[" + dexData.header.collect { return "\"$it\"" }.join(',') + "]"
-  def data = []
-  dexData.data.eachWithIndex
-  {
-    row, ri ->
-    data << "[" + row.collect { return "\"$it\"" }.join(',') + "]"
-  }
-  println "var csv = { 'header' : $header,\n 'data' : [" + data.join(',\n') + "] };";
+
+  println dexData.toCsvString()
 %>
 
 function setConfiguration(config)
 {
-  dex.console.log("Configuration", config);
-  network.config = dex.config.expandAndOverlay(config, network.config);
-  save('#config', config);
-  network.update();
+  network.configure(config);
 }
 
-function load(location) {
-  var config = {};
-
-  \$(location + " div").each(function(i) {
-    dex.console.log("Loading Setting: '" + \$(this).attr('id') + "'='" +
-      \$(this).attr('value') + "'"); 
-    config[\$(this).attr('id')] = \$(this).attr('value');
-  });
-
-  dex.console.log("Loaded Configuration:", config);
-  return config;
-}
-
-function save(location, config) {
-  dex.console.log("Saving Configuration To: " + location, config);
-  \$(location).children().remove();
-  _.keys(config).forEach(function (key) {
-    \$(location).append("<div id='" + key + "' value='" + config[key] + "'></div>");
-  });
-}
-
-var config = dex.config.expandAndOverlay({
+var network = new dex.charts.d3plus.Network({
   'parent': '#ChartDiv',
   'connect': 'first',
   'type' : 'rings',
   'edges' : {'arrows' : true},
-  'csv': csv }, load("#config"));
-
-var network = new dex.charts.d3plus.Network(config);
+  'csv': csv });
 
 network.render();
     

@@ -28,22 +28,20 @@
 
 <script>
 <%
-  def header = "[" + dexData.header.collect { return "\"$it\"" }.join(',') + "]"
-  def data = []
-  dexData.data.eachWithIndex
-  {
-    row, ri ->
-    data << "[" + row.collect { return "\"$it\"" }.join(',') + "]"
-  }
-  println "var csv = { 'header' : $header,\n 'data' : [" + data.join(',\n') + "] };";
+  println dexData.toCsvString();
 %>
 
-    var bar = new dex.charts.d3.BarChart({
-      'parent'                              : "#ChartArea",
-      'resizable'                           : false,
-      'csv'                                  : csv
-    });
-    
-    bar.render();
+var barchart = new dex.charts.d3.BarChart({
+  'parent'    : "#ChartArea",
+  'resizable' : false,
+  'csv'       : csv
+});
+
+function setConfiguration(config) {
+  barchart.configure(config);
+}
+
+barchart.load('#config');
+barchart.render();
 
 </script>

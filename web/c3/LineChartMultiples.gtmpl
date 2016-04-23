@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+.floatLeft {
+  float: left
+}
+
+body {
+  font: 10px sans-serif;
+}
+
+.arc path {
+  stroke: #fff;
+}
+
+#ParChart textarea
+{
+    width:100%;
+}
+
+#ParChart .textwrapper
+{
+    border:1px solid #999999;
+    margin:5px 0;
+    padding:5px;
+}
+
+#ParChart path
+{
+  fill: none;
+  /*stroke: #ccc;*/
+  stroke-opacity: .9;
+  shape-rendering: crispEdges;
+}
+
+#ParChart .foreground path
+{
+  fill: none;
+  stroke: steelblue;
+  stroke-opacity: .9;
+}
+
+#ParChart .brush .extent
+{
+  fill-opacity: .3;
+  stroke: #fff;
+  shape-rendering: crispEdges;
+}
+
+#ParChart .axis line, #ParChart .axis path
+{
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+#ParChart .axis text
+{
+  text-shadow: 0 1px 0 #fff;
+}
+
+.node circle {
+  cursor: pointer;
+  fill: #fff;
+  stroke: black;
+  stroke-width: 1px;
+}
+
+.node text {
+  font-size: 11px;
+}
+
+path.link {
+  fill: none;
+  stroke: #ccc;
+  stroke-width: 1px;
+}
+</style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/c3/0.4.10/c3.min.css"/>
+<html>
+  <head>
+    <title>DexCharts : Line Chart Multiples</title>
+  </head>
+  <body>
+<script>
+<%
+  println new File("javascript/jquery/latest/jquery-2.1.3.min.js").text
+  println new File("javascript/jqueryui/latest/jquery-ui.min.js").text
+  println new File("javascript/underscore/latest/underscore-min.js").text
+  println new File("javascript/d3/latest/d3.min.js").text
+  println new File("javascript/c3/latest/c3.min.js").text
+  println new File("javascript/dexjs/latest/dex.js").text
+  
+  println dexData.toCsvString()
+%>
+
+var groups = dex.csv.group(csv, [0]);
+dex.console.log("GROUPS", groups);
+
+var chords = []
+var height = 300;
+var width = 400;
+
+for (gi=0; gi<groups.length; gi++)
+{
+  var svg = d3.select("body").append("svg")
+    .attr("id", "ChartArea" + gi)
+    .attr("class", "floatLeft")
+    .attr("width", width)
+    .attr("height", height);
+
+  chords.push(new dex.charts.c3.LineChart(
+  {
+    'parent'     : '#ChartArea' + gi,
+    'id'         : 'Chord' + gi,
+    'resizable'  : false,
+    'width'      : width,
+    'height'     : height,
+    'linktype'   : 'spline',
+    'csv'        : dex.csv.columnSlice(groups[gi].csv, dex.range(1, groups[gi].csv.header.length-1))
+  }));
+
+  chords[gi].render();
+}
+
+</script>
+</body>
+</html>

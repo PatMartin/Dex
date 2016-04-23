@@ -27,51 +27,21 @@
 <script>
 
 <%
-  def header = "[" + dexData.header.collect { return "\"$it\"" }.join(',') + "]"
-  def data = []
-  dexData.data.eachWithIndex
-  {
-    row, ri ->
-    data << "[" + row.collect { return "\"$it\"" }.join(',') + "]"
-  }
-  println "var csv = { 'header' : $header,\n 'data' : [" + data.join(',\n') + "] }";
+  println dexData.toCsvString();
 %>
 
-function setConfiguration(config)
-{
-  dex.console.log("Configuration", config);
-  dendrogram.config = dex.config.expandAndOverlay(config, dendrogram.config);
-  save('#config', config);
-  dendrogram.update();
-}
-
-function load(location) {
-  var config = {};
-
-  \$(location + " div").each(function(i) {
-    dex.console.log("Loading Setting: '" + \$(this).attr('id') + "'='" +
-      \$(this).attr('value') + "'"); 
-    config[\$(this).attr('id')] = \$(this).attr('value');
-  });
-
-  dex.console.log("Loaded Configuration:", config);
-  return config;
-}
-
-function save(location, config) {
-  dex.console.log("Saving Configuration To: " + location, config);
-  \$(location).children().remove();
-  _.keys(config).forEach(function (key) {
-    \$(location).append("<div id='" + key + "' value='" + config[key] + "'></div>");
-  });
+function setConfiguration(config) {
+  dendogram.configure(config);
 }
 
 var dendrogram = new dex.charts.d3.Dendrogram({
   'parent'         : "#ChartArea",
   'csv'            : csv,
-  'root.name'      : csv.header[0]
+  'root.name'      : csv.header[0],
+  'connection.length' : 'fit-text'
 });
 
+dendrogram.load('#config');
 dendrogram.render();
 
 </script>

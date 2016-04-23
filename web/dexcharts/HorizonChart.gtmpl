@@ -32,14 +32,7 @@
 <script>
 
 <%
-  def header = "[" + dexData.header.collect { return "\"$it\"" }.join(',') + "]"
-  def data = []
-  dexData.data.eachWithIndex
-  {
-    row, ri ->
-    data << "[" + row.collect { return "\"$it\"" }.join(',') + "]"
-  }
-  println "var csv = { 'header' : $header,\n 'data' : [" + data.join(',\n') + "] };";
+  println dexData.toCsvString()
 %>
 
 var ncsv = dex.csv.numericSubset(csv);
@@ -52,12 +45,11 @@ for (var ri=0; ri<ncsv.data.length; ri++)
   }
 }
 
-var horizonChart = new dex.charts.d3.HorizonChart(
-  {
-    'parent' : '#ChartArea',
-    'csv'    : ncsv
-  }
-);
+var horizonChart = new dex.charts.d3.HorizonChart({
+  'parent' : '#ChartArea',
+  'csv'    : ncsv
+});
+
 horizonChart.render();
 
 </script>
