@@ -255,6 +255,7 @@ public class DexTask extends Task<DexTask> implements Comparable<DexTask>,
     this.name = name;
     setIconResource(ICONDIR
         + name.replaceAll("\\s*\\-\\>\\s*", "2").replaceAll("\\s+", "_")
+        .replaceAll("-+",  "_")
             .toLowerCase() + ".png");
   }
   
