@@ -23,6 +23,7 @@
 %>
 </script>
   <body>
+  <div id="config" style="display: none"></div>
   <svg id="ChartArea" height="100%" width="100%"></svg>
 <script>
 
@@ -31,13 +32,13 @@
 %>
 
 function setConfiguration(config) {
-  dendogram.configure(config);
+  dendrogram.configure(config).save("#config", config).update();
 }
 
 var dendrogram = new dex.charts.d3.Dendrogram({
-  'parent'         : "#ChartArea",
-  'csv'            : csv,
-  'root.name'      : csv.header[0],
+  'parent'            : "#ChartArea",
+  'csv'               : csv,
+  'root.name'         : csv.header[0],
   'connection.length' : 'fit-text'
 });
 
