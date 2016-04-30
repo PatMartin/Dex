@@ -69,7 +69,7 @@ class WebTask extends DexTask {
   
   private static boolean debug = true;
   private String previousConfig = null;
-  
+    
   /**
    * 
    * Override the default constructor to provide this component's name, category and help file.
@@ -128,7 +128,7 @@ class WebTask extends DexTask {
         .collect { configKey, configValue ->
           return "'${configKey}' : '${configValue}'";}.join(",") +
         "});}";
-    println "Configuration Script: '${configScript}'"
+    //println "Configuration Script: '${configScript}'"
     return configScript;
   }
   
@@ -164,7 +164,7 @@ class WebTask extends DexTask {
       def engine = new SimpleTemplateEngine()
       def template = engine.createTemplate(templateCode).make(binding)
       output = template.toString()
-      
+
       we.getLoadWorker().stateProperty().addListener(
           new ChangeListener<State>() {
             public void changed(ObservableValue ov, State oldState, State newState) {
