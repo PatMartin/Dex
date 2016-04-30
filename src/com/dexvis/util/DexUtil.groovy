@@ -72,13 +72,13 @@ public class DexUtil {
     StringWriter sw = new StringWriter();
     Serializer serializer = new Persister(new DexMatcher());
     serializer.write(task, sw);
-    println "DexTask.toString()   = " + sw.toString();
+    //println "DexTask.toString()   = " + sw.toString();
     return sw.toString();
   }
 
   public static DexTask dexTaskFromString(Class clazz, String taskStr)
   {
-    println "DexTask.fromString() = $taskStr"
+    //println "DexTask.fromString() = $taskStr"
     Serializer serializer = new Persister(new DexMatcher());
     return (DexTask) serializer.read(clazz, taskStr)
   }
