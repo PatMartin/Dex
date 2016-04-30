@@ -30,7 +30,7 @@ public class DexTaskTree extends TreeView<DexTaskItem> implements DexConstants
         "Root"));
     rootItem.setExpanded(true);
     
-    System.out.println("TASKMAP: " + taskMap);
+    //System.out.println("TASKMAP: " + taskMap);
     add(rootItem, taskMap);
     
     setCellFactory(new Callback<TreeView<DexTaskItem>, TreeCell<DexTaskItem>>()

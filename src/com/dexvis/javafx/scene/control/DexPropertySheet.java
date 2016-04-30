@@ -24,7 +24,7 @@ public class DexPropertySheet extends PropertySheet implements Cloneable
   public DexPropertySheet()
   {
     super();
-    System.out.println("--- Creating Property Sheet()");
+    //System.out.println("--- Creating Property Sheet()");
     setMode(PropertySheet.Mode.CATEGORY);
     properties = FXCollections.observableArrayList(new ArrayList<DexTaskProperty>());
   }
@@ -32,7 +32,7 @@ public class DexPropertySheet extends PropertySheet implements Cloneable
   public DexPropertySheet(Map<String, DexTaskProperty> propMap)
   {
     super();
-    System.out.println("--- Creating Property Sheet(propMap)");
+    //System.out.println("--- Creating Property Sheet(propMap)");
     List<DexTaskProperty> propList = new ArrayList<DexTaskProperty>();
     
     for (DexTaskProperty current : propMap.values())
@@ -46,9 +46,9 @@ public class DexPropertySheet extends PropertySheet implements Cloneable
   public DexPropertySheet(ObservableList<DexTaskProperty> properties)
   {
     super();
-    System.out.println("--- Creating Property Sheet(observableProps)");
+    //System.out.println("--- Creating Property Sheet(observableProps)");
     this.properties = properties;
-    // REM: Illogical, I think...
+
     for (DexTaskProperty item : properties)
     {
       this.getItems().add(item);

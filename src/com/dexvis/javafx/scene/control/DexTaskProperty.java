@@ -103,7 +103,7 @@ public class DexTaskProperty implements Item
     this.value = value;
     try
     {
-      System.out.println("DexPropertySheetItem:setValue():update");
+      //System.out.println("DexPropertySheetItem:setValue():update");
       getTask().update();
     }
     catch(DexException ex)
@@ -155,7 +155,7 @@ public class DexTaskProperty implements Item
   @Override
   public Optional<ObservableValue<? extends Object>> getObservableValue()
   {
-    // TODO Auto-generated method stub
-    return null;
+    // Returning null here results in NullPointerException
+    return Optional.empty();
   }
 }

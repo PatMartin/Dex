@@ -193,7 +193,7 @@ public class DexTaskList extends ListView<DexTaskItem> implements DexConstants
         System.out.println("DEX Prop Sheet Event: '" + event + "'");
       });
       rootLayout.add(dps, "grow");
-      
+
       Scene configScene = new Scene(rootLayout, 800, 600);
       configStage.setScene(configScene);
       configStage.show();
