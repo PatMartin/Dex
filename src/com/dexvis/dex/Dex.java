@@ -57,54 +57,79 @@ import com.dexvis.javafx.scene.control.ModalDialog;
 import com.dexvis.util.ClassPathUtil;
 import com.dexvis.util.SortedList;
 
+/**
+ * 
+ * This is the main class for Dex.
+ * 
+ * @author Patrick Martin
+ *
+ */
 public class Dex extends Application
 {
+  // Thread factory for executing task serially.
   private final static BasicThreadFactory serialThreadFactory = new BasicThreadFactory.Builder()
       .namingPattern("Dex-Serial-Task-%d").daemon(true)
       .priority(Thread.MAX_PRIORITY).build();
   
+  // Executor for executing task serially.
   public final static ExecutorService serialExecutor = Executors
       .newSingleThreadExecutor(serialThreadFactory);
   
+  // Thread factory for concurrent task execution. Such task may not update the
+  // UI.
   private final static BasicThreadFactory concurrentThreadFactory = new BasicThreadFactory.Builder()
       .namingPattern("Dex-Concurrent-Task-%d").daemon(true)
       .priority(Thread.MAX_PRIORITY).build();
   
+  // Executor for parallel task execution.
   public final static ExecutorService concurrentExecutor = Executors
       .newFixedThreadPool(
           Math.max(1, Runtime.getRuntime().availableProcessors() - 1),
           concurrentThreadFactory);
   
+  // Service for task completion notification.
   public final static CompletionService<Object> CCS = new ExecutorCompletionService(
       concurrentExecutor);
   
   static
   {
+    // Output this just to make sure the system properly identifies the
+    // available core.
     System.out.println("Available Processors: "
         + Runtime.getRuntime().availableProcessors());
   }
   
+  // GUI component housing our project name. Defaults to UnsavedProject.dex
   private StringProperty curProjectStringProp = new SimpleStringProperty(
       "UnsavedProject.dex");
   
+  // The list of task to be executed.
   private DexTaskList taskList = null;
   
+  // Pane containing our available tasks.
   private MigPane palettePane = new MigPane("insets 1", "[grow]", "[grow][]");
+  
+  // The workflow tasks pane.
   private MigPane workflowPane = new MigPane("insets 1", "[grow]", "[grow]");
   
+  // Main stage.
   private Stage stage = null;
   
+  // Holds our current project.
   private DexProject project = null;
-  // Here so we can dynamically reload stylesheets.
   
+  // Main scene.
   private Scene scene;
   
+  // Allows us to load projects from disk.
   private DexFileChooser projectChooser = new DexFileChooser("project",
       "Load Project", "Save Project", "DEX", "dex");
   
+  // Handles task selection within the palette by displaying the help screen for
+  // that task within the workflow pane.
   ChangeListener<Object> taskChange = (ov, objOld, objNew) -> {
-    System.out.println("*** Task Change: ov='" + ov + "', old='" + objOld
-        + "', new='" + objNew + "'");
+    // System.out.println("*** Task Change: ov='" + ov + "', old='" + objOld
+    // + "', new='" + objNew + "'");
     if (objNew == null)
     {
       return;
@@ -117,17 +142,29 @@ public class Dex extends Application
       workflowPane.add(helpNode, "grow");
     }
   };
-  
+
+  // Handles task selection within the workflow by displaying their config and/or output.
   ChangeListener<Object> activeTaskChange = (ov, objOld, objNew) -> {
-    System.out.println("*** Active Task Change: " + objNew);
+    //System.out.println("*** Active Task Change: " + objNew);
+
+    // Defensive coding, ensure something is selected.
     if (objNew == null)
     {
       return;
     }
+    
+    // Get the number of selected task.
     int numSelected = taskList.getSelectionModel().getSelectedIndices().size();
+    
+    // Determine when to wrap to the next row.
     int wrapNum = (int) Math.ceil(Math.sqrt(numSelected));
+    
+    // Main container for displayed task.
     MigPane taskContainer = new MigPane("", "[grow]", "[grow]");
+    
+    // Clear out the old workflow view.
     workflowPane.getChildren().clear();
+    
     // System.out.println("WRAPPING: " + numSelected + "->" + wrapNum);
     int itemNum = 0;
     for (DexTaskItem item : taskList.getSelectionModel().getSelectedItems())
@@ -136,10 +173,6 @@ public class Dex extends Application
       {
         itemNum++;
         Node configNode = item.getTask().get().getConfig();
-        // System.out.println("ITEM TASK: "
-        // + item.getTask().get());
-        // System.out.println("CONFIG NODE: "
-        // + configNode);
         // If the last, grow as much as we can.
         if (itemNum == taskList.getSelectionModel().getSelectedItems().size())
         {
@@ -201,7 +234,7 @@ public class Dex extends Application
       userGuideMenuItem.setOnAction(action -> userguide(action));
       helpMenu.getItems().addAll(aboutMenuItem, userGuideMenuItem);
       menubar.getMenus().addAll(fileMenu, optionsMenu, helpMenu);
-      //Text infoLabel = TextUtil.DropShadow("Info:");
+      // Text infoLabel = TextUtil.DropShadow("Info:");
       
       Label curFileLabel = new Label("Filename:");
       curFileLabel.setId("dex-curfile-label");
@@ -258,7 +291,7 @@ public class Dex extends Application
       rootLayout.setOnKeyPressed(action -> keyPress(action));
       rootLayout.getStyleClass().add("root");
       scene = new Scene(rootLayout, 1600, 900);
-      //AquaFx.style();
+      // AquaFx.style();
       scene.getStylesheets().add("Dex.css");
       // scene.getStylesheets().add("/win7glass.css");
       stage.setScene(scene);
@@ -304,18 +337,18 @@ public class Dex extends Application
       ex.printStackTrace();
     }
   }
-
+  
   private void clearOldProject()
   {
     // Clear the task list.
     taskList.getItems().clear();
     // Reset the project name.
     curProjectStringProp.set("UnnamedProject.dex");
-
+    
     // Clear the copy buffer?
-    //taskList.clearCopyTasks();
+    // taskList.clearCopyTasks();
   }
-
+  
   public void append(ActionEvent evt)
   {
     try
@@ -452,25 +485,25 @@ public class Dex extends Application
     }
   }
   
-//  public void initializeWorkflow(ActionEvent evt)
-//  {
-//    System.out.println("Initialize Workflow: ");
-//    //DexTaskState state = new DexTaskState();
-//    DexJobScheduler scheduler = new DexJobScheduler();
-//    DexJob job = new SerialJob(taskList.getItems());
-//    try
-//    {
-//      scheduler.initialize(job);
-//    }
-//    catch(Exception ex)
-//    {
-//      StringWriter sw = new StringWriter();
-//      ex.printStackTrace(new PrintWriter(sw));
-//      ModalDialog dialog = new ModalDialog(stage, "Initialization Status",
-//          sw.toString(), "Ok");
-//      ex.printStackTrace();
-//    }
-//  }
+  // public void initializeWorkflow(ActionEvent evt)
+  // {
+  // System.out.println("Initialize Workflow: ");
+  // //DexTaskState state = new DexTaskState();
+  // DexJobScheduler scheduler = new DexJobScheduler();
+  // DexJob job = new SerialJob(taskList.getItems());
+  // try
+  // {
+  // scheduler.initialize(job);
+  // }
+  // catch(Exception ex)
+  // {
+  // StringWriter sw = new StringWriter();
+  // ex.printStackTrace(new PrintWriter(sw));
+  // ModalDialog dialog = new ModalDialog(stage, "Initialization Status",
+  // sw.toString(), "Ok");
+  // ex.printStackTrace();
+  // }
+  // }
   
   public void onMouseClick(MouseEvent evt)
   {
@@ -555,7 +588,7 @@ public class Dex extends Application
         try
         {
           DexTask task = (DexTask) Class.forName(taskName).newInstance();
-          System.out.println("-- TASK: " + task);
+          //System.out.println("-- TASK: " + task);
           task.setStage(stage);
           String category = task.getCategory();
           if (taskMap.containsKey(category))
@@ -572,8 +605,12 @@ public class Dex extends Application
         }
         catch(Exception ex)
         {
-          // Sometimes useful
-          ex.printStackTrace();
+          // Abstract classes which can't be instantiated.
+          if (!taskName.equals("com.dexvis.dex.task.base.WebTask") &&
+              !taskName.equals("com.dexvis.dex.wf.DexTask"))
+          {
+            ex.printStackTrace();
+          }
         }
       }
     }
@@ -595,7 +632,7 @@ public class Dex extends Application
       WebView wv = new WebView();
       WebEngine we = wv.getEngine();
       String PAGE = "https://patmartin.gitbooks.io/dex-docs/content/about.html";
-          
+      
       we.load(PAGE);
       rootLayout.add(wv, "grow");
       Scene helpScene = new Scene(rootLayout, 800, 600);
