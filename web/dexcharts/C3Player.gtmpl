@@ -122,8 +122,6 @@ function save(location, config) {
 var config = dex.config.expandAndOverlay({
   parent : "#ChartArea",
   resizable : true,
-  width : 100,
-  height : 100,
   color : d3.scale.category20c(),
   csv : csv }, load("#config"));
 
