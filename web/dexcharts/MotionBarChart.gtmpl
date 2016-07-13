@@ -35,56 +35,21 @@
 <script>
 
 <%
-  def header = "[" + dexData.header.collect { return "\"$it\"" }.join(',') + "]"
-  def data = []
-  dexData.data.eachWithIndex
-  {
-    row, ri ->
-    data << "[" + row.collect { return "\"$it\"" }.join(',') + "]"
-  }
-  println "var csv = { 'header' : $header,\n 'data' : [" + data.join(',\n') + "] };";
+  println dexData.toCsvString();
 %>
 
-function setConfiguration(config)
-{
-  dex.console.log("Configuration", config);
-  motionBarChart.config = dex.config.expandAndOverlay(config, motionBarChart.config);
-  save('#config', config);
-  motionBarChart.update();
+function setConfiguration(config) {
+  motionBarChart.configure(config).save("#config", config).update();
 }
 
-
-function load(location) {
-  var config = {};
-
-  \$(location + " div").each(function(i) {
-    dex.console.log("Loading Setting: '" + \$(this).attr('id') + "'='" +
-      \$(this).attr('value') + "'"); 
-    config[\$(this).attr('id')] = \$(this).attr('value');
-  });
-
-  dex.console.log("Loaded Configuration:", config);
-  return config;
-}
-
-function save(location, config) {
-  dex.console.log("Saving Configuration To: " + location, config);
-  \$(location).children().remove();
-  _.keys(config).forEach(function (key) {
-    \$(location).append("<div id='" + key + "' value='" + config[key] + "'></div>");
-  });
-}
-
-var config = dex.config.expandAndOverlay({
+var motionBarChart = new dex.charts.d3.MotionBarChart({
   'parent'    : "#ChartArea",
-    'transform' : 'translate(70,50)',
-    'margin.right' : 200,
-    'margin.left'  : 150,
-    'csv' : csv }, load("#config"));
+    'csv' : csv });
 
-  // Configure a chart.
-  var motionBarChart = new dex.charts.d3.MotionBarChart(config);
-  motionBarChart.render();
+// Configure the chart.
+motionBarChart.load('#config');
+motionBarChart.render();
+
 </script>
 </body>
 </html>
