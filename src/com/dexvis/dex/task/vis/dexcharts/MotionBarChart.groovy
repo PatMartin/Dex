@@ -14,6 +14,10 @@ class MotionBarChart extends WebTask {
     
     setProperty('Dimensions', 'Height', 'height', 600)
     setProperty('Dimensions', 'Width', 'width', 800)
+    setProperty('Margins', 'Left', 'margin.left', 100)
+    setProperty('Margins', 'Right', 'margin.right', 50)
+    setProperty('Margins', 'Top', 'margin.top', 50)
+    setProperty('Margins', 'Bottom', 'margin.bottom', 100)
     setProperty('Dimensions', 'Transform', 'transform', '')
     
     setProperty('Source Columns', 'Name', 'index.name', 0)
@@ -31,7 +35,7 @@ class MotionBarChart extends WebTask {
     addProperties(TaskPropertyFactory.createFillProperties('Axis Lines', 'axisLine.fill'))
     addProperties(TaskPropertyFactory.createStrokeProperties('Axis Ticks', 'tick.stroke'))
     //addProperties(TaskPropertyFactory.createTextProperties('Y Axis Labels', 'yaxis.label'))
-    addProperties(TaskPropertyFactory.createTextProperties('X Axis Labels', 'xaxis.tickLabels'))
+    addProperties(TaskPropertyFactory.createTextProperties('X Axis Labels', 'xaxis.label'))
     
     setSaveDynamic(true)
   }
