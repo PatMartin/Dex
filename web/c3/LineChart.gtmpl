@@ -1,11 +1,9 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
 <style>
-  html,body{
-    height:100%;
-    min-height: 100%;
-    width="100%";
-    min-width="100%"
+  html,body,svg{
+    height: 100%;
+    width: 100%;
   }
 
 #ChartArea {
@@ -18,7 +16,7 @@
 </style>
 <html>
   <head>
-    <title>DexCharts : C3JS Bar Chart</title>
+    <title>C3 Line Chart</title>
   </head>
   <body>
   <div id="ChartArea"></div>
@@ -35,17 +33,10 @@
 
 <script>
 <%
-  def header = "[" + dexData.header.collect { return "\"$it\"" }.join(',') + "]"
-  def data = []
-  dexData.data.eachWithIndex
-  {
-    row, ri ->
-    data << "[" + row.collect { return "\"$it\"" }.join(',') + "]"
-  }
-  println "var csv = { 'header' : $header,\n 'data' : [" + data.join(',\n') + "] }";
+  println dexData.toCsvString();
 %>
   var gtypes = dex.csv.guessTypes(csv);
-  dex.console.log("TYPES", gtypes);
+  //dex.console.log("TYPES", gtypes);
   var ncsv = dex.csv.numericSubset(csv);
   var columns = dex.csv.transpose(ncsv);
 
