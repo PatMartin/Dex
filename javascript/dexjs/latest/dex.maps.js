@@ -708,6 +708,11 @@ var linechart = function (userConfig) {
         {
             selectedColumns.unshift(0);
         }
+        else if (gtypes[0] == "date")
+        {
+            selectedColumns.unshift(0);
+        }
+
         var ncsv = dex.csv.columnSlice(csv, selectedColumns);
 
         var columns = dex.csv.transpose(ncsv);
@@ -739,6 +744,8 @@ var linechart = function (userConfig) {
             groups: config.groups
         };
 
+        dex.console.log("TYPES:", gtypes);
+
         if (gtypes[0] == "string")
         {
             c3config["axis"] = {
@@ -749,6 +756,20 @@ var linechart = function (userConfig) {
                 }
             }
         }
+        else if (gtypes[0] == "date")
+        {
+            dex.console.log("DEALING WITH A DATE...");
+            c3config["axis"] = {
+                "x": {
+                    "type": "timeseries",
+                    "tick": {
+                        format: '%Y-%m-%d'
+                    }
+                }
+            }
+        }
+
+        dex.console.log("RENDER C3CONFIG", c3config);
 
         //dex.console.log("CATEGORIES", c3config);
         internalChart = c3.generate(c3config);
@@ -775,6 +796,8 @@ var linechart = function (userConfig) {
         var c3config = {
             'columns' : columns.data
         };
+
+        dex.console.log("C3CONFIG", c3config);
 
         //internalChart.groups(config.groups);
         internalChart.load(c3config);
@@ -2190,7 +2213,7 @@ var dendrogram = function Dendrogram(userConfig) {
     var chartContainer = d3.select(config.parent)
       .append("g")
       .attr("transform", "translate(" + config.margin.left +
-        ", " + config.margin.right + ")")
+        ", " + config.margin.top + ")")
       .append("g")
       .attr("id", config["id"])
       .attr("class", config["class"])
@@ -3508,15 +3531,15 @@ var motionbarchart = function (userConfig) {
   var defaultColor = d3.scale.category10();
 
   var csv = {
-    'header' : ['name', 'color', 'time', 'x', 'y', 'size'],
-    'data'   : []
+    'header': ['name', 'color', 'time', 'x', 'y', 'size'],
+    'data': []
   }
 
   var i = 0;
   for (var time = 1800; time < 1810; time += 1) {
     for (var color = 1; color < 4; color++) {
       csv.data.push(["name-" + color, color, time,
-                     i * color, i * i * color, i * i * i * color]);
+        i * color, i * i * color, i * i * i * color]);
     }
     i += 1;
   }
@@ -3526,43 +3549,43 @@ var motionbarchart = function (userConfig) {
   var defaults =
   {
     // The parent container of this chart.
-    'parent' : null,
+    'parent': null,
     // Set these when you need to CSS style components independently.
-    'id'     : 'MotionBarhart',
-    'class'  : 'MotionBarChart',
+    'id': 'MotionBarhart',
+    'class': 'MotionBarChart',
     // Our data...
-    'csv'    : csv,
+    'csv': csv,
 
     // Tells us which columns represent what.
-    'index'  : {
-      'name'  : 0,
-      'color' : 0,
-      'time'  : 1,
-      'y'     : 2
+    'index': {
+      'name': 0,
+      'color': 0,
+      'time': 1,
+      'y': 2
     },
     // Chart dimensions.
-    'width'  : 600,
-    'height' : 400,
-    'margin' : {
-      top    : 20,
-      right  : 100,
-      bottom : 100,
-      left   : 100
+    'width': 600,
+    'height': 400,
+    'margin': {
+      top: 20,
+      right: 120,
+      bottom: 80,
+      left: 50
     },
 
-    'bar' : dex.config.rectangle({
-        'color'        : function (d, i) {
+    'bar': dex.config.rectangle({
+        'color': function (d, i) {
           return color(i);
         },
-        'stroke.width' : 1,
-        'stroke.color' : 'black',
-        'events'       : {
-          'mouseover' : function () {
+        'stroke.width': 1,
+        'stroke.color': 'black',
+        'events': {
+          'mouseover': function () {
             d3.select(this)
               .style("stroke", 'red')
               .style("stroke-width", 2);
           },
-          'mouseout'  : function () {
+          'mouseout': function () {
             d3.select(this)
               .style("stroke", chart.config.bar.stroke.color)
               .style("stroke-width", chart.config.bar.stroke.width);
@@ -3572,64 +3595,50 @@ var motionbarchart = function (userConfig) {
     ),
 
     // Main label configuration
-    'label.font.size'        : 64,
-    'label.fill.fillColor'   : 'steelblue',
-    'label.fill.fillOpacity' : 0.4,
-    'label.y'                : function (d) {
-      return 0;
+    'label.font.size': 64,
+    'label.fill.fillColor': 'steelblue',
+    'label.fill.fillOpacity': 0.4,
+    'label.y': function (d) {
+      return chart.config.margin.top;
     },
-    'label.x'                : function (d) {
-      return chart.config.width * .5;
+    'label.dy' : '.50em',
+    'label.x': function (d) {
+      return chart.config.margin.left + (chart.config.width / 2);
     },
 
-    'transform' : 'translate(0,0)',
-    'duration'  : 10000,
+    'transform': '',
+    'duration': 5000,
 
-    'xaxis' : dex.config.axis({
-      'scale.type'                : 'linear',
-      'orient'                    : 'bottom',
-      'label'                     : dex.config.text({
-        'x'      : function (d) {
-          return (chart.config.width - chart.config.margin.right) / 2;
-        },
-        'y'      : function (d) {
-          return chart.config.height - chart.config.margin.bottom + 20;
-        },
-        'anchor' : 'end'
+    'xaxis': dex.config.axis({
+      'scale.type': 'linear',
+      'orient': 'bottom',
+      'label': dex.config.text({
+        'anchor': 'start',
+        'writingMode' : 'tb',
+        'dx' : function(d) { return chart.config.bar.width - (chart.config.xaxis.label.font.size / 2); },
+        'dy' : '.5em'
       }),
-      'tick.stroke.color'         : 'black',
-      'tick.stroke.width'         : 1,
-      'tick.fill.fillColor'       : 'none',
-      'axisLine.stroke.color'     : 'black',
-      'axisLine.stroke.width'     : 1,
-      'axisLine.stroke.dasharray' : "10 10",
-      'axisLine.fill.fillColor'   : 'none'
+      'tick.stroke.color': 'black',
+      'tick.stroke.width': 1,
+      'tick.fill.fillColor': 'none',
+      'axisLine.stroke.color': 'black',
+      'axisLine.stroke.width': 1,
+      'axisLine.stroke.dasharray': "0",
+      'axisLine.fill.fillColor': 'none'
     }),
-    'yaxis' : dex.config.axis({
-      'scale.type'                : 'linear',
-      'orient'                    : 'left',
-      'label'                     : dex.config.text({
-        'x'         : function (d) {
-          //return chart.config.width - chart.config.margin.right;
-          //return chart.config.margin.top;
-          return 0;
-        },
-        'y'         : function (d) {
-          //return chart.config.height - chart.config.margin.top
-          //  - chart.config.margin.bottom - chart.config.xaxis.label.font.size;
-          //return -chart.config.margin.left/2;
-          return 10;
-        },
-        'anchor'    : 'end',
-        'dy'        : '.75em',
-        'transform' : 'rotate(-90)'
+    'yaxis': dex.config.axis({
+      'scale.type': 'linear',
+      'orient': 'left',
+      'label': dex.config.text({
+        'anchor': 'start',
+        'dx' : function(d) { return chart.config.margin.left; },
       }),
-      'tick.stroke.width'         : 1,
-      'tick.fill.fillColor'       : 'none',
-      'axisLine.stroke.color'     : 'black',
-      'axisLine.stroke.width'     : 1,
-      'axisLine.stroke.dasharray' : "10 10",
-      'axisLine.fill.fillColor'   : 'none'
+      'tick.stroke.width': 1,
+      'tick.fill.fillColor': 'none',
+      'axisLine.stroke.color': 'black',
+      'axisLine.stroke.width': 2,
+      'axisLine.stroke.dasharray': "10 10",
+      'axisLine.fill.fillColor': 'none'
     })
   };
 
@@ -3645,8 +3654,8 @@ var motionbarchart = function (userConfig) {
     var width = d3.select(chart.config.parent).property("clientWidth");
     var height = d3.select(chart.config.parent).property("clientHeight");
     chart
-      .attr("width", width)
-      .attr("height", height)
+      .attr("width", width - chart.config.margin.left - chart.config.margin.right)
+      .attr("height", height - chart.config.margin.top - chart.config.margin.bottom)
       .update();
   };
 
@@ -3670,11 +3679,11 @@ var motionbarchart = function (userConfig) {
 
       if (!keyMap[curName]) {
         keyMap[curName] = {
-          'name'  : curName,
-          'color' : curColor,
-          'time'  : curTime,
-          'y'     : [[curTime, curY]],
-          'size'  : [[curTime, curSize]]
+          'name': curName,
+          'color': curColor,
+          'time': curTime,
+          'y': [[curTime, curY]],
+          'size': [[curTime, curSize]]
         };
       }
       else {
@@ -3691,17 +3700,14 @@ var motionbarchart = function (userConfig) {
 
     dex.console.log("EXTENTS: Y", yExtents, "UNIQUES", uniques[config.index.name]);
 
-    var width = config.width - config.margin.right;
-    var height = config.height - config.margin.top - config.margin.bottom;
-
     // Various scales. These domains make assumptions of data, naturally.
     var xScale = d3.scale.ordinal()
-      .domain(uniques[config.index.name])
-      .rangePoints([0, width]);
+      .domain(uniques[config.index.name].sort())
+      .rangePoints([0, config.width]);
 
     //  d3.scale.linear().domain(xExtents).range([0, width - 60]);
     var yScale = dex.config.createScale(config.yaxis.scale)
-      .domain([0, yExtents[1]]).range([height, 0]);
+      .domain([0, yExtents[1]]).range([config.height, 0]);
 
     // The x & y axes.
     var xAxis = dex.config.createAxis(config.xaxis)
@@ -3714,12 +3720,15 @@ var motionbarchart = function (userConfig) {
       .append("g")
       .attr("id", config["id"])
       .attr("class", config["class"])
-      .attr("transform", config.transform);
+      .attr("height", config.height)
+      .attr("width", config.width)
+      .attr("transform", "translate(" + config.margin.left +
+        ", " + config.margin.top + ")")
 
     // Add the x-axis.
     svg.append("g")
       .attr("class", "xaxis")
-      .attr("transform", "translate(0," + height + ")")
+      .attr("transform", "translate(0," + config.height + ")")
       .call(xAxis);
 
     // Add the y-axis.
@@ -3747,14 +3756,16 @@ var motionbarchart = function (userConfig) {
       .call(dex.config.configureStroke, config.yaxis.axisLine.stroke)
       .call(dex.config.configureFill, config.yaxis.axisLine.fill);
 
-    var xTickLabels = xticks.selectAll("text")
-      .style("text-anchor", "start");
+    //var xTickLabels = xticks
+    //  .append("text")
+    //  .text("P" + config.csv.header[config.index.name]);
 
-    // Add an x-axis label.
-    svg.append("text")
-      .attr("class", "xLabel")
-      .call(dex.config.configureText, config.xaxis.label)
-      .text(config.csv.header[config.index.name]);
+    //dex.console.log("XTICK-LABELS", xTickLabels);
+    xticks.selectAll("text")
+      .call(dex.config.configureText, config.xaxis.label);
+
+    //xticks.selectAll("text")
+    //  .call(dex.config.configureText, config.xaxis.label);
 
     // Add a y-axis label.
     svg.append("text")
@@ -3792,10 +3803,10 @@ var motionbarchart = function (userConfig) {
     bars
       .append("tooltip-content")
       .text(function (d, i) {
-        //dex.console.log("DTITLE", d);
         return "<table>" +
           "<tr><td>Name:</td><td>" + d.name + "</td></tr>" +
           "<tr><td>Category:</td><td>" + d.color + "</td></tr>" +
+          "<tr><td>Value:</td><td>" + d.y + "</td></tr>" +
           "</table>";
       });
 
@@ -3822,7 +3833,7 @@ var motionbarchart = function (userConfig) {
 
     // Positions the dots based on data.
     function position(bar) {
-      var barWidth = Math.floor((config.width - config.margin.left - config.margin.right) / bar.size());
+      var barWidth = Math.floor(config.width / bar.size() - 8);
 
       bar
         .attr("x", function (d, i) {
@@ -3838,11 +3849,6 @@ var motionbarchart = function (userConfig) {
           return yScale(0) - yScale(d.y);
         });
     }
-
-    // Defines a sort order so that the smallest dots are drawn on top.
-    //function order(a, b) {
-    //  return b.y - a.y;
-    // }
 
     // After the transition finishes, you can mouseover to change the year.
     function enableInteraction() {
@@ -3904,11 +3910,11 @@ var motionbarchart = function (userConfig) {
 
           //dex.console.log("ENTRY-DATA", entry);
           timeData.push({
-            time  : year,
-            name  : entry.name,
-            color : entry.color,
-            y     : interpolateValues(entry.y, year),
-            size  : interpolateValues(entry.size, year)
+            time: year,
+            name: entry.name,
+            color: entry.color,
+            y: interpolateValues(entry.y, year),
+            size: interpolateValues(entry.size, year)
           });
         }
       }
@@ -3934,11 +3940,11 @@ var motionbarchart = function (userConfig) {
 
     // Add tooltips
     $(chart.config.parent).tooltip({
-      items   : "rect",
-      content : function () {
+      items: "rect",
+      content: function () {
         return $(this).find("tooltip-content").text();
       },
-      track   : true
+      track: true
     });
 
     // Make the entire chart draggable.
@@ -3981,10 +3987,10 @@ var motionchart = function (userConfig) {
     // Tells us which columns represent what.
     'index'  : {
       'name'  : 0,
-      'time'  : 1,
-      'x'     : 2,
-      'y'     : 3,
-      'color' : 4,
+      'color' : 1,
+      'time'  : 2,
+      'x'     : 3,
+      'y'     : 4,
       'size'  : 5
     },
     // Chart dimensions.
@@ -4469,7 +4475,7 @@ var motioncirclechart = function (userConfig) {
       'name'  : 0,
       'color' : 1,
       'time'  : 2,
-      'y'     : 4
+      'y'     : 3
     },
     // Chart dimensions.
     'width'  : 600,
@@ -9559,18 +9565,6 @@ var treemap = function (userConfig) {
 
         var data = dex.csv.toNestedJson(dex.csv.copy(csv));
         dex.console.log("DATA", csv, data);
-
-        /*
-        var svg = d3.select("#body").append("div")
-            .attr("class", "chart")
-            .style("width", w + "px")
-            .style("height", h + "px")
-            .append("svg:svg")
-            .attr("width", w)
-            .attr("height", h)
-            .append("svg:g")
-            .attr("transform", "translate(.5,.5)");
-*/
 
         node = root = data;
 
