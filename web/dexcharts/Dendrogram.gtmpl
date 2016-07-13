@@ -8,6 +8,10 @@
     min-width : 100%;
   }
 
+#ChartArea {
+  height : 100%;
+  width : 100%;
+}
 </style>
 <html>
   <head>
@@ -24,7 +28,7 @@
 </script>
   <body>
   <div id="config" style="display: none"></div>
-  <svg id="ChartArea" height="100%" width="100%"></svg>
+  <svg id="ChartArea"></svg>
 <script>
 
 <%
