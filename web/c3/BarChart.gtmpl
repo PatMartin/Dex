@@ -60,13 +60,21 @@
       'type': 'bar',
       color : d3.scale.category20()
     },
-    'bar': {'width': { 'ratio': 0.9 }},
+    'bar': {'width': { 'ratio': 1 }},
     subchart: {
         show: true
     },
     zoom: {
         enabled: true
     },
+    axis: {
+      x: {
+      type: 'categories',
+      tick: {
+      fit: true
+    }
+  },
+},
     legend: {
       position : 'right'
     }
