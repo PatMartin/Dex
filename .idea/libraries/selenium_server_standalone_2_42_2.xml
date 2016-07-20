@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="selenium-server-standalone-2.42.2">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/selenium/selenium-server-standalone-2.42.2.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
