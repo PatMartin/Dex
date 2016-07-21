@@ -39,14 +39,14 @@ dataMap.each
   name, yearMap ->
   yearMap.each
   {
-    def newRow = [ name, year ]
     year, cm ->
-    codeMap.each
-    {
-      code, value ->
-      newRow << cm[code]
-    }
-    newData << newRow
+      def newRow = [ name, year ]
+      codeMap.each
+      {
+        code, value ->
+        newRow << cm[code]
+      }
+      newData << newRow
   }
 }
 

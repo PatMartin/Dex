@@ -150,7 +150,7 @@
 		<jar destfile="lib/dex-javafx.jar" basedir="../JavaFX/bin" />
 	</target>
 
-	<target name="Dex.jar" depends="dex-javafx">
+	<target name="Dex.jar"> <!-- depends="dex-javafx">-->
 
 		<manifestclasspath property="manifest.classpath" jarfile="Dex.jar">
 			<classpath refid="libraries.path" />

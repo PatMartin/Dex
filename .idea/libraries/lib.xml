@@ -1,0 +1,35 @@
+<component name="libraryTable">
+  <library name="lib">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/groovy-all-2.4.3.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/commons-math3-3.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/sqlite-jdbc-3.8.11.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/mysql-connector-java-5.1.20-bin.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/simple-xml-2.7.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/controlsfx-8.40.11-20151024.010657-12.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/aquafx-0.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/plantuml.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/hsqldb.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/antlr4.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/sqlite-jdbc-3.8.11.2 (1).jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/opencsv-2.3.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/ojdbc6.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/dex-javafx.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/commons-lang3-3.3.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jdom-2.0.5.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/commons-io-2.4.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/neo4j-jdbc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/xdb.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/miglayout-core-5.1-20150924.220012-180.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/xstream-1.4.7.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/miglayout-javafx-5.1-20150924.220035-180.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/Prefuse.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jython-2.5.3.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/bcel-5.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/controlsfx-8.40.10.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/guava-17.0.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
