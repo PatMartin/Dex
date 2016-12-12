@@ -84,7 +84,7 @@ public class SerialJob implements DexJob
               task.updateMessage("Aborted due to previous error.");
               task.progressAborted();
             }
-            else if (Dex.serialExecutor.isShutdown())
+            else if (isCancelled())
             {
               task.updateMessage("Execution terminated by users.");
               task.progressAborted();
@@ -123,6 +123,12 @@ public class SerialJob implements DexJob
           }
           catch(Exception ex)
           {
+            if(ex instanceof InterruptedException){
+              if(isCancelled()) {
+                task.updateMessage("Execution terminated by users.");
+                task.progressAborted();
+              }
+            }
             ERROR = true;
             task.updateMessage("Error: " + task.getName() + " after "
                 + (System.currentTimeMillis() - startTime) + " ms");
@@ -197,8 +203,9 @@ public class SerialJob implements DexJob
     Button cancelButton = new Button("Cancel");
     cancelButton.setOnAction((action) -> {
       // TODO: Figure out how to cancel task on a daemon.
-        Dex.serialExecutor.shutdownNow();
-        Dex.concurrentExecutor.shutdownNow();
+        jobTask.cancel(true);
+      //  Dex.serialExecutor.shutdownNow();
+      //  Dex.concurrentExecutor.shutdownNow();
         stage.hide();
       });
     
