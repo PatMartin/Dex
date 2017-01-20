@@ -1,4 +1,3 @@
-dist
 output
 .settings
 .groovy
@@ -8,6 +7,14 @@ textures
 .lock
 .project
 bin
+dist
 src/com/dexvis/dex/broken
 src/com/dexvis/dex/deprecated
 scripts/expect
+output.html
+data/.RData
+data/.Rhistory
+error.html
+wdi.db
+javascript/slickgrid/.DS_Store
+javascript/slickgrid/.gitignore
