@@ -1,12 +1,58 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
 <style>
-  html,body{
-    height : 100%;
-    min-height : 100%;
-    width : 100%;
-    min-width : 100%;
-  }
+    html, body {
+        height: 100%;
+        min-height: 100%;
+        width: 100%;
+        min-width: 100%;
+    }
+
+    #ChartArea {
+        height: 100%;
+        min-height: 100%;
+        width: 100%;
+        min-width: 100%;
+    }
+
+    .Treemap text {
+        pointer-events: none;
+    }
+
+    .Treemap .grandparent text {
+        font-weight: bold;
+    }
+
+    .Treemap rect {
+        fill: none;
+        stroke: #fff;
+    }
+
+    .Treemap rect.parent,
+    .grandparent rect {
+        stroke-width: 2px;
+    }
+
+    .Treemap .grandparent rect {
+        fill: steelblue;
+    }
+
+    .grandparent:hover rect {
+        fill: #ee9700;
+    }
+
+    .Treemap .children rect.parent,
+    .grandparent rect {
+        cursor: pointer;
+    }
+
+    .Treemap .children rect.parent {
+        fill-opacity: .1;
+    }
+
+    .Treemap .children:hover rect.child {
+        fill-opacity: .8;
+    }
   
 <%
   println new File("javascript/jqueryui/latest/jquery-ui.min.css").text
@@ -26,8 +72,7 @@
   println new File("javascript/jquery/latest/jquery-2.1.3.min.js").text
   println new File("javascript/jqueryui/latest/jquery-ui.min.js").text
   println new File("javascript/underscore/latest/underscore-min.js").text
-  println new File("javascript/d3/latest/d3.min.js").text
-  println new File("javascript/dexjs/latest/dex.js").text
+  println new File("javascript/dexjs/latest/dex.min.js").text
 %>
 </script>
 <script>
@@ -73,9 +118,6 @@ function save(location, config) {
 
 var config = dex.config.expandAndOverlay({
   parent : "#ChartArea",
-  resizable : true,
-  width : 100,
-  height : 100,
   color : d3.scale.category20c(),
   csv : csv }, load("#config"));
 

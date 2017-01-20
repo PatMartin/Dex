@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
 <style>
-  html,body{
+  html,body,#ChartArea{
     height : 100%;
     min-height : 100%;
     width : 100%;

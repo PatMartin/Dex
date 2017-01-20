@@ -7,93 +7,58 @@
     width : 100%;
     min-width : 100%;
   }
-.chart {
-  float:left;
-}
 
-body {
-  font: 10px sans-serif;
-}
-
-.arc path {
-  stroke: #fff;
-}
-
-.node circle {
-  cursor: pointer;
-  fill: #fff;
-  stroke: black;
-  stroke-width: 1px;
-}
-
-.node text {
-  font-size: 11px;
-}
-
-path.link {
-  fill: none;
-  stroke: #ccc;
-  stroke-width: 1px;
-}
-
-.par-chart {
-    float: left;
-    width: 70%;
-    overflow:hidden;
-}
-.data-table {
-  float: left;
-  width: 30%;
-  overflow:hidden;
-}
 
 #ParChart {
-    width: 100%;
-    height: 50%;
+    float: left;
+    width: 45%;
+    height: 100%;
+    overflow:hidden;
 }
 
 #Table {
-  width: 100%;
-  height : 50%;
+  float: left;
+  width: 45%;
+  overflow:hidden;
 }
 
+<%
+  println new File("javascript/jqueryui/latest/jquery-ui.min.css").text
+  println new File("javascript/jqueryui/latest/jquery-ui.theme.min.css").text
+%>
 </style>
-<link rel="stylesheet" href="http://syntagmatic.github.io/parallel-coordinates/d3.parcoords.css"/>
 
 <html>
   <head>
     <title>DexCharts : Parallel Coordinates To Table</title>
   </head>
   <body>
-<div id="ParChart" class="parcoords"></div></div>
-<div class="data-table" id="Table"></div>
+<svg id="ParChart"></svg>
+<div id="Table"></div>
 
-<script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
-<script src="http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
-<script src="http://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
-<script src="http://cdnjs.cloudflare.com/ajax/libs/sylvester/0.1.3/sylvester.js"></script>
 <script>
-
 <%
+  println new File("javascript/jquery/latest/jquery-2.1.3.min.js").text
+  println new File("javascript/jqueryui/latest/jquery-ui.min.js").text
+  println new File("javascript/underscore/latest/underscore-min.js").text
   println new File("javascript/dexjs/latest/dex.min.js").text
 
-  println dexData.toCsvString()
+  println dexData.toCsvString();
 %>
 
-var pcChart = new dex.charts.d3.ParallelCoordinates({
+var pcChart = dex.charts.d3.ParallelCoordinates({
   'parent'  : "#ParChart",
   'id'      : "ParChart",
   'csv'     : csv
 });
 
-var table = new dex.ui.Table({
+var table = dex.ui.Table({
   'parent' : "#Table",
-  'id'     : "Table",
   'csv'    : csv
 });
 
-table.subscribe(pcChart, "select", function(chartEvent) {
-  table.attr('csv', chartEvent.selected).update();
+table.subscribe(pcChart, "select", function(msg) {
+  table.attr('csv', msg.selected).update();
 });
 
 pcChart.render();
