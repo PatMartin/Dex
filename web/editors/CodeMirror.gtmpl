@@ -70,14 +70,14 @@
   });
 
   editor.on('keyup', function(editor, event) {
-    //console.log("Howdy...I am invisible");
+    console.log("Howdy...I got here...");
     
     if (typeof javaApp != 'undefined')
     {
-      //javaApp.log("New Content: '" + editor.getValue() + "'");
+      javaApp.log("New Content: '" + editor.getValue() + "'");
       javaApp.setContent(editor.getValue());
     }
   });
 
 </script>
-  </article>
+</article>
