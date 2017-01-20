@@ -90,7 +90,7 @@ class CreateJdbcTable extends DexTask {
   
   @Element(name="dbtype", required=false)
   private ChoiceBox dbCB = new ChoiceBox(FXCollections.observableArrayList(dbConfig.keySet()))
-  
+
   @Element(name="driver",required=false)
   private TextField driverText = new TextField("org.hsqldb.jdbc.JDBCDriver")
   @Element(name="url",required=false)
@@ -102,7 +102,7 @@ class CreateJdbcTable extends DexTask {
   @Element(name="table", required=false)
   private TextField tableText = new TextField("CSV")
   DexEnvironment env = DexEnvironment.getInstance()
-  
+    
   @Element(name="batch", required=false)
   private CheckBox batchCB = new CheckBox()
   
@@ -207,22 +207,47 @@ class CreateJdbcTable extends DexTask {
     
     def dbTypes = []
     Map<String, DateFormat> dateFmtMap = [:]
+
+    def selectedDb = dbCB.getSelectionModel().getSelectedItem()
+    println "SELECTED DB: '${selectedDb}'"
+
+    def dbTypeMaps = [
+      "default" : [
+        "integer" : "NUMBER(19,0)",
+        "double"  : "NUMBER(19,4)",
+        "date"    : "DATE",
+        "string"  : "VARCHAR2"
+      ],
+      "HyperSql" : [
+        "integer" : "INTEGER",
+        "double"  : "DOUBLE",
+        "date"    : "DATE",
+        "string"  : "VARCHAR"
+      ]
+    ]        
+
+    def dbTypeMap = dbTypeMaps["default"]
     
+    if (dbTypeMaps.containsKey(selectedDb))
+    {
+      dbTypeMap = dbTypeMaps[selectedDb]
+    }
+    println "DB TYPEMAP: '$dbTypeMap'"
     List<Integer> dataLengths = state.dexData.getMaxLengths()
     dataTypes.eachWithIndex { dataType, di ->
       
       // Enough to store a long integer
       if (dataType == "integer")
       {
-        dbTypes << "NUMBER(19,0)"
+        dbTypes << dbTypeMap["integer"]
       }
       else if (dataType == "double")
       {
-        dbTypes << "NUMBER(19, 4)"
+        dbTypes << dbTypeMap["double"]
       }
       else if (dataType == "date")
       {
-        dbTypes << "DATE"
+        dbTypes << dbTypeMap["date"]
         dateFmtMap.put(state.dexData.header[di], DateUtil.guessFormat(state.dexData.getColumn(di)))
       }
       else
@@ -238,11 +263,11 @@ class CreateJdbcTable extends DexTask {
           int dataSize = (int) Math.max(Math.min(Math.pow(2,
               Math.floor(Math.log(dataLengths[di]) / Math.log(2)) + 1),
               stringLengthSlider.getHighValue()), stringLengthSlider.getLowValue())
-          dbTypes << "VARCHAR2(${dataSize})"
+          dbTypes << dbTypeMap["string"] + "(${dataSize})"
         }
         else
         {
-          dbTypes << "VARCHAR(${stringLengthSlider.getHighValue() as Integer})"
+          dbTypes << dbTypeMap["string"] + "(${stringLengthSlider.getHighValue() as Integer})"
         }
       }
     }
