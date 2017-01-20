@@ -142,11 +142,12 @@ public class Dex extends Application
       workflowPane.add(helpNode, "grow");
     }
   };
-
-  // Handles task selection within the workflow by displaying their config and/or output.
+  
+  // Handles task selection within the workflow by displaying their config
+  // and/or output.
   ChangeListener<Object> activeTaskChange = (ov, objOld, objNew) -> {
-    //System.out.println("*** Active Task Change: " + objNew);
-
+    // System.out.println("*** Active Task Change: " + objNew);
+    
     // Defensive coding, ensure something is selected.
     if (objNew == null)
     {
@@ -485,26 +486,6 @@ public class Dex extends Application
     }
   }
   
-  // public void initializeWorkflow(ActionEvent evt)
-  // {
-  // System.out.println("Initialize Workflow: ");
-  // //DexTaskState state = new DexTaskState();
-  // DexJobScheduler scheduler = new DexJobScheduler();
-  // DexJob job = new SerialJob(taskList.getItems());
-  // try
-  // {
-  // scheduler.initialize(job);
-  // }
-  // catch(Exception ex)
-  // {
-  // StringWriter sw = new StringWriter();
-  // ex.printStackTrace(new PrintWriter(sw));
-  // ModalDialog dialog = new ModalDialog(stage, "Initialization Status",
-  // sw.toString(), "Ok");
-  // ex.printStackTrace();
-  // }
-  // }
-  
   public void onMouseClick(MouseEvent evt)
   {
     System.out.println("Mouse Click Detected: " + evt.getClickCount());
@@ -588,7 +569,7 @@ public class Dex extends Application
         try
         {
           DexTask task = (DexTask) Class.forName(taskName).newInstance();
-          //System.out.println("-- TASK: " + task);
+          // System.out.println("-- TASK: " + task);
           task.setStage(stage);
           String category = task.getCategory();
           if (taskMap.containsKey(category))
@@ -606,8 +587,8 @@ public class Dex extends Application
         catch(Exception ex)
         {
           // Abstract classes which can't be instantiated.
-          if (!taskName.equals("com.dexvis.dex.task.base.WebTask") &&
-              !taskName.equals("com.dexvis.dex.wf.DexTask"))
+          if (!taskName.equals("com.dexvis.dex.task.base.WebTask")
+              && !taskName.equals("com.dexvis.dex.wf.DexTask"))
           {
             ex.printStackTrace();
           }
