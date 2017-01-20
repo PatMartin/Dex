@@ -51,7 +51,8 @@
     <maxVersion></maxVersion>
     <jdkPreference>jreOnly</jdkPreference>
     <runtimeBits>64/32</runtimeBits>
-    <maxHeapPercent>50</maxHeapPercent>
+    <initialHeapPercent>20</initialHeapPercent>
+    <maxHeapPercent>80</maxHeapPercent>
   </jre>
   <splash>
     <file>C:\dex2ws\Dex\docs\dex.bmp</file>
@@ -60,8 +61,8 @@
     <timeoutErr>true</timeoutErr>
   </splash>
   <versionInfo>
-    <fileVersion>0.7.0.0</fileVersion>
-    <txtFileVersion>V0.7.0.0</txtFileVersion>
+    <fileVersion>0.8.0.8</fileVersion>
+    <txtFileVersion>V0.8.0.8</txtFileVersion>
     <fileDescription>Dex</fileDescription>
     <copyright>APL 2.0</copyright>
     <productVersion>0.8.0.8</productVersion>
