@@ -1,0 +1,482 @@
+<dex-project version="0.8">
+   <tasks class="java.util.ArrayList">
+      <task-item name="Read CSV" active="false">
+         <task class="com.dexvis.dex.task.input.ReadCsv">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+            <fileText>C:\dex\data\world\wdi\WDI_Data.csv</fileText>
+            <limitRows>false</limitRows>
+            <rowLimitText>200</rowLimitText>
+            <lastDir>C:\dex\data\world\wdi</lastDir>
+         </task>
+      </task-item>
+      <task-item name="Group Columns" active="false">
+         <task class="com.dexvis.dex.task.tablemanipulation.GroupColumns">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+            <groupName>YEAR</groupName>
+            <columnList>&lt;com.dexvis.simple.types.SimpleListSelectionView&gt;
+  &lt;sourceList&gt;
+    &lt;string&gt;Country Name&lt;/string&gt;
+    &lt;string&gt;Country Code&lt;/string&gt;
+    &lt;string&gt;Indicator Name&lt;/string&gt;
+    &lt;string&gt;Indicator Code&lt;/string&gt;
+  &lt;/sourceList&gt;
+  &lt;targetList&gt;
+    &lt;string&gt;1960&lt;/string&gt;
+    &lt;string&gt;1961&lt;/string&gt;
+    &lt;string&gt;1962&lt;/string&gt;
+    &lt;string&gt;1963&lt;/string&gt;
+    &lt;string&gt;1964&lt;/string&gt;
+    &lt;string&gt;1965&lt;/string&gt;
+    &lt;string&gt;1966&lt;/string&gt;
+    &lt;string&gt;1967&lt;/string&gt;
+    &lt;string&gt;1968&lt;/string&gt;
+    &lt;string&gt;1969&lt;/string&gt;
+    &lt;string&gt;1970&lt;/string&gt;
+    &lt;string&gt;1971&lt;/string&gt;
+    &lt;string&gt;1972&lt;/string&gt;
+    &lt;string&gt;1973&lt;/string&gt;
+    &lt;string&gt;1974&lt;/string&gt;
+    &lt;string&gt;1975&lt;/string&gt;
+    &lt;string&gt;1976&lt;/string&gt;
+    &lt;string&gt;1977&lt;/string&gt;
+    &lt;string&gt;1978&lt;/string&gt;
+    &lt;string&gt;1979&lt;/string&gt;
+    &lt;string&gt;1980&lt;/string&gt;
+    &lt;string&gt;1981&lt;/string&gt;
+    &lt;string&gt;1982&lt;/string&gt;
+    &lt;string&gt;1983&lt;/string&gt;
+    &lt;string&gt;1984&lt;/string&gt;
+    &lt;string&gt;1985&lt;/string&gt;
+    &lt;string&gt;1986&lt;/string&gt;
+    &lt;string&gt;1987&lt;/string&gt;
+    &lt;string&gt;1988&lt;/string&gt;
+    &lt;string&gt;1989&lt;/string&gt;
+    &lt;string&gt;1990&lt;/string&gt;
+    &lt;string&gt;1991&lt;/string&gt;
+    &lt;string&gt;1992&lt;/string&gt;
+    &lt;string&gt;1993&lt;/string&gt;
+    &lt;string&gt;1994&lt;/string&gt;
+    &lt;string&gt;1995&lt;/string&gt;
+    &lt;string&gt;1996&lt;/string&gt;
+    &lt;string&gt;1997&lt;/string&gt;
+    &lt;string&gt;1998&lt;/string&gt;
+    &lt;string&gt;1999&lt;/string&gt;
+    &lt;string&gt;2000&lt;/string&gt;
+    &lt;string&gt;2001&lt;/string&gt;
+    &lt;string&gt;2002&lt;/string&gt;
+    &lt;string&gt;2003&lt;/string&gt;
+    &lt;string&gt;2004&lt;/string&gt;
+    &lt;string&gt;2005&lt;/string&gt;
+    &lt;string&gt;2006&lt;/string&gt;
+    &lt;string&gt;2007&lt;/string&gt;
+    &lt;string&gt;2008&lt;/string&gt;
+    &lt;string&gt;2009&lt;/string&gt;
+    &lt;string&gt;2010&lt;/string&gt;
+    &lt;string&gt;2011&lt;/string&gt;
+    &lt;string&gt;2012&lt;/string&gt;
+    &lt;string&gt;2013&lt;/string&gt;
+    &lt;string&gt;2014&lt;/string&gt;
+    &lt;string&gt;2015&lt;/string&gt;
+  &lt;/targetList&gt;
+&lt;/com.dexvis.simple.types.SimpleListSelectionView&gt;</columnList>
+         </task>
+      </task-item>
+      <task-item name="Create Oracle DB" active="false">
+         <task class="com.dexvis.dex.task.database.CreateJdbcTable">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+            <dbtype>&lt;map&gt;
+  &lt;entry&gt;
+    &lt;string&gt;items&lt;/string&gt;
+    &lt;list&gt;
+      &lt;string&gt;Oracle&lt;/string&gt;
+      &lt;string&gt;MySql&lt;/string&gt;
+      &lt;string&gt;Sqlite&lt;/string&gt;
+      &lt;string&gt;Neo4J&lt;/string&gt;
+      &lt;string&gt;HyperSql&lt;/string&gt;
+      &lt;string&gt;Other&lt;/string&gt;
+    &lt;/list&gt;
+  &lt;/entry&gt;
+  &lt;entry&gt;
+    &lt;string&gt;selected&lt;/string&gt;
+    &lt;string&gt;Oracle&lt;/string&gt;
+  &lt;/entry&gt;
+&lt;/map&gt;</dbtype>
+            <driver>oracle.jdbc.OracleDriver</driver>
+            <url>jdbc:oracle:thin:@localhost:1521:XE</url>
+            <password>DEX</password>
+            <username>DEX</username>
+            <table>WDI</table>
+            <batch>false</batch>
+            <right_sizing>true</right_sizing>
+            <strict>true</strict>
+            <string_min>16</string_min>
+            <string_max>4000</string_max>
+         </task>
+      </task-item>
+      <task-item name="Create SqlLite DB" active="false">
+         <task class="com.dexvis.dex.task.database.CreateJdbcTable">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+            <dbtype>&lt;map&gt;
+  &lt;entry&gt;
+    &lt;string&gt;items&lt;/string&gt;
+    &lt;list&gt;
+      &lt;string&gt;Oracle&lt;/string&gt;
+      &lt;string&gt;MySql&lt;/string&gt;
+      &lt;string&gt;Sqlite&lt;/string&gt;
+      &lt;string&gt;Neo4J&lt;/string&gt;
+      &lt;string&gt;HyperSql&lt;/string&gt;
+      &lt;string&gt;Other&lt;/string&gt;
+    &lt;/list&gt;
+  &lt;/entry&gt;
+  &lt;entry&gt;
+    &lt;string&gt;selected&lt;/string&gt;
+    &lt;string&gt;Sqlite&lt;/string&gt;
+  &lt;/entry&gt;
+&lt;/map&gt;</dbtype>
+            <driver>org.sqlite.JDBC</driver>
+            <url>jdbc:sqlite:world.db</url>
+            <password>DEX</password>
+            <username>DEX</username>
+            <table>WDI</table>
+            <batch>false</batch>
+            <right_sizing>false</right_sizing>
+            <strict>false</strict>
+            <string_min>16</string_min>
+            <string_max>256</string_max>
+         </task>
+      </task-item>
+      <task-item name="Query Jdbc" active="false">
+         <task class="com.dexvis.dex.task.database.QueryJdbc">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+            <sqlScript class="javafx.beans.property.SimpleStringProperty">SELECT DISTINCT INDICATORCODE AS SERIES_CODE, INDICATORNAME AS SERIES_NAME FROM WDI;</sqlScript>
+            <dbtype>&lt;map&gt;
+  &lt;entry&gt;
+    &lt;string&gt;items&lt;/string&gt;
+    &lt;list&gt;
+      &lt;string&gt;HyperSql&lt;/string&gt;
+      &lt;string&gt;Oracle&lt;/string&gt;
+      &lt;string&gt;MySql&lt;/string&gt;
+      &lt;string&gt;Sqlite&lt;/string&gt;
+    &lt;/list&gt;
+  &lt;/entry&gt;
+  &lt;entry&gt;
+    &lt;string&gt;selected&lt;/string&gt;
+    &lt;string&gt;Oracle&lt;/string&gt;
+  &lt;/entry&gt;
+&lt;/map&gt;</dbtype>
+            <driver>oracle.jdbc.OracleDriver</driver>
+            <url>jdbc:oracle:thin:@localhost:1521:XE</url>
+            <password>DEX</password>
+            <username>DEX</username>
+         </task>
+      </task-item>
+      <task-item name="View Data" active="false">
+         <task class="com.dexvis.dex.task.utilities.ViewData">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+         </task>
+      </task-item>
+      <task-item name="Create Jdbc Table" active="false">
+         <task class="com.dexvis.dex.task.database.CreateJdbcTable">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+            <dbtype>&lt;map&gt;
+  &lt;entry&gt;
+    &lt;string&gt;items&lt;/string&gt;
+    &lt;list&gt;
+      &lt;string&gt;Oracle&lt;/string&gt;
+      &lt;string&gt;MySql&lt;/string&gt;
+      &lt;string&gt;Sqlite&lt;/string&gt;
+      &lt;string&gt;Neo4J&lt;/string&gt;
+      &lt;string&gt;HyperSql&lt;/string&gt;
+      &lt;string&gt;Other&lt;/string&gt;
+    &lt;/list&gt;
+  &lt;/entry&gt;
+  &lt;entry&gt;
+    &lt;string&gt;selected&lt;/string&gt;
+    &lt;string&gt;Sqlite&lt;/string&gt;
+  &lt;/entry&gt;
+&lt;/map&gt;</dbtype>
+            <driver>org.sqlite.JDBC</driver>
+            <url>jdbc:sqlite:wdi.db</url>
+            <password>DEX</password>
+            <username>DEX</username>
+            <table>SERIES</table>
+            <batch>false</batch>
+            <right_sizing>false</right_sizing>
+            <strict>false</strict>
+            <string_min>16</string_min>
+            <string_max>256</string_max>
+         </task>
+      </task-item>
+      <task-item name="Query Jdbc" active="false">
+         <task class="com.dexvis.dex.task.database.QueryJdbc">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+            <sqlScript class="javafx.beans.property.SimpleStringProperty">SELECT DISTINCT COUNTRYCODE AS COUNTRY_CODE, COUNTRYNAME AS COUNTRY_NAME
+FROM WDI
+WHERE
+COUNTRYCODE != &apos;FCS&apos; AND
+COUNTRYCODE != &apos;NAC&apos; AND
+COUNTRYCODE != &apos;SST&apos; AND
+COUNTRYCODE != &apos;HPC&apos; AND
+COUNTRYCODE != &apos;MIC&apos; AND
+COUNTRYCODE != &apos;OSS&apos; AND
+COUNTRYCODE != &apos;UMC&apos; AND
+COUNTRYCODE != &apos;ECA&apos; AND
+COUNTRYCODE != &apos;MNA&apos; AND
+COUNTRYCODE != &apos;SSA&apos; AND
+COUNTRYCODE != &apos;OEC&apos; AND
+COUNTRYCODE != &apos;INX&apos; AND
+COUNTRYCODE != &apos;OED&apos; AND
+COUNTRYCODE != &apos;SSF&apos; AND
+COUNTRYCODE != &apos;MEA&apos; AND
+COUNTRYCODE != &apos;LDC&apos; AND
+COUNTRYCODE != &apos;LMY&apos; AND
+COUNTRYCODE != &apos;NOC&apos; AND
+COUNTRYCODE != &apos;EAP&apos; AND
+COUNTRYCODE != &apos;SSF&apos; AND
+COUNTRYCODE != &apos;EUU&apos; AND
+COUNTRYCODE != &apos;LIC&apos; AND
+COUNTRYCODE != &apos;LMC&apos; AND
+COUNTRYCODE != &apos;WLD&apos; AND
+COUNTRYCODE != &apos;ARB&apos; AND
+COUNTRYCODE != &apos;CAF&apos; AND
+COUNTRYCODE != &apos;CEB&apos; AND
+COUNTRYCODE != &apos;EAS&apos; AND
+COUNTRYCODE != &apos;ECS&apos; AND
+COUNTRYCODE != &apos;LCN&apos; AND
+COUNTRYCODE != &apos;EUU&apos; AND
+COUNTRYCODE != &apos;LAC&apos; AND
+COUNTRYCODE != &apos;PSS&apos; AND
+COUNTRYCODE != &apos;SAS&apos; AND
+COUNTRYCODE != &apos;EMU&apos; AND
+COUNTRYCODE != &apos;HIC&apos; AND
+COUNTRYCODE != &apos;CSS&apos; AND
+COUNTRYCODE != &apos;KSV&apos;;</sqlScript>
+            <dbtype>&lt;map&gt;
+  &lt;entry&gt;
+    &lt;string&gt;items&lt;/string&gt;
+    &lt;list&gt;
+      &lt;string&gt;HyperSql&lt;/string&gt;
+      &lt;string&gt;Oracle&lt;/string&gt;
+      &lt;string&gt;MySql&lt;/string&gt;
+      &lt;string&gt;Sqlite&lt;/string&gt;
+    &lt;/list&gt;
+  &lt;/entry&gt;
+  &lt;entry&gt;
+    &lt;string&gt;selected&lt;/string&gt;
+    &lt;string&gt;Oracle&lt;/string&gt;
+  &lt;/entry&gt;
+&lt;/map&gt;</dbtype>
+            <driver>oracle.jdbc.OracleDriver</driver>
+            <url>jdbc:oracle:thin:@localhost:1521:XE</url>
+            <password>DEX</password>
+            <username>DEX</username>
+         </task>
+      </task-item>
+      <task-item name="Filter Aggregates" active="false">
+         <task class="com.dexvis.dex.task.utilities.GroovyFilter">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+            <operationCB>&lt;map&gt;
+  &lt;entry&gt;
+    &lt;string&gt;items&lt;/string&gt;
+    &lt;list&gt;
+      &lt;string&gt;INCLUDE&lt;/string&gt;
+      &lt;string&gt;EXCLUDE&lt;/string&gt;
+    &lt;/list&gt;
+  &lt;/entry&gt;
+  &lt;entry&gt;
+    &lt;string&gt;selected&lt;/string&gt;
+    &lt;string&gt;EXCLUDE&lt;/string&gt;
+  &lt;/entry&gt;
+&lt;/map&gt;</operationCB>
+            <conditionCB>&lt;map&gt;
+  &lt;entry&gt;
+    &lt;string&gt;items&lt;/string&gt;
+    &lt;list&gt;
+      &lt;string&gt;IF&lt;/string&gt;
+      &lt;string&gt;UNLESS&lt;/string&gt;
+    &lt;/list&gt;
+  &lt;/entry&gt;
+  &lt;entry&gt;
+    &lt;string&gt;selected&lt;/string&gt;
+    &lt;string&gt;IF&lt;/string&gt;
+  &lt;/entry&gt;
+&lt;/map&gt;</conditionCB>
+            <groovyExpText>col.COUNTRY_CODE in [
+ &apos;PSS&apos;, &apos;SAS&apos;, &apos;EMU&apos;, &apos;HIC&apos;, &apos;CSS&apos;, &apos;KSV&apos;
+ ]</groovyExpText>
+         </task>
+      </task-item>
+      <task-item name="View Data" active="false">
+         <task class="com.dexvis.dex.task.utilities.ViewData">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+         </task>
+      </task-item>
+      <task-item name="Create Jdbc Table" active="false">
+         <task class="com.dexvis.dex.task.database.CreateJdbcTable">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+            <dbtype>&lt;map&gt;
+  &lt;entry&gt;
+    &lt;string&gt;items&lt;/string&gt;
+    &lt;list&gt;
+      &lt;string&gt;Oracle&lt;/string&gt;
+      &lt;string&gt;MySql&lt;/string&gt;
+      &lt;string&gt;Sqlite&lt;/string&gt;
+      &lt;string&gt;Neo4J&lt;/string&gt;
+      &lt;string&gt;HyperSql&lt;/string&gt;
+      &lt;string&gt;Other&lt;/string&gt;
+    &lt;/list&gt;
+  &lt;/entry&gt;
+  &lt;entry&gt;
+    &lt;string&gt;selected&lt;/string&gt;
+    &lt;string&gt;Sqlite&lt;/string&gt;
+  &lt;/entry&gt;
+&lt;/map&gt;</dbtype>
+            <driver>org.sqlite.JDBC</driver>
+            <url>jdbc:sqlite:wdi.db</url>
+            <password>DEX</password>
+            <username>DEX</username>
+            <table>COUNTRIES</table>
+            <batch>false</batch>
+            <right_sizing>false</right_sizing>
+            <strict>false</strict>
+            <string_min>16</string_min>
+            <string_max>256</string_max>
+         </task>
+      </task-item>
+      <task-item name="Query Jdbc" active="true">
+         <task class="com.dexvis.dex.task.database.QueryJdbc">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+            <sqlScript class="javafx.beans.property.SimpleStringProperty">SELECT
+  COUNTRYNAME AS COUNTRY_NAME,
+  INDICATORCODE AS SERIES_CODE,
+  YEAR,
+  YEAR_VALUE AS VALUE
+FROM WDI
+WHERE (YEAR_VALUE IS NOT NULL OR YEAR_VALUE != &apos;null&apos;) AND
+(COUNTRYCODE != &apos;FCS&apos; AND
+COUNTRYCODE != &apos;NAC&apos; AND
+COUNTRYCODE != &apos;SST&apos; AND
+COUNTRYCODE != &apos;HPC&apos; AND
+COUNTRYCODE != &apos;MIC&apos; AND
+COUNTRYCODE != &apos;OSS&apos; AND
+COUNTRYCODE != &apos;UMC&apos; AND
+COUNTRYCODE != &apos;ECA&apos; AND
+COUNTRYCODE != &apos;MNA&apos; AND
+COUNTRYCODE != &apos;SSA&apos; AND
+COUNTRYCODE != &apos;OEC&apos; AND
+COUNTRYCODE != &apos;INX&apos; AND
+COUNTRYCODE != &apos;OED&apos; AND
+COUNTRYCODE != &apos;SSF&apos; AND
+COUNTRYCODE != &apos;MEA&apos; AND
+COUNTRYCODE != &apos;LDC&apos; AND
+COUNTRYCODE != &apos;LMY&apos; AND
+COUNTRYCODE != &apos;NOC&apos; AND
+COUNTRYCODE != &apos;EAP&apos; AND
+COUNTRYCODE != &apos;SSF&apos; AND
+COUNTRYCODE != &apos;EUU&apos; AND
+COUNTRYCODE != &apos;LIC&apos; AND
+COUNTRYCODE != &apos;LMC&apos; AND
+COUNTRYCODE != &apos;WLD&apos; AND
+COUNTRYCODE != &apos;ARB&apos; AND
+COUNTRYCODE != &apos;CAF&apos; AND
+COUNTRYCODE != &apos;CEB&apos; AND
+COUNTRYCODE != &apos;EAS&apos; AND
+COUNTRYCODE != &apos;ECS&apos; AND
+COUNTRYCODE != &apos;LCN&apos; AND
+COUNTRYCODE != &apos;EUU&apos; AND
+COUNTRYCODE != &apos;LAC&apos; AND
+COUNTRYCODE != &apos;PSS&apos; AND
+COUNTRYCODE != &apos;SAS&apos; AND
+COUNTRYCODE != &apos;EMU&apos; AND
+COUNTRYCODE != &apos;HIC&apos; AND
+COUNTRYCODE != &apos;CSS&apos; AND
+COUNTRYCODE != &apos;KSV&apos;)
+ORDER BY SERIES_CODE, COUNTRY_NAME, YEAR;</sqlScript>
+            <dbtype>&lt;map&gt;
+  &lt;entry&gt;
+    &lt;string&gt;items&lt;/string&gt;
+    &lt;list&gt;
+      &lt;string&gt;HyperSql&lt;/string&gt;
+      &lt;string&gt;Oracle&lt;/string&gt;
+      &lt;string&gt;MySql&lt;/string&gt;
+      &lt;string&gt;Sqlite&lt;/string&gt;
+    &lt;/list&gt;
+  &lt;/entry&gt;
+  &lt;entry&gt;
+    &lt;string&gt;selected&lt;/string&gt;
+    &lt;string&gt;Oracle&lt;/string&gt;
+  &lt;/entry&gt;
+&lt;/map&gt;</dbtype>
+            <driver>oracle.jdbc.OracleDriver</driver>
+            <url>jdbc:oracle:thin:@localhost:1521:XE</url>
+            <password>DEX</password>
+            <username>DEX</username>
+         </task>
+      </task-item>
+      <task-item name="View Data" active="false">
+         <task class="com.dexvis.dex.task.utilities.ViewData">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+         </task>
+      </task-item>
+      <task-item name="Create Jdbc Table" active="true">
+         <task class="com.dexvis.dex.task.database.CreateJdbcTable">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+            <dbtype>&lt;map&gt;
+  &lt;entry&gt;
+    &lt;string&gt;items&lt;/string&gt;
+    &lt;list&gt;
+      &lt;string&gt;Oracle&lt;/string&gt;
+      &lt;string&gt;MySql&lt;/string&gt;
+      &lt;string&gt;Sqlite&lt;/string&gt;
+      &lt;string&gt;Neo4J&lt;/string&gt;
+      &lt;string&gt;HyperSql&lt;/string&gt;
+      &lt;string&gt;Other&lt;/string&gt;
+    &lt;/list&gt;
+  &lt;/entry&gt;
+  &lt;entry&gt;
+    &lt;string&gt;selected&lt;/string&gt;
+    &lt;string&gt;Sqlite&lt;/string&gt;
+  &lt;/entry&gt;
+&lt;/map&gt;</dbtype>
+            <driver>org.sqlite.JDBC</driver>
+            <url>jdbc:sqlite:wdi.db</url>
+            <password>DEX</password>
+            <username>DEX</username>
+            <table>SERIES_DATA</table>
+            <batch>false</batch>
+            <right_sizing>false</right_sizing>
+            <strict>false</strict>
+            <string_min>16</string_min>
+            <string_max>256</string_max>
+         </task>
+      </task-item>
+   </tasks>
+</dex-project>
