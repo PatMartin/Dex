@@ -1882,7 +1882,97 @@
             </prop-sheet>
          </task>
       </task-item>
-      <task-item name="Read CSV" active="false">
+      <task-item name="Par Coord -&gt; Chord" active="false">
+         <task class="com.dexvis.dex.task.vis.dexcharts.ParCoor2Chord">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+         </task>
+      </task-item>
+      <task-item name="Par Coord -&gt; Dendrogram" active="false">
+         <task class="com.dexvis.dex.task.vis.dexcharts.ParCoor2Dendrogram">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+         </task>
+      </task-item>
+      <task-item name="Par Coord -&gt; Table" active="false">
+         <task class="com.dexvis.dex.task.vis.dexcharts.ParCoor2Table">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+         </task>
+      </task-item>
+      <task-item name="Sankey Diagram" active="false">
+         <task class="com.dexvis.dex.task.vis.dexcharts.Sankey">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+         </task>
+      </task-item>
+      <task-item name="Sunburst" active="true">
+         <task class="com.dexvis.dex.task.vis.dexcharts.Sunburst">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper">
+                  <property>
+                     <name>Height</name>
+                     <target>height</target>
+                     <category>Dimensions</category>
+                     <value class="java.lang.Integer">600</value>
+                  </property>
+                  <property>
+                     <name>Width</name>
+                     <target>width</target>
+                     <category>Dimensions</category>
+                     <value class="java.lang.Integer">800</value>
+                  </property>
+                  <property>
+                     <name>Transform</name>
+                     <target>transform</target>
+                     <category>Dimensions</category>
+                  </property>
+                  <property>
+                     <name>Resizable</name>
+                     <target>resizable</target>
+                     <category>Dimensions</category>
+                     <value class="java.lang.Boolean">true</value>
+                  </property>
+               </properties>
+            </prop-sheet>
+         </task>
+      </task-item>
+      <task-item name="Radial Tree" active="false">
+         <task class="com.dexvis.dex.task.vis.dexcharts.RadialTree">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper">
+                  <property>
+                     <name>Height</name>
+                     <target>height</target>
+                     <category>Dimensions</category>
+                     <value class="java.lang.Integer">600</value>
+                  </property>
+                  <property>
+                     <name>Width</name>
+                     <target>width</target>
+                     <category>Dimensions</category>
+                     <value class="java.lang.Integer">800</value>
+                  </property>
+                  <property>
+                     <name>Transform</name>
+                     <target>transform</target>
+                     <category>Dimensions</category>
+                  </property>
+                  <property>
+                     <name>Resizable</name>
+                     <target>resizable</target>
+                     <category>Dimensions</category>
+                     <value class="java.lang.Boolean">true</value>
+                  </property>
+               </properties>
+            </prop-sheet>
+         </task>
+      </task-item>
+      <task-item name="Read CSV" active="true">
          <task class="com.dexvis.dex.task.input.ReadCsv">
             <prop-sheet>
                <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
@@ -1891,6 +1981,72 @@
             <limitRows>false</limitRows>
             <rowLimitText>0</rowLimitText>
             <lastDir>C:\dex2ws\Dex\data</lastDir>
+         </task>
+      </task-item>
+      <task-item name="Add Row Number" active="false">
+         <task class="com.dexvis.dex.task.tablemanipulation.AddRowNumber">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+         </task>
+      </task-item>
+      <task-item name="Group Columns" active="false">
+         <task class="com.dexvis.dex.task.tablemanipulation.GroupColumns">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+            <groupName>GROUP_NAME</groupName>
+            <columnList>&lt;com.dexvis.simple.types.SimpleListSelectionView&gt;
+  &lt;sourceList&gt;
+    &lt;string&gt;Timestamp&lt;/string&gt;
+    &lt;string&gt;S0C&lt;/string&gt;
+    &lt;string&gt;S1C&lt;/string&gt;
+    &lt;string&gt;S0U&lt;/string&gt;
+    &lt;string&gt;S1U&lt;/string&gt;
+    &lt;string&gt;EC&lt;/string&gt;
+    &lt;string&gt;OC&lt;/string&gt;
+    &lt;string&gt;PC&lt;/string&gt;
+    &lt;string&gt;YGC&lt;/string&gt;
+    &lt;string&gt;YGCT&lt;/string&gt;
+    &lt;string&gt;FGC&lt;/string&gt;
+    &lt;string&gt;FGCT&lt;/string&gt;
+    &lt;string&gt;GCT&lt;/string&gt;
+  &lt;/sourceList&gt;
+  &lt;targetList&gt;
+    &lt;string&gt;EU&lt;/string&gt;
+    &lt;string&gt;OU&lt;/string&gt;
+    &lt;string&gt;PU&lt;/string&gt;
+  &lt;/targetList&gt;
+&lt;/com.dexvis.simple.types.SimpleListSelectionView&gt;</columnList>
+         </task>
+      </task-item>
+      <task-item name="Select Columns" active="true">
+         <task class="com.dexvis.dex.task.tablemanipulation.SelectColumns">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+            <columnList>&lt;com.dexvis.simple.types.SimpleListSelectionView&gt;
+  &lt;sourceList&gt;
+    &lt;string&gt;S0C&lt;/string&gt;
+    &lt;string&gt;S1C&lt;/string&gt;
+    &lt;string&gt;S0U&lt;/string&gt;
+    &lt;string&gt;S1U&lt;/string&gt;
+    &lt;string&gt;EC&lt;/string&gt;
+    &lt;string&gt;OC&lt;/string&gt;
+    &lt;string&gt;OU&lt;/string&gt;
+    &lt;string&gt;PC&lt;/string&gt;
+    &lt;string&gt;PU&lt;/string&gt;
+    &lt;string&gt;YGC&lt;/string&gt;
+    &lt;string&gt;YGCT&lt;/string&gt;
+    &lt;string&gt;FGC&lt;/string&gt;
+    &lt;string&gt;FGCT&lt;/string&gt;
+    &lt;string&gt;GCT&lt;/string&gt;
+  &lt;/sourceList&gt;
+  &lt;targetList&gt;
+    &lt;string&gt;Timestamp&lt;/string&gt;
+    &lt;string&gt;EU&lt;/string&gt;
+  &lt;/targetList&gt;
+&lt;/com.dexvis.simple.types.SimpleListSelectionView&gt;</columnList>
          </task>
       </task-item>
       <task-item name="Clustered Force" active="false">
@@ -1907,15 +2063,94 @@
             </prop-sheet>
          </task>
       </task-item>
-      <task-item name="Par Coord -&gt; Chord" active="false">
-         <task class="com.dexvis.dex.task.vis.dexcharts.ParCoor2Chord">
+      <task-item name="Radar Chart" active="false">
+         <task class="com.dexvis.dex.task.vis.dexcharts.RadarChart">
             <prop-sheet>
-               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper">
+                  <property>
+                     <name>Height</name>
+                     <target>height</target>
+                     <category>Dimensions</category>
+                     <value class="java.lang.Integer">600</value>
+                  </property>
+                  <property>
+                     <name>Width</name>
+                     <target>width</target>
+                     <category>Dimensions</category>
+                     <value class="java.lang.Integer">800</value>
+                  </property>
+                  <property>
+                     <name>Transform</name>
+                     <target>transform</target>
+                     <category>Dimensions</category>
+                  </property>
+                  <property>
+                     <name>Resizable</name>
+                     <target>resizable</target>
+                     <category>Dimensions</category>
+                     <value class="java.lang.Boolean">true</value>
+                  </property>
+                  <property>
+                     <name>Circle Radius</name>
+                     <target>radar.circle.r</target>
+                     <category>Radar Circles</category>
+                  </property>
+                  <property>
+                     <name>Circle CX</name>
+                     <target>radar.circle.cx</target>
+                     <category>Radar Circles</category>
+                  </property>
+                  <property>
+                     <name>Circle CY</name>
+                     <target>radar.circle.cy</target>
+                     <category>Radar Circles</category>
+                  </property>
+                  <property>
+                     <name>Circle Transform</name>
+                     <target>radar.circle.transform</target>
+                     <category>Radar Circles</category>
+                  </property>
+                  <property>
+                     <name>Fill Color</name>
+                     <target>radar.circle.fill.fillColor</target>
+                     <category>Radar Circles</category>
+                  </property>
+                  <property>
+                     <name>Fill Opacity</name>
+                     <target>radar.circle.fill.fillOpacity</target>
+                     <category>Radar Circles</category>
+                  </property>
+                  <property>
+                     <name>Stroke Color</name>
+                     <target>radar.circle.stroke.color</target>
+                     <category>Radar Circles</category>
+                  </property>
+                  <property>
+                     <name>Stroke Width</name>
+                     <target>radar.circle.stroke.width</target>
+                     <category>Radar Circles</category>
+                  </property>
+                  <property>
+                     <name>Stroke Dash Array</name>
+                     <target>radar.circle.stroke.dasharray</target>
+                     <category>Radar Circles</category>
+                  </property>
+                  <property>
+                     <name>Stroke Opacity</name>
+                     <target>radar.circle.stroke.opacity</target>
+                     <category>Radar Circles</category>
+                  </property>
+                  <property>
+                     <name>Stroke Transform</name>
+                     <target>radar.circle.stroke.transform</target>
+                     <category>Radar Circles</category>
+                  </property>
+               </properties>
             </prop-sheet>
          </task>
       </task-item>
-      <task-item name="Par Coord -&gt; Dendrogram" active="true">
-         <task class="com.dexvis.dex.task.vis.dexcharts.ParCoor2Dendrogram">
+      <task-item name="ScatterPlot" active="false">
+         <task class="com.dexvis.dex.task.vis.dexcharts.ScatterPlot">
             <prop-sheet>
                <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
             </prop-sheet>
