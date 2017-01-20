@@ -87,11 +87,13 @@ public class CodeMirrorEditor {
 
     public void setContent(String content)
     {
+      println "Setting content from Dex: '${content}'"
       editor.setContent(content);
     }
 
     public String getContent()
     {
+      println "Getting content from Dex: '${editor.getContent()}'"
       return editor.getContent();
     }
   }
