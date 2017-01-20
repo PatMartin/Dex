@@ -12,7 +12,8 @@ public class ParallelJob implements DexJob
 {
   private Stage stage = null;
   private List<DexTask> taskList = new ArrayList<DexTask>();
-
+  private boolean terminated = false;
+  
   public ParallelJob(List<DexTaskItem> itemList)
   {
     for (DexTaskItem item : itemList)
@@ -30,19 +31,20 @@ public class ParallelJob implements DexJob
       }
     }
   }
-
-  @Override
-  public DexJobState initialize() throws DexException
+  
+  public void terminate()
   {
-    DexJobState status = DexJobState.startState();
-    DexTaskState state = new DexTaskState();
+    setTerminated(true);
+  }
+  
+  public boolean isTerminated()
+  {
+    return terminated;
+  }
 
-    for (DexTask task : taskList)
-    {
-      state = task.initialize(state);
-    }
-
-    return status;
+  public void setTerminated(boolean terminated)
+  {
+    this.terminated = terminated;
   }
 
   @Override
@@ -50,70 +52,45 @@ public class ParallelJob implements DexJob
   {
     DexJobState status = DexJobState.startState();
     DexTaskState state = new DexTaskState();
-
+    
     // Need independent task state for each task.
     for (DexTask task : taskList)
     {
-      state = task.execute(state);
+      if (!isTerminated())
+      {
+        state = task.execute(state);
+      }
     }
-
+    
     return status;
   }
-
-  @Override
-  public DexJobState terminate() throws DexException
-  {
-    DexJobState status = DexJobState.startState();
-    DexTaskState state = new DexTaskState();
-
-    for (DexTask task : taskList)
-    {
-      state = task.terminate(state);
-    }
-
-    return status;
-  }
-
-  @Override
-  public DexJobState suspend() throws DexException
-  {
-    DexJobState status = DexJobState.startState();
-    DexTaskState state = new DexTaskState();
-
-    for (DexTask task : taskList)
-    {
-      state = task.suspend(state);
-    }
-
-    return status;
-  }
-
+  
   @Override
   public DexJobState start() throws DexException
   {
     DexJobState status = DexJobState.startState();
     DexTaskState state = new DexTaskState();
-
+    
     for (DexTask task : taskList)
     {
       state = task.start(state);
     }
-
+    
     return status;
   }
-
+  
   @Override
   public void setStage(Stage stage) throws DexException
   {
     this.stage = stage;
   }
-
+  
   @Override
   public Stage getStage() throws DexException
   {
     return stage;
   }
-
+  
   @Override
   public List<DexTask> getTaskList()
   {

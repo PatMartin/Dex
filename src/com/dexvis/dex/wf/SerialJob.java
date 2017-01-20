@@ -31,6 +31,7 @@ public class SerialJob implements DexJob
   private Stage stage = null;
   
   private Callback<DexTask, Node> factory = null;
+  private boolean terminated = false;
   
   public SerialJob(List<DexTaskItem> itemList)
   {
@@ -75,7 +76,7 @@ public class SerialJob implements DexJob
       
       for (DexTask task : job.getTaskList())
       {
-        if (task.getActive())
+        if (task.getActive() && !isTerminated())
         {
           try
           {
@@ -86,7 +87,7 @@ public class SerialJob implements DexJob
             }
             else if (Dex.serialExecutor.isShutdown())
             {
-              task.updateMessage("Execution terminated by users.");
+              task.updateMessage("Execution terminated by user.");
               task.progressAborted();
             }
             else
@@ -146,23 +147,6 @@ public class SerialJob implements DexJob
   }
   
   @Override
-  public DexJobState initialize() throws DexException
-  {
-    DexJobState status = DexJobState.startState();
-    DexTaskState state = new DexTaskState();
-    
-    for (DexTask task : taskList)
-    {
-      if (task.getActive())
-      {
-        state = task.initialize(state);
-      }
-    }
-    
-    return status;
-  }
-  
-  @Override
   public DexJobState execute() throws DexException
   {
     DexJobState status = DexJobState.startState();
@@ -197,8 +181,7 @@ public class SerialJob implements DexJob
     Button cancelButton = new Button("Cancel");
     cancelButton.setOnAction((action) -> {
       // TODO: Figure out how to cancel task on a daemon.
-        Dex.serialExecutor.shutdownNow();
-        Dex.concurrentExecutor.shutdownNow();
+        terminate();
         stage.hide();
       });
     
@@ -213,11 +196,8 @@ public class SerialJob implements DexJob
     
     Button bgButton = new Button("Run in Background");
     bgButton.setOnAction((action) -> {
-      // executorService.shutdownNow();
-      // progress.getTasks().clear();
-        stage.hide();
-        // executorService.shutdown();
-      });
+      stage.hide();
+    });
     
     progressPane.add(progress, "grow,span");
     progressPane.add(cancelButton);
@@ -229,42 +209,30 @@ public class SerialJob implements DexJob
     stage.show();
     
     // Executor.
-    Dex.serialExecutor.submit(jobTask);
+    try
+    {
+      Dex.serialExecutor.submit(jobTask);
+    }
+    catch(Exception ex)
+    {
+      ex.printStackTrace();
+    }
     return status;
   }
   
-  @Override
-  public DexJobState terminate() throws DexException
+  public void terminate()
   {
-    DexJobState status = DexJobState.startState();
-    DexTaskState state = new DexTaskState();
-    
-    for (DexTask task : taskList)
-    {
-      if (task.getActive())
-      {
-        state = task.terminate(state);
-      }
-    }
-    
-    return status;
+    setTerminated(true);
   }
   
-  @Override
-  public DexJobState suspend() throws DexException
+  public boolean isTerminated()
   {
-    DexJobState status = DexJobState.startState();
-    DexTaskState state = new DexTaskState();
-    
-    for (DexTask task : taskList)
-    {
-      if (task.getActive())
-      {
-        state = task.suspend(state);
-      }
-    }
-    
-    return status;
+    return terminated;
+  }
+  
+  protected void setTerminated(boolean terminated)
+  {
+    this.terminated = terminated;
   }
   
   @Override

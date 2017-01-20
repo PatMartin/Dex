@@ -47,7 +47,7 @@ public class DexTask extends Task<DexTask> implements Comparable<DexTask>,
   private String name = "NONE";
   // Default helpfile, NONE
   private String helpFile = "NONE";
-  
+
   private String ICONDIR = "/icons/";
   private String missingIconResource = "missing_icon.png";
   private String iconResource = missingIconResource;
@@ -84,20 +84,6 @@ public class DexTask extends Task<DexTask> implements Comparable<DexTask>,
     setName(name);
     setHelpFile(helpFile);
   }
-  
-  // public DexTask(@ElementMap(entry="property", key="name", required=false)
-  // Map<String, DexTaskProperty> properties)
-  // {
-  // System.out.println("CREATING(EMAP) : " + getName());
-  // for (DexTaskProperty property : properties.values())
-  // {
-  // System.out.println("************* SETTING TASK: " + property.getName() + "
-  // to " + this);
-  // property.setTask(this);
-  // }
-  //
-  // setProperties(properties);
-  // }
   
   /**
    * 
@@ -147,7 +133,7 @@ public class DexTask extends Task<DexTask> implements Comparable<DexTask>,
    */
   public DexTaskState terminate(DexTaskState state) throws DexException
   {
-    updateMessage("Terminated: " + getTitle());
+    updateMessage("Terminating: " + getTitle());
     return state;
   }
   
