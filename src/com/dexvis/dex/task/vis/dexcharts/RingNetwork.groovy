@@ -6,11 +6,11 @@ import com.dexvis.dex.task.base.WebTask
 import com.dexvis.util.TaskPropertyFactory
 
 @Root
-class Network extends WebTask {
-  public Network() {
-    super("Visualization: Dex Charts", "Network",
-      "visualization/dex_charts/Network.html",
-      "web/dexcharts/Network.gtmpl")
+class RingNetwork extends WebTask {
+  public RingNetwork() {
+    super("Visualization: Dex Charts", "Ring Network",
+      "visualization/dex_charts/RingNetwork.html",
+      "web/dexcharts/RingNetwork.gtmpl")
 
     setProperty('Dimensions', 'Height', 'height', 600)
     setProperty('Dimensions', 'Width', 'width', 800)
