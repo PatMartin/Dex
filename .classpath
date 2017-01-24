@@ -2,8 +2,6 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="resources"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/JavaFX"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/TMI"/>
 	<classpathentry exported="true" kind="con" path="GROOVY_SUPPORT"/>
 	<classpathentry exported="true" kind="con" path="GROOVY_DSL_SUPPORT"/>
 	<classpathentry kind="lib" path="lib/antlr4.jar"/>
@@ -36,6 +34,9 @@
 	<classpathentry kind="lib" path="lib/jruby.jar"/>
 	<classpathentry kind="lib" path="lib/mysql-connector-java-5.1.20-bin.jar"/>
 	<classpathentry kind="lib" path="lib/controlsfx-8.40.12.jar"/>
+	<classpathentry kind="lib" path="lib/dex-tmi.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/jdk1.8.0_112"/>
+	<classpathentry kind="lib" path="lib/dex-javafx.jar"/>
+	<classpathentry kind="lib" path="lib/neo4j-jdbc.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
