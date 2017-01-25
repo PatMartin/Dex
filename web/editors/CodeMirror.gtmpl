@@ -2,7 +2,17 @@
 
 <title>CodeMirror</title>
 <meta charset="utf-8"/>
-
+<!--
+<script type="text/javascript"
+src="https://getfirebug.com/firebug-lite.js">
+{
+    overrideConsole: false,
+    startInNewWindow: false,
+    startOpened: true,
+    enableTrace: true
+}
+</script>
+-->
 <style>
   <%
     // Base
@@ -20,11 +30,9 @@
    ** Code Mirror **
    *****************/
   <%
-    out.println new File("javascript/codemirror/latest/lib/codemirror.js").text
-
+    out.println new File("javascript/codemirror/latest/codemirror.min.js").text
     // Dynamic mode:
     out.println new File("javascript/codemirror/latest/mode/${mode}/${mode}.js").text
-
     out.println new File("javascript/codemirror/latest/addon/selection/active-line.js").text
     out.println new File("javascript/codemirror/latest/addon/edit/matchbrackets.js").text
     out.println new File("javascript/codemirror/latest/addon/display/fullscreen.js").text
@@ -69,13 +77,15 @@
     highlightSelectionMatches: {showToken: /\w/}
   });
 
-  editor.on('keyup', function(editor, event) {
-    console.log("Howdy...I got here...");
-    
+  editor.on('keyup', function(editor, event) { 
     if (typeof javaApp != 'undefined')
     {
       javaApp.log("New Content: '" + editor.getValue() + "'");
       javaApp.setContent(editor.getValue());
+    }
+    else
+    {
+      console.log("Java APP is UNDEFINED!!!");
     }
   });
 

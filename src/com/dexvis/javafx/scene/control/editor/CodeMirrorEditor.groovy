@@ -37,7 +37,8 @@ public class CodeMirrorEditor {
 
     this.we = we;
     this.content = content;
-
+    JavaApp japp = new JavaApp(this);
+    
     def effectiveBindings = bindings.clone()
     effectiveBindings.content = content.getValue()
 
@@ -61,7 +62,7 @@ public class CodeMirrorEditor {
               //
               // So that clients work with JSEditor for pluggable WebView editors and
               // Editor for pluggable editors of all types.
-              window.setMember("javaApp", new JavaApp(this))
+              window.setMember("javaApp", japp)
             }
           }
         });
