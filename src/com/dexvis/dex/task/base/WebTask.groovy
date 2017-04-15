@@ -8,7 +8,6 @@ import javafx.concurrent.Worker.State
 import javafx.event.ActionEvent
 import javafx.event.EventHandler
 import javafx.scene.Node
-import javafx.scene.image.Image
 import javafx.scene.input.KeyCode
 import javafx.scene.input.KeyEvent
 import javafx.scene.web.WebEngine
@@ -21,7 +20,6 @@ import javax.xml.transform.TransformerFactory
 import javax.xml.transform.dom.DOMSource
 import javax.xml.transform.stream.StreamResult
 
-import org.antlr.v4.codegen.model.OutputFile;
 import org.apache.commons.io.FileUtils
 import org.simpleframework.xml.Root
 import org.tbee.javafx.scene.layout.MigPane
@@ -29,12 +27,10 @@ import org.w3c.dom.Document
 
 import com.dexvis.dex.exception.DexException
 import com.dexvis.dex.wf.DexTask
-import com.dexvis.dex.wf.DexTaskMetaData
 import com.dexvis.dex.wf.DexTaskState
 import com.dexvis.javafx.event.ReflectiveKeyEventHandler
 import com.dexvis.javafx.scene.control.DexFileChooser
 import com.dexvis.javafx.scene.control.DexPropertySheet
-import com.thoughtworks.selenium.webdriven.commands.GetConfirmation;
 import com.thoughtworks.xstream.annotations.XStreamOmitField
 
 /**
@@ -128,7 +124,7 @@ class WebTask extends DexTask {
         .collect { configKey, configValue ->
           return "'${configKey}' : '${configValue}'";}.join(",") +
         "});}";
-    //println "Configuration Script: '${configScript}'"
+    println "Configuration Script: '${configScript}'"
     return configScript;
   }
   

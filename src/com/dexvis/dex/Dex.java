@@ -41,8 +41,6 @@ import javafx.stage.Stage;
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 import org.tbee.javafx.scene.layout.MigPane;
 
-import com.aquafx_project.AquaFx;
-import com.aquafx_project.controls.skin.AquaSkin;
 import com.dexvis.dex.collections.HierarchicalMap;
 import com.dexvis.dex.wf.DexJob;
 import com.dexvis.dex.wf.DexJobScheduler;
