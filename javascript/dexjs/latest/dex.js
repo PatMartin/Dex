@@ -27,7 +27,6 @@
 
 /*global define, module*/
 (function (context) {
-  'use strict';
 
   /**
    * @private
@@ -185,15 +184,11 @@
   }
 }(this));
 },{}],4:[function(require,module,exports){
-"use strict";
-
 /**
  *
  * This module provides routines for dealing with arrays.
  *
- * @module dex:array
- * @name array
- * @memberOf dex
+ * @module dex/array
  *
  */
 
@@ -268,6 +263,89 @@ module.exports = function array(dex) {
       }
       //dex.console.log("AFTER: array.slice(range=" + range + "): arraySlice=" + arraySlice);
       return arraySlice;
+    },
+
+    'getPermutations': function (list, maxLen) {
+      // Copy initial values as arrays
+      var perm = list.map(function (val) {
+        return [val];
+      });
+      // Our permutation generator
+      var generate = function (perm, maxLen, currLen) {
+        // Reached desired length
+        if (currLen === maxLen) {
+          return perm;
+        }
+        // For each existing permutation
+        for (var i = 0, len = perm.length; i < len; i++) {
+          var currPerm = perm.shift();
+          // Create new permutation
+          for (var k = 0; k < list.length; k++) {
+            perm.push(currPerm.concat(list[k]));
+          }
+        }
+        // Recurse
+        return generate(perm, maxLen, currLen + 1);
+      };
+      // Start with size 1 because of initial values
+      return generate(perm, maxLen, 1);
+    },
+
+    'getCombinations': function (list, comboLength) {
+      var i, j, combs, head, tailcombs;
+
+      // There is no way to take e.g. sets of 5 elements from
+      // a set of 4.
+      if (comboLength > list.length || comboLength <= 0) {
+        return [];
+      }
+
+      // K-sized set has only one K-sized subset.
+      if (comboLength == list.length) {
+        return [list];
+      }
+
+      // There is N 1-sized subsets in a N-sized set.
+      if (comboLength == 1) {
+        combs = [];
+        for (i = 0; i < list.length; i++) {
+          combs.push([list[i]]);
+        }
+        return combs;
+      }
+
+      // Assert {1 < k < set.length}
+
+      // Algorithm description:
+      // To get k-combinations of a set, we want to join each element
+      // with all (k-1)-combinations of the other elements. The set of
+      // these k-sized sets would be the desired result. However, as we
+      // represent sets with lists, we need to take duplicates into
+      // account. To avoid producing duplicates and also unnecessary
+      // computing, we use the following approach: each element i
+      // divides the list into three: the preceding elements, the
+      // current element i, and the subsequent elements. For the first
+      // element, the list of preceding elements is empty. For element i,
+      // we compute the (k-1)-computations of the subsequent elements,
+      // join each with the element i, and store the joined to the set of
+      // computed k-combinations. We do not need to take the preceding
+      // elements into account, because they have already been the i:th
+      // element so they are already computed and stored. When the length
+      // of the subsequent list drops below (k-1), we cannot find any
+      // (k-1)-combs, hence the upper limit for the iteration:
+      combs = [];
+      for (i = 0; i < list.length - comboLength + 1; i++) {
+        // head is a list that includes only our current element.
+        head = list.slice(i, i + 1);
+        // We take smaller combinations from the subsequent elements
+        tailcombs = dex.array.getCombinations(list.slice(i + 1), comboLength - 1);
+        // For each (k-1)-combination we join it with the current
+        // and store it to the set of k-combinations.
+        for (j = 0; j < tailcombs.length; j++) {
+          combs.push(head.concat(tailcombs[j]));
+        }
+      }
+      return combs;
     },
 
     /**
@@ -405,7 +483,7 @@ module.exports = function array(dex) {
       // Deep copy:
       //return $.extend(true, {}, array);
     },
-    'isNumeric' : function(array) {
+    'isNumeric': function (array) {
       return array.every(dex.object.isNumeric);
     }
   };
@@ -413,712 +491,412 @@ module.exports = function array(dex) {
 },{}],5:[function(require,module,exports){
 /**
  *
- * @name AreaChart
- * @constructor
- * @classdesc This class constructs a c3 area chart.
- * @memberOf dex.charts.c3
- * @implements {dex/component}
+ * This module provides a C3 Area Chart.
  *
- * @example {@lang javascript}
- * var areachart = new dex.charts.c3.AreaChart({
- *   'parent' : "#AreaChart",
- *   'id'     : "AreaChart"
- *   'csv'    : { header : [ "X", "Y", "Z" ],
- *                data   : [[ 1, 2, 3 ], [4, 5, 6], [7, 8, 9]]}
- * });
+ * @name dex/charts/c3/AreaChart
  *
- * @param {object} userConfig - A user supplied configuration object which will override the defaults.
- * @param {string} userConfig.parent - The parent node to which this Axis will be attached.  Ex: #MyParent
- * will attach to a node with an id = "MyParent".
- * @param {string} [userConfig.id=Axis] - The id of this axis.
- * @param {string} [userConfig.class=Axis] - The class of this axis.
- * @param {csv} userConfig.csv - The user's CSV data.
- *
- *  @inherit module:dex/component
- *
+ * @param userConfig
+ * @returns AreaChart
  */
 var areachart = function (userConfig) {
-    var chart;
+  var defaults = {
+    'parent': '#C3_AreaChart',
+    'id': 'C3_AreaChart',
+    'class': 'C3_LineChart',
+    'resizable': true,
+    'width': "100%",
+    'height': "100%",
+    "options": {
+      "data.type" : "area-spline"
+    }
+  };
 
-    var defaults =
-    {
-        // The parent container of this chart.
-        'parent': '#AreaChart',
-        // Set these when you need to CSS style components independently.
-        'id': 'AreaChart',
-        'class': 'AreaChart',
-        'resizable': true,
-        'csv': {
-            'header': [],
-            'data': []
-        },
-        'linktype' : 'area-spline',
-        'width': "100%",
-        'height': "100%",
-        'transform': "translate(0 0)",
-    };
-
-    var chart = new dex.component(userConfig, defaults);
-
-    chart.render = function render() {
-        window.onresize = this.resize;
-        chart.resize();
-    };
-
-    chart.resize = function resize() {
-        if (chart.config.resizable) {
-            var width = d3.select(chart.config.parent).property("clientWidth");
-            var height = d3.select(chart.config.parent).property("clientHeight");
-            dex.console.log(chart.config.id + ": resize(" + width + "," + height + ")");
-            chart.attr("width", width).attr("height", height).update();
-        }
-        else {
-            chart.update();
-        }
-    };
-
-    chart.update = function () {
-        var chart = this;
-        var config = chart.config;
-        var csv = config.csv;
-
-        var gtypes = dex.csv.guessTypes(csv);
-        var ncsv = dex.csv.numericSubset(csv);
-        var columns = dex.csv.transpose(ncsv);
-
-        for (var ci = 0; ci < columns.header.length; ci++) {
-            columns.data[ci].unshift(columns.header[ci]);
-        }
-
-        var types = {};
-        dex.range(1, ncsv.header.length)
-            .map(function(hi) { types[ncsv.header[hi-1]] = config.linktype; });
-
-        var c3config = {
-            'bindto' : config.parent,
-            'data': {
-                'columns': columns.data,
-                'types': types,
-                color : d3.scale.category20()
-            },
-            subchart: {
-                show: true
-            },
-            zoom: {
-                enabled: true
-            },
-            legend: {
-                position : 'right'
-            }
-        };
-
-        // Set categorical axis if first column is a string.
-        if (gtypes[0] == "string")
-        {
-            c3config['axis'] = { 'x' : {
-                'type' : 'category',
-                'label' : { 'text' : csv.header[0],
-                'position' : 'outer-center' },
-                'categories': dex.csv.transpose(dex.csv.columnSlice(csv, [0])).data[0]
-            }};
-        }
-
-        var chart = c3.generate(c3config);
-    };
-
-    $(document).ready(function () {
-        // Make the entire chart draggable.
-        //$(chart.config.parent).draggable();
-    });
-
-    return chart;
+  var combinedConfig = dex.config.expandAndOverlay(userConfig, defaults);
+  return dex.charts.c3.C3Chart(combinedConfig);
 };
 
 module.exports = areachart;
-
 },{}],6:[function(require,module,exports){
 /**
  *
- * @constructor
- * @name BarChart
- * @classdesc This class constructs a c3 bar chart.
- * @memberOf dex.charts.c3
- * @implements {dex/component}
+ * This module provides a C3 Bar Chart.
  *
- * @example {@lang javascript}
- * var areachart = dex.charts.c3.BarChart({
- *   'parent' : "#AreaChart",
- *   'id'     : "AreaChart"
- *   'csv'    : { header : [ "X", "Y", "Z" ],
- *                data   : [[ 1, 2, 3 ], [4, 5, 6], [7, 8, 9]]}
- * });
+ * @name dex/charts/c3/BarChart
  *
- * @param {object} userConfig - A user supplied configuration object which will override the defaults.
- * @param {string} userConfig.parent - The parent node to which this Axis will be attached.  Ex: #MyParent
- * will attach to a node with an id = "MyParent".
- * @param {string} [userConfig.id=Axis] - The id of this axis.
- * @param {string} [userConfig.class=Axis] - The class of this axis.
- * @param {csv} userConfig.csv - The user's CSV data.
- *
- * @inherit module:dex/component
- *
+ * @param userConfig
+ * @returns BarChart
  */
 var barchart = function (userConfig) {
-    var chart;
+  var defaults = {
+    'parent': '#C3_BarChart',
+    'id': 'C3_BarChart',
+    'class': 'C3_BarChart',
+    'resizable': true,
+    'width': "100%",
+    'height': "100%",
+    "options": {
+      "data.type": "bar"
+    }
+  };
 
-    var defaults =
-    {
-        // The parent container of this chart.
-        'parent': '#BarChart',
-        // Set these when you need to CSS style components independently.
-        'id': 'BarChart',
-        'class': 'BarChart',
-        'resizable': true,
-        'csv': {
-            'header': [],
-            'data': []
-        },
-        'width': "100%",
-        'height': "100%",
-        'transform': "translate(0 0)",
-    };
-
-    var chart = new dex.component(userConfig, defaults);
-
-    chart.render = function render() {
-        window.onresize = this.resize;
-        chart.resize();
-    };
-
-    chart.resize = function resize() {
-        if (chart.config.resizable) {
-            var width = d3.select(chart.config.parent).property("clientWidth");
-            var height = d3.select(chart.config.parent).property("clientHeight");
-            dex.console.log(chart.config.id + ": resize(" + width + "," + height + ")");
-            chart.attr("width", width).attr("height", height).update();
-        }
-        else {
-            chart.update();
-        }
-    };
-
-    chart.update = function () {
-        var chart = this;
-        var config = chart.config;
-        var csv = config.csv;
-
-        var gtypes = dex.csv.guessTypes(csv);
-        var ncsv = dex.csv.numericSubset(csv);
-        var columns = dex.csv.transpose(ncsv);
-
-        for (var ci = 0; ci < columns.header.length; ci++) {
-            columns.data[ci].unshift(columns.header[ci]);
-        }
-
-        var c3config = {
-            'bindto' : config.parent,
-            'data': {
-                'columns': columns.data,
-                'type': 'bar',
-                color : d3.scale.category20()
-            },
-            'bar': {'width': { 'ratio': 0.9 }},
-            subchart: {
-                show: true
-            },
-            zoom: {
-                enabled: true
-            },
-            legend: {
-                position : 'right'
-            }
-        };
-
-        // Set categorical axis if first column is a string.
-        if (gtypes[0] == "string")
-        {
-            c3config['axis'] = { 'x' : {
-                'type' : 'category',
-                'label' : { 'text' : csv.header[0],
-                'position' : 'outer-center' },
-                'categories': dex.csv.transpose(dex.csv.columnSlice(csv, [0])).data[0]
-            }};
-        }
-
-        var chart = c3.generate(c3config);
-    };
-
-    $(document).ready(function () {
-        // Make the entire chart draggable.
-        //$(chart.config.parent).draggable();
-    });
-
-    return chart;
+  var combinedConfig = dex.config.expandAndOverlay(userConfig, defaults);
+  return dex.charts.c3.C3Chart(combinedConfig);
 };
 
 module.exports = barchart;
 },{}],7:[function(require,module,exports){
-/**
- *
- * @name LineChart
- * @constructor
- * @classdesc This class constructs a c3 line chart.
- * @memberOf dex.charts.c3
- * @implements {dex/component}
- *
- * @example {@lang javascript}
- * var areachart = new dex.charts.c3.AreaChart({
- *   'parent' : "#AreaChart",
- *   'id'     : "AreaChart"
- *   'csv'    : { header : [ "X", "Y", "Z" ],
- *                data   : [[ 1, 2, 3 ], [4, 5, 6], [7, 8, 9]]}
- * });
- *
- * @param {object} userConfig - A user supplied configuration object which will override the defaults.
- * @param {string} userConfig.parent - The parent node to which this Axis will be attached.  Ex: #MyParent
- * will attach to a node with an id = "MyParent".
- * @param {string} [userConfig.id=Axis] - The id of this axis.
- * @param {string} [userConfig.class=Axis] - The class of this axis.
- * @param {csv} userConfig.csv - The user's CSV data.
- *
- * @inherit module:dex/component
- *
- */
-
-var linechart = function (userConfig) {
-    var chart;
-
-    var defaults =
-    {
-        // The parent container of this chart.
-        'parent': '#LineChart',
-        // Set these when you need to CSS style components independently.
-        'id': 'LineChart',
-        'class': 'LineChart',
-        'resizable': true,
-        'csv': {
-            'header': [],
-            'data': []
-        },
-        'linktype' : 'line',
-        'width': "100%",
-        'height': "100%"
-    };
-
-    var chart = new dex.component(userConfig, defaults);
-    var internalChart;
-    var selectedColumns = [];
-
-    chart.resize = function resize() {
-        dex.console.log("PARENT: '" + chart.config.parent + "'");
-        if (chart.config.resizable) {
-            var width = $("" + chart.config.parent).width();
-            var height = $("" + chart.config.parent).height();
-            dex.console.log("RESIZE: " + width + "x" + height);
-            chart.attr("width", width)
-              .attr("height", height)
-              .update();
-        }
-        else {
-            chart.update();
-        }
-    };
-
-    chart.render = function render() {
-
-        //var chart = this;
-        var config = chart.config;
-        var csv = config.csv;
-        window.onresize = this.resize;
-        
-        d3.select(config.parent).selectAll("*").remove();
-        var gtypes = dex.csv.guessTypes(csv);
-        selectedColumns = dex.csv.getNumericIndices(csv);
-        if (gtypes[0] == "string")
-        {
-            selectedColumns.unshift(0);
-        }
-        else if (gtypes[0] == "date")
-        {
-            selectedColumns.unshift(0);
-        }
-
-        var ncsv = dex.csv.columnSlice(csv, selectedColumns);
-
-        var columns = dex.csv.transpose(ncsv);
-
-        for (var ci = 0; ci < columns.header.length; ci++) {
-            columns.data[ci].unshift(columns.header[ci]);
-        }
-
-        var types = {};
-        dex.range(1, ncsv.header.length)
-          .map(function(hi) { types[ncsv.header[hi-1]] = config.linktype; });
-
-        var c3config = {
-            'bindto' : config.parent,
-            'data': {
-                'x' : columns.header[0],
-                'columns' : columns.data,
-                'types' : types
-            },
-            subchart: {
-                show: true
-            },
-            zoom: {
-                enabled: true
-            },
-            legend: {
-                position : 'right'
-            },
-            groups: config.groups
-        };
-
-        //dex.console.log("TYPES:", gtypes);
-
-        if (gtypes[0] == "string")
-        {
-            c3config["axis"] = {
-                "x": {
-                    "type": "category",
-                    "categories": [].concat.apply([],
-                      dex.matrix.uniques(dex.matrix.slice(csv.data, [0]))).sort()
-                }
-            }
-        }
-        else if (gtypes[0] == "date")
-        {
-            //dex.console.log("DEALING WITH A DATE...");
-            c3config["axis"] = {
-                "x": {
-                    "type": "timeseries",
-                    "tick": {
-                        format: '%Y-%m-%d'
-                    }
-                }
-            }
-        }
-
-        //dex.console.log("RENDER C3CONFIG", c3config);
-
-        //dex.console.log("CATEGORIES", c3config);
-        internalChart = c3.generate(c3config);
-    };
-
-    chart.update = function () {
-        var chart = this;
-        var config = chart.config;
-        var csv = config.csv;
-
-        var gtypes = dex.csv.guessTypes(csv);
-
-        var ncsv = dex.csv.columnSlice(csv, selectedColumns);
-        var columns = dex.csv.transpose(ncsv);
-
-        for (var ci = 0; ci < columns.header.length; ci++) {
-            columns.data[ci].unshift(columns.header[ci]);
-        }
-
-        var types = {};
-        dex.range(1, ncsv.header.length)
-          .map(function(hi) { types[ncsv.header[hi-1]] = config.linktype; });
-
-        var c3config = {
-            'columns' : columns.data
-        };
-
-        //dex.console.log("C3CONFIG", c3config);
-
-        //internalChart.groups(config.groups);
-        internalChart.load(c3config);
-    };
-
-    $(document).ready(function () {
-        // Make the entire chart draggable.
-        //$(chart.config.parent).draggable();
-    });
-
-    return chart;
-};
-
-module.exports = linechart;
-},{}],8:[function(require,module,exports){
-/**
- *
- * @constructor
- * @name StackedAreaChart
- * @classdesc This class constructs a c3 stacked area chart.
- * @memberOf dex.charts.c3
- * @implements {dex/component}
- *
- * @example {@lang javascript}
- * var areachart = dex.charts.c3.BarChart({
- *   'parent' : "#AreaChart",
- *   'id'     : "AreaChart"
- *   'csv'    : { header : [ "X", "Y", "Z" ],
- *                data   : [[ 1, 2, 3 ], [4, 5, 6], [7, 8, 9]]}
- * });
- *
- * @param {object} userConfig - A user supplied configuration object which will override the defaults.
- * @param {string} userConfig.parent - The parent node to which this Axis will be attached.  Ex: #MyParent
- * will attach to a node with an id = "MyParent".
- * @param {string} [userConfig.id=Axis] - The id of this axis.
- * @param {string} [userConfig.class=Axis] - The class of this axis.
- * @param {csv} userConfig.csv - The user's CSV data.
- *
- * @inherit module:dex/component
- *
- */
-var stackedareachart = function (userConfig) {
-    var chart;
-
-    var defaults =
-    {
-        // The parent container of this chart.
-        'parent': '#AreaChart',
-        // Set these when you need to CSS style components independently.
-        'id': 'AreaChart',
-        'class': 'AreaChart',
-        'resizable': true,
-        'csv': {
-            'header': [],
-            'data': []
-        },
-        'width': "100%",
-        'height': "100%",
-        'transform': "translate(0 0)",
-    };
-
-    var chart = new dex.component(userConfig, defaults);
-
-    chart.render = function render() {
-        window.onresize = this.resize;
-        chart.resize();
-    };
-
-    chart.resize = function resize() {
-        if (chart.config.resizable) {
-            var width = d3.select(chart.config.parent).property("clientWidth");
-            var height = d3.select(chart.config.parent).property("clientHeight");
-            dex.console.log(chart.config.id + ": resize(" + width + "," + height + ")");
-            chart.attr("width", width).attr("height", height).update();
-        }
-        else {
-            chart.update();
-        }
-    };
-
-    chart.update = function () {
-        var chart = this;
-        var config = chart.config;
-        var csv = config.csv;
-
-        var gtypes = dex.csv.guessTypes(csv);
-        var ncsv = dex.csv.numericSubset(csv);
-        var columns = dex.csv.transpose(ncsv);
-
-        for (var ci = 0; ci < columns.header.length; ci++) {
-            columns.data[ci].unshift(columns.header[ci]);
-        }
-
-        var types = {};
-        dex.range(1, ncsv.header.length)
-            .map(function(hi) { types[ncsv.header[hi-1]] = 'area-spline'; });
-
-        var c3config = {
-            'bindto' : config.parent,
-            'data': {
-                'columns': columns.data,
-                'types': types,
-                'groups' : [ columns.header ],
-                color : d3.scale.category20()
-            },
-            subchart: {
-                show: true
-            },
-            zoom: {
-                enabled: true
-            },
-            legend: {
-                position : 'right'
-            }
-        };
-
-        // Set categorical axis if first column is a string.
-        if (gtypes[0] == "string")
-        {
-            c3config['axis'] = { 'x' : {
-                'type' : 'category',
-                'label' : { 'text' : csv.header[0],
-                'position' : 'outer-center' },
-                'categories': dex.csv.transpose(dex.csv.columnSlice(csv, [0])).data[0]
-            }};
-        }
-
-        var chart = c3.generate(c3config);
-    };
-
-    $(document).ready(function () {
-        // Make the entire chart draggable.
-        //$(chart.config.parent).draggable();
-    });
-
-    return chart;
-};
-
-module.exports = stackedareachart;
-},{}],9:[function(require,module,exports){
-/**
- *
- * @constructor
- * @name StackedBarChart
- * @classdesc This class constructs a c3 stacked bar chart.
- * @memberOf dex.charts.c3
- * @implements {dex/component}
- *
- * @example {@lang javascript}
- * var areachart = dex.charts.c3.BarChart({
- *   'parent' : "#AreaChart",
- *   'id'     : "AreaChart"
- *   'csv'    : { header : [ "X", "Y", "Z" ],
- *                data   : [[ 1, 2, 3 ], [4, 5, 6], [7, 8, 9]]}
- * });
- *
- * @param {object} userConfig - A user supplied configuration object which will override the defaults.
- * @param {string} userConfig.parent - The parent node to which this Axis will be attached.  Ex: #MyParent
- * will attach to a node with an id = "MyParent".
- * @param {string} [userConfig.id=Axis] - The id of this axis.
- * @param {string} [userConfig.class=Axis] - The class of this axis.
- * @param {csv} userConfig.csv - The user's CSV data.
- *
- * @inherit module:dex/component
- *
- */
-var stackedbarchart = function (userConfig) {
+var c3chart = function (userConfig) {
   var chart;
+  var internalChart;
 
   var defaults = {
     // The parent container of this chart.
-    'parent': '#BarChart',
-    // Set these when you need to CSS style components independently.
-    'id': 'BarChart',
-    'class': 'BarChart',
+    'parent': '#C3ChartParent',
+    'id': 'C3ChartId',
+    'class': 'C3ChartClass',
     'resizable': true,
+    'width': "100%",
+    'height': "100%",
+    'margin': {
+      'left': 50,
+      'right': 50,
+      'top': 20,
+      'bottom': 20
+    },
+    "color": d3.scale.category10(),
+    "draggable": false,
     'csv': {
       'header': [],
       'data': []
     },
-    'padding': {
-      'top': 10,
-      'bottom': 10,
-      'left': 50,
-      'right': 10
+    'options': {
+      "tooltip.show": true,
+      "subchart.show": false,
+      "zoom.enabled": true,
+      "point.show": true,
+      "legend.position": "right"
     },
-    'order': 'desc',
-    'width': "100%",
-    'height': "100%",
-    'transform': "translate(0 0)",
   };
 
-  var chart = new dex.component(userConfig, defaults);
+  chart = new dex.component(userConfig, defaults);
 
   chart.render = function render() {
-    window.onresize = this.resize;
-    chart.resize();
-  };
-
-  chart.resize = function resize() {
-    if (chart.config.resizable) {
-      var width = d3.select(chart.config.parent).property("clientWidth");
-      var height = d3.select(chart.config.parent).property("clientHeight");
-      dex.console.log(chart.config.id + ": resize(" + width + "," + height + ")");
-      chart.attr("width", width).attr("height", height).update();
-    }
-    else {
-      chart.update();
-    }
-  };
-
-  chart.update = function () {
-    var chart = this;
     var config = chart.config;
     var csv = config.csv;
+    d3 = dex.charts.d3.d3v3;
+    d3.select(config.parent).selectAll("*").remove();
 
+    config.options.padding =
+      config.options.padding || config.margin;
+    config.options.bindto = config.parent;
+    var dataOptions = getDataOptions(csv);
+    //dex.console.log("PRE-OPTS", config.options);
+    config.options =
+      dex.config.expandAndOverlay(config.options,
+        getDataOptions(csv));
+    //dex.console.log("C3OPTIONS", JSON.stringify(config.options));
+    internalChart = c3.generate(config.options);
+    chart.resize();
+    dex.config.apply(chart);
+    return chart;
+  };
+
+  function getDataOptions(csv) {
+    var options = {};
     var gtypes = dex.csv.guessTypes(csv);
     var ncsv = dex.csv.numericSubset(csv);
-    var columns = dex.csv.transpose(ncsv);
+    var columns = dex.csv.transpose(csv);
 
-    for (var ci = 0; ci < columns.header.length; ci++) {
-      columns.data[ci].unshift(columns.header[ci]);
-    }
-
-    var c3config = {
-      'bindto': config.parent,
-      'data': {
-        'columns': columns.data,
-        'type': 'bar',
-        color: d3.scale.category20(),
-        'groups': [columns.header],
-        'order': config.order
-      },
-      'bar': {'width': {'ratio': 0.9}},
-      subchart: {
-        show: true
-      },
-      zoom: {
-        enabled: true
-      },
-      legend: {
-        position: 'right'
-      }
-    };
-
-    // Set categorical axis if first column is a string.
+    ncsv.data.unshift(ncsv.header);
+    // Categorical axis
     if (gtypes[0] == "string") {
-      c3config['axis'] = {
-        'x': {
-          'type': 'category',
-          'label': {
-            'text': csv.header[0],
-            'position': 'outer-center'
+      // Donut an pie charts are a special case
+      if (chart.config && chart.config.options &&
+        chart.config.options.data && (
+          chart.config.options.data.type == "pie" ||
+          chart.config.options.data.type == "donut"
+        )) {
+        var summary = dex.csv.summary(csv, [0]);
+
+        return {
+          data: {
+            "columns": summary.data,
+            "color": chart.config.color
+          }
+        }
+      }
+      else {
+        options = {
+          data: {
+            "rows": ncsv.data,
+            "color": chart.config.color
           },
-          'categories': dex.csv.transpose(dex.csv.columnSlice(csv, [0])).data[0]
+          axis: {
+            x: {
+              type: "category",
+              categories: columns.data[0]
+            }
+          }
+        };
+        if (chart.config.stack) {
+          options.data.groups = [ncsv.header];
+        }
+        return options;
+      }
+    }
+    else if (gtypes[0] == "date") {
+      var numericIndices = dex.csv.getNumericIndices(csv);
+      numericIndices.unshift(0);
+      var tcsv = dex.csv.columnSlice(csv, numericIndices);
+      tcsv.data.unshift(tcsv.header);
+      options = {
+        data: {
+          "x": tcsv.header[0],
+          "rows": tcsv.data,
+          "color": chart.config.color
+        },
+        axis: {
+          x: {
+            type: "timeseries",
+            tick: {
+              format: '%Y-%m-%d'
+            }
+          }
         }
       };
-    }
 
-    var chart = c3.generate(c3config);
+      if (chart.config.stack) {
+        options.data.groups = [ncsv.header];
+      }
+      return options;
+    }
+    else {
+      options = {
+        data: {
+          "x": ncsv.header[0],
+          "rows": ncsv.data,
+          "color": chart.config.color
+        }
+      };
+
+      if (chart.config.stack) {
+        options.data.groups = [dex.array.copy(ncsv.header)];
+        options.data.groups[0].shift();
+      }
+      return options;
+    }
+  }
+
+  chart.update = function () {
+    var config = chart.config;
+    var csv = config.csv;
+    var dataOptions = getDataOptions(csv);
+    config.options =
+      dex.config.expandAndOverlay(config.options,
+        getDataOptions(config.csv));
+    internalChart.load(config.options);
+    dex.config.apply(chart);
+    return chart;
   };
 
   $(document).ready(function () {
-    // Make the entire chart draggable.
-    //$(chart.config.parent).draggable();
+    if (chart.config.draggable) {
+      $("#" + chart.config.id).draggable();
+    }
   });
 
   return chart;
-}
+};
 
-module.exports = stackedbarchart;
+module.exports = c3chart;
+},{}],8:[function(require,module,exports){
+/**
+ *
+ * This module provides a C3 Donut Chart.
+ *
+ * @name dex/charts/c3/DonutChart
+ *
+ * @param userConfig
+ * @returns DonutChart
+ */
+var donutchart = function (userConfig) {
+  var defaults = {
+    'parent': '#C3_DonutChart',
+    'id': 'C3_DonutChart',
+    'class': 'C3_DonutChart',
+    'resizable': true,
+    'width': "100%",
+    'height': "100%",
+    "options": {
+      "data.type": "donut"
+    }
+  };
+
+  var combinedConfig = dex.config.expandAndOverlay(userConfig, defaults);
+  return dex.charts.c3.C3Chart(combinedConfig);
+};
+
+module.exports = donutchart;
+},{}],9:[function(require,module,exports){
+/**
+ *
+ * This module provides a C3 Line Chart.
+ *
+ * @name dex/charts/c3/LineChart
+ *
+ * @param userConfig
+ * @returns LineChart
+ */
+var linechart = function (userConfig) {
+  var defaults = {
+    'parent': '#C3_LineChart',
+    'id': 'C3_LineChart',
+    'class': 'C3_LineChart',
+    'resizable': true,
+    'width': "100%",
+    'height': "100%",
+    "options": {
+      "data.type": "line"
+    }
+  };
+
+  var combinedConfig = dex.config.expandAndOverlay(userConfig, defaults);
+  return dex.charts.c3.C3Chart(combinedConfig);
+};
+
+module.exports = linechart;
 },{}],10:[function(require,module,exports){
 /**
  *
- * This module provides C3 based visualization components.
+ * This module provides a C3 Pie Chart.
  *
+ * @name dex/charts/c3/PieChart
+ *
+ * @param userConfig
+ * @returns PieChart
+ */
+var piechart = function (userConfig) {
+  var defaults = {
+    'parent': '#C3_PieChart',
+    'id': 'C3_PieChart',
+    'class': 'C3_PieChart',
+    'resizable': true,
+    'width': "100%",
+    'height': "100%",
+    "options": {
+      "data.type": "pie"
+    }
+  };
+
+  var combinedConfig = dex.config.expandAndOverlay(userConfig, defaults);
+  return dex.charts.c3.C3Chart(combinedConfig);
+};
+
+module.exports = piechart;
+},{}],11:[function(require,module,exports){
+/**
+ *
+ * This module provides a C3 ScatterPlot
+ *
+ * @name dex/charts/c3/ScatterPlot
+ *
+ * @param userConfig
+ * @returns ScatterPlot
+ */
+var scatterplot = function (userConfig) {
+  var defaults = {
+    'parent': '#C3_ScatterPlot',
+    'id': 'C3_ScatterPlot',
+    'class': 'C3_ScatterPlot',
+    'resizable': true,
+    'width': "100%",
+    'height': "100%",
+    "options": {
+      "data.type": "scatter"
+    }
+  };
+
+  var combinedConfig = dex.config.expandAndOverlay(userConfig, defaults);
+  return dex.charts.c3.C3Chart(combinedConfig);
+};
+
+module.exports = scatterplot;
+},{}],12:[function(require,module,exports){
+/**
+ *
+ * This module provides a C3 StackedArea Chart.
+ *
+ * @name dex/charts/c3/StackedAreaChart
+ *
+ * @param userConfig
+ * @returns StackedAreaChart
+ */
+var stackedareachart = function (userConfig) {
+  var defaults = {
+    'parent': '#C3_StackedAreaChart',
+    'id': 'C3_StackedAreaChart',
+    'class': 'C3_StackedAreaChart',
+    'resizable': true,
+    'width': "100%",
+    'height': "100%",
+    "stack" : true,
+    "options": {
+      "data.type": "area"
+    }
+  };
+
+  var combinedConfig = dex.config.expandAndOverlay(userConfig, defaults);
+  return dex.charts.c3.C3Chart(combinedConfig);
+};
+
+module.exports = stackedareachart;
+},{}],13:[function(require,module,exports){
+/**
+ *
+ * This module provides a C3 StackedBar Chart.
+ *
+ * @name dex/charts/c3/StackedBarChart
+ *
+ * @param userConfig
+ * @returns StackedBarChart
+ */
+var stackedbarchart = function (userConfig) {
+  var defaults = {
+    'parent': '#C3_StackedBarChart',
+    'id': 'C3_StackedBarChart',
+    'class': 'C3_StackedBarChart',
+    'resizable': true,
+    'width': "100%",
+    'height': "100%",
+    "stack" : true,
+    "options": {
+      "data.type": "bar"
+    }
+  };
+
+  var combinedConfig = dex.config.expandAndOverlay(userConfig, defaults);
+  return dex.charts.c3.C3Chart(combinedConfig);
+};
+
+module.exports = stackedbarchart;
+},{}],14:[function(require,module,exports){
+/**
  * @module dex/charts/c3
- * @name c3
- * @memberOf dex.charts
- *
  */
 var c3 = {};
 
+c3.C3Chart = require("./C3Chart");
+c3.PieChart = require("./PieChart");
+c3.DonutChart = require("./DonutChart");
 c3.AreaChart = require("./AreaChart");
 c3.BarChart = require("./BarChart");
 c3.LineChart = require("./LineChart");
+c3.ScatterPlot = require("./ScatterPlot");
 c3.StackedAreaChart = require("./StackedAreaChart");
 c3.StackedBarChart = require("./StackedBarChart");
 
 module.exports = c3;
-},{"./AreaChart":5,"./BarChart":6,"./LineChart":7,"./StackedAreaChart":8,"./StackedBarChart":9}],11:[function(require,module,exports){
+},{"./AreaChart":5,"./BarChart":6,"./C3Chart":7,"./DonutChart":8,"./LineChart":9,"./PieChart":10,"./ScatterPlot":11,"./StackedAreaChart":12,"./StackedBarChart":13}],15:[function(require,module,exports){
 /**
  *
  * This module provides visualization components for charting
@@ -1126,8 +904,14 @@ module.exports = c3;
  * D3 to three.js and WebGL.
  *
  * @module dex/charts
- * @name charts
- * @memberOf dex
+ * @property {module:dex/charts/c3} c3           - The C3 charting module.
+ * @property {module:dex/charts/d3} d3           - The D3 charting module.
+ * @property {module:dex/charts/d3plus} d3plus   - The D3Plus charting module.
+ * @property {module:dex/charts/echarts} echarts - The ECharts charting module.
+ * @property {module:dex/charts/elegans} elegans - Elegans 3D/WebGL charting module.
+ * @property {module:dex/charts/nvd3} nvd3       - The NVD3 charting module.
+ * @property {module:dex/charts/threejs} threejs - The WebGL/ThreeJS charting module.
+ * @property {module:dex/charts/vis} vis         - The Vis.js charting module.
  *
  */
 module.exports = function charts() {
@@ -1135,121 +919,121 @@ module.exports = function charts() {
     'c3'      : require("./c3/c3"),
     'd3'      : require("./d3/d3"),
     'd3plus'  : require("./d3plus/d3plus"),
-    'dygraphs': require("./dygraphs/dygraphs"),
-    'google'  : require("./google/google"),
+    'echarts' : require("./echarts/echarts"),
+    'elegans' : require("./elegans/elegans"),
+    'nvd3'    : require("./nvd3/nvd3"),
     'threejs' : require("./threejs/threejs"),
     'vis'     : require("./vis/vis")
   };
 };
-},{"./c3/c3":10,"./d3/d3":33,"./d3plus/d3plus":35,"./dygraphs/dygraphs":37,"./google/google":43,"./threejs/threejs":45,"./vis/vis":47}],12:[function(require,module,exports){
-var chord = function (userConfig) {
+},{"./c3/c3":14,"./d3/d3":33,"./d3plus/d3plus":35,"./echarts/echarts":38,"./elegans/elegans":40,"./nvd3/nvd3":43,"./threejs/threejs":45,"./vis/vis":47}],16:[function(require,module,exports){
+var bumpchart = function (userConfig) {
   d3 = dex.charts.d3.d3v3;
   var chart;
 
-  var defaults =
-    {
-      // The parent container of this chart.
-      'parent': '#ChordDiagram',
-      // Set these when you need to CSS style components independently.
-      'id': 'Chord',
-      'class': 'Chord',
-      'resizable': true,
-      // Our data...
-      'csv': {
-        // Give folks without data something to look at anyhow.
-        'header': ["X", "Y", "Z"],
-        'data': [
-          [0, 0, 0],
-          [1, 1, 1],
-          [2, 2, 2]
-        ]
+  var defaults = {
+    'parent': '#BumpChartParent',
+    'id': 'BumpChartId',
+    'class': 'BumpChartClass',
+    'resizable': true,
+    // Sample data...
+    'csv': {
+      'header': ["category", "sequence", "rank"],
+      'data': [
+        ["Team 1", 1, 1],
+        ["Team 1", 2, 2],
+        ["Team 1", 3, 3],
+        ["Team 2", 1, 2],
+        ["Team 2", 2, 1],
+        ["Team 2", 3, 2],
+        ["Team 3", 1, 3],
+        ["Team 3", 2, 3],
+        ["Team 3", 3, 1]
+      ]
+    },
+    'width': "100%",
+    'height': "100%",
+    'margin': {
+      'left': 140,
+      'right': 160,
+      'top': 50,
+      'bottom': 50
+    },
+    'transform': "",
+    'color': d3.scale.category10(),
+    'format': d3.format("d"),
+    'key': {'category': 0, 'sequence': 1, 'rank': 2},
+    'chartLabel': dex.config.text({
+      'text': "",
+      'x': function () {
+        return (chart.config.width - chart.config.margin.left -
+          chart.config.margin.right) / 2;
       },
-      'width': "100%",
-      'height': "100%",
-      'transform': "translate(0 0)",
-      'padding': 0.05,
-      'nodes': {
-        'mouseout': dex.config.link({
-          'stroke.color': "black",
-          //'stroke.dasharray': '5 5',
-          'stroke.width': 1,
-          'fill.fillColor': function (d, i) {
-            //dex.console.log("COLORD", d);
-            return (chart.config.color(d.index));
-          },
-          'fill.fillOpacity': 0.5,
-          'fill.fill': 'none',
-          'd': d3.svg.arc(),
-          'transform': ''
-        }),
-        'mouseover': dex.config.link({
-          'stroke.color': "red",
-          //'stroke.dasharray': '5 5',
-          'stroke.width': 1,
-          'fill.fillColor': function (d, i) {
-            //dex.console.log("COLORD", d);
-            return (chart.config.color(d.index));
-          },
-          'fill.fillOpacity': 1,
-          'fill.fill': 'none',
-          'd': d3.svg.arc(),
-          'transform': ''
-        })
+      'y': function (d) {
+        return chart.config.height -
+          (.5 * chart.config.margin.bottom);
       },
-      'links': {
-        'mouseout': dex.config.link({
-          'stroke.color': "grey",
-          'stroke.dasharray': '',
-          'stroke.width': 1,
-          'fill.fillColor': function (d, i) {
-            return (chart.config.color(d.target.index));
-          },
-          'fill.fillOpacity': 0.3,
-          'fill.fill': 'none',
-          'd': d3.svg.chord(),
-          'transform': ''
-        }),
-        'mouseover': dex.config.link({
-          'stroke.color': "black",
-          'stroke.dasharray': '',
-          'stroke.width': 2,
-          'fill.fillColor': function (d, i) {
-            return (chart.config.color(d.target.index));
-          },
-          'transform': "",
-          'fill.fillOpacity': 1,
-          'fill.fill': 'none',
-          'd': d3.svg.chord()
-        })
-      },
-//                .style("fill", function (d) {
-//        return chart.config.color(d.index);
-//      })
-    'color': d3.scale.category20(),
-    'innerRadius': 130,
-    'outerRadius': 200,
-    'tick.start.x': 1,
-    'tick.start.y': 0,
-    'tick.end.x': 5,
-    'tick.end.y': 0,
-    'tick.padding': 10,
-    'tick.stroke': dex.config.stroke(
-      {
-        'width': 2,
-        'color': 'black'
-        //'dasharray' : '1 2'
+      'font': dex.config.font({
+        'fontSize': '32px'
       }),
-    'title': dex.config.text(),
-    'label': dex.config.text()
+      'fill.fillColor': 'steelblue',
+      'anchor': 'middle'
+    }),
+    'categoryLabel': dex.config.text({
+      'x': 8,
+      'dy': ".31em",
+      'cursor': "pointer",
+      'font': dex.config.font({
+        'size': 16,
+        'weight': 'bold',
+      }),
+      'fill.fillColor': function (d) {
+        return chart.config.color(
+          d.key);
+      }
+    }),
+    'sequenceLabel': dex.config.text({
+      'dx': 0,
+      'anchor': 'middle',
+      'dy': ".31em",
+      'cursor': "pointer",
+      'font': dex.config.font({
+        'size': 32,
+        'weight': 'bold',
+      }),
+      'fill.fillColor': function (d) {
+        return "black";
+      }
+    }),
+    'circle': dex.config.circle({
+      'r': 6,
+      'stroke': dex.config.stroke({
+        'color': function (d) {
+          return chart.config.color(d.key);
+        },
+        'width': 4,
+      }),
+      'fill.fillColor': 'white'
+    }),
+    'line': dex.config.line({
+      'stroke': dex.config.stroke({
+        'color': function (d) {
+          return chart.config.color(d.key);
+        },
+        'width': 3,
+        //'dasharray' : "1 1"
+      }),
+      'fill.fillColor': 'none'
+    })
   };
 
-  var chart = new dex.component(userConfig, defaults);
+  chart = new dex.component(userConfig, defaults);
 
   chart.render = function render() {
     d3 = dex.charts.d3.d3v3;
-    chart.resize = this.resize(chart);
-    window.onresize = chart.resize;
-    return chart.resize();
+    chart.resize();
+    dex.config.apply(chart);
+    return chart;
   };
 
   chart.update = function () {
@@ -1257,48 +1041,430 @@ var chord = function (userConfig) {
     var chart = this;
     var config = chart.config;
     var csv = config.csv;
+    var margin = config.margin;
+    var width = config.width - margin.left - margin.right;
+    var height = config.height - margin.top - margin.bottom;
+
+    var categoryKey = dex.csv.getColumnName(csv, config.key.category);
+    var sequenceKey = dex.csv.getColumnName(csv, config.key.sequence);
+    var rankKey = dex.csv.getColumnName(csv, config.key.rank);
+
+    var categoryIndex = dex.csv.getColumnNumber(csv, config.key.category);
+    var sequenceIndex = dex.csv.getColumnNumber(csv, config.key.sequence);
+    var rankIndex = dex.csv.getColumnNumber(csv, config.key.rank);
+
+    //dex.console.log("cat", categoryKey, "sequence", sequenceKey, "rank", rankKey);
 
     d3.selectAll(config.parent).selectAll("*").remove();
 
-    var minDimension = Math.min(config.width, config.height);
-    var outer = Math.min(config.width, config.height) / 3;
+    var svg = d3.select(config.parent)
+      .append("svg")
+      .attr("id", config["id"])
+      .attr("class", config["class"])
+      .attr('width', config.width)
+      .attr('height', config.height);
 
-    var inner = Math.max(outer - 20, 10);
-    config.innerRadius = inner;
-    config.outerRadius = outer;
+    var rootG = svg.append('g')
+      .attr('transform', 'translate(' +
+        margin.left + ',' + margin.top + ') ' +
+        config.transform);
 
-    // Calculated attributes.
-    config.nodes.mouseover.d.innerRadius(config.innerRadius).outerRadius(config.outerRadius + 2);
-    config.nodes.mouseout.d.innerRadius(config.innerRadius).outerRadius(config.outerRadius);
-    config.links.mouseover.d.radius(config.innerRadius);
-    config.links.mouseout.d.radius(config.innerRadius);
+    var data = dex.csv.toJson(csv);
+    //dex.console.log("JSON", JSON.stringify(data));
 
-    chart.attr("transform", "translate(" + (config.width / 2) + "," + (config.height / 2) + ")");
+    var dataNest = d3.nest()
+      .key(function (d) {
+        return d[csv.header[categoryIndex]];
+      })
+      .entries(data);
 
-    //console.log("LONGEST: " + longest + ", FONT-SIZE: " + config.label.font.size + ", INNER: " + inner + ", OUTER: " + outer);
-    if (config.debug) {
-      console.log("===== Chord#" + config.id + "." + config.class +
-        " Configuration =====");
-      console.dir(config);
+    data = dataNest;
+
+    var speed = 100;
+
+    var x = d3.scale.linear()
+      .range([0, width]);
+
+    var clippingIndex = d3.scale.linear()
+      .range([0, width]);
+
+    var y = d3.scale.ordinal()
+      .rangeRoundBands([height, 0], .1);
+
+    var xAxis = d3.svg.axis()
+      .scale(x)
+      .tickSize(0)
+      .tickFormat(d3.format("d"))
+      .orient("bottom")
+      .ticks(10);
+
+    var xAxis1 = d3.svg.axis()
+      .scale(x)
+      .tickSize(0)
+      .tickFormat(d3.format("d"))
+      .orient("top")
+      .ticks(10);
+
+    var yAxis = d3.svg.axis()
+      .scale(y)
+      .tickSize(-width)
+      .tickPadding(10)
+      .tickFormat(d3.format("d"))
+      .orient("left");
+
+    var line = d3.svg.line()
+      .x(function (d) {
+        return x(+d[sequenceKey]);
+      })
+      .y(function (d) {
+        return y(+d[rankKey]) + y.rangeBand() / 2;
+      });
+
+    var clip = svg.append("clipPath")
+      .attr("id", "clip")
+      .append("rect")
+      .attr("width", 0)
+      .attr("height", height);
+
+    y.domain(d3.range(d3.min(data, function (series) {
+        return d3.min(series.values, function (d) {
+          return +d[rankKey];
+        });
+      }),
+        d3.max(data, function (series) {
+          return d3.max(series.values, function (d) {
+            return +d[rankKey];
+          });
+        }) + 1)
+        .reverse()
+    );
+
+    x.domain(d3.extent(data[0].values.map(function (d) {
+      return +d[sequenceKey];
+    })));
+
+    clippingIndex.domain([1, data[0].values.length]);
+
+    //set y axis
+    rootG.append("g")
+      .attr("class", "y axis")
+      .call(yAxis)
+      .style('fill', 'none');
+
+    //set bottom axis y
+    rootG.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(" + 0 + "," + height + ")")
+      .call(xAxis);
+
+    //set top axis
+    rootG.append("g")
+      .attr("class", "x axis")
+      .call(xAxis1);
+
+    // Style the axis labels.
+    rootG.selectAll(".axis").filter(".x").selectAll(".tick").select("text")
+      .call(dex.config.configureText, config.sequenceLabel);
+
+    var key = rootG.selectAll(".key")
+      .data(data)
+      .enter().append("g")
+      .attr("class", "key");
+
+    var path = key.append("path")
+      .attr("class", "line")
+      .call(dex.config.configureLine, config.line)
+      .attr("clip-path", function (d) {
+        return "url(#clip)";
+      })
+      .attr("d", function (d) {
+        return line(d.values);
+      })
+      .on("mouseover", function (d) {
+        key.style("opacity", 0.2);
+        key.filter(function (path) {
+          return path.key === d.key;
+        }).style("opacity", 1);
+      })
+      .on("mouseout", function (d) {
+        key.style("opacity", 1);
+      });
+
+    var circleStart = key.append("circle")
+      .call(dex.config.configureCircle, config.circle)
+      .attr("cx", function (d) {
+        return x(+d.values[0][sequenceKey]);
+      })
+      .attr("cy", function (d) {
+        return y(+d.values[0][rankKey]) + y.rangeBand() / 2;
+      })
+      //    .style("fill", function(d) { return d.color; })
+      .on("mouseover", function (d) {
+        key.style("opacity", 0.2);
+        key.filter(function (path) {
+          return path.key === d.key;
+        }).style("opacity", 1);
+      })
+      .on("mouseout", function (d) {
+        key.style("opacity", 1);
+      });
+
+    var circleEnd = key.append("circle")
+      .call(dex.config.configureCircle, config.circle)
+      .attr("cx", function (d) {
+        return x(+d.values[0][sequenceKey]);
+      })
+      .attr("cy", function (d) {
+        return y(+d.values[0][rankKey]) + y.rangeBand() / 2;
+      })
+      .on("mouseover", function (d) {
+        key.style("opacity", 0.2);
+        key.filter(function (path) {
+          return path.key === d.key;
+        }).style("opacity", 1);
+      })
+      .on("mouseout", function (d) {
+        key.style("opacity", 1);
+      });
+
+    // text label for the chart
+    rootG.append("text")
+      .call(dex.config.configureText, config.chartLabel);
+
+    var label = key.append("text")
+      .attr("transform", function (d) {
+        //dex.console.log("D", d, sequenceKey);
+        return "translate(" + (+x(d.values[0][sequenceKey])) +
+          "," + (+y(d.values[0][rankKey]) + y.rangeBand() / 2) + ")";
+      })
+      .call(dex.config.configureText, config.categoryLabel)
+      .on("mouseover", function (d) {
+        key.style("opacity", 0.2);
+        key.filter(function (path) {
+          return path.key === d.key;
+        }).style("opacity", 1);
+      })
+      .on("mouseout", function (d) {
+        key.style("opacity", 1);
+      })
+      .text(function (d) {
+        return " " + d.values[0][rankKey] + ". " + d.key;
+      });
+
+    var xIndex = 1;
+
+    var transition = d3.transition()
+      .duration(speed)
+      .each("start", function start() {
+        label.transition()
+          .duration(speed)
+          .ease('linear')
+          .attr("transform", function (d) {
+            //dex.console.log("D:" + xIndex, d, sequenceKey);
+            return "translate(" + x(+d.values[xIndex][sequenceKey]) + "," + (y(+d.values[xIndex][rankKey]) + y.rangeBand() / 2) + ")";
+          })
+          .text(function (d) {
+            return " " + d.values[xIndex][rankKey] + ". " + d.key;
+          });
+
+        circleEnd.transition()
+          .duration(speed)
+          .ease('linear')
+          .attr("cx", function (d) {
+            return x(+(d.values[xIndex][sequenceKey]));
+          })
+          .attr("cy", function (d) {
+            return y(+(d.values[xIndex][rankKey])) + y.rangeBand() / 2;
+          });
+
+        clip.transition()
+          .duration(speed)
+          .ease('linear')
+          .attr("width", clippingIndex(xIndex + 1))
+          .attr("height", height);
+
+        xIndex += 1;
+
+        if (xIndex !== data[0].values.length) transition = transition.transition().each("start", start);
+
+      });
+    // Allow method chaining
+    return chart;
+  };
+
+  $(document).ready(function () {
+    // Make the entire chart draggable.
+    if (chart.config.draggable) {
+      $(chart.config.parent).draggable();
+    }
+  });
+
+  return chart;
+};
+
+module.exports = bumpchart;
+},{}],17:[function(require,module,exports){
+var chord = function (userConfig) {
+  d3 = dex.charts.d3.d3v3;
+  var chart;
+
+  var defaults = {
+    // The parent container of this chart.
+    "parent": "#ChordParent",
+    // Set these when you need to CSS style components independently.
+    "id": "ChordId",
+    "class": "ChordClass",
+    "resizable": true,
+    // Our data...
+    "csv": {
+      // Give folks without data something to look at anyhow.
+      "header": ["X", "Y", "Z"],
+      "data": [
+        [0, 0, 0],
+        [1, 1, 1],
+        [2, 2, 2]
+      ]
+    },
+    "width": "100%",
+    "height": "100%",
+    "margin": {
+      "left": 50,
+      "right": 50,
+      "top": 50,
+      "bottom": 50
+    },
+    "transform": "",
+    "draggable" : false,
+    "padding": 0.05,
+    "nodes": {
+      "mouseout": dex.config.link({
+        "stroke.color": "black",
+        //"stroke.dasharray": "5 5",
+        "stroke.width": 0,
+        "fill.fillColor": function (d, i) {
+          //dex.console.log("COLORD", d);
+          return (chart.config.color(chart.config.chordData.header[d.index]));
+        },
+        "fill.fillOpacity": 0.5,
+        "fill.fill": "none",
+        "d": d3.svg.arc(),
+        "transform": ""
+      }),
+      "mouseover": dex.config.link({
+        "stroke.color": "white",
+        //"stroke.dasharray": "5 5",
+        "stroke.width": 2,
+        "fill.fillColor": function (d, i) {
+          //dex.console.log("D", d)
+          return (chart.config.color(chart.config.chordData.header[d.index]));
+        },
+        "fill.fillOpacity": 1,
+        "fill.fill": "none",
+        "d": d3.svg.arc(),
+        "transform": ""
+      })
+    },
+    "links": {
+      "mouseout": dex.config.link({
+        "stroke.color": "white",
+        "stroke.dasharray": "",
+        "stroke.width": 0,
+        "fill.fillColor": function (d, i) {
+          return (chart.config.color(chart.config.chordData.header[d.source.index]));
+        },
+        "fill.fillOpacity": 0.2,
+        "fill.fill": "none",
+        "d": d3.svg.chord(),
+        "transform": ""
+      }),
+      "mouseover": dex.config.link({
+        "stroke.color": "white",
+        "stroke.dasharray": "",
+        "stroke.width": 1,
+        "fill.fillColor": function (d, i) {
+          return (chart.config.color(chart.config.chordData.header[d.source.index]));
+        },
+        "transform": "",
+        "fill.fillOpacity": 1,
+        "fill.fill": "none",
+        "d": d3.svg.chord()
+      }),
+    },
+    "color": d3.scale.category20c(),
+    "innerRadius": "auto",
+    "outerRadius": "auto",
+    "tick.start.x": 1,
+    "tick.start.y": 0,
+    "tick.end.x": 5,
+    "tick.end.y": 0,
+    "tick.padding": 10,
+    "tick.stroke": dex.config.stroke({
+      "width": 2,
+      "color": "black"
+    }),
+    "title": dex.config.text(),
+    "label": dex.config.text()
+  };
+
+  chart = new dex.component(userConfig, defaults);
+
+  chart.render = function render() {
+    d3 = dex.charts.d3.d3v3;
+    chart.resize();
+    dex.config.apply(chart);
+    return chart;
+  };
+
+  chart.update = function () {
+    d3 = dex.charts.d3.d3v3;
+    var chart = this;
+    var config = chart.config;
+    var csv = config.csv;
+    var margin = config.margin;
+    var width = config.width - margin.left - margin.right;
+    var height = config.height - margin.top - margin.bottom;
+
+    d3.selectAll(config.parent).selectAll("*").remove();
+
+    var outer;
+    var inner;
+    if (config.outerRadius == "auto") {
+      outer = Math.min(width, height) / 2;
+      inner = Math.max(outer - 20, 10);
+    }
+    else {
+      outer = config.outerRadius;
+      inner = config.innerRadius;
     }
 
-    var chartContainer = d3.select(config.parent)
-      .append("g")
-      .attr("class", config["id"])
+    // Calculated attributes.
+    config.nodes.mouseover.d.innerRadius(inner).outerRadius(outer + 2);
+    config.nodes.mouseout.d.innerRadius(inner).outerRadius(outer);
+    config.links.mouseover.d.radius(inner);
+    config.links.mouseout.d.radius(inner);
+
+    var svg = d3.select(config.parent)
+      .append("svg")
       .attr("id", config["id"])
-      .attr("transform", config.transform);
+      .attr("class", config["class"])
+      .attr("width", config.width)
+      .attr("height", config.height);
+
+    var rootG = svg.append("g")
+      .attr("transform", "translate(" +
+        (margin.left + (width / 2)) + "," +
+        (margin.top + (height / 2)) + ") " +
+        config.transform);
 
     chordData = dex.csv.getConnectionMatrix(csv);
-    //dex.console.log("Connection Matrix:", chordData);
-    //dex.console.log("CSV", csv);
+    config.chordData = chordData;
+
     var chord = d3.layout.chord()
       .padding(config.padding)
       .sortSubgroups(d3.descending)
       .matrix(chordData.connections);
 
-    //dex.console.log("LINKS", config.links);
-
-    chartContainer.append("g")
+    rootG.append("g")
       .attr("class", "arcs")
       .selectAll("path")
       .data(chord.groups)
@@ -1308,32 +1474,26 @@ var chord = function (userConfig) {
       .on("mouseover", function (activeChord) {
         d3.select(this)
           .call(dex.config.configureLink, config.nodes.mouseover);
-        //dex.console.log("F", activeChord);
-        chartContainer.selectAll("g.chord path")
+
+        rootG.selectAll("g.chord path")
           .filter(function (d) {
-            //return false;
-            //dex.console.log("ACTIVE D", d);
+
             return d.source.index == activeChord.index || d.target.index == activeChord.index;
           })
-          //.call("opacity", config.links.mouseover.fill.fillOpacity);
           .call(dex.config.configureLink, config.links.mouseover);
       })
       .on("mouseout", function (inactiveChord) {
         d3.select(this)
           .call(dex.config.configureLink, config.nodes.mouseout)
         //dex.console.log("INACTIVE", inactiveChord);
-        chartContainer.selectAll("g.chord path")
+        rootG.selectAll("g.chord path")
           .filter(function (d) {
-            //return false;
-            //dex.console.log("INACTIVE D", d);
             return d.source.index == inactiveChord.index || d.target.index == inactiveChord.index;
           })
           .call(dex.config.configureLink, config.links.mouseout);
-        //.style("opacity", config.links.mouseout.fill.fillOpacity);
       });
 
-    // REM: Used to be svg.
-    var ticks = chartContainer.append("g")
+    var ticks = rootG.append("g")
       .attr("id", "ChordTicks")
       .selectAll("g")
       .data(chord.groups)
@@ -1349,23 +1509,14 @@ var chord = function (userConfig) {
         var endAngle = this.parentNode.__data__.endAngle;
         var midAngle = startAngle + (endAngle - startAngle) / 2.0;
         return "rotate(" + (midAngle * 180 / Math.PI - 90) + ")"
-          + "translate(" + config.outerRadius + ",0)";
-        //return "translate(" + config.xoffset + "," + config.yoffset + ")rotate(" + (midAngle * 180 / Math.PI - 90) + ")"
-        //    + "translate(" + config.outerRadius + ",0)";
-        //return "translate(" + config.xoffset + "," + config.yoffset + ")rotate(" + (d.angle * 180 / Math.PI - 90) + ")"
-        //    + "translate(" + config.outerRadius + ",0)";
+          + "translate(" + outer + ",0)";
       });
 
     ticks.append("line")
       .call(dex.config.configureLine, config.tick);
-    //.attr("x1", 1)
-    //.attr("y1", 0)
-    //.attr("x2", config.tickLength)
-    //.attr("y2", 0)
-    //.attr("stroke-width", config.strokeWidth)
-    //.style("stroke", "#000");
 
     ticks.append("text")
+      //.call(dex.config.configureText, config.label)
       .attr("x", config.tick.padding + (config.tick.padding / 4))
       .attr("dy", ".35em")
       .attr("font-size", config.label.font.size)
@@ -1380,7 +1531,7 @@ var chord = function (userConfig) {
         return d.label;
       });
 
-    chartContainer.append("g")
+    rootG.append("g")
       .attr("class", "chord")
       .selectAll("path")
       .data(chord.chords)
@@ -1395,7 +1546,7 @@ var chord = function (userConfig) {
           .call(dex.config.configureLink, config.links.mouseout);
       });
 
-    var chartTitle = chartContainer.append("text").call(dex.config.configureText, config.title,
+    var chartTitle = rootG.append("text").call(dex.config.configureText, config.title,
       config.title.text);
 
     /** Returns an array of tick angles and labels, given a group. */
@@ -1410,29 +1561,39 @@ var chord = function (userConfig) {
       });
     }
 
+    dex.config.apply(chart);
+
     // Allow method chaining
     return chart;
   };
 
   $(document).ready(function () {
     // Make the entire chart draggable.
-    //$(chart.config.parent).draggable();
+    if (chart.config.draggable) {
+      $(chart.config.parent).draggable();
+    }
   });
 
   return chart;
 }
 
 module.exports = chord;
-},{}],13:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 var clusteredforce = function (userConfig) {
   d3 = dex.charts.d3.d3v3;
-  var defaults =
-  {
+  var defaults = {
     'parent': '#ClusteredForceParent',
-    'id': "ClusteredForce",
-    'class': "ClusteredForce",
+    'id': "ClusteredForceId",
+    'class': "ClusteredForceClass",
     'height': "100%",
     'width': "100%",
+    'resizable': true,
+    'margin': {
+      'left': 100,
+      'right': 100,
+      'top': 50,
+      'bottom': 50
+    },
     'csv': {
       'header': ["X", "Y"],
       'data': [
@@ -1505,38 +1666,16 @@ var clusteredforce = function (userConfig) {
 
   chart.render = function () {
     d3 = dex.charts.d3.d3v3;
-    window.onresize = this.resize;
-    chart.resize();
-  };
-
-  chart.resize = function () {
-    d3 = dex.charts.d3.d3v3;
-    d3.selectAll("#" + chart.config.id).remove();
-    var width = d3.select(chart.config.parent).property("clientWidth");
-    var height = d3.select(chart.config.parent).property("clientHeight");
-    chart.attr("width", width).attr("height", height).update();
+    return chart.resize();
   };
 
   chart.update = function () {
     d3 = dex.charts.d3.d3v3;
     var config = chart.config;
-
+    var margin = config.margin;
     var csv = config.csv;
 
     var radius = d3.scale.sqrt().range([0, 12]);
-
-    /*
-    var minValue, maxValue;
-
-    if (!config.scaleColumns) {
-      minValue = dex.matrix.min(csv.data, numericIndices[0]);
-      maxValue = dex.matrix.max(csv.data, numericIndices[0]);
-      for (i = 0; i < numericIndices.length; i++) {
-        minValue = Math.min(minValue, dex.matrix.min(csv.data, numericIndices[i]));
-        maxValue = Math.max(maxValue, dex.matric.max(csv.data, numericIndices[i]));
-      }
-    }
-*/
 
     var nodes = [];
 
@@ -1545,16 +1684,19 @@ var clusteredforce = function (userConfig) {
     var max = null;
 
     config.groups.forEach(function (group) {
-      "use strict";
+      var valIndex = dex.csv.getColumnNumber(csv, group.value);
+      var catIndex = dex.csv.getColumnNumber(csv, group.category);
+      var labelIndex = dex.csv.getColumnNumber(csv, group.label);
+
       config.csv.data.forEach(function (row) {
-        var value = +(row[group.value]);
+        var value = +(row[valIndex]);
         nodes.push({
-          'category': row[group.category],
+          'category': row[catIndex],
           'value': +value,
-          'color' : config.color(row[group.category]),
-          'text': "<table><tr><td>Label</td></td><td>" + row[group.label] +
-          "</td></tr><tr><td>Category</td><td>" + row[group.category] + "</td></tr>" +
-          "<tr><td>Value</td><td>" + row[group.value] +
+          'color': config.color(row[catIndex]),
+          'text': "<table><tr><td>Label</td></td><td>" + row[labelIndex] +
+          "</td></tr><tr><td>Category</td><td>" + row[catIndex] + "</td></tr>" +
+          "<tr><td>Value</td><td>" + row[valIndex] +
           "</td></tr></table>"
         });
         if (min == null || min > +value) {
@@ -1572,11 +1714,10 @@ var clusteredforce = function (userConfig) {
       .range([config.minRadius, config.maxRadius]);
 
     nodes.forEach(function (node) {
-      "use strict";
       node.radius = radiusScale(+node.value);
     });
 
-    dex.console.log("NODES", nodes, "VALUES", values, "EXTENTS", min, max);
+    //dex.console.log("NODES", nodes, "VALUES", values, "EXTENTS", min, max);
 
     force = d3.layout.force()
       .nodes(nodes)
@@ -1586,17 +1727,24 @@ var clusteredforce = function (userConfig) {
       .on("tick", tick)
       .start();
 
-    var chartContainer = d3.select(config.parent);
+    d3.selectAll(config.parent).selectAll("*").remove();
 
-    chartContainer.append('defs')
-      .attr('id', 'gradients');
-
-    chartContainer.append("g")
+    var svg = d3.select(config.parent)
+      .append("svg")
       .attr("id", config["id"])
       .attr("class", config["class"])
+      .attr('width', config.width)
+      .attr('height', config.height);
+
+    svg.append('defs')
+      .attr('id', 'gradients');
+
+    var rootG = svg.append('g')
+      .attr('transform', 'translate(' +
+        margin.left + ',' + margin.top + ')')
       .attr("transform", config.transform);
 
-    var circle = chartContainer.selectAll("circle")
+    var circle = rootG.selectAll("circle")
       .data(nodes)
       .enter().append("circle")
       .call(dex.config.configureCircle, config.circle)
@@ -1707,16 +1855,18 @@ var clusteredforce = function (userConfig) {
 };
 
 module.exports = clusteredforce;
-},{}],14:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 var dendrogram = function Dendrogram(userConfig) {
   d3 = dex.charts.d3.d3v3;
+  var chart;
+
   var defaults =
   {
     // The parent container of this chart.
-    'parent': null,
+    'parent': 'DendrogramParent',
     // Set these  when you need to CSS style components independently.
-    'id': 'Dendrogram',
-    'class': 'Dendrogram',
+    'id': 'DendrogramId',
+    'class': 'DendrogramClass',
     'resizable': true,
     'margin': {
       'top': 10,
@@ -1724,6 +1874,7 @@ var dendrogram = function Dendrogram(userConfig) {
       'left': 10,
       'right': 10
     },
+    'transform' : '',
     // diagonal, elbow
     'connectionType': 'diagonal',
     // Our data...
@@ -1747,7 +1898,6 @@ var dendrogram = function Dendrogram(userConfig) {
         'stroke': dex.config.stroke()
       }
     },
-    //'transform': 'translate(20,0)',
     'root': {
       'name': "ROOT",
       'category': "ROOT"
@@ -1802,50 +1952,28 @@ var dendrogram = function Dendrogram(userConfig) {
     })
   };
 
-  var chart = new dex.component(userConfig, defaults);
+  chart = new dex.component(userConfig, defaults);
 
   chart.render = function render() {
     d3 = dex.charts.d3.d3v3;
-    var chart = this;
-    window.onresize = chart.resize;
     chart.resize();
-  };
-
-  chart.resize = function resize() {
-    d3 = dex.charts.d3.d3v3;
-    dex.console.log("PARENT: '" + chart.config.parent + "'");
-    if (chart.config.resizable) {
-      var width = $("" + chart.config.parent).width();
-      var height = $("" + chart.config.parent).height();
-      dex.console.log("RESIZE: " + width + "x" + height);
-      chart.attr("width", width)
-        .attr("height", height)
-        .update();
-    }
-    else {
-      chart.update();
-    }
+    dex.config.apply(chart);
+    return chart;
   };
 
   chart.update = function update() {
     d3 = dex.charts.d3.d3v3;
     var chart = this;
     var config = chart.config;
-
+    var margin = config.margin;
     var csv = config.csv;
     var json;
+    var width = config.width - margin.left - margin.right;
+    var height = config.height - margin.top - margin.bottom;
 
     d3.selectAll(config.parent).selectAll("*").remove();
 
-    if (config.debug) {
-      console.log("===== Dendrogram Configuration =====");
-      console.dir(config);
-    }
-
     var i = 0, root;
-
-    var width = config.width - config.margin.left - config.margin.right;
-    var height = config.height - config.margin.top - config.margin.bottom;
 
     var tree = d3.layout.tree()
       .size([height, width]);
@@ -1877,34 +2005,17 @@ var dendrogram = function Dendrogram(userConfig) {
         });
     }
 
-    var chartContainer = d3.select(config.parent)
-      .append("g")
-      .attr("transform", "translate(" + config.margin.left +
-        ", " + config.margin.top + ")")
-      .append("g")
+    var svg = d3.select(config.parent)
+      .append("svg")
       .attr("id", config["id"])
       .attr("class", config["class"])
-      .attr("transform", config.transform);
-/*
-    var gradient = chartContainer.append("defs")
-      .append("linearGradient")
-      .attr("id", "gradient")
-      .attr("x1", "0%")
-      .attr("y1", "0%")
-      .attr("x2", "100%")
-      .attr("y2", "100%")
-      .attr("spreadMethod", "pad");
+      .attr('width', config.width)
+      .attr('height', config.height);
 
-    gradient.append("stop")
-      .attr("offset", "0%")
-      .attr("stop-color", "#0c0")
-      .attr("stop-opacity", 1);
-
-    gradient.append("stop")
-      .attr("offset", "100%")
-      .attr("stop-color", "#c00")
-      .attr("stop-opacity", 1);
-*/
+    var rootG = svg.append('g')
+      .attr('transform', 'translate(' +
+        margin.left + ',' + margin.top + ') ' +
+        config.transform);
 
     json =
     {
@@ -1991,7 +2102,7 @@ var dendrogram = function Dendrogram(userConfig) {
       });
 
       // Update the nodes…
-      var node = chartContainer.selectAll("g.node")
+      var node = rootG.selectAll("g.node")
         .data(nodes, function (d) {
           return d.id || (d.id = ++i);
         });
@@ -2066,7 +2177,7 @@ var dendrogram = function Dendrogram(userConfig) {
         .style("fill-opacity", 1e-6);
 
       // Update the links…
-      var link = chartContainer.selectAll("path.link")
+      var link = rootG.selectAll("path.link")
         .data(layout.links(nodes), function (d) {
           return d.target.id;
         });
@@ -2127,6 +2238,9 @@ var dendrogram = function Dendrogram(userConfig) {
         d.children = null;
       }
     }
+
+    dex.config.apply(chart);
+    return chart;
   };
 
   $(document).ready(function () {
@@ -2138,7 +2252,7 @@ var dendrogram = function Dendrogram(userConfig) {
 };
 
 module.exports = dendrogram;
-},{}],15:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 var horizontallegend = function (userConfig) {
   var defaults = {
     'parent'     : null,
@@ -2246,37 +2360,22 @@ var horizontallegend = function (userConfig) {
 };
 
 module.exports = horizontallegend;
-},{}],16:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 var motionbarchart = function (userConfig) {
   d3 = dex.charts.d3.d3v3;
-  var defaultColor = d3.scale.category10();
-
-  var csv = {
-    'header': ['name', 'color', 'time', 'x', 'y', 'size'],
-    'data': []
-  }
-
-  var i = 0;
-  for (var time = 1800; time < 1810; time += 1) {
-    for (var color = 1; color < 4; color++) {
-      csv.data.push(["name-" + color, color, time,
-        i * color, i * i * color, i * i * i * color]);
-    }
-    i += 1;
-  }
+  var chart;
 
   var color = d3.scale.category20c();
 
-  var defaults =
-  {
+  var defaults = {
     // The parent container of this chart.
-    'parent': null,
+    'parent': '#MotionBarChartParent',
     // Set these when you need to CSS style components independently.
-    'id': 'MotionBarhart',
-    'class': 'MotionBarChart',
+    'id': 'MotionBarhartId',
+    'class': 'MotionBarChartClass',
     // Our data...
-    'csv': csv,
-
+    'csv': undefined,
+    'resizable': true,
     // Tells us which columns represent what.
     'index': {
       'name': 0,
@@ -2285,13 +2384,13 @@ var motionbarchart = function (userConfig) {
       'y': 2
     },
     // Chart dimensions.
-    'width': 600,
-    'height': 400,
+    'width': '100%',
+    'height': '100%',
     'margin': {
-      top: 20,
+      top: 50,
       right: 120,
-      bottom: 80,
-      left: 50
+      bottom: 180,
+      left: 150
     },
 
     'bar': dex.config.rectangle({
@@ -2322,9 +2421,9 @@ var motionbarchart = function (userConfig) {
     'label.y': function (d) {
       return chart.config.margin.top;
     },
-    'label.dy' : '.50em',
+    'label.dy': '.50em',
     'label.x': function (d) {
-      return chart.config.margin.left + (chart.config.width / 2);
+      return (chart.config.width - chart.config.margin.left - chart.config.margin.right) / 2;
     },
 
     'transform': '',
@@ -2335,9 +2434,11 @@ var motionbarchart = function (userConfig) {
       'orient': 'bottom',
       'label': dex.config.text({
         'anchor': 'start',
-        'writingMode' : 'tb',
-        'dx' : function(d) { return chart.config.bar.width - (chart.config.xaxis.label.font.size / 2); },
-        'dy' : '.5em'
+        'writingMode': 'tb',
+        'dx': function (d) {
+          return (chart.config.bar.width) / 2;
+        },
+        'dy': '.5em'
       }),
       'tick.stroke.color': 'black',
       'tick.stroke.width': 1,
@@ -2352,7 +2453,7 @@ var motionbarchart = function (userConfig) {
       'orient': 'left',
       'label': dex.config.text({
         'anchor': 'end',
-        'dx' : '-.5em' //function(d) { return chart.config.margin.left; },
+        'dx': '-.5em' //function(d) { return chart.config.margin.left; },
       }),
       'title': dex.config.text(),
       'tick.stroke.width': 1,
@@ -2365,42 +2466,37 @@ var motionbarchart = function (userConfig) {
   };
 
   var chart = new dex.component(userConfig, defaults);
-  var config = chart.config;
 
   chart.render = function render() {
     d3 = dex.charts.d3.d3v3;
-    window.onresize = this.resize;
-    this.resize();
-  };
-
-  chart.resize = function resize() {
-    d3 = dex.charts.d3.d3v3;
-    var width = d3.select(chart.config.parent).property("clientWidth");
-    var height = d3.select(chart.config.parent).property("clientHeight");
-    chart
-      .attr("width", width - chart.config.margin.left - chart.config.margin.right)
-      .attr("height", height - chart.config.margin.top - chart.config.margin.bottom)
-      .update();
+    return chart.resize();
   };
 
   chart.update = function update() {
     d3 = dex.charts.d3.d3v3;
-    // If we need to call super:
-    //DexComponent.prototype.update.call(this);
-    var chart = this.chart;
-    var config = this.config;
+    var config = chart.config;
+    var margin = config.margin;
     var csv = config.csv;
 
-    d3.selectAll('#' + config.id).remove();
+    var width = config.width - margin.left - margin.right;
+    var height = config.height - margin.top - margin.bottom;
+
+    d3.selectAll(config.parent).selectAll('*').remove();
 
     var keyMap = {};
 
+    var nameIndex = dex.csv.getColumnNumber(csv, config.index.name);
+    var colorIndex = dex.csv.getColumnNumber(csv, config.index.color);
+    var timeIndex = dex.csv.getColumnNumber(csv, config.index.time);
+    var yIndex = dex.csv.getColumnNumber(csv, config.index.y);
+    var sizeIndex = dex.csv.getColumnNumber(csv, config.index.size);
+
     csv.data.forEach(function (row) {
-      var curName = row[config.index.name];
-      var curColor = row[config.index.color];
-      var curTime = row[config.index.time];
-      var curY = row[config.index.y];
-      var curSize = +row[config.index.size];
+      var curName = row[nameIndex];
+      var curColor = row[colorIndex];
+      var curTime = row[timeIndex];
+      var curY = row[yIndex];
+      var curSize = +row[sizeIndex];
 
       if (!keyMap[curName]) {
         keyMap[curName] = {
@@ -2419,20 +2515,20 @@ var motionbarchart = function (userConfig) {
 
     var uniques = dex.matrix.uniques(csv.data);
 
-    var timeExtents = dex.matrix.extent(csv.data, [config.index.time]);
-    //var xExtents = [0, uniques[config.index.name].length-1];
-    var yExtents = dex.matrix.extent(csv.data, [config.index.y]);
+    var timeExtents = dex.matrix.extent(csv.data, [timeIndex]);
+    //var xExtents = [0, uniques[nameIndex].length-1];
+    var yExtents = dex.matrix.extent(csv.data, [yIndex]);
 
-    //dex.console.log("EXTENTS: Y", yExtents, "UNIQUES", uniques[config.index.name]);
+    //dex.console.log("EXTENTS: Y", yExtents, "UNIQUES", uniques[nameIndex]);
 
     // Various scales. These domains make assumptions of data, naturally.
     var xScale = d3.scale.ordinal()
-      .domain(uniques[config.index.name].sort())
-      .rangePoints([0, config.width]);
+      .domain(uniques[nameIndex].sort())
+      .rangePoints([0, width]);
 
     //  d3.scale.linear().domain(xExtents).range([0, width - 60]);
     var yScale = dex.config.createScale(config.yaxis.scale)
-      .domain([0, yExtents[1]]).range([config.height, 0]);
+      .domain([0, yExtents[1]]).range([height, 0]);
 
     // The x & y axes.
     var xAxis = dex.config.createAxis(config.xaxis)
@@ -2442,48 +2538,54 @@ var motionbarchart = function (userConfig) {
       .scale(yScale);
 
     var svg = d3.select(config.parent)
-      .append("g")
+      .append("svg")
       .attr("id", config["id"])
       .attr("class", config["class"])
-      .attr("height", config.height)
-      .attr("width", config.width)
-      .attr("transform", "translate(" + config.margin.left +
-        ", " + config.margin.top + ")")
+      .attr('width', config.width)
+      .attr('height', config.height);
+
+    var rootG = svg
+      .append('g')
+      .attr('transform', 'translate(' +
+        margin.left + ',' + margin.top + ') ' +
+        config.transform);
 
     // Add the x-axis.
-    svg.append("g")
+    rootG.append("g")
       .attr("class", "xaxis")
-      .attr("transform", "translate(0," + config.height + ")")
+      .attr('width', width)
+      .attr('height', height)
+      .attr("transform", "translate(0," + height + ")")
       .call(xAxis);
 
     // Add the y-axis.
-    svg.append("g")
+    rootG.append("g")
       .attr("class", "yaxis")
       .call(yAxis);
 
-    var xticks = svg.selectAll(".xaxis .tick");
+    var xticks = rootG.selectAll(".xaxis .tick");
 
     var xtickLines = xticks.selectAll("line")
       .call(dex.config.configureStroke, config.xaxis.tick.stroke)
       .call(dex.config.configureFill, config.xaxis.tick.fill);
 
-    var yticks = svg.selectAll(".yaxis .tick");
+    var yticks = rootG.selectAll(".yaxis .tick");
 
     var yTickLines = yticks.selectAll("line")
       .call(dex.config.configureStroke, config.yaxis.tick.stroke)
       .call(dex.config.configureFill, config.yaxis.tick.fill);
 
-    svg.selectAll(".xaxis path")
+    rootG.selectAll(".xaxis path")
       .call(dex.config.configureStroke, config.xaxis.axisLine.stroke)
       .call(dex.config.configureFill, config.xaxis.axisLine.fill);
 
-    svg.selectAll(".yaxis path")
+    rootG.selectAll(".yaxis path")
       .call(dex.config.configureStroke, config.yaxis.axisLine.stroke)
       .call(dex.config.configureFill, config.yaxis.axisLine.fill);
 
     //var xTickLabels = xticks
     //  .append("text")
-    //  .text("P" + config.csv.header[config.index.name]);
+    //  .text("P" + config.csv.header[nameIndex]);
 
     //dex.console.log("XTICK-LABELS", xTickLabels);
     xticks.selectAll("text")
@@ -2493,16 +2595,16 @@ var motionbarchart = function (userConfig) {
     //  .call(dex.config.configureText, config.xaxis.label);
 
     // Add a y-axis label.
-    svg.append("text")
+    rootG.append("text")
       .attr("class", "yLabel")
       .call(dex.config.configureText, config.yaxis.title)
-      .text(config.csv.header[config.index.y]);
+      .text(config.csv.header[yIndex]);
 
     yticks.selectAll("text")
       .call(dex.config.configureText, config.yaxis.label);
 
     // Add the year label; the value is set on transition.
-    var label = svg.append("text")
+    var label = rootG.append("text")
       .attr("class", "timeLabel")
       .attr("text-anchor", "end")
       .call(dex.config.configureText, config.label)
@@ -2517,7 +2619,7 @@ var motionbarchart = function (userConfig) {
     });
 
     // Add a bar per nation. Initialize the data at min year value, and set the colors.
-    var bars = svg.append("g")
+    var bars = rootG.append("g")
       .attr("class", "bars")
       .selectAll(".bar")
       .data(interpolateData(timeExtents[0]))
@@ -2541,7 +2643,7 @@ var motionbarchart = function (userConfig) {
     // Add an overlay for the year label.
     var box = label.node().getBBox();
 
-    var overlay = svg.append("rect")
+    var overlay = rootG.append("rect")
       .attr("class", "overlay")
       .attr("x", box.x)
       .attr("y", box.y)
@@ -2553,7 +2655,7 @@ var motionbarchart = function (userConfig) {
       .on("mouseover", enableInteraction);
 
     // Start a transition that interpolates the data based on year.
-    svg.transition()
+    rootG.transition()
       .duration(config.duration)
       .ease("linear")
       .tween("year", tweenYear)
@@ -2561,7 +2663,7 @@ var motionbarchart = function (userConfig) {
 
     // Positions the dots based on data.
     function position(bar) {
-      var barWidth = Math.floor(config.width / bar.size() - 8);
+      var barWidth = Math.floor(width / bar.size() - 8);
 
       bar
         .attr("x", function (d, i) {
@@ -2590,7 +2692,7 @@ var motionbarchart = function (userConfig) {
         .clamp(true);
 
       // Cancel the current transition, if any.
-      svg.transition().duration(0);
+      rootG.transition().duration(0);
 
       overlay
         .on("mouseover", mouseover)
@@ -2679,1499 +2781,24 @@ var motionbarchart = function (userConfig) {
       },
       track: true
     });
-
-    // Make the entire chart draggable.
-    $(chart.config.parent).draggable();
-    $(chart.config.parent).find("rect").draggable();
   });
 
   return chart;
 };
 
 module.exports = motionbarchart;
-},{}],17:[function(require,module,exports){
-var motionchart = function (userConfig) {
-  d3 = dex.charts.d3.d3v3;
-  var defaultColor = d3.scale.category20();
-
-  var csv = {
-    'header' : ['name', 'color', 'time', 'x', 'y', 'size'],
-    'data'   : []
-  }
-
-  var i = 0;
-  for (var time = 1800; time < 1810; time += 1) {
-    for (var color = 1; color < 4; color++) {
-      csv.data.push(["name-" + color, color, time,
-                     i * color, i * i * color, i * i * i * color]);
-    }
-    i += 1;
-  }
-
-  var defaults =
-  {
-    // The parent container of this chart.
-    'parent' : null,
-    // Set these when you need to CSS style components independently.
-    'id'     : 'MotionChart',
-    'class'  : 'MotionChart',
-    // Our data...
-    'csv'    : csv,
-
-    // Tells us which columns represent what.
-    'index'  : {
-      'name'  : 0,
-      'color' : 1,
-      'time'  : 2,
-      'x'     : 3,
-      'y'     : 4,
-      'size'  : 5
-    },
-    // Chart dimensions.
-    'width'  : 600,
-    'height' : 400,
-    'margin' : {top : 50, right : 50, bottom : 50, left : 50},
-
-    // Configuration for drawing the data-circles.
-    'circle' : dex.config.circle({
-      'colorscale'       : d3.scale.category10(),
-      //'stroke.dasharray' : "1 1",
-      'stroke.width'     : 1,
-      'stroke.color'     : 'black',
-      'fill.fillColor'   : function (d) {
-        //dex.console.log("color(", d, ")=");
-        return chart.config.circle.colorscale(d.name);
-      },
-      'fill.fillOpacity' : .4,
-      'sizeScale.type'   : 'linear',
-      'events'           : {
-        'mouseover' : function () {
-          d3.select(this)
-            .style("stroke", 'red')
-            .style("stroke-width", 4)
-            .style("fill-opacity", 1);
-        },
-        'mouseout'  : function () {
-          d3.select(this)
-            .style("stroke", chart.config.circle.stroke.color)
-            .style("stroke-width", chart.config.circle.stroke.width)
-            .style("opacity", chart.config.circle.fill.fillOpacity);
-        }
-      }
-    }),
-
-    // Main label configuration
-    'label.font.size'        : 128,
-    'label.fill.fillColor'   : 'steelblue',
-    'label.fill.fillOpacity' : 0.4,
-    'label.y'                : function (d) {
-      return chart.config.height * .5;
-    },
-    'label.x'                : function (d) {
-      return chart.config.width * .8;
-    },
-
-    'transform' : 'translate(0,0)',
-    'duration'  : 10000,
-
-    'xaxis' : dex.config.axis({
-      'scale.type'              : 'linear',
-      'orient'                  : 'bottom',
-      'label': dex.config.text({
-        'anchor': 'middle',
-        'writingMode' : 'lr',
-        'dx' : 0,
-        'dy' : '1.5em'
-      }),
-      'title': dex.config.text({
-        'anchor' : 'middle',
-        'font.size' : '16',
-        'x': function (d) {
-          return (chart.config.width - chart.config.margin.left) / 2; },
-        'y': function(d) {
-          return chart.config.height - chart.config.margin.bottom - 12;
-        }
-      }),
-      'tick.stroke.width'       : 1,
-      'tick.fill.fillColor'     : 'none',
-      'axisLine.stroke.color'   : 'black',
-      'axisLine.stroke.width'   : 1,
-      'axisLine.fill.fillColor' : 'none'
-    }),
-    'yaxis' : dex.config.axis({
-      'scale.type'              : 'linear',
-      'orient'                  : 'left',
-      'label': dex.config.text({
-        'anchor': 'middle',
-        'writingMode' : 'tb',
-        'dx' : '-1em',
-        'dy' : '-.5em'
-      }),
-      'title': dex.config.text({
-        'anchor' : 'start',
-        'writingMode' : 'tb',
-        //'transform' : 'rotate(90)',
-        'font.size' : '16',
-        'x': function (d) { return 0; },
-        'dx' : '1em',
-        'y': function(d) {
-          return config.margin.top;
-        },
-        'dy' : '2em'
-      }),
-      'tick.stroke.width'       : 3,
-      'tick.fill.fillColor'     : 'red',
-      'axisLine.stroke.color'   : 'black',
-      'axisLine.stroke.width'   : 1,
-      'axisLine.fill.fillColor' : 'none'
-    })
-  };
-
-  var chart = new dex.component(userConfig, defaults);
-  var config = chart.config;
-
-  chart.render = function render() {
-    d3 = dex.charts.d3.d3v3;
-    window.onresize = this.resize;
-    this.resize();
-  };
-
-  chart.resize = function resize() {
-    d3 = dex.charts.d3.d3v3;
-    var width = d3.select(chart.config.parent).property("clientWidth");
-    var height = d3.select(chart.config.parent).property("clientHeight");
-    chart
-      .attr("width", width)
-      .attr("height", height)
-      .update();
-  };
-
-  chart.update = function update() {
-    d3 = dex.charts.d3.d3v3;
-    // If we need to call super:
-    //DexComponent.prototype.update.call(this);
-    var chart = this.chart;
-    var config = this.config;
-    var csv = config.csv;
-
-    d3.selectAll('#' + config.id).remove();
-
-    if (config.debug) {
-      console.log("===== Motion Chart Configuration =====");
-      console.dir(config);
-    }
-
-    var keyMap = {};
-
-    csv.data.forEach(function (row) {
-      var curName = row[config.index.name];
-      var curColor = row[config.index.color];
-      var curTime = row[config.index.time];
-      var curX = row[config.index.x];
-      var curY = row[config.index.y];
-      var curSize = +row[config.index.size];
-
-      if (!keyMap[curName]) {
-        keyMap[curName] = {
-          'name'  : curName,
-          'color' : curColor,
-          'time'  : curTime,
-          'x'     : [[curTime, curX]],
-          'y'     : [[curTime, curY]],
-          'size'  : [[curTime, curSize]]
-        };
-      }
-      else {
-        keyMap[curName].x.push([curTime, curX]);
-        keyMap[curName].y.push([curTime, curY]);
-        keyMap[curName].size.push([curTime, curSize]);
-      }
-    });
-
-    // Various accessors that specify the four dimensions of data to visualize.
-    function key(d) {
-      return d.name;
-    }
-
-    function color(d) {
-      return d.color;
-    }
-
-    function x(d) {
-      return d.x;
-    }
-
-    function y(d) {
-      return d.y;
-    }
-
-    function radius(d) {
-      return d.size;
-    }
-
-    var timeExtents = dex.matrix.extent(csv.data, [config.index.time]);
-    var xExtents = dex.matrix.extent(csv.data, [config.index.x]);
-    var yExtents = dex.matrix.extent(csv.data, [config.index.y]);
-    var sizeExtents = dex.matrix.extent(csv.data, [config.index.size]);
-
-    //dex.console.log("EXTENTS: X", xExtents, "Y", yExtents, "RADIUS", sizeExtents);
-
-    var width = config.width - config.margin.right;
-    var height = config.height - config.margin.top - config.margin.bottom;
-
-    // Various scales. These domains make assumptions of data, naturally.
-    var xScale =
-      dex.config.createScale(config.xaxis.scale)
-        .domain(xExtents).range([0, width - 60]);
-
-    //  d3.scale.linear().domain(xExtents).range([0, width - 60]);
-    var yScale = dex.config.createScale(config.yaxis.scale)
-      .domain(yExtents).range([height, 60]);
-
-    //d3.scale.linear().domain(yExtents).range([height, 60]);
-    var radiusScale = dex.config.createScale(config.circle.sizeScale)
-      .domain(sizeExtents).range([2, 50]);
-    //d3.scale.linear().domain(sizeExtents).range([2, 50]);
-
-    // The x & y axes.
-    var xAxis = dex.config.createAxis(config.xaxis)
-      .scale(xScale);
-
-    var yAxis = dex.config.createAxis(config.yaxis)
-      .scale(yScale);
-
-    var svg = d3.select(config.parent)
-      .append("g")
-      .attr("id", config["id"])
-      .attr("class", config["class"])
-      .attr("transform", config.transform);
-
-    // Add the x-axis.
-    svg.append("g")
-      .attr("class", "xaxis")
-      .attr("transform", "translate(0," + height + ")")
-      .call(xAxis);
-
-    // Add the y-axis.
-    svg.append("g")
-      .attr("class", "yaxis")
-      .call(yAxis);
-
-    var xticks = svg.selectAll(".xaxis .tick");
-
-    xticks.selectAll("line")
-      .call(dex.config.configureStroke, config.xaxis.tick.stroke)
-      .call(dex.config.configureFill, config.xaxis.tick.fill);
-
-    var yticks = svg.selectAll(".yaxis .tick");
-
-    yticks.selectAll("line")
-      .call(dex.config.configureStroke, config.yaxis.tick.stroke)
-      .call(dex.config.configureFill, config.yaxis.tick.fill);
-
-    svg.selectAll(".xaxis path")
-      .call(dex.config.configureStroke, config.xaxis.axisLine.stroke)
-      .call(dex.config.configureFill, config.xaxis.axisLine.fill);
-
-    svg.selectAll(".yaxis path")
-      .call(dex.config.configureStroke, config.yaxis.axisLine.stroke)
-      .call(dex.config.configureFill, config.yaxis.axisLine.fill);
-
-    // Add an x-axis label.
-    svg.append("text")
-      .attr("class", "xLabel")
-      .call(dex.config.configureText, config.xaxis.title)
-      //.attr("dx", width)
-      //.attr("dy", height - 6)
-      .text(config.csv.header[config.index.x]);
-
-    // Add a y-axis label.
-    svg.append("text")
-      .attr("class", "yLabel")
-      .call(dex.config.configureText, config.yaxis.title)
-      .text(config.csv.header[config.index.y]);
-
-    xticks.selectAll("text")
-      .call(dex.config.configureText, config.xaxis.label);
-
-    yticks.selectAll("text")
-      .call(dex.config.configureText, config.yaxis.label);
-
-    // Add the year label; the value is set on transition.
-    var label = svg.append("text")
-      .attr("class", "timeLabel")
-      .attr("text-anchor", "end")
-      .attr("y", height - 24)
-      .attr("x", width)
-      .call(dex.config.configureText, config.label)
-      .text(timeExtents[0]);
-
-    // Load the data.
-    //d3.json("nations.json", function (nations) {
-
-    // A bisector since many nation's data is sparsely-defined.
-    var bisect = d3.bisector(function (d) {
-      return d[0];
-    });
-
-    // Add a dot per nation. Initialize the data at min year value, and set the colors.
-    var dot = svg.append("g")
-      .attr("class", "dots")
-      .selectAll(".dot")
-      .data(interpolateData(timeExtents[0]))
-      .enter().append("circle")
-      .attr("class", "dot")
-      .call(dex.config.configureCircle, config.circle)
-      .call(position)
-      .sort(order);
-
-    // Add a title.
-    dot.append("tooltip-content")
-      .text(function (d) {
-        //dex.console.log("DTITLE", d);
-        return "<table>" +
-          "<tr><td>Name:</td><td>" + d.name + "</td></tr>" +
-          "<tr><td>Category:</td><td>" + d.color + "</td></tr>" +
-          "<tr><td>Time:</td><td>" + d.time + "</td></tr>" +
-          "<tr><td>X:</td><td>" + d.x + "</td></tr>" +
-          "<tr><td>Y:</td><td>" + d.y + "</td></tr>" +
-          "<tr><td>Size:</td><td>" + d.size + "</td></tr>" +
-          "</table>";
-      });
-
-    // Add an overlay for the year label.
-    var box = label.node().getBBox();
-
-    var overlay = svg.append("rect")
-      .attr("class", "overlay")
-      .attr("x", box.x)
-      .attr("y", box.y)
-      .attr("width", box.width)
-      .attr("height", box.height)
-      .attr("fill", "none")
-      .style("pointer-events", "all")
-      .style("cursor", "ew-resize")
-      .on("mouseover", enableInteraction);
-
-    // Start a transition that interpolates the data based on year.
-    svg.transition()
-      .duration(config.duration)
-      .ease("linear")
-      .tween("year", tweenYear)
-      .each("end", enableInteraction);
-
-    // Positions the dots based on data.
-    function position(dot) {
-      dot
-        .attr("cx", function (d) {
-          //dex.console.log("d=", d, "x(d)=" + x(d),
-          //    "cx=xScale(x(d))=" + xScale(x(d)));
-          return xScale(x(d));
-        })
-        .attr("cy", function (d) {
-          //dex.console.log("d=", d, "y(d)=" + x(d),
-          //  "cy=yScale(y(d))=" + yScale(y(d)));
-          return yScale(y(d));
-        })
-        .attr("r", function (d) {
-          //dex.console.log("d=", d, "radius(d)=" + radius(d),
-          //    "r=radiusScale(radius(d))=" + radiusScale(radius(d)));
-          return radiusScale(radius(d));
-        });
-      //.each(function (d) {
-      //dex.console.log("circle.cx=" + xScale(x(d)) + ", cy=" + yScale(y(d)) +
-      //", r=" + radiusScale(radius(d)));
-      //});
-    }
-
-    // Defines a sort order so that the smallest dots are drawn on top.
-    function order(a, b) {
-      return radius(b) - radius(a);
-    }
-
-    // After the transition finishes, you can mouseover to change the year.
-    function enableInteraction() {
-      //dex.console.log("ENABLING INTERACTION");
-      var yearScale = d3.scale.linear()
-        .domain(timeExtents)
-        .range([box.x + 10, box.x + box.width - 10])
-        .clamp(true);
-
-      // Cancel the current transition, if any.
-      svg.transition().duration(0);
-
-      overlay
-        .on("mouseover", mouseover)
-        .on("mouseout", mouseout)
-        .on("mousemove", mousemove)
-        .on("touchmove", mousemove);
-
-      function mouseover() {
-        label.classed("active", true);
-      }
-
-      function mouseout() {
-        label.classed("active", false);
-      }
-
-      function mousemove() {
-        displayYear(yearScale.invert(d3.mouse(this)[0]));
-      }
-    }
-
-    // Tweens the entire chart by first tweening the year, and then the data.
-    // For the interpolated data, the dots and label are redrawn.
-    function tweenYear() {
-      var year = d3.interpolateNumber(timeExtents[0], timeExtents[1]);
-      return function (t) {
-        displayYear(year(t));
-      };
-    }
-
-    // Updates the display to show the specified year.
-    function displayYear(year) {
-      //dex.console.log("key='" + key + "', interpolateData(" + year + ")=",
-      //  interpolateData(year));
-      dot.data(interpolateData(year), key).call(position).sort(order);
-      label.text(Math.round(year));
-    }
-
-    // Interpolates the dataset for the given (fractional) year.
-    function interpolateData(year) {
-      var timeData = [];
-
-      //
-      for (var name in keyMap) {
-        if (keyMap.hasOwnProperty(name)) {
-          var entry = keyMap[name];
-
-          //dex.console.log("ENTRY-DATA", entry);
-          timeData.push({
-            time  : year,
-            name  : entry.name,
-            color : entry.color,
-            x     : interpolateValues(entry.x, year),
-            y     : interpolateValues(entry.y, year),
-            size  : interpolateValues(entry.size, year)
-          });
-        }
-      }
-      //dex.console.log("interpolateData(" + year + ")=", timeData);
-      return timeData;
-    }
-
-    // Finds (and possibly interpolates) the value for the specified year.
-    function interpolateValues(values, year) {
-      //dex.console.log("VALUES", values);
-      var i = bisect.left(values, year, 0, values.length - 1),
-        a = values[i];
-      if (i > 0) {
-        var b = values[i - 1],
-          t = (year - a[0]) / (b[0] - a[0]);
-        return a[1] * (1 - t) + b[1] * t;
-      }
-      return a[1];
-    }
-  };
-
-  $(document).ready(function () {
-
-    // Add tooltips
-    $(document).tooltip({
-      items   : "circle",
-      content : function () {
-        return $(this).find("tooltip-content").text();
-      },
-      track   : true
-    });
-
-    // Make the entire chart draggable.
-    //$(chart.config.parent).draggable();
-    //$(chart.config.parent).find("rect").draggable();
-  });
-
-  return chart;
-};
-
-module.exports = motionchart;
-},{}],18:[function(require,module,exports){
-var motioncirclechart = function (userConfig) {
-  d3 = dex.charts.d3.d3v3;
-  var defaultColor = d3.scale.category10();
-
-  var csv = {
-    'header' : ['name', 'color', 'time', 'x', 'y', 'size'],
-    'data'   : []
-  }
-
-  var i = 0;
-  for (var time = 1800; time < 1810; time += 1) {
-    for (var color = 1; color < 4; color++) {
-      csv.data.push(["name-" + color, color, time,
-                     i * color, i * i * color, i * i * i * color]);
-    }
-    i += 1;
-  }
-
-  var color = d3.scale.category20c();
-
-  var defaults =
-  {
-    // The parent container of this chart.
-    'parent' : null,
-    // Set these when you need to CSS style components independently.
-    'id'     : 'MotionCircleChart',
-    'class'  : 'MotionCircleChart',
-    // Our data...
-    'csv'    : csv,
-
-    // Tells us which columns represent what.
-    'index'  : {
-      'name'  : 0,
-      'color' : 1,
-      'time'  : 2,
-      'y'     : 3
-    },
-    // Chart dimensions.
-    'width'  : 600,
-    'height' : 400,
-    'margin' : {
-      top    : 20,
-      right  : 100,
-      bottom : 100,
-      left   : 100
-    },
-
-    'circle' : dex.config.circle({
-      'fill.fillColor' : function (d, i) {
-        return color(i);
-      },
-      'stroke.width'   : 1,
-      'stroke.color'   : 'black',
-      'events'         : {
-        'mouseover' : function () {
-          d3.select(this)
-            .style("stroke", 'red')
-            .style("stroke-width", 2);
-        },
-        'mouseout'  : function () {
-          d3.select(this)
-            .style("stroke", chart.config.circle.stroke.color)
-            .style("stroke-width", chart.config.circle.stroke.width);
-        }
-      }
-    }),
-
-    // Main label configuration
-    'label.font.size'        : 64,
-    'label.fill.fillColor'   : 'steelblue',
-    'label.fill.fillOpacity' : 0.4,
-    'label.y'                : function (d) {
-      return 0;
-    },
-    'label.x'                : function (d) {
-      return chart.config.width * .5;
-    },
-
-    'transform' : 'translate(0,0)',
-    'duration'  : 10000,
-
-    'xaxis' : dex.config.axis({
-      'scale.type'                : 'linear',
-      'orient'                    : 'bottom',
-      'label'                     : dex.config.text({
-        'x'      : function (d) {
-          return (chart.config.width - chart.config.margin.right) / 2;
-        },
-        'y'      : function (d) {
-          return chart.config.height - chart.config.margin.bottom + 20;
-        },
-        'anchor' : 'end'
-      }),
-      'tick.stroke.color'         : 'black',
-      'tick.stroke.width'         : 1,
-      'tick.fill.fillColor'       : 'none',
-      'axisLine.stroke.color'     : 'black',
-      'axisLine.stroke.width'     : 1,
-      'axisLine.stroke.dasharray' : "10 10",
-      'axisLine.fill.fillColor'   : 'none'
-    }),
-    'yaxis' : dex.config.axis({
-      'scale.type'                : 'linear',
-      'orient'                    : 'left',
-      'label'                     : dex.config.text({
-        'x'         : function (d) {
-          //return chart.config.width - chart.config.margin.right;
-          //return chart.config.margin.top;
-          return 0;
-        },
-        'y'         : function (d) {
-          //return chart.config.height - chart.config.margin.top
-          //  - chart.config.margin.bottom - chart.config.xaxis.label.font.size;
-          //return -chart.config.margin.left/2;
-          return 10;
-        },
-        'anchor'    : 'end',
-        'dy'        : '.75em',
-        'transform' : 'rotate(-90)'
-      }),
-      'tick.stroke.width'         : 1,
-      'tick.fill.fillColor'       : 'none',
-      'axisLine.stroke.color'     : 'black',
-      'axisLine.stroke.width'     : 1,
-      'axisLine.stroke.dasharray' : "10 10",
-      'axisLine.fill.fillColor'   : 'none'
-    })
-  };
-
-  var chart = new dex.component(userConfig, defaults);
-  var config = chart.config;
-
-  chart.render = function render() {
-    d3 = dex.charts.d3.d3v3;
-    window.onresize = this.resize;
-    this.resize();
-  };
-
-  chart.resize = function resize() {
-    d3 = dex.charts.d3.d3v3;
-    var width = d3.select(chart.config.parent).property("clientWidth");
-    var height = d3.select(chart.config.parent).property("clientHeight");
-    chart
-      .attr("width", width)
-      .attr("height", height)
-      .update();
-  };
-
-  chart.update = function update() {
-    d3 = dex.charts.d3.d3v3;
-    var chart = this.chart;
-    var config = this.config;
-    var csv = config.csv;
-
-    d3.selectAll('#' + config.id).remove();
-
-    var keyMap = {};
-
-    csv.data.forEach(function (row) {
-      var curName = row[config.index.name];
-      var curColor = row[config.index.color];
-      var curTime = row[config.index.time];
-      var curY = row[config.index.y];
-      var curSize = +row[config.index.size];
-
-      if (!keyMap[curName]) {
-        keyMap[curName] = {
-          'name'  : curName,
-          'color' : curColor,
-          'time'  : curTime,
-          'y'     : [[curTime, curY]],
-          'size'  : [[curTime, curSize]]
-        };
-      }
-      else {
-        keyMap[curName].y.push([curTime, curY]);
-        keyMap[curName].size.push([curTime, curSize]);
-      }
-    });
-
-    var uniques = dex.matrix.uniques(csv.data);
-
-    var timeExtents = dex.matrix.extent(csv.data, [config.index.time]);
-    //var xExtents = [0, uniques[config.index.name].length-1];
-    var yExtents = dex.matrix.extent(csv.data, [config.index.y]);
-
-    dex.console.log("EXTENTS: Y", yExtents, "UNIQUES", uniques[config.index.name]);
-
-    var width = config.width - config.margin.right;
-    var height = config.height - config.margin.top - config.margin.bottom;
-
-    // Various scales. These domains make assumptions of data, naturally.
-    var xScale = d3.scale.ordinal()
-      .domain(uniques[config.index.name])
-      .rangePoints([0, width]);
-
-    //  d3.scale.linear().domain(xExtents).range([0, width - 60]);
-    var yScale = dex.config.createScale(config.yaxis.scale)
-      .domain([0, yExtents[1]]).range([height, 0]);
-
-    // The x & y axes.
-    var xAxis = dex.config.createAxis(config.xaxis)
-      .scale(xScale);
-
-    var yAxis = dex.config.createAxis(config.yaxis)
-      .scale(yScale);
-
-    var svg = d3.select(config.parent)
-      .append("g")
-      .attr("id", config["id"])
-      .attr("class", config["class"])
-      .attr("transform", config.transform);
-
-    // Add the x-axis.
-    svg.append("g")
-      .attr("class", "xaxis")
-      .attr("transform", "translate(0," + height + ")")
-      .call(xAxis);
-
-    // Add the y-axis.
-    svg.append("g")
-      .attr("class", "yaxis")
-      .call(yAxis);
-
-    var xticks = svg.selectAll(".xaxis .tick");
-
-    var xtickLines = xticks.selectAll("line")
-      .call(dex.config.configureStroke, config.xaxis.tick.stroke)
-      .call(dex.config.configureFill, config.xaxis.tick.fill);
-
-    var yticks = svg.selectAll(".yaxis .tick");
-
-    var yTickLines = yticks.selectAll("line")
-      .call(dex.config.configureStroke, config.yaxis.tick.stroke)
-      .call(dex.config.configureFill, config.yaxis.tick.fill);
-
-    svg.selectAll(".xaxis path")
-      .call(dex.config.configureStroke, config.xaxis.axisLine.stroke)
-      .call(dex.config.configureFill, config.xaxis.axisLine.fill);
-
-    svg.selectAll(".yaxis path")
-      .call(dex.config.configureStroke, config.yaxis.axisLine.stroke)
-      .call(dex.config.configureFill, config.yaxis.axisLine.fill);
-
-    var xTickLabels = xticks.selectAll("text")
-      .style("text-anchor", "start");
-
-    // Add an x-axis label.
-    svg.append("text")
-      .attr("class", "xLabel")
-      .call(dex.config.configureText, config.xaxis.label)
-      .text(config.csv.header[config.index.name]);
-
-    // Add a y-axis label.
-    svg.append("text")
-      .attr("class", "yLabel")
-      .call(dex.config.configureText, config.yaxis.label)
-      .text(config.csv.header[config.index.y]);
-
-    // Add the year label; the value is set on transition.
-    var label = svg.append("text")
-      .attr("class", "timeLabel")
-      .attr("text-anchor", "end")
-      .call(dex.config.configureText, config.label)
-      .text(timeExtents[0]);
-
-    // Load the data.
-    //d3.json("nations.json", function (nations) {
-
-    // A bisector since many nation's data is sparsely-defined.
-    var bisect = d3.bisector(function (d) {
-      return d[0];
-    });
-
-    // Add a dot per nation. Initialize the data at min year value, and set the colors.
-    var circles = svg.append("g")
-      .attr("class", "circles")
-      .selectAll(".circle")
-      .data(interpolateData(timeExtents[0]))
-      .enter().append("circle")
-      .attr("class", "circle")
-      .call(dex.config.configureCircle, config.circle)
-      .call(position);
-    //.sort(order);
-
-    // Add a title.
-    circles
-      .append("tooltip-content")
-      .text(function (d, i) {
-        //dex.console.log("DTITLE", d);
-        return "<table>" +
-          "<tr><td>Name:</td><td>" + d.name + "</td></tr>" +
-          "<tr><td>Category:</td><td>" + d.color + "</td></tr>" +
-          "</table>";
-      });
-
-    // Add an overlay for the year label.
-    var box = label.node().getBBox();
-
-    var overlay = svg.append("rect")
-      .attr("class", "overlay")
-      .attr("x", box.x)
-      .attr("y", box.y)
-      .attr("width", box.width)
-      .attr("height", box.height)
-      .attr("fill", "none")
-      .style("pointer-events", "all")
-      .style("cursor", "ew-resize")
-      .on("mouseover", enableInteraction);
-
-    // Start a transition that interpolates the data based on year.
-    svg.transition()
-      .duration(config.duration)
-      .ease("linear")
-      .tween("year", tweenYear)
-      .each("end", enableInteraction);
-
-    // Positions the dots based on data.
-    function position(circle) {
-      //var circleRadius = Math.floor((config.width - config.margin.left - config.margin.right) / circle.size());
-      //var circleRadius = chart.config.circle.r;
-      var circleRadius = 10;
-
-      circle
-        .attr("cx", function (d, i) {
-          return xScale(d.name);
-        })
-        .attr("cy", function (d) {
-          return yScale(d.y);
-        })
-        .attr("r", function (d) {
-          return 10;
-          //return circleRadius;
-        });
-    }
-
-    // Defines a sort order so that the smallest dots are drawn on top.
-    //function order(a, b) {
-    //  return b.y - a.y;
-    // }
-
-    // After the transition finishes, you can mouseover to change the year.
-    function enableInteraction() {
-      //dex.console.log("ENABLING INTERACTION");
-      var yearScale = d3.scale.linear()
-        .domain(timeExtents)
-        .range([box.x + 10, box.x + box.width - 10])
-        .clamp(true);
-
-      // Cancel the current transition, if any.
-      svg.transition().duration(0);
-
-      overlay
-        .on("mouseover", mouseover)
-        .on("mouseout", mouseout)
-        .on("mousemove", mousemove)
-        .on("touchmove", mousemove);
-
-      function mouseover() {
-        label.classed("active", true);
-      }
-
-      function mouseout() {
-        label.classed("active", false);
-      }
-
-      function mousemove() {
-        displayYear(yearScale.invert(d3.mouse(this)[0]));
-      }
-    }
-
-    // Tweens the entire chart by first tweening the year, and then the data.
-    // For the interpolated data, the dots and label are redrawn.
-    function tweenYear() {
-      var year = d3.interpolateNumber(timeExtents[0], timeExtents[1]);
-      return function (t) {
-        displayYear(year(t));
-      };
-    }
-
-    // Updates the display to show the specified year.
-    function displayYear(year) {
-      //dex.console.log("key='" + key + "', interpolateData(" + year + ")=",
-      //  interpolateData(year));
-      circles.data(interpolateData(year), function (d) {
-        return d.name;
-      }).call(position);//.sort(order);
-      label.text(Math.round(year));
-    }
-
-    // Interpolates the dataset for the given (fractional) year.
-    function interpolateData(year) {
-      var timeData = [];
-
-      //
-      for (var name in keyMap) {
-        if (keyMap.hasOwnProperty(name)) {
-          var entry = keyMap[name];
-
-          //dex.console.log("ENTRY-DATA", entry);
-          timeData.push({
-            time  : year,
-            name  : entry.name,
-            color : entry.color,
-            y     : interpolateValues(entry.y, year),
-            size  : interpolateValues(entry.size, year)
-          });
-        }
-      }
-      //dex.console.log("interpolateData(" + year + ")=", timeData);
-      return timeData;
-    }
-
-    // Finds (and possibly interpolates) the value for the specified year.
-    function interpolateValues(values, year) {
-      //dex.console.log("VALUES", values);
-      var i = bisect.left(values, year, 0, values.length - 1),
-        a = values[i];
-      if (i > 0) {
-        var b = values[i - 1],
-          t = (year - a[0]) / (b[0] - a[0]);
-        return a[1] * (1 - t) + b[1] * t;
-      }
-      return a[1];
-    }
-  };
-
-  $(document).ready(function () {
-
-    // Add tooltips
-    $(chart.config.parent).tooltip({
-      items   : "rect",
-      content : function () {
-        return $(this).find("tooltip-content").text();
-      },
-      track   : true
-    });
-
-    // Make the entire chart draggable.
-    $(chart.config.parent).draggable();
-    $(chart.config.parent).find("rect").draggable();
-  });
-
-  return chart;
-};
-
-module.exports = motioncirclechart;
-},{}],19:[function(require,module,exports){
-var motionlinechart = function (userConfig) {
-  d3 = dex.charts.d3.d3v3;
-  var defaultColor = d3.scale.category10();
-
-  var csv = {
-    'header' : ['name', 'color', 'time', 'x', 'y', 'size'],
-    'data'   : []
-  }
-
-  var i = 0;
-  for (var time = 1800; time < 1810; time += 1) {
-    for (var color = 1; color < 4; color++) {
-      csv.data.push(["name-" + color, color, time,
-                     i * color, i * i * color, i * i * i * color]);
-    }
-    i += 1;
-  }
-
-  var color = d3.scale.category20c();
-
-  var defaults =
-  {
-    // The parent container of this chart.
-    'parent' : null,
-    // Set these when you need to CSS style components independently.
-    'id'     : 'MotionLineChart',
-    'class'  : 'MotionLineChart',
-    // Our data...
-    'csv'    : csv,
-
-    // Tells us which columns represent what.
-    'index'  : {
-      'name'  : 0,
-      'color' : 1,
-      'time'  : 2,
-      'y'     : 4
-    },
-    // Chart dimensions.
-    'width'  : 600,
-    'height' : 400,
-    'margin' : {
-      top    : 20,
-      right  : 100,
-      bottom : 100,
-      left   : 100
-    },
-
-    'circle'                 : dex.config.path({
-      'fill.fillColor' : function (d, i) {
-        return color(i);
-      },
-      'stroke.width'   : 1,
-      'stroke.color'   : 'black',
-      'events'         : {
-        'mouseover' : function () {
-          d3.select(this)
-            .style("stroke", 'red')
-            .style("stroke-width", 2);
-        },
-        'mouseout'  : function () {
-          d3.select(this)
-            .style("stroke", chart.config.circle.stroke.color)
-            .style("stroke-width", chart.config.circle.stroke.width);
-        }
-      }
-    }),
-    'line'                   : dex.config.line({
-      'stroke.color'   : 'black',
-      'stroke.width'   : 1,
-      'fill.fillColor' : 'none',
-      'fill.opacity'   : 0,
-      //'interpolate'    : 'linear'
-      //'interpolate'    : 'linear-closed'
-      //'interpolate'    : 'step-before'
-      //'interpolate'    : 'basis'
-      //'interpolate'    : 'basis-open'
-      //'interpolate'    : 'basis-closed'
-      //'interpolate'    : 'bundle'
-      'interpolate'    : 'cardinal'
-      //'interpolate'    : 'cardinal-open'
-      //'interpolate'    : 'cardinal-closed'
-      //'interpolate'    : 'monotone'
-    }),
-    // Main label configuration
-    'label.font.size'        : 64,
-    'label.fill.fillColor'   : 'steelblue',
-    'label.fill.fillOpacity' : 0.4,
-    'label.y'                : function (d) {
-      return chart.config.height * .1;
-    },
-    'label.x'                : function (d) {
-      return chart.config.width * .5;
-    },
-
-    'transform' : 'translate(0,0)',
-    'duration'  : 10000,
-
-    'xaxis' : dex.config.axis({
-      'scale.type'                : 'linear',
-      'orient'                    : 'bottom',
-      'label': dex.config.text({
-        'anchor': 'middle',
-        'writingMode' : 'lr',
-        'dx' : 0,
-        'dy' : '1.5em'
-      }),
-      'title': dex.config.text({
-        'anchor' : 'middle',
-        'font.size' : '16',
-        'x': function (d) {
-          return (chart.config.width - chart.config.margin.left) / 2; },
-        'y': function(d) {
-          return chart.config.height - chart.config.margin.bottom - 12;
-        }
-      }),
-      'tick.stroke.color'         : 'black',
-      'tick.stroke.width'         : 1,
-      'tick.fill.fillColor'       : 'none',
-      'axisLine.stroke.color'     : 'black',
-      'axisLine.stroke.width'     : 1,
-      'axisLine.stroke.dasharray' : "10 10",
-      'axisLine.fill.fillColor'   : 'none'
-    }),
-    'yaxis' : dex.config.axis({
-      'scale.type'                : 'linear',
-      'orient'                    : 'left',
-      'label': dex.config.text({
-        'anchor': 'middle',
-        'writingMode' : 'tb',
-        'dx' : '-1em',
-        'dy' : '-.5em'
-      }),
-      'title': dex.config.text({
-        'anchor' : 'start',
-        'writingMode' : 'tb',
-        //'transform' : 'rotate(90)',
-        'font.size' : '16',
-        'x': function (d) { return 0; },
-        'dx' : '1em',
-        'y': function(d) {
-          return config.margin.top;
-        },
-        'dy' : '2em'
-      }),
-      'tick.stroke.width'         : 1,
-      'tick.fill.fillColor'       : 'none',
-      'axisLine.stroke.color'     : 'black',
-      'axisLine.stroke.width'     : 1,
-      'axisLine.stroke.dasharray' : "10 10",
-      'axisLine.fill.fillColor'   : 'none'
-    })
-  };
-
-  var chart = new dex.component(userConfig, defaults);
-  var config = chart.config;
-
-  chart.render = function render() {
-    d3 = dex.charts.d3.d3v3;
-    window.onresize = this.resize;
-    this.resize();
-  };
-
-  chart.resize = function resize() {
-    d3 = dex.charts.d3.d3v3;
-    var width = d3.select(chart.config.parent).property("clientWidth");
-    var height = d3.select(chart.config.parent).property("clientHeight");
-    chart
-      .attr("width", width)
-      .attr("height", height)
-      .update();
-  };
-
-  chart.update = function update() {
-    d3 = dex.charts.d3.d3v3;
-    // If we need to call super:
-    //DexComponent.prototype.update.call(this);
-    var chart = this.chart;
-    var config = this.config;
-    var csv = config.csv;
-
-    d3.selectAll('#' + config.id).remove();
-
-    var keyMap = {};
-
-    csv.data.forEach(function (row) {
-      var curName = row[config.index.name];
-      var curColor = row[config.index.color];
-      var curTime = row[config.index.time];
-      var curY = row[config.index.y];
-      var curSize = +row[config.index.size];
-
-      if (!keyMap[curName]) {
-        keyMap[curName] = {
-          'name'  : curName,
-          'color' : curColor,
-          'time'  : curTime,
-          'y'     : [[curTime, curY]],
-          'size'  : [[curTime, curSize]]
-        };
-      }
-      else {
-        keyMap[curName].y.push([curTime, curY]);
-        keyMap[curName].size.push([curTime, curSize]);
-      }
-    });
-
-    var uniques = dex.matrix.uniques(csv.data);
-
-    var timeExtents = dex.matrix.extent(csv.data, [config.index.time]);
-    //var xExtents = [0, uniques[config.index.name].length-1];
-    var yExtents = dex.matrix.extent(csv.data, [config.index.y]);
-
-    dex.console.log("EXTENTS: Y", yExtents, "UNIQUES", uniques[config.index.name]);
-
-    var width = config.width - config.margin.right;
-    var height = config.height - config.margin.top - config.margin.bottom;
-
-    // Various scales. These domains make assumptions of data, naturally.
-    var xScale = d3.scale.ordinal()
-      .domain(uniques[config.index.name])
-      .rangePoints([0, width]);
-
-    //  d3.scale.linear().domain(xExtents).range([0, width - 60]);
-    var yScale = dex.config.createScale(config.yaxis.scale)
-      .domain([0, yExtents[1]]).range([height, 0]);
-
-    // The x & y axes.
-    var xAxis = dex.config.createAxis(config.xaxis)
-      .scale(xScale);
-
-    var yAxis = dex.config.createAxis(config.yaxis)
-      .scale(yScale);
-
-    var svg = d3.select(config.parent)
-      .append("g")
-      .attr("id", config["id"])
-      .attr("class", config["class"])
-      .attr("transform", config.transform);
-
-    // Add the x-axis.
-    svg.append("g")
-      .attr("class", "xaxis")
-      .attr("transform", "translate(0," + height + ")")
-      .call(xAxis);
-
-    // Add the y-axis.
-    svg.append("g")
-      .attr("class", "yaxis")
-      .call(yAxis);
-
-    var xticks = svg.selectAll(".xaxis .tick");
-
-    xticks.selectAll("line")
-      .call(dex.config.configureStroke, config.xaxis.tick.stroke)
-      .call(dex.config.configureFill, config.xaxis.tick.fill);
-
-    var yticks = svg.selectAll(".yaxis .tick");
-
-    yticks.selectAll("line")
-      .call(dex.config.configureStroke, config.yaxis.tick.stroke)
-      .call(dex.config.configureFill, config.yaxis.tick.fill);
-
-    svg.selectAll(".xaxis path")
-      .call(dex.config.configureStroke, config.xaxis.axisLine.stroke)
-      .call(dex.config.configureFill, config.xaxis.axisLine.fill);
-
-    svg.selectAll(".yaxis path")
-      .call(dex.config.configureStroke, config.yaxis.axisLine.stroke)
-      .call(dex.config.configureFill, config.yaxis.axisLine.fill);
-
-    xticks.selectAll("text")
-      .call(dex.config.configureText, config.xaxis.label);
-
-    yticks.selectAll("text")
-      .call(dex.config.configureText, config.yaxis.label);
-
-    // Add an x-axis label.
-    svg.append("text")
-      .attr("class", "xLabel")
-      .call(dex.config.configureText, config.xaxis.title)
-      .text(config.csv.header[config.index.name]);
-
-    // Add a y-axis label.
-    svg.append("text")
-      .attr("class", "yLabel")
-      .call(dex.config.configureText, config.yaxis.title)
-      .text(config.csv.header[config.index.y]);
-
-    // Add the year label; the value is set on transition.
-    var label = svg.append("text")
-      .attr("class", "timeLabel")
-      .attr("text-anchor", "end")
-      .attr("y", height - 24)
-      .attr("x", width)
-      .call(dex.config.configureText, config.label)
-      .text(timeExtents[0]);
-
-    // Load the data.
-    //d3.json("nations.json", function (nations) {
-
-    // A bisector since many nation's data is sparsely-defined.
-    var bisect = d3.bisector(function (d) {
-      return d[0];
-    });
-
-    var initialData = interpolateData(timeExtents[0]);
-
-    // Add a dot per nation. Initialize the data at min year value, and set the colors.
-    var circles = svg.append("g")
-      .attr("class", "circles")
-      .selectAll(".circle")
-      .data(initialData)
-      .enter().append("circle")
-      .attr("class", "circle")
-      .call(dex.config.configureCircle, config.circle)
-      .call(position);
-    //.sort(order);
-
-    dex.console.log("INITIAL DATA:", initialData);
-
-    var d3line = d3.svg.line();
-    dex.config.configureLine(d3line, config.line);
-
-    d3line
-      .x(function (d, i) {
-        return xScale(d.name);
-      })
-      .y(function (d, i) {
-        return yScale(d.y)
-      });
-
-    var line = svg.selectAll('path.dataline')
-      .data([initialData])
-      .enter()
-      .append("svg:path")
-      .attr("d", d3line);
-      //.call(dex.config.configureLine, config.line);
-
-    dex.console.log("LINE: ", line);
-
-    // Add a title.
-    circles
-      .append("tooltip-content")
-      .text(function (d, i) {
-        //dex.console.log("DTITLE", d);
-        return "<table>" +
-          "<tr><td>Name:</td><td>" + d.name + "</td></tr>" +
-          "<tr><td>Category:</td><td>" + d.color + "</td></tr>" +
-          "</table>";
-      });
-
-    // Add an overlay for the year label.
-    var box = label.node().getBBox();
-
-    var overlay = svg.append("rect")
-      .attr("class", "overlay")
-      .attr("x", box.x)
-      .attr("y", box.y)
-      .attr("width", box.width)
-      .attr("height", box.height)
-      .attr("fill", "none")
-      .style("pointer-events", "all")
-      .style("cursor", "ew-resize")
-      .on("mouseover", enableInteraction);
-
-    // Start a transition that interpolates the data based on year.
-    svg.transition()
-      .duration(config.duration)
-      .ease("linear")
-      .tween("year", tweenYear)
-      .each("end", enableInteraction);
-
-    // After the transition finishes, you can mouseover to change the year.
-    function enableInteraction() {
-      //dex.console.log("ENABLING INTERACTION");
-      var yearScale = d3.scale.linear()
-        .domain(timeExtents)
-        .range([box.x + 10, box.x + box.width - 10])
-        .clamp(true);
-
-      // Cancel the current transition, if any.
-      svg.transition().duration(0);
-
-      overlay
-        .on("mouseover", mouseover)
-        .on("mouseout", mouseout)
-        .on("mousemove", mousemove)
-        .on("touchmove", mousemove);
-
-      function mouseover() {
-        label.classed("active", true);
-      }
-
-      function mouseout() {
-        label.classed("active", false);
-      }
-
-      function mousemove() {
-        displayYear(yearScale.invert(d3.mouse(this)[0]));
-      }
-    }
-
-    // Tweens the entire chart by first tweening the year, and then the data.
-    // For the interpolated data, the dots and label are redrawn.
-    function tweenYear() {
-      var year = d3.interpolateNumber(timeExtents[0], timeExtents[1]);
-      return function (t) {
-        displayYear(year(t));
-      };
-    }
-
-    // Positions the dots based on data.
-    function position(circle) {
-      //var circleRadius = Math.floor((config.width - config.margin.left - config.margin.right) / circle.size());
-      //var circleRadius = chart.config.circle.r;
-      var circleRadius = 10;
-
-      circle
-        .attr("cx", function (d, i) {
-          return xScale(d.name);
-        })
-        .attr("cy", function (d) {
-          return yScale(d.y);
-        })
-        .attr("r", function (d) {
-          return 10;
-          //return circleRadius;
-        });
-    }
-
-    // Defines a sort order so that the smallest dots are drawn on top.
-    //function order(a, b) {
-    //  return b.y - a.y;
-    // }
-
-    // Updates the display to show the specified year.
-    function displayYear(year) {
-      //dex.console.log("key='" + key + "', interpolateData(" + year + ")=",
-      //  interpolateData(year));
-      var yearData = interpolateData(year);
-      circles.data(yearData, function (d) {
-        return d.name;
-      }).call(position);//.sort(order);
-      label.text(Math.round(year));
-
-      line.data([yearData])
-        .attr("d", d3line)
-        .call(dex.config.configurePath, config.line);
-
-//        .attr("x", function (d) {
-//          return xScale(d.name);
-//        })
-//        .attr("y", function (d) {
-//          dex.console.log("Y:" + yScale(d.y));
-//          return yScale(d.y)
-//        });
-      //.call(positionLine);
-    }
-
-    // Interpolates the dataset for the given (fractional) year.
-    function interpolateData(year) {
-      var timeData = [];
-
-      //
-      for (var name in keyMap) {
-        if (keyMap.hasOwnProperty(name)) {
-          var entry = keyMap[name];
-
-          //dex.console.log("ENTRY-DATA", entry);
-          timeData.push({
-            time  : year,
-            name  : entry.name,
-            color : entry.color,
-            y     : interpolateValues(entry.y, year),
-            size  : interpolateValues(entry.size, year)
-          });
-        }
-      }
-      //dex.console.log("interpolateData(" + year + ")=", timeData);
-      return timeData;
-    }
-
-    // Finds (and possibly interpolates) the value for the specified year.
-    function interpolateValues(values, year) {
-      //dex.console.log("VALUES", values);
-      var i = bisect.left(values, year, 0, values.length - 1),
-        a = values[i];
-      if (i > 0) {
-        var b = values[i - 1],
-          t = (year - a[0]) / (b[0] - a[0]);
-        return a[1] * (1 - t) + b[1] * t;
-      }
-      return a[1];
-    }
-  }
-  ;
-
-  $(document).ready(function () {
-
-    // Add tooltips
-    $(chart.config.parent).tooltip({
-      items   : "rect",
-      content : function () {
-        return $(this).find("tooltip-content").text();
-      },
-      track   : true
-    });
-
-    // Make the entire chart draggable.
-    $(chart.config.parent).draggable();
-    $(chart.config.parent).find("rect").draggable();
-  });
-
-  return chart;
-};
-
-module.exports = motionlinechart;
-},{}],20:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 var orbitallayout = function (userConfig) {
   d3 = dex.charts.d3.d3v3;
   var chart;
+  var colors = d3.scale.category10();
 
-  var defaults =
-  {
+  var defaults = {
     // The parent container of this chart.
-    'parent': '#ChordDiagram',
+    'parent': '#OrbitalLayoutParent',
     // Set these when you need to CSS style components independently.
-    'id': 'Chord',
-    'class': 'Chord',
+    'id': 'OrbitalLayoutId',
+    'class': 'OrbitalLayoutClass',
     'resizable': true,
     // Our data...
     'csv': {
@@ -4185,10 +2812,31 @@ var orbitallayout = function (userConfig) {
     },
     'width': "100%",
     'height': "100%",
-    'transform': "translate(0 0)",
+    'margin': {
+      'left': 10,
+      'right': 10,
+      'top': 10,
+      'bottom': 10
+    },
+    'transform': "",
     'title': dex.config.text(),
     'label': dex.config.text(),
-    'circles': dex.config.circle(),
+    'radiusScale' : d3.scale.linear()
+      .domain([0, 1, 2, 3, 4])
+      .range([60, 20, 5, 2, 1])
+      .clamp(true),
+    'orbitScale' : d3.scale.linear()
+      .domain([0, 5])
+      .range([4.5, .3])
+      .clamp(true),
+    'circles': dex.config.circle({
+      "r": function (d) {
+        return chart.config.radiusScale(d.depth)
+      },
+      "fill.fillColor": function (d) {
+        return colors(d.depth);
+      }
+    }),
     'orbits': dex.config.circle({
       'r': 5,
       'fill': {
@@ -4202,38 +2850,28 @@ var orbitallayout = function (userConfig) {
         'dasharray': "2 2"
       })
     }),
-    'refreshFrequencyMs' :50,
-    'tickRadianStep' : 0.004363323129985824
+    'refreshFrequencyMs': 50,
+    'tickRadianStep': 0.004363323129985824
   };
 
   var chart = new dex.component(userConfig, defaults);
 
   chart.render = function render() {
     d3 = dex.charts.d3.d3v3;
-    window.onresize = this.resize;
-    chart.resize();
-  };
-
-  chart.resize = function resize() {
-    d3 = dex.charts.d3.d3v3;
-    if (chart.config.resizable) {
-      var width = d3.select(chart.config.parent).property("clientWidth");
-      var height = d3.select(chart.config.parent).property("clientHeight");
-      dex.console.log(chart.config.id + ": resize(" + width + "," + height + ")");
-      chart.attr("width", width).attr("height", height).update();
-    }
-    else {
-      chart.update();
-    }
+    return chart.resize();
   };
 
   chart.update = function () {
     d3 = dex.charts.d3.d3v3;
-    var chart = this;
     var config = chart.config;
+    var margin = config.margin;
     var csv = config.csv;
 
-    d3.selectAll("#" + config.id).remove();
+    var width = config.width - margin.left - margin.right;
+    var height = config.height - margin.top - margin.bottom;
+
+    d3.selectAll(config.parent).selectAll("*").remove();
+
     var data = dex.csv.toNestedJson(dex.csv.copy(csv));
 
     d3.layout.orbit = function () {
@@ -4338,8 +2976,6 @@ var orbitallayout = function (userConfig) {
         //Probably should use d3.functor to turn a string into an object key
         childrenAccessor = _function;
         return this;
-
-
       }
 
       d3.rebind(_orbitLayout, orbitDispatch, "on");
@@ -4407,16 +3043,9 @@ var orbitallayout = function (userConfig) {
           }
         }
       }
-
     }
 
-    //down with category20a()!!
-    colors = d3.scale.category20();
-
-    orbitScale = d3.scale.linear().domain([1, 3]).range([3.8, 1.5]).clamp(true);
-    radiusScale = d3.scale.linear().domain([0, 1, 2, 3]).range([20, 10, 3, 1]).clamp(true);
-
-    var minSize = Math.min(config.width, config.height);
+    var minSize = Math.min(width, height);
 
     orbit = d3.layout.orbit().size([minSize, minSize])
       .children(function (d) {
@@ -4426,18 +3055,26 @@ var orbitallayout = function (userConfig) {
         return d.depth
       })
       .orbitSize(function (d) {
-        return orbitScale(d.depth)
+        return config.orbitScale(d.depth)
       })
       .speed(.1)
       .nodes(data);
 
-    var chartContainer = d3.select(config.parent)
-      .append("g")
-      .attr("class", config["id"])
+    var svg = d3.select(config.parent)
+      .append("svg")
       .attr("id", config["id"])
-      .attr("transform", config.transform);
+      .attr("class", config["class"])
+      .attr('width', config.width)
+      .attr('height', config.height);
 
-    chartContainer.selectAll("g.node").data(orbit.nodes())
+    var rootG = svg
+      .append('g')
+      .attr('transform', 'translate(' +
+        margin.left + ',' + margin.top + ') ' +
+        config.transform);
+
+    rootG.selectAll("g.node")
+      .data(orbit.nodes())
       .enter()
       .append("g")
       .attr("class", "node")
@@ -4451,14 +3088,8 @@ var orbitallayout = function (userConfig) {
       .append("circle");
 
     circles.call(dex.config.configureCircle, config.circles);
-    circles.attr("r", function (d) {
-        return radiusScale(d.depth)
-      })
-      .style("fill", function (d) {
-        return colors(d.depth)
-      });
 
-    chartContainer.selectAll("circle.orbits")
+    rootG.selectAll("circle.orbits")
       .data(orbit.orbitalRings())
       .enter()
       .insert("circle", "g")
@@ -4493,13 +3124,18 @@ var orbitallayout = function (userConfig) {
 
     function nodeOver(d) {
       orbit.stop();
-      d3.select(this).append("text").text(d.name).style("text-anchor", "middle").attr("y", 35);
-      d3.select(this).select("circle").style("stroke", "black").style("stroke-width", 3);
+      var circle = d3.select(this).select("circle");
+      circle.style("stroke", "black").style("stroke-width", 3);
+      d3.select(this)
+        .append("text")
+        .text(d.name)
+        .style("text-anchor", "middle")
+        .attr("y", -config.radiusScale(d.depth) - 5);
     }
 
     function nodeOut() {
       orbit.start();
-      //d3.selectAll("text").remove();
+      d3.selectAll("text").remove();
       d3.selectAll("g.node > circle").style("stroke", "none").style("stroke-width", 0);
     }
   };
@@ -4513,16 +3149,15 @@ var orbitallayout = function (userConfig) {
 };
 
 module.exports = orbitallayout;
-},{}],21:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 var parallelcoordinates = function (userConfig) {
   d3 = dex.charts.d3.d3v3;
   var chart;
 
-  defaults =
-  {
-    'id': "ParallelCoordinates",
-    'class': "ParallelCoordinates",
-    'parent': null,
+  defaults = {
+    'parent': "ParallelCoordinatesParent",
+    'id': "ParallelCoordinatesId",
+    'class': "ParallelCoordinatesClass",
     'width': "100%",
     'height': "100%",
     'resizable': true,
@@ -4539,14 +3174,12 @@ var parallelcoordinates = function (userConfig) {
       ]
     },
     'rows': 0,
-    //'transform'       : function (d) {
-    //  return 'scale(.95, .95) translate(50, 50)'
-    //},
     'normalize': false,
+    'transform': '',
     'margin': {
-      'left': 80,
-      'right': 60,
-      'top': 60,
+      'left': 20,
+      'right': 20,
+      'top': 20,
       'bottom': 20
     },
     'axis': {
@@ -4621,8 +3254,8 @@ var parallelcoordinates = function (userConfig) {
       // If you want to stagger labels.
       'dy': function (d, i) {
         return (i % 2) ?
-        -chart.config.margin.top * .60 :
-        -chart.config.margin.top * .20;
+          -chart.config.margin.top * .60 :
+          -chart.config.margin.top * .20;
       },
       'font.size': function (d) {
         var maxFontSizeByHeight =
@@ -4677,7 +3310,7 @@ var parallelcoordinates = function (userConfig) {
             return chart.config.color(i);
           },
           'width': .8,
-          //'dasharray': "10 10"
+          'dasharray': "1 2"
         }),
       'fill': {
         'fillColor': "none",
@@ -4694,27 +3327,10 @@ var parallelcoordinates = function (userConfig) {
   };
 
   chart = new dex.component(userConfig, defaults);
+
   chart.render = function render() {
     d3 = dex.charts.d3.d3v3;
-    window.onresize = this.resize;
-    chart.resize();
-  };
-
-  chart.resize = function resize() {
-    d3 = dex.charts.d3.d3v3;
-    if (chart.config.resizable) {
-      var width = d3.select(chart.config.parent).property("clientWidth");
-      var height = d3.select(chart.config.parent).property("clientHeight");
-      chart
-        .attr("width", width - chart.config.margin.left - chart.config.margin.right)
-        .attr("height", height - chart.config.margin.top - chart.config.margin.bottom)
-        .attr("transform", "translate(" + chart.config.margin.left + "," +
-          chart.config.margin.top + ")")
-        .update();
-    }
-    else {
-      chart.update();
-    }
+    return chart.resize();
   };
 
   chart.update = function update() {
@@ -4722,6 +3338,10 @@ var parallelcoordinates = function (userConfig) {
     var chart = this;
     var config = chart.config;
     var csv = config.csv;
+    var margin = config.margin;
+
+    var width = config.width - margin.left - margin.right;
+    var height = config.height - margin.top - margin.bottom;
 
     d3.selectAll(chart.config.parent).selectAll('*').remove();
 
@@ -4731,7 +3351,7 @@ var parallelcoordinates = function (userConfig) {
     var jsonData = dex.csv.toJson(csv);
 
     var x = d3.scale.ordinal()
-      .rangePoints([0, config.width], 1);
+      .rangePoints([0, width], 1);
 
     var y = {};
 
@@ -4745,13 +3365,18 @@ var parallelcoordinates = function (userConfig) {
     var dimensions;
     var key;
 
-    //dex.console.log("TRANSFORM:", config.transform, "HEIGHT: ", config.height, "WIDTH:", config.width);
-    var chartContainer = d3.select(config.parent).append("g")
+    var svg = d3.select(config.parent)
+      .append("svg")
       .attr("id", config["id"])
       .attr("class", config["class"])
-      //.attr("width", config.width)
-      //.attr("height", config.height)
-      .attr("transform", config.transform);
+      .attr('width', config.width)
+      .attr('height', config.height);
+
+    var rootG = svg
+      .append('g')
+      .attr('transform', 'translate(' +
+        margin.left + ',' + margin.top + ') ' +
+        config.transform);
 
     // Extract the list of dimensions and create a scale for each.
     //x.domain(dimensions = d3.keys(cars[0]).filter(function(d)
@@ -4784,7 +3409,7 @@ var parallelcoordinates = function (userConfig) {
 
         y[d] = d3.scale.linear()
           .domain(extent)
-          .range([config.height, 0]);
+          .range([height, 0]);
         allExtents.concat(extent);
       }
       else {
@@ -4792,14 +3417,14 @@ var parallelcoordinates = function (userConfig) {
           .domain(jsonData.map(function (p) {
             return p[d];
           }))
-          .rangePoints([config.height, 0]);
+          .rangePoints([height, 0]);
       }
 
       return true;
     }));
 
     // Add grey background lines for context.
-    background = chartContainer.append("g")
+    background = rootG.append("g")
       .attr("class", "background")
       .selectAll("path")
       .data(jsonData)
@@ -4808,7 +3433,7 @@ var parallelcoordinates = function (userConfig) {
       .attr("d", path)
       .attr("id", "fillpath");
 
-    foreground = chartContainer.append("g")
+    foreground = rootG.append("g")
       .selectAll("path")
       .data(jsonData)
       .enter().append("path")
@@ -4836,7 +3461,7 @@ var parallelcoordinates = function (userConfig) {
 //      });
 
     // Add a group element for each dimension.
-    var g = chartContainer.selectAll(".dimension")
+    var g = rootG.selectAll(".dimension")
       .data(dimensions)
       .enter().append("g")
       .attr("class", "dimension")
@@ -4905,7 +3530,7 @@ var parallelcoordinates = function (userConfig) {
           return !y[p].brush.empty();
         }),
 
-      // Get an array of min/max values for each brush constraint.
+        // Get an array of min/max values for each brush constraint.
         extents = actives.map(function (p) {
           return y[p].brush.extent();
         });
@@ -4947,8 +3572,10 @@ var parallelcoordinates = function (userConfig) {
       }
 
       //dex.console.log("Selected: ", dex.json.toCsv(activeData, dimensions));
-      chart.publish({"type" : "select", "selected" : dex.json.toCsv(activeData, dimensions)});
+      chart.publish({"type": "select", "selected": dex.json.toCsv(activeData, dimensions)});
     }
+
+    return chart;
   };
 
   $(document).ready(function () {
@@ -4965,143 +3592,17 @@ var parallelcoordinates = function (userConfig) {
 };
 
 module.exports = parallelcoordinates;
-},{}],22:[function(require,module,exports){
-var piechart = function (userConfig) {
-  d3 = dex.charts.d3.d3v3;
-  var chart = new dex.component(userConfig,
-    {
-      'parent'      : "#PieChart",
-      'id'          : "PieChart",
-      'class'       : "PieChart",
-      'csv'         : {
-        'header' : ["X", "Y"],
-        'data'   : [[0, 0], [1, 1], [2, 4], [3, 9], [4, 16]]
-      },
-      'xi'          : 0,
-      'yi'          : 2,
-      'xoffset'     : 200,
-      'yoffset'     : 0,
-      'colors'      : d3.scale.category20(),
-      'innerRadius' : 0,
-      'outerRadius' : 190,
-      'radius'      : 200,
-      'label'       : {
-        'fontSize'   : 16,
-        'textAnchor' : 'middle'
-      },
-      'caption'     : {
-        'text'       : '',
-        'fontSize'   : 24,
-        'textAnchor' : 'middle'
-      }
-    });
-
-  chart.render = function () {
-    d3 = dex.charts.d3.d3v3;
-    window.onresize = this.resize;
-    chart.resize();
-  };
-
-  chart.resize = function () {
-    d3 = dex.charts.d3.d3v3;
-    d3.selectAll("#" + chart.config.id).remove();
-    var width = d3.select(chart.config.parent).property("clientWidth");
-    var height = d3.select(chart.config.parent).property("clientHeight");
-    chart
-      .attr("width", width)
-      .attr("height", height)
-      .attr("outerRadius", Math.min(width / 2, height / 2))
-      .attr("transform", "translate(" + (width / 2) + "," + (height / 2) + ")")
-      .update();
-  };
-
-  chart.update = function () {
-    d3 = dex.charts.d3.d3v3;
-    var chart = this;
-    var config = chart.config;
-    var csv = config.csv;
-
-//  var radius = Math.min(config.width, config.height) / 2;
-
-    var color = d3.scale.ordinal()
-      .range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
-
-    var arc = d3.svg.arc()
-      .outerRadius(config.outerRadius)
-      .innerRadius(config.innerRadius);
-
-    var pie = d3.layout.pie()
-      .sort(null)
-      .value(function (d) {
-        return d[config.yi];
-      });
-
-    var chartContainer = d3.select(config.parent).append("g")
-      .attr("id", config["id"])
-      .attr("class", config["class"])
-      .attr("transform", config.transform);
-
-    var data = csv.data;
-
-    // Convert all y values to numerics.
-    data.forEach(function (d) {
-      d[config.yi] = +d[config.yi];
-    });
-
-    var g = chartContainer.selectAll(".arc")
-      .data(pie(data, function (d) {
-        return d[config.yi];
-      }))
-      .enter().append("g")
-      .attr("class", function (d) {
-        return "arc";
-      });
-
-    g.append("path")
-      .attr("d", arc)
-      .style("fill", function (d, i) {
-        return config.colors(i);
-      });
-
-    g.append("text")
-      .attr("transform", function (d) {
-        return "translate(" + arc.centroid(d) + ")";
-      })
-      .attr("dy", ".35em")
-      .style("text-anchor", config.label.textAnchor)
-      .style("font-size", config.label.fontSize)
-      .text(function (d) {
-        return d.data[config.xi];
-      });
-
-    chartContainer.append("text")
-      //.attr("dy", ".35em")
-      .attr("y", -config.radius)
-      .style("font-size", config.caption.fontSize)
-      .style("text-anchor", config.caption.textAnchor)
-      .text(config.caption.text);
-  };
-
-  $(document).ready(function () {
-    // Make the entire chart draggable.
-    $(chart.config.parent).draggable();
-  });
-
-  return chart;
-};
-
-module.exports = piechart;
-},{}],23:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 var radarchart = function (userConfig) {
   d3 = dex.charts.d3.d3v3;
   var chart;
 
   var defaults = {
     // The parent container of this chart.
-    'parent': '#RadarChart',
+    'parent': '#RadarChartParent',
     // Set these when you need to CSS style components independently.
-    'id': 'RadarChart',
-    'class': 'RadarChart',
+    'id': 'RadarChartId',
+    'class': 'RadarChartClass',
     'resizable': true,
     // Our data...
     'csv': {
@@ -5143,7 +3644,7 @@ var radarchart = function (userConfig) {
       'font.size': '16px',
       'anchor': function (d, i) {
         var degreesPerSection = 360 / (chart.attr('csv').header.length - 1);
-        dex.console.log("Degrees Per Section", degreesPerSection, degreesPerSection * (i-1));
+        //dex.console.log("Degrees Per Section", degreesPerSection, degreesPerSection * (i-1));
         if (degreesPerSection * i < 10) {
           return "middle";
         }
@@ -5153,7 +3654,7 @@ var radarchart = function (userConfig) {
         else if (degreesPerSection * i < 185) {
           return "middle";
         }
-        dex.console.log("D", d, i);
+
         return "end";
       },
       'dy' : function(d, i) {
@@ -5240,8 +3741,6 @@ var radarchart = function (userConfig) {
 
   chart.render = function render() {
     d3 = dex.charts.d3.d3v3;
-    chart.resize = this.resize(chart);
-    window.onresize = chart.resize;
     return chart.resize();
   };
 
@@ -5250,10 +3749,9 @@ var radarchart = function (userConfig) {
     var chart = this;
     var config = chart.config;
     var margin = config.margin;
-    var csv = config.csv;
-
     var width = config.width - margin.left - margin.right;
     var height = config.height - margin.top - margin.bottom;
+    var csv = config.csv;
 
     // Remove the old, build from scratch.
     d3.selectAll(config.parent).selectAll('*').remove();
@@ -5301,26 +3799,25 @@ var radarchart = function (userConfig) {
     //////////// Create the container SVG and g /////////////
     /////////////////////////////////////////////////////////
 
-    var chartContainer = d3.select(config.parent)
-      .append("g")
+    var svg = d3.select(config.parent)
+      .append("svg")
       .attr("id", config["id"])
       .attr("class", config["class"])
       .attr('width', config.width)
-      .attr('height', config.height)
-      .attr("transform", config.transform);
+      .attr('height', config.height);
 
-    var chartG = chartContainer
-      .append('g')
+    var rootG = svg.append('g')
       .attr('transform', 'translate(' +
-        margin.left + ',' + margin.top + ') translate(' +
-        width / 2 + ' ' + height / 2 + ")");
+        (margin.left + config.width/2) + ',' +
+        (margin.top + config.height/2) + ') ' +
+        config.transform);
 
     /////////////////////////////////////////////////////////
     ////////// Glow filter for some extra pizzazz ///////////
     /////////////////////////////////////////////////////////
 
     //Filter for the outside glow
-    var filter = chartG.append('defs').append('filter').attr('id', 'glow'),
+    var filter = rootG.append('defs').append('filter').attr('id', 'glow'),
       feGaussianBlur = filter.append('feGaussianBlur').attr('stdDeviation', '2.5').attr('result', 'coloredBlur'),
       feMerge = filter.append('feMerge'),
       feMergeNode_1 = feMerge.append('feMergeNode').attr('in', 'coloredBlur'),
@@ -5331,7 +3828,7 @@ var radarchart = function (userConfig) {
     /////////////////////////////////////////////////////////
 
     //Wrapper for the grid & axes
-    var axisGrid = chartG.append("g").attr("class", "axisWrapper");
+    var axisGrid = rootG.append("g").attr("class", "axisWrapper");
 
     //Draw the background circles, broken in WebView
     axisGrid.selectAll(".levels")
@@ -5420,7 +3917,7 @@ var radarchart = function (userConfig) {
     }
 
     //Create a wrapper for the blobs
-    var blobWrapper = chartG.selectAll(".radarWrapper")
+    var blobWrapper = rootG.selectAll(".radarWrapper")
       .data(data)
       .enter().append("g")
       .attr("class", "radarWrapper");
@@ -5490,7 +3987,7 @@ var radarchart = function (userConfig) {
     /////////////////////////////////////////////////////////
 
     //Wrapper for the invisible circles on top
-    var blobCircleWrapper = chartG.selectAll(".radarCircleWrapper")
+    var blobCircleWrapper = rootG.selectAll(".radarCircleWrapper")
       .data(data)
       .enter().append("g")
       .attr("class", "radarCircleWrapper");
@@ -5528,7 +4025,7 @@ var radarchart = function (userConfig) {
       });
 
     //Set up the small tooltip for when you hover over a circle
-    var tooltip = chartG.append("text")
+    var tooltip = rootG.append("text")
       .attr("class", "tooltip")
       .style("opacity", 0);
 
@@ -5578,7 +4075,7 @@ var radarchart = function (userConfig) {
 
 module.exports = radarchart;
 
-},{}],24:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 var radialtree = function (userConfig) {
   d3 = dex.charts.d3.d3v4;
   var chart;
@@ -5604,7 +4101,7 @@ var radialtree = function (userConfig) {
     'labelColorScheme': d3.scaleOrdinal(d3.schemeCategory10),
     'width': "100%",
     'height': "100%",
-    'transform': "translate(0 0)",
+    'transform': "",
     'label': dex.config.text({
         'dy': '.31em',
         "x": function (d) {
@@ -5661,52 +4158,30 @@ var radialtree = function (userConfig) {
     },
     'connectionLength': 80,
     'maxAngle': 360,
-    'radius': 300,
-    'margin': {
-      'left': 10,
-      'right': 10,
-      'top': 25,
-      'bottom': 10
+    'radius': function() {
+    return Math.min(
+      (chart.config.width - chart.config.margin.left -
+       chart.config.margin.right) / 2,
+      (chart.config.height - chart.config.margin.top -
+       chart.config.margin.bottom)/2);
     },
-
+    'margin': {
+      'left': 30,
+      'right': 30,
+      'top': 60,
+      'bottom': 60
+    }
   };
 
   var chart = new dex.component(userConfig, defaults);
 
   chart.render = function render() {
     d3 = dex.charts.d3.d3v4;
-    var chart = this;
-    var config = chart.config;
-    chart.resize = chart.resize(chart);
-    window.onresize = function () {
-      chart.resize().update();
-    }
-    chart.resize();
-
-    d3.selectAll(config.parent).selectAll('*').remove();
-
-    var margin = config.margin;
-    var width = config.width - margin.left - margin.right;
-    var height = config.height - margin.top - margin.bottom;
-
-    var svg = d3.select(config.parent)
-      .append("svg")
-      .attr("id", config["id"])
-      .attr("class", config["class"])
-      .attr('width', config.width)
-      .attr('height', config.height)
-      .attr("transform", config.transform);
-
-    var g = svg.append("g")
-      .attr("transform", "translate(" + (width / 2 + margin.left) + "," +
-        (height / 2 + margin.top) + ")");
-
-    return chart.update();
+    return chart.resize();
   };
 
   chart.update = function () {
     d3 = dex.charts.d3.d3v4;
-    var chart = this;
     var config = chart.config;
     var csv = config.csv;
     var margin = config.margin;
@@ -5714,7 +4189,20 @@ var radialtree = function (userConfig) {
     var width = config.width - margin.left - margin.right;
     var height = config.height - margin.top - margin.bottom;
 
+    d3.selectAll(config.parent).selectAll('*').remove();
+
     var data = dex.csv.toNestedJson(dex.csv.copy(csv));
+
+    var svg = d3.select(config.parent)
+      .append("svg")
+      .attr("id", config["id"])
+      .attr("class", config["class"])
+      .attr('width', config.width)
+      .attr('height', config.height);
+
+    var g = svg.append("g")
+      .attr("transform", "translate(" + (width / 2 + margin.left) + "," +
+        (height / 2 + margin.top) + ") " + config.transform);
 
     chart.internalUpdate(data);
 
@@ -5723,7 +4211,6 @@ var radialtree = function (userConfig) {
 
   chart.internalUpdate = function (source) {
     d3 = dex.charts.d3.d3v4;
-    var chart = this;
     var config = chart.config;
     var csv = config.csv;
     var margin = config.margin;
@@ -5732,7 +4219,7 @@ var radialtree = function (userConfig) {
     var g = svg.select("g");
 
     var tree = d3.tree()
-      .size([config.maxAngle, config.radius])
+      .size([config.maxAngle, config.radius()])
       .separation(config.separationModel);
 
     var hier = d3.hierarchy(source);
@@ -5815,84 +4302,42 @@ var radialtree = function (userConfig) {
 
 module.exports = radialtree;
 
-},{}],25:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 var sankey = function (userConfig) {
   d3 = dex.charts.d3.d3v3;
   var defaultColor = d3.scale.category20c();
+  var chart;
 
-  var defaults =
-    {
-      // The parent container of this chart.
-      'parent': null,
-      // Set these when you need to CSS style components independently.
-      'id': 'Sankey',
-      'class': 'Sankey',
-      // Our data...
-      'csv': {
-        // Give folks without data something to look at anyhow.
-        'header': ["X", "Y", "WEIGHT"],
-        'data': [
-          ["A1", "A2", 1],
-          ["B1", "B2", 2],
-          ["C1", "C2", 2],
-          ["C2", "C3", 4]
-        ]
-      },
-      'relationships': null,
-      // width and height of our bar chart.
-      'width': "100%",
-      'height': "100%",
-      // The x an y indexes to chart.
-      "transform": "translate(5,0) scale(.95)",
-      'layoutIterations': 32,
-      'columnTitle': dex.config.text({
-          'fill.fillColor': 'black',
-          'x': function (d) {
-            var center = window.innerWidth / 2;
-            //var center = (typeof userConfig.width !== 'undefined' ?
-            //  userConfig.width : defaults.width) / 2;
-
-            var nodeWidth = (userConfig.mouseout && userConfig.mouseout.node &&
-            userConfig.mouseout.node.rectangle && userConfig.mouseout.node.rectangle.width) ?
-              userConfig.mouseout.node.rectangle.width : defaults.mouseout.node.rectangle.width;
-
-            var nodePadding = (userConfig.mouseout && userConfig.mouseout.node &&
-            userConfig.mouseout.node.padding) ?
-              userConfig.mouseout.node.padding : defaults.mouseout.node.padding;
-
-            //dex.console.log("d.x=" + d.x + ", width=" + window.innerWidth + ", nodeWidth=" + nodeWidth +
-            //  ", nodePadding=" + nodePadding + ", center=" + center);
-            if (+d > center) {
-              //return +d-nodePadding-nodeWidth;
-              return +d + nodeWidth / 2;
-            }
-            else {
-              //return +d + nodeWidth + nodePadding;
-              return +d + nodeWidth / 2;
-            }
-          },
-          "y": 10,
-          "writingMode": "tb",
-          "glyphOrientationVertical": 0,
-          "anchor": function (d, i) {
-            //var center = (typeof userConfig.width !== 'undefined' ?
-            // userConfig.width : defaults.width) / 2;
-            var center = window.innerWidth / 2;
-
-            if (+d > center) {
-              // End if horizontal
-              return "start";
-            }
-            else {
-              return "start";
-            }
-          },
-          "text": function (d, i) {
-            return d + ", i" + i;
-          }
-        }
-      ),
-      'label': dex.config.text({
+  var defaults = {
+    // The parent container of this chart.
+    'parent': '#SankeyParent',
+    // Set these when you need to CSS style components independently.
+    'id': 'SankeyId',
+    'class': 'SankeyClass',
+    'resizable': true,
+    'width': "100%",
+    'height': "100%",
+    'margin': {
+      'left': 100,
+      'right': 100,
+      'top': 50,
+      'bottom': 50
+    },
+    'transform': "",
+    // Our data...
+    'csv': {
+      // Give folks without data something to look at anyhow.
+      'header': ["X", "Y", "WEIGHT"],
+      'data': [
+        ["A1", "A2", 1],
+        ["B1", "B2", 2],
+        ["C1", "C2", 2],
+        ["C2", "C3", 4]
+      ]
+    },
+    'relationships': null,
+    'layoutIterations': 32,
+    'columnTitle': dex.config.text({
         'fill.fillColor': 'black',
         'x': function (d) {
           var center = window.innerWidth / 2;
@@ -5900,8 +4345,7 @@ var sankey = function (userConfig) {
           //  userConfig.width : defaults.width) / 2;
 
           var nodeWidth = (userConfig.mouseout && userConfig.mouseout.node &&
-          userConfig.mouseout.node.rectangle &&
-          userConfig.mouseout.node.rectangle.width) ?
+          userConfig.mouseout.node.rectangle && userConfig.mouseout.node.rectangle.width) ?
             userConfig.mouseout.node.rectangle.width : defaults.mouseout.node.rectangle.width;
 
           var nodePadding = (userConfig.mouseout && userConfig.mouseout.node &&
@@ -5910,108 +4354,105 @@ var sankey = function (userConfig) {
 
           //dex.console.log("d.x=" + d.x + ", width=" + window.innerWidth + ", nodeWidth=" + nodeWidth +
           //  ", nodePadding=" + nodePadding + ", center=" + center);
-          if (d.x > center) {
-            return -nodePadding;
+          if (+d > center) {
+            //return +d-nodePadding-nodeWidth;
+            return +d + nodeWidth / 2;
           }
           else {
-            return nodeWidth + nodePadding;
+            //return +d + nodeWidth + nodePadding;
+            return +d + nodeWidth / 2;
           }
         },
-        'y': function (d) {
-          return d.dy / 2;
-        },
-        'transform': null,
-        'dy': '.35em',
-        'anchor': function (d, i) {
+        "y": 10,
+        "writingMode": "tb",
+        "glyphOrientationVertical": 0,
+        "anchor": function (d, i) {
           //var center = (typeof userConfig.width !== 'undefined' ?
           // userConfig.width : defaults.width) / 2;
           var center = window.innerWidth / 2;
 
-          if (d.x > center) {
-            return "end";
+          if (+d > center) {
+            // End if horizontal
+            return "start";
           }
           else {
             return "start";
           }
         },
-        'font': {
-          'size': 14
-        },
-        'color': "black",
-        'opacity': 1,
-        'text': function (d) {
-          return d.name;
+        "text": function (d, i) {
+          return d + ", i" + i;
         }
-      }),
-      //'columnLayout' : function(node, nodeMap) { return nodeMap[node.name].column },
-      'mouseout': {
-        'link': {
-          'stroke': dex.config.stroke({
-            'opacity': .2,
-            'color': function (d) {
-              return defaultColor(d.category);
-            },
-            'width': function (d) {
-              //return 0;
-              return Math.max(1, d.dy);
-            }
-          }),
-          'fill': dex.config.fill({
-            'fillColor': 'none',
-            'fillOpacity': .4
-          }),
-          'curvature': 0.5
-        },
-        'node': {
-          'padding': 4,
-          'rectangle': dex.config.rectangle(
-            {
-              'width': 32,
-              'color': function (d) {
-                return defaultColor(d.name.replace(/ .*/, ""));
-              },
-              'height': function (d) {
-                return d.dy;
-              },
-              'stroke': dex.config.stroke({
-                'color': function (d) {
-                  return d3.rgb(d.color).darker(2);
-                }
-              })
-            })
+      }
+    ),
+    'label': dex.config.text({
+      'fill.fillColor': 'black',
+      'x': function (d) {
+        var center = window.innerWidth / 2;
+        //var center = (typeof userConfig.width !== 'undefined' ?
+        //  userConfig.width : defaults.width) / 2;
+
+        var nodeWidth = (userConfig.mouseout && userConfig.mouseout.node &&
+        userConfig.mouseout.node.rectangle &&
+        userConfig.mouseout.node.rectangle.width) ?
+          userConfig.mouseout.node.rectangle.width : defaults.mouseout.node.rectangle.width;
+
+        var nodePadding = (userConfig.mouseout && userConfig.mouseout.node &&
+        userConfig.mouseout.node.padding) ?
+          userConfig.mouseout.node.padding : defaults.mouseout.node.padding;
+
+        //dex.console.log("d.x=" + d.x + ", width=" + window.innerWidth + ", nodeWidth=" + nodeWidth +
+        //  ", nodePadding=" + nodePadding + ", center=" + center);
+        if (d.x > center) {
+          return -nodePadding;
+        }
+        else {
+          return nodeWidth + nodePadding;
         }
       },
-      'mouseover': {
-        'link': {
-          'stroke': dex.config.stroke({
-            'opacity': .8,
-            'width': function (d) {
-              return Math.max(1, d.dy);
-            },
-            'color': function (d) {
-              return defaultColor(d.category);
-            }
-          }),
-          'fill': dex.config.fill({
-            'fillColor': 'none',
-            'fillOpacity': .8
-          }),
-        },
-        'node': {
-          'stroke': dex.config.stroke({
-            'opacity': .8,
-            'width': function (d) {
-              return Math.max(1, d.dy);
-            },
-            'color': function (d) {
-              return defaultColor(d.category);
-            }
-          }),
-          'fill': dex.config.fill({
-            'fillColor': 'none',
-            'fillOpacity': .8
-          })
+      'y': function (d) {
+        return d.dy / 2;
+      },
+      'transform': null,
+      'dy': '.35em',
+      'anchor': function (d, i) {
+        //var center = (typeof userConfig.width !== 'undefined' ?
+        // userConfig.width : defaults.width) / 2;
+        var center = window.innerWidth / 2;
+
+        if (d.x > center) {
+          return "end";
         }
+        else {
+          return "start";
+        }
+      },
+      'font': {
+        'size': 14
+      },
+      'color': "black",
+      'opacity': 1,
+      'text': function (d) {
+        return d.name;
+      }
+    }),
+    //'columnLayout' : function(node, nodeMap) { return nodeMap[node.name].column },
+    'mouseout': {
+      'link': {
+        'stroke': dex.config.stroke({
+          'opacity': .2,
+          'color': function (d) {
+            return defaultColor(d.category);
+          },
+          'width': function (d) {
+            //return 0;
+            return Math.max(1, d.dy);
+          }
+        }),
+        'fill': dex.config.fill({
+          'fillColor': 'none',
+          'fillOpacity': .4
+        }),
+        'curvature': 0.5
       },
       'node': {
         'padding': 4,
@@ -6030,26 +4471,75 @@ var sankey = function (userConfig) {
               }
             })
           })
+      }
+    },
+    'mouseover': {
+      'link': {
+        'stroke': dex.config.stroke({
+          'opacity': .8,
+          'width': function (d) {
+            return Math.max(1, d.dy);
+          },
+          'color': function (d) {
+            return defaultColor(d.category);
+          }
+        }),
+        'fill': dex.config.fill({
+          'fillColor': 'none',
+          'fillOpacity': .8
+        }),
       },
-      "manualColumnLayout": false
-    };
+      'node': {
+        'stroke': dex.config.stroke({
+          'opacity': .8,
+          'width': function (d) {
+            return Math.max(1, d.dy);
+          },
+          'color': function (d) {
+            return defaultColor(d.category);
+          }
+        }),
+        'fill': dex.config.fill({
+          'fillColor': 'none',
+          'fillOpacity': .8
+        })
+      }
+    },
+    'node': {
+      'padding': 4,
+      'rectangle': dex.config.rectangle({
+        'width': 32,
+        'color': function (d) {
+          return defaultColor(d.name.replace(/ .*/, ""));
+        },
+        'height': function (d) {
+          return d.dy;
+        },
+        'stroke': dex.config.stroke({
+          'color': function (d) {
+            return d3.rgb(d.color).darker(2);
+          }
+        })
+      })
+    },
+    "manualColumnLayout": false
+  };
 
-  //dex.console.log("USER-CONFIG", userConfig, "DEFAULTS:", defaults);
-  var config = dex.object.overlay(dex.config.expand(userConfig), dex.config.expand(defaults));
+  var chart = new dex.component(userConfig, defaults);
 
   // If we do not have specifically defined relationship fields, then lets
   // try to make an educated guess about what to do with them.  If the last
   // column is numeric, we will assume that this is to be used as a weight.
   // Otherwise, we will use a uniform weighting of 1 for each link.
-  if (!config.relationships) {
+  if (!chart.config.relationships) {
     // If we have less than 3 columns or the last column does not contain
     // numerics then we will create a set of relationships for each column
     // with a standard weight of 1 and a single category of 1.
-    if (config.csv.header.length < 3 || !dex.csv.isColumnNumeric(config.csv, config.csv.header.length - 1)) {
-      config.relationships = [];
+    if (chart.config.csv.header.length < 3 || !dex.csv.isColumnNumeric(chart.config.csv, chart.config.csv.header.length - 1)) {
+      chart.config.relationships = [];
 
-      for (i = 1; i < config.csv.header.length; i++) {
-        config.relationships.push(
+      for (i = 1; i < chart.config.csv.header.length; i++) {
+        chart.config.relationships.push(
           {
             'source': i - 1,
             'target': i,
@@ -6068,10 +4558,10 @@ var sankey = function (userConfig) {
     // If we fall through here, then the last column is numeric.  We will
     // use this for our weight.
     else {
-      config.relationships = [];
+      chart.config.relationships = [];
 
-      for (i = 1; i < config.csv.header.length - 1; i++) {
-        config.relationships.push(
+      for (i = 1; i < chart.config.csv.header.length - 1; i++) {
+        chart.config.relationships.push(
           {
             'source': i - 1,
             'target': i,
@@ -6089,54 +4579,34 @@ var sankey = function (userConfig) {
     }
   }
 
-  var chart = new dex.component(userConfig, config);
-
-  // TODO: Figure out how I want to do this.  Partial implementation.
-  chart.renderGui = function () {
+  chart.render = function render() {
     d3 = dex.charts.d3.d3v3;
-    dex.console.log("SETTINGS", d3.select("#settings").select("#" + chart.config.id).selectAll("#setting"));
-    d3.select("#settings").select("#" + chart.config.id).selectAll("#setting").each(function (d) {
-      dex.console.log("SETTING", d);
-    });
-  };
-
-  chart.render = function () {
-    d3 = dex.charts.d3.d3v3;
-    window.onresize = this.resize;
-    this.update();
-  };
-
-  chart.resize = function () {
-    d3 = dex.charts.d3.d3v3;
-    var width = window.innerWidth;
-    var height = window.innerHeight;
-
-    //dex.console.log(config.id + " RESIZING: " + width + "x" + height);
-    d3.selectAll(config.parent).selectAll('*').remove();
-
-    chart.attr("width", width)
-      .attr("height", height)
-      .update();
+    return chart.resize();
   };
 
   chart.update = function () {
     d3 = dex.charts.d3.d3v3;
     var config = chart.config;
-    //dex.console.log("UPDATING CHART....");
-    //dex.console.log("-- WIDTH : " + config.width);
-    //dex.console.log("-- HEIGHT: " + config.height);
-    var width = d3.select(config.parent).property("clientWidth");
-    var height = d3.select(config.parent).property("clientHeight");
+    var margin = config.margin;
     var csv = config.csv;
+
+    var width = config.width - margin.left - margin.right;
+    var height = config.height - margin.top - margin.bottom;
 
     d3.selectAll(config.parent).selectAll('*').remove();
 
-    var chartContainer = d3.select(config.parent).append("g")
-      .attr("class", config["id"])
+    var svg = d3.select(config.parent)
+      .append("svg")
       .attr("id", config["id"])
-      .attr("width", config.width)
-      .attr("height", config.height)
-      .attr("transform", config.transform);
+      .attr("class", config["class"])
+      .attr('width', config.width)
+      .attr('height', config.height);
+
+    var rootG = svg
+      .append('g')
+      .attr('transform', 'translate(' +
+        margin.left + ',' + margin.top + ') ' +
+        config.transform);
 
     var sankeyData = [];
 
@@ -6219,8 +4689,6 @@ var sankey = function (userConfig) {
         return formatNumber(d) + " " + units;
       };
 
-    chartContainer.onresize = chart.resize;
-
     function manualColumnLayout(nodes, nodeWidth, size) {
       var numSinks = 1;
 
@@ -6292,7 +4760,7 @@ var sankey = function (userConfig) {
       .layout(config.layoutIterations);
 
     // add in the links
-    var link = chartContainer.append("g").selectAll(".link")
+    var link = rootG.append("g").selectAll(".link")
       .data(graph.links)
       .enter().append("path")
       .attr("class", "link")
@@ -6305,11 +4773,11 @@ var sankey = function (userConfig) {
         return b.dy - a.dy;
       })
       .on("mouseover", function (d) {
-        chartContainer.selectAll("#" + d.linkid)//.style("stroke-opacity", 1)
+        rootG.selectAll("#" + d.linkid)//.style("stroke-opacity", 1)
           .call(dex.config.configureLink, config.mouseover.link);
       })
       .on("mouseout", function (d) {
-        chartContainer.selectAll("#" + d.linkid)//.style("stroke-opacity", config.link.stroke.opacity);
+        rootG.selectAll("#" + d.linkid)//.style("stroke-opacity", config.link.stroke.opacity);
           .call(dex.config.configureLink, config.mouseout.link);
       });
 
@@ -6321,7 +4789,7 @@ var sankey = function (userConfig) {
       });
 
     // add in the nodes
-    var node = chartContainer.append("g").selectAll(".node")
+    var node = rootG.append("g").selectAll(".node")
       .data(graph.nodes)
       .enter().append("g")
       .attr("class", "node")
@@ -6345,7 +4813,7 @@ var sankey = function (userConfig) {
           d.sourceLinks : d.targetLinks;
 
         links.forEach(function (link) {
-          chartContainer.selectAll("#" + link.linkid)
+          rootG.selectAll("#" + link.linkid)
             .call(dex.config.configureLink, config.mouseover.node);
         });
       })
@@ -6354,7 +4822,7 @@ var sankey = function (userConfig) {
         var links = (d.sourceLinks.length > 0) ?
           d.sourceLinks : d.targetLinks;
         links.forEach(function (link) {
-          chartContainer.selectAll("#" + link.linkid)
+          rootG.selectAll("#" + link.linkid)
             .call(dex.config.configureLink, config.mouseout.link);
         });
       })
@@ -6369,7 +4837,7 @@ var sankey = function (userConfig) {
 
     /////////// A HACK TO ADD TITLE LABELS
     var locations = {};
-    var rects = chartContainer.selectAll("rect").each(function (rect) {
+    var rects = rootG.selectAll("rect").each(function (rect) {
       locations[rect.x] = true;
     });
 
@@ -6381,7 +4849,7 @@ var sankey = function (userConfig) {
 
     //orderedLocations = orderedLocations.map(function(d) { return +d + locationWidth});
 
-    var titles = chartContainer.append("g").selectAll("text")
+    var titles = rootG.append("g").selectAll("text")
       .data(orderedLocations)
       .enter()
       .append("text")
@@ -6751,560 +5219,6 @@ d3sankey = function () {
 };
 
 module.exports = sankey;
-},{}],26:[function(require,module,exports){
-var sankeyparticles = function (userConfig) {
-  d3 = dex.charts.d3.d3v3;
-  var chart;
-
-  var defaults =
-  {
-    // The parent container of this chart.
-    'parent': '#SankeyParticles',
-    // Set these when you need to CSS style components independently.
-    'id': 'SankeyParticles',
-    'class': 'SankeyParticles',
-    'resizable': true,
-    // Our data...
-    'csv': {
-      // Give folks without data something to look at anyhow.
-      'header': ["X", "Y", "Z"],
-      'data': [
-        [0, 0, 0],
-        [1, 1, 1],
-        [2, 2, 2]
-      ]
-    },
-    'width': "100%",
-    'height': "100%",
-    'margin' : { 'top' : 2, 'bottom' : 10, 'left' : 2, 'right' : 10 },
-    'transform': "translate(0 0)",
-    'title': dex.config.text(),
-    'label': dex.config.text()
-  };
-
-  var chart = new dex.component(userConfig, defaults);
-
-  chart.render = function render() {
-    d3 = dex.charts.d3.d3v3;
-    window.onresize = this.resize;
-    chart.resize();
-  };
-
-  chart.resize = function resize() {
-    d3 = dex.charts.d3.d3v3;
-    if (chart.config.resizable) {
-      var width = d3.select(chart.config.parent).property("clientWidth");
-      var height = d3.select(chart.config.parent).property("clientHeight");
-      dex.console.log(chart.config.id + ": resize(" + width + "," + height + ")");
-      chart.attr("width", width).attr("height", height).update();
-    }
-    else {
-      chart.update();
-    }
-  };
-
-  d3sankey = function () {
-    var sankey = {},
-      nodeWidth = 24,
-      nodePadding = 8,
-      size = [1, 1],
-      nodes = [],
-      links = [];
-
-    sankey.nodeWidth = function (_) {
-      if (!arguments.length) return nodeWidth;
-      nodeWidth = +_;
-      return sankey;
-    };
-
-    sankey.nodePadding = function (_) {
-      if (!arguments.length) return nodePadding;
-      nodePadding = +_;
-      return sankey;
-    };
-
-    sankey.nodes = function (_) {
-      if (!arguments.length) return nodes;
-      nodes = _;
-      return sankey;
-    };
-
-    sankey.links = function (_) {
-      if (!arguments.length) return links;
-      links = _;
-      return sankey;
-    };
-
-    sankey.size = function (_) {
-      if (!arguments.length) return size;
-      size = _;
-      return sankey;
-    };
-
-    sankey.layout = function (iterations) {
-      computeNodeLinks();
-      computeNodeValues();
-      computeNodeBreadths();
-      computeNodeDepths(iterations);
-      computeLinkDepths();
-      return sankey;
-    };
-
-    sankey.relayout = function () {
-      computeLinkDepths();
-      return sankey;
-    };
-
-    sankey.link = function () {
-      var curvature = .5;
-
-      function link(d) {
-        var x0 = d.source.x + d.source.dx,
-          x1 = d.target.x,
-          xi = d3.interpolateNumber(x0, x1),
-          x2 = xi(curvature),
-          x3 = xi(1 - curvature),
-          y0 = d.source.y + d.sy + d.dy / 2,
-          y1 = d.target.y + d.ty + d.dy / 2;
-        return "M" + x0 + "," + y0
-          + "C" + x2 + "," + y0
-          + " " + x3 + "," + y1
-          + " " + x1 + "," + y1;
-      }
-
-      link.curvature = function (_) {
-        if (!arguments.length) return curvature;
-        curvature = +_;
-        return link;
-      };
-
-      return link;
-    };
-
-    // Populate the sourceLinks and targetLinks for each node.
-    // Also, if the source and target are not objects, assume they are indices.
-    function computeNodeLinks() {
-      nodes.forEach(function (node) {
-        node.sourceLinks = [];
-        node.targetLinks = [];
-      });
-      links.forEach(function (link) {
-        var source = link.source,
-          target = link.target;
-        if (typeof source === "number") source = link.source = nodes[link.source];
-        if (typeof target === "number") target = link.target = nodes[link.target];
-        source.sourceLinks.push(link);
-        target.targetLinks.push(link);
-      });
-    }
-
-    // Compute the value (size) of each node by summing the associated links.
-    function computeNodeValues() {
-      nodes.forEach(function (node) {
-        node.value = Math.max(
-          d3.sum(node.sourceLinks, value),
-          d3.sum(node.targetLinks, value)
-        );
-      });
-    }
-
-    // Iteratively assign the breadth (x-position) for each node.
-    // Nodes are assigned the maximum breadth of incoming neighbors plus one;
-    // nodes with no incoming links are assigned breadth zero, while
-    // nodes with no outgoing links are assigned the maximum breadth.
-    function computeNodeBreadths() {
-      var remainingNodes = nodes,
-        nextNodes,
-        x = 0;
-
-      while (remainingNodes.length) {
-        nextNodes = [];
-        remainingNodes.forEach(function (node) {
-          node.x = x;
-          node.dx = nodeWidth;
-          node.sourceLinks.forEach(function (link) {
-            if (nextNodes.indexOf(link.target) < 0) {
-              nextNodes.push(link.target);
-            }
-          });
-        });
-        remainingNodes = nextNodes;
-        ++x;
-      }
-
-      //
-      moveSinksRight(x);
-      scaleNodeBreadths((size[0] - nodeWidth) / (x - 1));
-    }
-
-    function moveSourcesRight() {
-      nodes.forEach(function (node) {
-        if (!node.targetLinks.length) {
-          node.x = d3.min(node.sourceLinks, function (d) {
-              return d.target.x;
-            }) - 1;
-        }
-      });
-    }
-
-    function moveSinksRight(x) {
-      nodes.forEach(function (node) {
-        if (!node.sourceLinks.length) {
-          node.x = x - 1;
-        }
-      });
-    }
-
-    function scaleNodeBreadths(kx) {
-      nodes.forEach(function (node) {
-        node.x *= kx;
-      });
-    }
-
-    function computeNodeDepths(iterations) {
-      var nodesByBreadth = d3.nest()
-        .key(function (d) {
-          return d.x;
-        })
-        .sortKeys(d3.ascending)
-        .entries(nodes)
-        .map(function (d) {
-          return d.values;
-        });
-
-      //
-      initializeNodeDepth();
-      resolveCollisions();
-      for (var alpha = 1; iterations > 0; --iterations) {
-        relaxRightToLeft(alpha *= .99);
-        resolveCollisions();
-        relaxLeftToRight(alpha);
-        resolveCollisions();
-      }
-
-      function initializeNodeDepth() {
-        var ky = d3.min(nodesByBreadth, function (nodes) {
-          return (size[1] - (nodes.length - 1) * nodePadding) / d3.sum(nodes, value);
-        });
-
-        nodesByBreadth.forEach(function (nodes) {
-          nodes.forEach(function (node, i) {
-            node.y = i;
-            node.dy = node.value * ky;
-          });
-        });
-
-        links.forEach(function (link) {
-          link.dy = link.value * ky;
-        });
-      }
-
-      function relaxLeftToRight(alpha) {
-        nodesByBreadth.forEach(function (nodes, breadth) {
-          nodes.forEach(function (node) {
-            if (node.targetLinks.length) {
-              var y = d3.sum(node.targetLinks, weightedSource) / d3.sum(node.targetLinks, value);
-              node.y += (y - center(node)) * alpha;
-            }
-          });
-        });
-
-        function weightedSource(link) {
-          return center(link.source) * link.value;
-        }
-      }
-
-      function relaxRightToLeft(alpha) {
-        nodesByBreadth.slice().reverse().forEach(function (nodes) {
-          nodes.forEach(function (node) {
-            if (node.sourceLinks.length) {
-              var y = d3.sum(node.sourceLinks, weightedTarget) / d3.sum(node.sourceLinks, value);
-              node.y += (y - center(node)) * alpha;
-            }
-          });
-        });
-
-        function weightedTarget(link) {
-          return center(link.target) * link.value;
-        }
-      }
-
-      function resolveCollisions() {
-        nodesByBreadth.forEach(function (nodes) {
-          var node,
-            dy,
-            y0 = 0,
-            n = nodes.length,
-            i;
-
-          // Push any overlapping nodes down.
-          nodes.sort(ascendingDepth);
-          for (i = 0; i < n; ++i) {
-            node = nodes[i];
-            dy = y0 - node.y;
-            if (dy > 0) node.y += dy;
-            y0 = node.y + node.dy + nodePadding;
-          }
-
-          // If the bottommost node goes outside the bounds, push it back up.
-          dy = y0 - nodePadding - size[1];
-          if (dy > 0) {
-            y0 = node.y -= dy;
-
-            // Push any overlapping nodes back up.
-            for (i = n - 2; i >= 0; --i) {
-              node = nodes[i];
-              dy = node.y + node.dy + nodePadding - y0;
-              if (dy > 0) node.y -= dy;
-              y0 = node.y;
-            }
-          }
-        });
-      }
-
-      function ascendingDepth(a, b) {
-        return a.y - b.y;
-      }
-    }
-
-    function computeLinkDepths() {
-      nodes.forEach(function (node) {
-        node.sourceLinks.sort(ascendingTargetDepth);
-        node.targetLinks.sort(ascendingSourceDepth);
-      });
-      nodes.forEach(function (node) {
-        var sy = 0, ty = 0;
-        node.sourceLinks.forEach(function (link) {
-          link.sy = sy;
-          sy += link.dy;
-        });
-        node.targetLinks.forEach(function (link) {
-          link.ty = ty;
-          ty += link.dy;
-        });
-      });
-
-      function ascendingSourceDepth(a, b) {
-        return a.source.y - b.source.y;
-      }
-
-      function ascendingTargetDepth(a, b) {
-        return a.target.y - b.target.y;
-      }
-    }
-
-    function center(node) {
-      return node.y + node.dy / 2;
-    }
-
-    function value(link) {
-      return link.value;
-    }
-
-    return sankey;
-  };
-
-  chart.update = function () {
-    var chart = this;
-    var config = chart.config;
-    var csv = config.csv;
-
-    d3.selectAll(config.parent).selectAll('*').remove();
-
-    var data = dex.csv.getGraph(csv);
-    //dex.console.log("DATA", data);
-
-    var margin = config.margin,
-      width = config.width - margin.left - margin.right,
-      height = config.height - margin.top - margin.bottom;
-
-    var formatNumber = d3.format(",.0f"),
-      format = function (d) {
-        return formatNumber(d) + " TWh";
-      },
-      color = d3.scale.category20();
-
-    var chartContainer = d3.select(config.parent)
-      .append("g")
-      .attr("class", config["id"])
-      .attr("id", config["id"])
-      .attr("transform", config.transform);
-
-    var sankey = d3sankey()
-      .nodeWidth(15)
-      .nodePadding(10)
-      .size([width, height]);
-
-    var path = sankey.link();
-
-    var freqCounter = 1;
-
-    data.links.forEach(function (d) {
-      d.o_value = d.value;
-      d.value = 1;
-    })
-
-    sankey
-      .nodes(data.nodes)
-      .links(data.links)
-      .layout(32);
-
-    var link = chartContainer.append("g").selectAll(".link")
-      .data(data.links)
-      .enter().append("path")
-      .attr("class", "link")
-      .attr("d", path)
-      .style("stroke-width", function (d) {
-        return Math.max(1, d.dy);
-      })
-      .sort(function (a, b) {
-        return b.dy - a.dy;
-      });
-
-    link.append("title")
-      .text(function (d) {
-        return d.source.name + " → " + d.target.name + "\n" + format(d.o_value);
-      });
-
-    var node = chartContainer.append("g").selectAll(".node")
-      .data(data.nodes)
-      .enter().append("g")
-      .attr("class", "node")
-      .attr("transform", function (d) {
-        return "translate(" + d.x + "," + d.y + ")";
-      })
-      .call(d3.behavior.drag()
-        .origin(function (d) {
-          return d;
-        })
-        .on("dragstart", function () {
-          this.parentNode.appendChild(this);
-        })
-        .on("drag", dragmove));
-
-    node.append("rect")
-      .attr("height", function (d) {
-        return d.dy;
-      })
-      .attr("width", sankey.nodeWidth())
-      .style("fill", function (d) {
-        return d.color = color(d.name.replace(/ .*/, ""));
-      })
-      .style("stroke", "none")
-      .append("title")
-      .text(function (d) {
-        return d.name + "\n" + format(d.o_value);
-      });
-
-    node.append("text")
-      .attr("x", -6)
-      .attr("y", function (d) {
-        return d.dy / 2;
-      })
-      .attr("dy", ".35em")
-      .attr("text-anchor", "end")
-      .attr("transform", null)
-      .text(function (d) {
-        return d.name;
-      })
-      .filter(function (d) {
-        return d.x < width / 2;
-      })
-      .attr("x", 6 + sankey.nodeWidth())
-      .attr("text-anchor", "start");
-
-    function dragmove(d) {
-      d3.select(this).attr("transform", "translate(" + d.x + "," + (d.y = Math.max(0, Math.min(height - d.dy, d3.event.y))) + ")");
-      sankey.relayout();
-      link.attr("d", path);
-    }
-
-    var linkExtent = d3.extent(data.links, function (d) {
-      return d.o_value
-    });
-    var frequencyScale = d3.scale.linear().domain(linkExtent).range([0.05, 1]);
-    var particleSize = d3.scale.linear().domain(linkExtent).range([1, 5]);
-
-
-    data.links.forEach(function (link) {
-      link.freq = frequencyScale(link.o_value);
-      link.particleSize = 2;
-      link.particleColor = d3.scale.linear().domain([0, 1])
-        .range([link.source.color, link.target.color]);
-    })
-
-    var t = d3.timer(tick, 1000);
-    var particles = [];
-
-    function tick(elapsed, time) {
-
-      particles = particles.filter(function (d) {
-        return d.current < d.path.getTotalLength()
-      });
-
-      chartContainer.selectAll("path.link")
-        .each(
-          function (d) {
-//        if (d.freq < 1) {
-            for (var x = 0; x < 2; x++) {
-              var offset = (Math.random() - .5) * (d.dy - 4);
-              if (Math.random() < d.freq) {
-                var length = this.getTotalLength();
-                particles.push({
-                  link: d,
-                  time: elapsed,
-                  offset: offset,
-                  path: this,
-                  length: length,
-                  animateTime: length,
-                  speed: 0.5 + (Math.random())
-                })
-              }
-            }
-
-//        }
-            /*        else {
-             for (var x = 0; x<d.freq; x++) {
-             var offset = (Math.random() - .5) * d.dy;
-             particles.push({link: d, time: elapsed, offset: offset, path: this})
-             }
-             } */
-          });
-
-      particleEdgeCanvasPath(elapsed);
-    }
-
-    function particleEdgeCanvasPath(elapsed) {
-      var context = chartContainer.select("canvas")
-        .node().getContext("2d")
-
-      context.clearRect(0, 0, 1000, 1000);
-
-      context.fillStyle = "gray";
-      context.lineWidth = "1px";
-      for (var x in particles) {
-        var currentTime = elapsed - particles[x].time;
-//        var currentPercent = currentTime / 1000 * particles[x].path.getTotalLength();
-        particles[x].current = currentTime * 0.15 * particles[x].speed;
-        var currentPos = particles[x].path.getPointAtLength(particles[x].current);
-        context.beginPath();
-        context.fillStyle = particles[x].link.particleColor(0);
-        context.arc(currentPos.x, currentPos.y + particles[x].offset, particles[x].link.particleSize, 0, 2 * Math.PI);
-        context.fill();
-      }
-    }
-
-  };
-
-  $(document).ready(function () {
-    // Make the entire chart draggable.
-    //$(chart.config.parent).draggable();
-  });
-
-  return chart;
-};
-
-module.exports = sankeyparticles;
 },{}],27:[function(require,module,exports){
 var scatterplot = function (userConfig) {
   d3 = dex.charts.d3.d3v3;
@@ -7518,16 +5432,25 @@ var scatterplot = function (userConfig) {
 module.exports = scatterplot;
 },{}],28:[function(require,module,exports){
 var sunburst = function (userConfig) {
+  d3 = dex.charts.d3.d3v3;
   var chart;
 
-  var defaults =
-  {
+  var defaults = {
     // The parent container of this chart.
-    'parent': '#Sunburst',
+    'parent': '#SunburstParent',
     // Set these when you need to CSS style components independently.
-    'id': 'Sunburst',
-    'class': 'Sunburst',
+    'id': 'SunburstId',
+    'class': 'SunburstChart',
     'resizable': true,
+    'width': "100%",
+    'height': "100%",
+    'margin': {
+      'left': 100,
+      'right': 100,
+      'top': 50,
+      'bottom': 50
+    },
+    'transform': "",
     // Our data...
     'csv': {
       // Give folks without data something to look at anyhow.
@@ -7538,45 +5461,34 @@ var sunburst = function (userConfig) {
         [2, 2, 2]
       ]
     },
-    'width': "100%",
-    'height': "100%",
-    'transform': "translate(0 0)",
     'title': dex.config.text(),
-    'label': dex.config.text()
+    'label': dex.config.text({
+      'fill.fillColor': 'white'
+    }),
+    'color' : d3.scale.category20c()
   };
 
-  var chart = new dex.component(userConfig, defaults);
+  chart = new dex.component(userConfig, defaults);
 
   chart.render = function render() {
-    window.onresize = this.resize;
-    chart.resize();
-  };
-
-  chart.resize = function resize() {
-    if (chart.config.resizable) {
-      var width = d3.select(chart.config.parent).property("clientWidth");
-      var height = d3.select(chart.config.parent).property("clientHeight");
-      dex.console.log(chart.config.id + ": resize(" + width + "," + height + ")");
-      chart.attr("width", width).attr("height", height).update();
-    }
-    else {
-      chart.update();
-    }
+    d3 = dex.charts.d3.d3v3;
+    return chart.resize();
   };
 
   chart.update = function () {
-    var chart = this;
+    d3 = dex.charts.d3.d3v3;
     var config = chart.config;
+    var margin = config.margin;
     var csv = config.csv;
+    var width = config.width - margin.left - margin.right;
+    var height = config.height - margin.top - margin.bottom;
 
-    d3.selectAll(config.parent).selectAll('*').remove();
+    d3.selectAll(config.parent).selectAll("*").remove();
 
     var data = dex.csv.toNestedJson(dex.csv.copy(csv));
     //dex.console.log("DATA", csv, data);
 
-    var width = config.width - 10,
-      height = config.height - 10,
-      radius = Math.min(width, height) / 2;
+    var radius = Math.min(width, height) / 2;
 
     var x = d3.scale.linear()
       .range([0, 2 * Math.PI]);
@@ -7584,12 +5496,19 @@ var sunburst = function (userConfig) {
     var y = d3.scale.linear()
       .range([0, radius]);
 
-    var color = d3.scale.category20c();
-
-    var chartContainer = d3.select(config.parent).append("g")
-      .attr("class", config["id"])
+    var svg = d3.select(config.parent)
+      .append("svg")
       .attr("id", config["id"])
-      .attr("transform", "translate(" + width / 2 + "," + (height / 2 + 10) + ")");
+      .attr("class", config["class"])
+      .attr('width', config.width)
+      .attr('height', config.height);
+
+    var rootG = svg
+      .append('g')
+      .attr('transform', 'translate(' +
+        margin.left + ',' + margin.top + ') ' +
+        'translate(' + width / 2 + ',' + (height / 2) + ')' +
+        config.transform);
 
     var partition = d3.layout.partition()
       .value(function (d) {
@@ -7610,62 +5529,60 @@ var sunburst = function (userConfig) {
         return Math.max(0, y(d.y + d.dy));
       });
 
-
-
-    //d3.json("https://s3-us-west-2.amazonaws.com/s.cdpn.io/65174/flare.json", function (error, root) {
-
     var root = data;
 
-      var g = chartContainer.selectAll("g")
-        .data(partition.nodes(root))
-        .enter().append("g");
+    var g = rootG.selectAll("g")
+      .data(partition.nodes(root))
+      .enter().append("g");
 
-      var path = g.append("path")
-        .attr("d", arc)
-        .style("fill", function (d) {
-          return color((d.children ? d : d.parent).name);
-        })
-        .on("click", click);
+    var path = g.append("path")
+      .attr("d", arc)
+      .style("fill", function (d) {
+        //dex.console.log("COLOR", (d.children ? d : d.parent).name,
+        //  config.color((d.children ? d : d.parent).name));
+        return config.color((d.children ? d : d.parent).name);
+      })
+      .on("click", click);
 
-      var text = g.append("text")
-        .call(dex.config.configureText, config.label)
-        .attr("transform", function (d) {
-          //dex.console.log("D", d);
-          return "rotate(" + computeTextRotation(d) + ")";
-        })
-        .attr("x", function (d) {
-          return y(d.y);
-        })
-        .attr("dx", "6") // margin
-        .attr("dy", ".35em") // vertical-align
-        .text(function (d) {
-          return d.name;
+    var text = g.append("text")
+      .call(dex.config.configureText, config.label)
+      .attr("transform", function (d) {
+        //dex.console.log("D", d);
+        return "rotate(" + computeTextRotation(d) + ")";
+      })
+      .attr("x", function (d) {
+        return y(d.y);
+      })
+      .attr("dx", "6") // margin
+      .attr("dy", ".35em") // vertical-align
+      .text(function (d) {
+        return d.name;
+      });
+
+    function click(d) {
+      // fade out all text elements
+      text.transition().attr("opacity", 0);
+
+      path.transition()
+        .duration(750)
+        .attrTween("d", arcTween(d))
+        .each("end", function (e, i) {
+          // check if the animated element's data e lies within the visible angle span given in d
+          if (e.x >= d.x && e.x < (d.x + d.dx)) {
+            // get a selection of the associated text element
+            var arcText = d3.select(this.parentNode).select("text");
+            // fade in the text element and recalculate positions
+            arcText.transition().duration(750)
+              .attr("opacity", 1)
+              .attr("transform", function () {
+                return "rotate(" + computeTextRotation(e) + ")"
+              })
+              .attr("x", function (d) {
+                return y(d.y);
+              });
+          }
         });
-
-      function click(d) {
-        // fade out all text elements
-        text.transition().attr("opacity", 0);
-
-        path.transition()
-          .duration(750)
-          .attrTween("d", arcTween(d))
-          .each("end", function (e, i) {
-            // check if the animated element's data e lies within the visible angle span given in d
-            if (e.x >= d.x && e.x < (d.x + d.dx)) {
-              // get a selection of the associated text element
-              var arcText = d3.select(this.parentNode).select("text");
-              // fade in the text element and recalculate positions
-              arcText.transition().duration(750)
-                .attr("opacity", 1)
-                .attr("transform", function () {
-                  return "rotate(" + computeTextRotation(e) + ")"
-                })
-                .attr("x", function (d) {
-                  return y(d.y);
-                });
-            }
-          });
-      }
+    }
 
     d3.select(self.frameElement).style("height", height + "px");
 
@@ -7677,20 +5594,19 @@ var sunburst = function (userConfig) {
       return function (d, i) {
         return i
           ? function (t) {
-          return arc(d);
-        }
+            return arc(d);
+          }
           : function (t) {
-          x.domain(xd(t));
-          y.domain(yd(t)).range(yr(t));
-          return arc(d);
-        };
+            x.domain(xd(t));
+            y.domain(yd(t)).range(yr(t));
+            return arc(d);
+          };
       };
     }
 
     function computeTextRotation(d) {
       return (x(d.x + d.dx / 2) - Math.PI / 2) / Math.PI * 180;
     }
-
   };
 
   $(document).ready(function () {
@@ -7705,7 +5621,7 @@ module.exports = sunburst;
 },{}],29:[function(require,module,exports){
 var topojsonmap = function (userConfig) {
   d3 = dex.charts.d3.d3v3;
-  var chart = null;
+  var chart;
 
   var defaults = {
     'parent': '#TopoJsonMap',
@@ -7716,23 +5632,31 @@ var topojsonmap = function (userConfig) {
     'projection': d3.geo.albers(),
     'width': '100%',
     'height': '100%',
+    'resizable': true,
     'transform': 'translate(0,0)',
+    'feature' : {
+      "topology" : undefined,
+      "path" : dex.config.path({
+        "fill.fillColor" : "lightgrey",
+        "stroke.color" : "white"
+      })
+    },
     'margin': {
-      'left': 10,
-      'right': 10,
-      'top': 10,
-      'bottom': 10
+      'left': 0,
+      'right': 0,
+      'top': 0,
+      'bottom': 0
     },
     "selectedColor": "steelblue",
-    "unselectedColor": "grey",
+    "unselectedColor": "lightgrey",
   };
+
+  var selected = {};
 
   chart = new dex.component(userConfig, defaults);
 
   chart.render = function render() {
     d3 = dex.charts.d3.d3v3;
-    chart.resize = this.resize(chart);
-    window.onresize = chart.resize;
     return chart.resize();
   };
 
@@ -7745,18 +5669,24 @@ var topojsonmap = function (userConfig) {
     var width = config.width - margin.left - margin.right;
     var height = config.height - margin.top - margin.bottom;
 
+    dex.console.log("WIDTH", config.width, width, config.height, height);
+
     d3.selectAll(config.parent).selectAll("*").remove();
 
-    var chartContainer = d3.select(config.parent)
-      .append("g")
+    var svg = d3.select(config.parent)
+      .append("svg")
       .attr("id", config["id"])
       .attr("class", config["class"])
-      .attr("transform", config.transform)
       .attr('width', config.width)
       .attr('height', config.height);
 
+    var rootG = svg.append('g')
+      .attr('transform', 'translate(' +
+        (margin.left) + ',' +
+        (margin.top) + ') ' +
+        config.transform);
+
     var featureBounds,
-      geoParent,
       geo,
       geoLayer = {},
       slast,
@@ -7775,9 +5705,6 @@ var topojsonmap = function (userConfig) {
       .center([width / 2, height / 2])
       .scaleExtent([1, 8])
       .on("zoom", zoomed);
-
-    var svg = chartContainer;
-
 
     function getFeaturesBox() {
       return {
@@ -7813,7 +5740,7 @@ var topojsonmap = function (userConfig) {
       tlast = trans;
       slast = scale;
 
-      geoParent.attr('transform', [
+      rootG.attr('transform', [
         'translate(' + trans + ')',
         'scale(' + scale + ')'
       ].join(' '));
@@ -7881,12 +5808,27 @@ var topojsonmap = function (userConfig) {
       fitGeoInside();
     }
 
-    // load topojson & make map
+    function passThru(d) {
+      var e = d3.event;
 
-    dex.console.log("CONFIG", config);
+      var prev = this.style.pointerEvents;
+      this.style.pointerEvents = 'none';
+
+      var el = document.elementFromPoint(d3.event.x, d3.event.y);
+
+      var e2 = document.createEvent('MouseEvent');
+      e2.initMouseEvent(e.type, e.bubbles, e.cancelable, e.view, e.detail, e.screenX, e.screenY, e.clientX, e.clientY, e.ctrlKey, e.altKey, e.shiftKey, e.metaKey, e.button, e.relatedTarget);
+
+      el.dispatchEvent(e2);
+
+      this.style.pointerEvents = prev;
+    }
+
+    // load topojson & make map
     var topology = chart.config.toplogy;
 
-    var features = topojson.feature(config.topology, config.feature).features;
+    var features = topojson.feature(
+      config.topology, config.feature.topology).features;
 
     var collection = {
       'type': 'FeatureCollection',
@@ -7895,9 +5837,7 @@ var topojsonmap = function (userConfig) {
 
     featureBounds = path.bounds(collection);
 
-    geoParent = svg.append("g");
-
-    geoParent
+    rootG
       .append('rect')
       .attr('class', 'bg')
       .attr('pointer-events', 'none')
@@ -7905,24 +5845,51 @@ var topojsonmap = function (userConfig) {
       .attr('width', width)
       .attr('height', height);
 
-    geo = geoParent.append("g");
+    geo = rootG.append("g");
 
     geo.selectAll('.feature')
       .data(features)
       .enter()
       .append("path")
       .attr("class", "feature")
-      .attr("d", path);
-
+      .attr("d", path)
+      .call(dex.config.configurePath, config.feature.path)
+      .on("mouseover", function (d) {
+        chart.publish({
+          "type": "mouseover",
+          "target": d
+        });
+      })
+      .on("mousedown", function (d) {
+        if (selected[d.id]) {
+          chart.publish({
+            "type": "unselect",
+            "target": d
+          });
+          selected[d.id] = false;
+          d3.select(this).style("fill", config.unselectedColor);
+        }
+        else {
+          chart.publish({
+            "type": "select",
+            "target": d
+          });
+          selected[d.id] = true;
+          d3.select(this).style("fill", config.selectedColor);
+        }
+      });
 
     svg.append("rect")
       .attr("class", "overlay")
       .attr("width", width)
       .attr("height", height)
+      .style("pointer-events", "all")
+      .style("fill", "none")
+      .on("mousedown", passThru)
+      .on("mouseover", passThru)
       .call(zoom);
 
     initialize();
-
   };
   return chart;
 };
@@ -7934,10 +5901,10 @@ var treemap = function (userConfig) {
   var chart = null;
 
   var defaults = {
-    'parent': '#Treemap',
+    'parent': '#TreemapParent',
     // Set these when you need to CSS style components independently.
-    'id': 'Treemap',
-    'class': 'Treemap',
+    'id': 'TreemapId',
+    'class': 'TreemapClass',
     'resizable': true,
     // Our data...
     'csv': undefined,
@@ -7988,12 +5955,9 @@ var treemap = function (userConfig) {
   };
 
   var chart = new dex.component(userConfig, defaults);
-  var color = config.color;
 
   chart.render = function render() {
     d3 = dex.charts.d3.d3v3;
-    chart.resize = this.resize(chart);
-    window.onresize = chart.resize;
     return chart.resize();
   };
 
@@ -8002,24 +5966,25 @@ var treemap = function (userConfig) {
     var config = chart.config;
     var margin = config.margin;
     var csv = config.csv;
+    var color = config.color;
 
     var width = config.width - margin.left - margin.right;
     var height = config.height - margin.top - margin.bottom;
 
     d3.selectAll(config.parent).selectAll("*").remove();
 
-    var chartContainer = d3.select(config.parent)
-      .append("g")
+    var svg = d3.select(config.parent)
+      .append("svg")
       .attr("id", config["id"])
       .attr("class", config["class"])
       .attr('width', config.width)
-      .attr('height', config.height)
-      .attr("transform", config.transform);
+      .attr('height', config.height);
 
-    var chartG = chartContainer
+    var rootG = svg
       .append('g')
       .attr('transform', 'translate(' +
-        margin.left + ',' + margin.top + ')');
+        margin.left + ',' + margin.top + ') ' +
+        config.transform);
 
     var formatNumber = d3.format(",d");
     var transitioning;
@@ -8045,7 +6010,7 @@ var treemap = function (userConfig) {
       .ratio(height / width * 0.5 * (1 + Math.sqrt(5)))
       .round(false);
 
-    var grandparent = chartG.append("g")
+    var grandparent = rootG.append("g")
       .attr("class", "grandparent");
 
     grandparent.append("rect")
@@ -8110,7 +6075,7 @@ var treemap = function (userConfig) {
         .select("text")
         .text(config.title + name(d));
 
-      var g1 = chartG.insert("g", ".grandparent")
+      var g1 = rootG.insert("g", ".grandparent")
         .datum(d)
         .attr("class", "depth");
 
@@ -8188,10 +6153,10 @@ var treemap = function (userConfig) {
         y.domain([d.y, d.y + d.dy]);
 
         // Enable anti-aliasing during the transition.
-        chartG.style("shape-rendering", null);
+        rootG.style("shape-rendering", null);
 
         // Draw child nodes on top of parent nodes.
-        chartG.selectAll(".depth").sort(function (a, b) {
+        rootG.selectAll(".depth").sort(function (a, b) {
           return a.depth - b.depth;
         });
 
@@ -8207,7 +6172,7 @@ var treemap = function (userConfig) {
 
         // Remove the old node when the transition is finished.
         t1.remove().each("end", function () {
-          chartG.style("shape-rendering", "crispEdges");
+          rootG.style("shape-rendering", "crispEdges");
           transitioning = false;
         });
 
@@ -8280,7 +6245,7 @@ var treemap = function (userConfig) {
     }
 
     function name(d) {
-      dex.console.log("NAME", d);
+      //dex.console.log("NAME", d);
       return d.parent
         ? name(d.parent) + " > " + d.name + " (" +
         formatNumber(d.size) + ")"
@@ -8306,10 +6271,10 @@ var treemapBarChart = function (userConfig) {
 
   var defaults = {
     // The parent container of this chart.
-    'parent': '#TreemapBarChart',
+    'parent': '#TreemapBarChartParent',
     // Set these when you need to CSS style components independently.
-    'id': 'TreemapBarChart',
-    'class': 'TreemapBarChart',
+    'id': 'TreemapBarChartId',
+    'class': 'TreemapBarChartClass',
     'resizable': true,
     // Our data...
     'csv': {
@@ -8340,7 +6305,7 @@ var treemapBarChart = function (userConfig) {
     },
     'width': "100%",
     'height': "100%",
-    'transform': "translate(0 0)",
+    'transform': "",
     'colorScheme': d3.schemeCategory20,
     // <text fill="#000" y="9" x="0.5" dy="0.71em">Property Crime</text>
     // <text fill="#000" y="9" x="0.5" dy=".71em" dx="0" font-family="sans-serif" font-size="14" font-weight="normal" font-style="normal" text-decoration="none" word-spacing="normal" letter-spacing="normal" variant="normal" transform="" style="text-anchor: start; fill: grey; fill-opacity: 1;">Violent Crime</text>
@@ -8355,7 +6320,7 @@ var treemapBarChart = function (userConfig) {
     'margin': {
       'top': 25,
       'right': 15,
-      'bottom': 50,
+      'bottom': 100,
       'left': 60
     },
     // <text fill="#000" y="3" x="0.5" dy="0.71em">2000</text>
@@ -8371,30 +6336,35 @@ var treemapBarChart = function (userConfig) {
   };
 
   var chart = new dex.component(userConfig, defaults);
-  var config = chart.config;
 
   chart.render = function render() {
-    d3 = dex.charts.d3.d3v4;
-    chart.resize = this.resize(chart);
-    window.onresize = chart.resize;
+    d3 = dex.charts.d3.d3v3;
     return chart.resize();
   };
 
   chart.update = function update() {
     d3 = dex.charts.d3.d3v4;
+    var config = chart.config;
     var margin = config.margin;
+    var csv = config.csv;
+
     var width = config.width - margin.left - margin.right;
     var height = config.height - margin.top - margin.bottom;
 
     d3.selectAll(config.parent).selectAll("*").remove();
 
-    var chartContainer = d3.select(config.parent)
-      .append("g")
+    var svg = d3.select(config.parent)
+      .append("svg")
       .attr("id", config["id"])
       .attr("class", config["class"])
-      .attr("transform", config.transform)
       .attr('width', config.width)
       .attr('height', config.height);
+
+    var rootG = svg
+      .append('g')
+      .attr('transform', 'translate(' +
+        margin.left + ',' + margin.top + ') ' +
+        config.transform);
 
     var colorDomain = dex.csv.uniqueArray(config.csv, config.index.color);
     var categoryDomain = dex.csv.uniqueArray(config.csv, config.index.category);
@@ -8468,7 +6438,7 @@ var treemapBarChart = function (userConfig) {
       return a.data.x - b.data.x
     })
 
-    var svg = chartContainer
+    var svg = rootG
       .append('g')
       .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
 
@@ -8477,14 +6447,12 @@ var treemapBarChart = function (userConfig) {
         return d.data.x
       }).sort())
       .range([0, width])
-      .padding(0.15)
-
-    // REM
+      .padding(0.15);
 
     var x1 = d3.scaleBand()
       .domain(categoryDomain)
       .rangeRound([0, x0.bandwidth()])
-      .paddingInner(0.1)
+      .paddingInner(0.1);
 
     var y = d3.scaleLinear()
       .domain([0, d3.max(xData, function (d) {
@@ -8492,28 +6460,28 @@ var treemapBarChart = function (userConfig) {
           return e.value
         })
       })]).nice()
-      .range([0, height])
+      .range([0, height]);
 
     var x0Axis = d3.axisBottom()
       .scale(x0)
-      .tickSize(0)
+      .tickSize(0);
 
     var x1Axis = d3.axisBottom()
-      .scale(x1)
+      .scale(x1);
 
     var yAxis = d3.axisLeft()
       .tickSize(-width)
       //.tickFormat(tickFormat)
-      .scale(y.copy().range([height, 0]))
+      .scale(y.copy().range([height, 0]));
 
     svg.append('g')
       .attr('class', 'x0 axis')
       .attr('transform', 'translate(0,' + (height + 22) + ')')
-      .call(x0Axis)
+      .call(x0Axis);
 
     var gy = svg.append('g')
       .attr('class', 'y axis')
-      .call(yAxis)
+      .call(yAxis);
 
     var xs = svg.selectAll('.x')
       .data(xData, function (d) {
@@ -8523,17 +6491,17 @@ var treemapBarChart = function (userConfig) {
       .attr('class', 'x')
       .attr('transform', function (d) {
         return 'translate(' + x0(d.data.x) + ',0)'
-      })
+      });
 
     xs.append('g')
       .attr('class', 'x1 axis')
       .attr('transform', 'translate(0,' + height + ')')
-      .call(x1Axis)
+      .call(x1Axis);
 
     d3.select('#inflation-adjusted').on('change', function () {
       options.key = this.checked ? 'adj_value' : 'value';
       tmUpdate();
-    })
+    });
 
     tmUpdate();
 
@@ -8971,8 +6939,6 @@ module.exports = verticallegend;
  * This module provides D3 based visualization components.
  *
  * @module dex/charts/d3
- * @name d3
- * @memberOf dex.charts
  *
  */
 var d3 = {};
@@ -8981,6 +6947,7 @@ d3.d3v4 = require("../../../lib/d3.v4.4.0.min");
 d3.d3v3 = require("../../../lib/d3.v3.5.17.min");
 
 //d3.Axis = require("./Axis");
+d3.BumpChart = require("./BumpChart");
 d3.Chord = require("./Chord");
 d3.ClusteredForce = require("./ClusteredForce");
 d3.Dendrogram = require("./Dendrogram");
@@ -8989,16 +6956,15 @@ d3.Dendrogram = require("./Dendrogram");
 d3.HorizontalLegend = require("./HorizontalLegend");
 //d3.LineChart = require("./LineChart");
 d3.MotionBarChart = require("./MotionBarChart");
-d3.MotionChart = require("./MotionChart");
-d3.MotionCircleChart = require("./MotionCircleChart");
-d3.MotionLineChart = require("./MotionLineChart");
+//d3.MotionChart = require("./MotionChart");
+//d3.MotionCircleChart = require("./MotionCircleChart");
+//d3.MotionLineChart = require("./MotionLineChart");
 d3.OrbitalLayout = require("./OrbitalLayout");
 d3.ParallelCoordinates = require("./ParallelCoordinates");
-d3.PieChart = require("./PieChart");
 d3.RadarChart = require("./RadarChart");
 d3.RadialTree = require("./RadialTree");
 d3.Sankey = require("./Sankey");
-d3.SankeyParticles = require("./SankeyParticles");
+//d3.SankeyParticles = require("./SankeyParticles");
 d3.ScatterPlot = require("./ScatterPlot");
 d3.Sunburst = require("./Sunburst");
 //d3.TitledTreemap = require("./TitledTreemap");
@@ -9008,22 +6974,20 @@ d3.TreemapBarChart = require("./TreemapBarChart");
 d3.TopoJsonMap = require("./TopoJsonMap");
 
 module.exports = d3;
-},{"../../../lib/d3.v3.5.17.min":1,"../../../lib/d3.v4.4.0.min":2,"./Chord":12,"./ClusteredForce":13,"./Dendrogram":14,"./HorizontalLegend":15,"./MotionBarChart":16,"./MotionChart":17,"./MotionCircleChart":18,"./MotionLineChart":19,"./OrbitalLayout":20,"./ParallelCoordinates":21,"./PieChart":22,"./RadarChart":23,"./RadialTree":24,"./Sankey":25,"./SankeyParticles":26,"./ScatterPlot":27,"./Sunburst":28,"./TopoJsonMap":29,"./Treemap":30,"./TreemapBarChart":31,"./VerticalLegend":32}],34:[function(require,module,exports){
+},{"../../../lib/d3.v3.5.17.min":1,"../../../lib/d3.v4.4.0.min":2,"./BumpChart":16,"./Chord":17,"./ClusteredForce":18,"./Dendrogram":19,"./HorizontalLegend":20,"./MotionBarChart":21,"./OrbitalLayout":22,"./ParallelCoordinates":23,"./RadarChart":24,"./RadialTree":25,"./Sankey":26,"./ScatterPlot":27,"./Sunburst":28,"./TopoJsonMap":29,"./Treemap":30,"./TreemapBarChart":31,"./VerticalLegend":32}],34:[function(require,module,exports){
 var ringnetwork = function (userConfig) {
   d3 = dex.charts.d3.d3v3;
   var chart;
 
-  var defaults =
-  {
+  var defaults = {
     // The parent container of this chart.
-    'parent': '#RingNetwork',
+    'parent': '#RingNetworkParent',
     // Set these when you need to CSS style components independently.
-    'id': 'RingNetwork',
-    'class': 'RingNetwork',
+    'id': 'RingNetworkId',
+    'class': 'RingNetworkClass',
     'resizable': true,
-    // Our data...
+    // Sample default data...
     'csv': {
-      // Give folks without data something to look at anyhow.
       'header': ["NAME", "GENDER", "VEHICLE"],
       'data': [
         ["JIM", "M", "CAR"],
@@ -9032,33 +6996,25 @@ var ringnetwork = function (userConfig) {
         ["SALLY", "F", "TRUCK"]
       ]
     },
-    'type' : "rings",
+    'type': "rings",
     'connect': 'last',
     //'connect' : 'all',
     'width': "100%",
     'height': "100%",
-    'transform': "translate(0 0)",
+    'transform': "",
+    'margin': {
+      'left': 100,
+      'right': 100,
+      'top': 50,
+      'bottom': 50
+    }
   };
 
   var chart = new dex.component(userConfig, defaults);
 
   chart.render = function render() {
     d3 = dex.charts.d3.d3v3;
-    window.onresize = this.resize;
-    chart.resize();
-  };
-
-  chart.resize = function resize() {
-    d3 = dex.charts.d3.d3v3;
-    if (chart.config.resizable) {
-      var width = d3.select(chart.config.parent).property("clientWidth");
-      var height = d3.select(chart.config.parent).property("clientHeight");
-      dex.console.log(chart.config.id + ": resize(" + width + "," + height + ")");
-      chart.attr("width", width).attr("height", height).update();
-    }
-    else {
-      chart.update();
-    }
+    return chart.resize();
   };
 
   chart.update = function () {
@@ -9066,6 +7022,9 @@ var ringnetwork = function (userConfig) {
     var chart = this;
     var config = chart.config;
     var csv = config.csv;
+
+    // Nuke the old one
+    d3.selectAll(config.parent).selectAll("*").remove();
 
     var connections = [];
 
@@ -9092,7 +7051,7 @@ var ringnetwork = function (userConfig) {
       }
     }
 
-    //dex.console.log("Connections", connections);
+    dex.console.debug("Connections", connections);
 
     // instantiate d3plus
     var viz = d3plus.viz()
@@ -9123,8 +7082,6 @@ module.exports = ringnetwork;
  * This module provides d3plus based visualizations.
  *
  * @module dex/charts/d3plus
- * @name d3plus
- * @memberOf dex.charts
  *
  */
 var d3plus = {};
@@ -9133,64 +7090,146 @@ d3plus.RingNetwork = require("./RingNetwork");
 
 module.exports = d3plus;
 },{"./RingNetwork":34}],36:[function(require,module,exports){
-/**
- * This will construct a new DygraphsLineChart with the user supplied userConfig applied.
- * @param userConfig - A user supplied configuration of the form:
- * @returns {DexComponent} The LineChart
- * @constructor
- *
- */
-var linechart = function (userConfig) {
-  var defaults =
-  {
-    'parent'    : null,
-    'id'        : "DygraphsLineChart",
-    "class"     : "DygraphsLineChart",
-    'csv'       : {
-      'header' : ["X", "Y"],
-      'data'   : [
-        [0, 0],
-        [1, 1],
-        [2, 4],
-        [3, 9],
-        [4, 16]
-      ]
+var bubblechart = function (userConfig) {
+  d3 = dex.charts.d3.d3v3;
+  var chart;
+
+  var defaults = {
+    'parent': '#EChartParent',
+    'id': 'EChartId',
+    'class': 'EChartClass',
+    'resizable': true,
+    'csv': {
+      'header': [],
+      'data': []
     },
-    'width'     : 600,
-    'height'    : 400,
-    'transform' : '',
-    'options'   : {}
+    'title' : 'Title',
+    'width': "100%",
+    'height': "100%"
   };
 
-  var chart = new dex.component(userConfig, defaults);
-  var config = chart.config;
+  var config1 = dex.config.expandAndOverlay(
+    userConfig, defaults);
 
-  chart.render = function () {
-    this.update();
-  };
+  var config2 = { 'options' : {
+    title: {
+      text: config1.title
+    },
+    legend: {
+      right: 10,
+      data: config1.csv.header
+    },
+    xAxis: {
+      splitLine: {
+        lineStyle: {
+          type: 'dashed'
+        }
+      }
+    },
+    yAxis: {
+      splitLine: {
+        lineStyle: {
+          type: 'dashed'
+        }
+      },
+      scale: true
+    },
+    series: [{
+      name: config1.csv.header[0],
+      data: config1.csv.data[0],
+      type: 'scatter',
+      symbolSize: function (data) {
+        return Math.sqrt(data[2]) / 5e2;
+      },
+      label: {
+        emphasis: {
+          show: true,
+          formatter: function (param) {
+            return param.data[3];
+          },
+          position: 'top'
+        },
+        normal: {
+          textStyle: {
+            color: 'black'
+          }
+        }
+      },
+      itemStyle: {
+        normal: {
+          shadowBlur: 10,
+          shadowColor: 'rgba(120, 36, 50, 0.5)',
+          shadowOffsetY: 5,
+          color: new echarts.graphic.RadialGradient(0.4, 0.3, 1, [{
+            offset: 0,
+            color: 'rgb(251, 118, 123)'
+          }, {
+            offset: 1,
+            color: 'rgb(204, 46, 72)'
+          }])
+        }
+      }
+    }, {
+      name: config1.csv.header[1],
+      data: config1.csv.data[1],
+      type: 'scatter',
+      symbolSize: function (data) {
+        return Math.sqrt(data[2]) / 5e2;
+      },
+      label: {
+        emphasis: {
+          show: true,
+          formatter: function (param) {
+            return param.data[3];
+          },
+          position: 'top'
+        },
+        normal: {
+          textStyle: {
+            color: 'black'
+          }
+        }
+      },
+      itemStyle: {
+        normal: {
+          shadowBlur: 10,
+          shadowColor: 'rgba(25, 100, 150, 0.5)',
+          shadowOffsetY: 5,
+          color: new echarts.graphic.RadialGradient(0.4, 0.3, 1, [{
+            offset: 0,
+            color: 'rgb(129, 227, 238)'
+          }, {
+            offset: 1,
+            color: 'rgb(25, 183, 207)'
+          }])
+        }
+      }
+    }]
+  }};
 
-  chart.update = function () {
-    var chart = this;
+  var chart = new dex.component(config1, config2);
+  var internalChart;
+
+  chart.render = function render() {
+    d3 = dex.charts.d3.d3v3;
     var config = chart.config;
     var csv = config.csv;
 
-    var csvIndices = dex.range(0, csv.header.length);
-    dex.console.trace("CSV INDICES: ", csvIndices);
-    // Map the header.
+    //d3.select(config.parent).selectAll("*").remove();
 
-    var csvData = csvIndices.map(function (i) {
-        return csv.header[i];
-      }).join(",") + "\n";
+    dex.console.log("CSV", csv, "KI",
+      dex.csv.createMap(csv, [0]));
 
-    csvData += config.csv.data.map(function (row) {
-      return csvIndices.map(function (i) {
-        return row[i];
-      }).join(",");
-    }).join("\n") + "\n";
+    internalChart = echarts.init(d3.select(config.parent)[0][0]);
+    internalChart.setOption(config.options);
+    chart.resize();
 
-    d3.selectAll(config.id).remove();
-    g = new Dygraph(document.getElementById(config.parent.substring(1)),
-      csvData, config.options);
+    return chart;
+  };
+
+  chart.update = function () {
+    //d3 = dex.charts.d3.d3v3;
+    internalChart.resize();
   };
 
   $(document).ready(function () {
@@ -9201,600 +7240,412 @@ var linechart = function (userConfig) {
   return chart;
 };
 
-module.exports = linechart;
+module.exports = bubblechart;
 },{}],37:[function(require,module,exports){
+var echart = function (userConfig) {
+  d3 = dex.charts.d3.d3v3;
+  var echart;
+
+  var defaults = {
+    'parent': '#EChartParent',
+    'id': 'EChartId',
+    'class': 'EChartClass',
+    'resizable': true,
+    'csv': {
+      'header': [],
+      'data': []
+    },
+    'width': "100%",
+    'height': "100%",
+  };
+
+  var chart = new dex.component(userConfig, defaults);
+  var internalChart;
+
+  chart.render = function render() {
+    d3 = dex.charts.d3.d3v3;
+    var config = chart.config;
+    var csv = config.csv;
+
+    d3.select(config.parent).selectAll("*").remove();
+
+    internalChart = echarts.init(d3.select(config.parent)[0][0]);
+    internalChart.setOption(config.options);
+    chart.resize();
+
+    return chart;
+  };
+
+  chart.update = function () {
+    //d3 = dex.charts.d3.d3v3;
+    internalChart.resize();
+  };
+
+  $(document).ready(function () {
+    // Make the entire chart draggable.
+    //$(chart.config.parent).draggable();
+  });
+
+  return chart;
+};
+
+module.exports = echart;
+},{}],38:[function(require,module,exports){
 /**
  *
- * This module provides a dygraphs linechart component.
+ * This module provides ECharts 3.0 based visualization components.
  *
- * @module dex/charts/dygraphs
- * @name dygraphs
- * @memberOf dex.charts
+ * @module dex/charts/echarts
  *
  */
+var echarts = {};
 
-var dygraphs = {};
+echarts.EChart = require("./EChart");
+echarts.BubbleChart = require("./BubbleChart");
 
-dygraphs.LineChart = require("./LineChart");
-
-module.exports = dygraphs;
-},{"./LineChart":36}],38:[function(require,module,exports){
-var diffbarchart = function (userConfig) {
+module.exports = echarts;
+},{"./BubbleChart":36,"./EChart":37}],39:[function(require,module,exports){
+var scatterplot = function (userConfig) {
+  d3 = dex.charts.d3.d3v3;
+  var chart;
 
   var defaults = {
-    // The parent container of this chart.
-    'parent'     : "#GoogleDiffBarChart",
-    // Set these when you need to CSS style components independently.
-    'id'         : 'GoogleDiffBarChart',
-    'class'      : 'GoogleDiffBarChart',
-    // Our data...
-    'csv'        : {
-      'header' : ['Category', 'Major', 'Degrees'],
-      'data'   : [
-        ['old', 'Business', 256070],
-        ['old', 'Education', 108034],
-        ['old', 'Social Sciences & History', 127101],
-        ['old', 'Health', 81863],
-        ['old', 'Psychology', 74194],
-        ['new', 'Business', 358293],
-        ['new', 'Education', 101265],
-        ['new', 'Social Sciences & History', 172780],
-        ['new', 'Health', 129634],
-        ['new', 'Psychology', 97216]]
+    'parent': '#Elegans_ScatterPlotParent',
+    'id': 'Elegans_ScatterPlotId',
+    'class': 'Elegans_ScatterPlotParentClass',
+    'resizable': true,
+    'csv': {
+      'header': [],
+      'data': []
     },
-    'resizable' : true,
-    'diff'       : {
-      'compare'       : 'Category',
-      'compareGroups' : ['old', 'new']
+    'series': [
+      {
+        'name': 'series-1',
+        'coordinates': {'x': 0, 'y': 1, 'z': 2},
+        'group': undefined,
+        'shape': 'circle',
+        'size': 1,
+      }
+    ],
+    'stage': {
+      width: 700,
+      height: 530,
+      world_width: 500,
+      world_height: 500,
+      axis_labels: {x: "X", y: "Y", z: "Z"},
+      bg_color: 0xffffff,
+      player: false,
+      space_mode: 'wireframe',
+      range: {x: [0, 0], y: [0, 0], z: [0, 0]},
+      autorange: true,
+      grid: true,
+      perspective: true,
+      orbit: false,
+      save_image: false
     },
-    'options'    : {
-      'bars' : 'horizontal',
-      'hAxis.viewWindowMode' : 'maximized',
-      'vAxis.viewWindowMode' : 'maximized',
-      'chartArea.width' : function() { return chart.config.width * 0.8; },
-      'chartArea.height' : function() { return chart.config.height * 0.8; }
-    }
+    //'shapes': ["circle", "cross", "rect", "diamond", "circle", "circle"],
+    'color': d3.scale.category10(),
+    'width': "100%",
+    'height': "100%",
   };
 
-  var chart = new dex.component(userConfig, defaults);
+  chart = new dex.component(userConfig, defaults);
+  var internalChart;
 
   chart.render = function render() {
-    window.onresize = this.resize;
-    chart.attr("options.chart.title", 'title')
-      .attr("options.chart.subtitle", 'subtitle')
-      .attr("options.colors", [
-        'steelblue', 'red', 'blue', 'green',
-        'orange', 'purple', 'grey', 'brown',
-        'cyan', 'magenta']);
+    d3 = dex.charts.d3.d3v3;
+    var config = chart.config;
+    var csv = config.csv;
+
+    var tcsv = dex.csv.transpose(csv);
+
+    d3.select(config.parent).selectAll("*").remove();
+
     chart.resize();
-  };
 
-  chart.resize = function resize() {
-    if (chart.config.resizable) {
-      var config = chart.config;
-      var target = (config.parent && config.parent[0] == '#') ?
-        config.parent.substring(1) : config.parent;
-      var targetElt = document.getElementById(target);
+    internalChart = new Elegans.Stage(d3.select(config.parent)[0][0], config.stage);
+    config.series.forEach(function (series) {
 
-      var width = targetElt.clientWidth;
-      var height = targetElt.clientHeight;
-      dex.console.log("google.DiffBarChart Resize: " + width + "x" + height);
-
-      chart
-        .attr("width", width)
-        .attr("height", height)
-        .update();
-    }
-    else {
-      chart.update();
-    }
-  };
-
-  chart.update = function update() {
-    var chart = this;
-    var config = chart.config;
-
-    // Keep a copy of the before and after data
-    var beforeData = [dex.array.copy(config.csv.header)];
-    var afterData = [dex.array.copy(config.csv.header)];
-
-    // Find the category we're grouping on.
-    var groupIndex = config.csv.header.indexOf(config.diff.category);
-
-    // Nothing to chart if the group index is invalid.  Simply return.
-    if (groupIndex < 0) {
-      return;
-    }
-
-    // Iterate over each row in the data:
-    config.csv.data.forEach(function (row) {
-      // Copy the rows with matching group indexes.
-      if (row[groupIndex] == config.diff.compareGroups[0]) {
-        beforeData.push(dex.array.copy(row));
+      //dex.console.log("SERIES", series);
+      var groups;
+      if (series.group) {
+        //dex.console.log("GROUPING BY: " + series.group + " = " +
+        //  dex.csv.getColumnNumber(series.group));
+        groups = dex.csv.group(csv, [dex.csv.getColumnNumber(csv, series.group)]);
+        //dex.console.log("GROUP", group);
+        groups.forEach(function (group) {
+          group.name = group.key;
+        })
       }
-      else if (row[groupIndex] == config.diff.compareGroups[1]) {
-        afterData.push(dex.array.copy(row));
+      else {
+        groups = [series];
+        groups[0].csv = csv;
       }
-    })
 
-    // Remove the group index from the copied data.
-    beforeData.forEach(function (row) {
-      row.splice(groupIndex, 1);
-    });
-    afterData.forEach(function (row) {
-      row.splice(groupIndex, 1);
+      //dex.console.log("GROUPS", csv, groups);
+
+      groups.forEach(function (group) {
+        //dex.console.log("GROUP", group);
+        data = {
+          'x': dex.csv.getColumnData(group.csv, series.coordinates.x),
+          'y': dex.csv.getColumnData(group.csv, series.coordinates.y),
+          'z': dex.csv.getColumnData(group.csv, series.coordinates.z)
+        };
+
+        //dex.console.log("GROUP", group);
+
+        internalChart.add(new Elegans.Scatter(data, {
+          fill_color: config.color(group.name),
+          shape: series.shape,
+          name: group.name,
+          size: series.size
+        }));
+      });
     });
 
-    dex.console.log("csv", config.csv, "before", beforeData, "after", afterData);
+    internalChart.render();
 
-    // Get the valid query string for the parent:
-    var target = (config.parent && config.parent[0] == '#') ?
-      config.parent.substring(1) : config.parent;
+    return chart;
+  };
 
-    // Use js dom to locate the target node.
-    var targetNode = document.getElementById(target);
-
-    // Delete the children.
-    while (targetNode.firstChild) {
-      targetNode.removeChild(targetNode.firstChild);
-    }
-
-    var beforeDataTable = google.visualization.arrayToDataTable(beforeData);
-    var afterDataTable = google.visualization.arrayToDataTable(afterData);
-
-    var diffChart = new google.visualization.BarChart(targetNode);
-
-    var diffDataTable = diffChart.computeDiff(beforeDataTable, afterDataTable);
-    diffChart.draw(diffDataTable, config.options);
+  chart.update = function () {
+    //d3 = dex.charts.d3.d3v3;
+    //internalChart.resize();
   };
 
   $(document).ready(function () {
     // Make the entire chart draggable.
-    $(chart.config.parent).draggable();
+    //$(chart.config.parent).draggable();
   });
 
   return chart;
 };
 
-module.exports = diffbarchart;
-},{}],39:[function(require,module,exports){
-var diffpiechart = function (userConfig) {
-
-  var defaults = {
-    // The parent container of this chart.
-    'parent'     : "#DiffPieChart",
-    // Set these when you need to CSS style components independently.
-    'id'         : 'DiffPieChart',
-    'class'      : 'DiffPieChart',
-    // Our data...
-    'csv'        : {
-      'header' : ['Category', 'Major', 'Degrees'],
-      'data'   : [
-        ['old', 'Business', 256070],
-        ['old', 'Education', 108034],
-        ['old', 'Social Sciences & History', 127101],
-        ['old', 'Health', 81863],
-        ['old', 'Psychology', 74194],
-        ['new', 'Business', 358293],
-        ['new', 'Education', 101265],
-        ['new', 'Social Sciences & History', 172780],
-        ['new', 'Health', 129634],
-        ['new', 'Psychology', 97216]]
-    },
-    'resizable' : true,
-    'diff'       : {
-      'compare'       : 'Category',
-      'compareGroups' : ['old', 'new']
-    },
-    'options'    : {
-      'title'           : 'default title',
-      'legend.position' : 'bottom'
-    }
-  };
-
-  var chart = new dex.component(userConfig, defaults);
-
-  chart.render = function render() {
-    window.onresize = this.resize;
-    chart
-      .resize();
-  };
-
-  chart.resize = function resize() {
-    if (chart.config.resizable) {
-      var config = chart.config;
-      var target = (config.parent && config.parent[0] == '#') ?
-        config.parent.substring(1) : config.parent;
-      var targetElt = document.getElementById(target);
-
-      var width = targetElt.clientWidth;
-      var height = targetElt.clientHeight;
-      dex.console.log("google.DiffPieChart Resize: " + width + "x" + height);
-
-      chart
-        .attr("width", width)
-        .attr("height", height)
-        .attr("options.chartArea.width", width * .8)
-        .attr("options.chartArea.height", height * .8)
-        .update();
-    }
-    else {
-      chart.update();
-    }
-  };
-
-  chart.update = function update() {
-    var chart = this;
-    var config = chart.config;
-
-    var oldData = [dex.array.copy(config.csv.header)];
-    var newData = [dex.array.copy(config.csv.header)];
-    var groupIndex = config.csv.header.indexOf(config.diff.category);
-
-    if (groupIndex < 0) {
-      return;
-    }
-
-    config.csv.data.forEach(function (row) {
-      if (row[groupIndex] == config.diff.compareGroups[0]) {
-        oldData.push(dex.array.copy(row));
-      }
-      else if (row[groupIndex] == config.diff.compareGroups[1]) {
-        newData.push(dex.array.copy(row));
-      }
-    })
-
-    newData.forEach(function (row) {
-      row.splice(groupIndex, 1);
-    });
-    oldData.forEach(function (row) {
-      row.splice(groupIndex, 1);
-    });
-
-    dex.console.log("csv", config.csv, "old", oldData, "new", newData);
-
-    var target = (config.parent && config.parent[0] == '#') ?
-      config.parent.substring(1) : config.parent;
-
-    var targetNode = document.getElementById(target);
-
-    while (targetNode.firstChild) {
-      targetNode.removeChild(targetNode.firstChild);
-    }
-
-    var oldDataTable = google.visualization.arrayToDataTable(oldData);
-    var newDataTable = google.visualization.arrayToDataTable(newData);
-
-    var diffChart = new google.visualization.PieChart(targetNode);
-
-    var diffDataTable = diffChart.computeDiff(oldDataTable, newDataTable);
-    diffChart.draw(diffDataTable, config.options);
-  };
-
-  $(document).ready(function () {
-    // Make the entire chart draggable.
-    $(chart.config.parent).draggable();
-  });
-
-  return chart;
-};
-
-module.exports = diffpiechart;
+module.exports = scatterplot;
 },{}],40:[function(require,module,exports){
 /**
- *
- * @param userConfig A user supplied configuration object which will override the defaults.
- * @returns {DexComponent} Returns the Axis object.
- * @constructor
- *
+ * @module dex/charts/c3
  */
-var piechart = function (userConfig) {
+var elegans = {};
 
-  // Todo: Mouseover events to communicate with other charting components.
+elegans.ScatterPlot = require("./ScatterPlot");
+
+module.exports = elegans;
+},{"./ScatterPlot":39}],41:[function(require,module,exports){
+var bubblechart = function (userConfig) {
+  d3 = dex.charts.d3.d3v3;
+  var chart;
+
   var defaults = {
-    // The parent container of this chart.
-    'parent'     : null,
-    // Set these when you need to CSS style components independently.
-    'id'         : 'PieChart',
-    'class'      : 'PieChart',
-    // Our data...
-    'csv'        : {
-      'header' : ["Task", "Hours per Day"],
-      'data'   : [
-        ['Work', 8],
-        ['Eat', 2],
-        ['Watch TV', 1],
-        ['Sleep', 7],
-        ['Chores', 2],
-        ['Code', 4]
-      ]
+    'parent': '#Nvd3_BubbleChartParent',
+    'id': 'Nvd3_BubbleChartId',
+    'class': 'Nvd3_BubbleChartClass',
+    'resizable': true,
+    'csv': {
+      'header': [],
+      'data': []
     },
-    'resizeable' : true,
-    'title'      : "title",
-    'options'    : {}
+    'width': "100%",
+    'height': "100%",
+    'legend': 'right'
   };
 
   var chart = new dex.component(userConfig, defaults);
+  var internalChart;
 
   chart.render = function render() {
-    window.onresize = this.resize;
-    chart.resize();
-  };
+    d3 = dex.charts.d3.d3v3;
+    var config = chart.config;
+    var csv = config.csv;
 
-  chart.resize = function resize() {
-    if (chart.config.resizeable) {
-      var config = chart.config;
-      var target = (config.parent && config.parent[0] == '#') ?
-        config.parent.substring(1) : config.parent;
-      var targetNode = document.getElementById(target);
+    d3.select(config.parent).selectAll("*").remove();
 
-      while (targetNode.firstChild) {
-        targetNode.removeChild(targetNode.firstChild);
+    //dex.console.log("CSV", csv, dex.csv.group(csv, [0]));
+    var groups = dex.csv.group(csv, [0]);
+    var nvd3Data = groups.map(function (group) {
+      //dex.console.log("KEY", group.key, group);
+      return {
+        'key': group.key,
+        'values': group.csv.data.map(function (row) {
+          return {'x': +row[1], 'y': +row[2], 'size': +row[3]};
+        })
       }
-
-      var width = targetNode.clientWidth;
-      var height = targetNode.clientHeight;
-      //dex.console.log("google.PieChart Resize: " + width + "x" + height);
-      //var width = d3.select(chart.config.parent).property("clientWidth");
-      //var height = d3.select(chart.config.parent).property("clientHeight");
-      //chart.attr("width", width).attr("height", height).update();
-      chart.update();
-    }
-    else {
-      chart.update();
-    }
-  };
-
-  chart.update = function update() {
-    var chart = this;
-    var config = chart.config;
-
-    var data = dex.matrix.copy(config.csv.data);
-    data.unshift(dex.array.copy(config.csv.header));
-    dex.console.log("google.PieChart Data:", data, "Options", config.options);
-
-    var dataTable = google.visualization.arrayToDataTable(data);
-
-    var target = (config.parent && config.parent[0] == '#') ?
-      config.parent.substring(1) : config.parent;
-
-    var chart = new google.visualization.PieChart(
-      document.getElementById(target));
-
-    chart.draw(dataTable, config.options);
-  };
-
-  $(document).ready(function () {
-    // Make the entire chart draggable.
-    $(chart.config.parent).draggable().zIndex(0);
-  });
-
-  return chart;
-};
-
-module.exports = piechart;
-},{}],41:[function(require,module,exports){
-/**
- *
- * @param userConfig A user supplied configuration object which will override the defaults.
- * @returns {DexComponent} Returns the Axis object.
- * @constructor
- *
- */
-var timeline = function (userConfig) {
-
-  var defaults = {
-    // The parent container of this chart.
-    'parent'     : null,
-    // Set these when you need to CSS style components independently.
-    'id'         : 'Timeline',
-    'class'      : 'Timeline',
-    // Our data...
-    'csv'        : {
-      'header' : ["President", "Start", "End"],
-      'data'   : [
-        ['Washington', '3/29/1789', '2/3/1797'],
-        ['Adams', '2/3/1797', '2/3/1801'],
-        ['Jefferson', '2/3/1801', '2/3/1809']
-      ]
-    },
-    'resizable' : true,
-    'title'      : "Timeline",
-    'options'    : {}
-  };
-
-  var chart = new dex.component(userConfig, defaults);
-
-  chart.render = function render() {
-    window.onresize = this.resize;
-    chart.resize();
-  };
-
-  chart.resize = function resize() {
-    if (chart.config.resizable || isNaN(chart.config.height) ||
-      isNaN(chart.config.width)) {
-      var config = chart.config;
-      var target = (config.parent && config.parent[0] == '#') ?
-        config.parent.substring(1) : config.parent;
-      var targetElt = document.getElementById(target);
-
-      var width = targetElt.clientWidth;
-      var height = targetElt.clientHeight;
-      dex.console.log("google.Timeline Resize: " + width + "x" + height);
-      //var width = d3.select(chart.config.parent).property("clientWidth");
-      //var height = d3.select(chart.config.parent).property("clientHeight");
-      //chart.attr("width", width).attr("height", height).update();
-      chart.update();
-    }
-    else {
-      chart.update();
-    }
-  };
-
-  chart.update = function update() {
-    var chart = this;
-    var config = chart.config;
-
-    // Guessing types, then setting the category column to the first
-    // string.  The fromIndex to the first occurrence of a 'date' type
-    // and toIndex to the second occurrence of a 'date' type.
-    //
-    // If the data does not contain at least a string and two dates, it
-    // will chart nothing.
-    var categoryIndex;
-    var fromIndex;
-    var toIndex;
-
-    var types = dex.csv.guessTypes(config.csv);
-
-    categoryIndex = types.indexOf('string');
-    fromIndex = types.indexOf('date');
-    toIndex = types.indexOf('date', fromIndex + 1);
-
-    if (categoryIndex == -1 || fromIndex == -1 || toIndex == -1) {
-      return;
-    }
-
-    var chartCsv = dex.csv.columnSlice(config.csv, [categoryIndex, fromIndex, toIndex]);
-    var data = chartCsv.data;
-    data.unshift(dex.array.copy(chartCsv.header));
-    dex.console.log("google.PieChart Data:", data, "Options", config.options);
-
-    var dataTable = google.visualization.arrayToDataTable(data);
-
-    var target = (config.parent && config.parent[0] == '#') ?
-      config.parent.substring(1) : config.parent;
-
-    var chart = new google.visualization.Timeline(
-      document.getElementById(target));
-
-    chart.draw(dataTable, config.options);
-  };
-
-  $(document).ready(function () {
-    // Make the entire chart draggable.
-    $(chart.config.parent).draggable();
-  });
-
-  return chart;
-};
-
-module.exports = timeline;
-},{}],42:[function(require,module,exports){
-/**
- *
- * @param userConfig A user supplied configuration object which will override the defaults.
- * @returns {DexComponent} Returns the Axis object.
- * @constructor
- *
- */
-var wordtree = function (userConfig) {
-
-  var defaults = {
-    // The parent container of this chart.
-    'parent'     : null,
-    // Set these when you need to CSS style components independently.
-    'id'         : 'WordTree',
-    'class'      : 'WordTree',
-    // Our data...
-    'csv'        : {
-      'header' : ["LINE"],
-      'data'   : [
-        ['Now is the time for all good men to fight.'],
-        ['Now is the time for all good men to flee.'],
-        ['Now is not the time.']
-      ]
-    },
-    'resizeable' : true,
-    'options'    : {
-      'wordtree' : {
-        'format' : 'implicit'
-      }
-    }
-  };
-
-  var chart = new dex.component(userConfig, defaults);
-
-  chart.render = function render() {
-    window.onresize = this.resize;
-    chart.resize();
-  };
-
-  chart.resize = function resize() {
-    if (chart.config.resizeable) {
-      var config = chart.config;
-      var target = (config.parent && config.parent[0] == '#') ?
-        config.parent.substring(1) : config.parent;
-      var targetElt = document.getElementById(target);
-
-      var width = targetElt.clientWidth;
-      var height = targetElt.clientHeight;
-      dex.console.log("google.WordTree Resize: " + width + "x" + height);
-      //var width = d3.select(chart.config.parent).property("clientWidth");
-      //var height = d3.select(chart.config.parent).property("clientHeight");
-      //chart.attr("width", width).attr("height", height).update();
-      chart
-        //.attr("options.height", height)
-        //.attr("options.width", width)
-        .update();
-    }
-    else {
-      chart.update();
-    }
-  };
-
-  chart.update = function update() {
-    var chart = this;
-    var config = chart.config;
-    var target = (config.parent && config.parent[0] == '#') ?
-      config.parent.substring(1) : config.parent;
-
-    var phrases = [["Phrases"]];
-    config.csv.data.forEach(function (row) {
-      row.forEach(function (col) {
-        phrases.push([col.toLowerCase()]);
-      })
     });
 
-    dex.console.log("PHRASES", phrases);
+    //dex.console.log("NVDDATA", nvd3Data);
 
-    var data = google.visualization.arrayToDataTable(phrases);
+    var nvd3Chart = nv.models.scatterChart()
+      .showDistX(true)
+      .showDistY(true)
+      .useVoronoi(true)
+      .color(d3.scale.category10().range())
+      .duration(300);
 
-    var chart = new google.visualization.WordTree(
-      document.getElementById(target));
-    chart.draw(data, config.options);
+    //nvd3Chart.xAxis.tickFormat(d3.format('.02f'));
+    nvd3Chart.yAxis.tickFormat(d3.format('.02f'));
+    nvd3Chart.xAxis
+      .showMaxMin(false)
+      .tickFormat(function (d) {
+        return d3.time.format('%x')(new Date(d))
+      });
+
+    var svg = d3.select(config.parent)
+      .append("svg")
+      .attr("id", config["id"])
+      .attr("class", config["class"])
+      .attr('width', config.width)
+      .attr('height', config.height)
+      .datum(nvd3Data)
+      .transition()
+      .duration(500)
+      .call(nvd3Chart);
+
+    nv.utils.windowResize(nvd3Chart.update);
+
+    internalChart = nv.addGraph(function () {
+      return nvd3Chart;
+    }, function () {
+      d3.selectAll(".nv-legend-symbol").on('click',
+        function () {
+          dex.console.log("Clicked Legend Of", nvd3Chart.datum());
+        });
+    });
+
+    return chart
+  };
+
+  chart.update = function () {
+    d3 = dex.charts.d3.d3v3;
+    //internalChart.load({'columns': chart.config.csv.data});
   };
 
   $(document).ready(function () {
-
     // Make the entire chart draggable.
-    $(chart.config.parent).draggable();
+    //$(chart.config.parent).draggable();
   });
 
   return chart;
 };
 
-module.exports = wordtree;
+module.exports = bubblechart;
+},{}],42:[function(require,module,exports){
+var stackedareachart = function (userConfig) {
+  d3 = dex.charts.d3.d3v3;
+  var chart;
+
+  var defaults = {
+    'parent': '#Nvd3_StackedAreaChart',
+    'id': 'Nvd3_StackedAreaChartId',
+    'class': 'Nvd3_StackedAreaChartClass',
+    'resizable': true,
+    'csv': {
+      'header': [],
+      'data': []
+    },
+    'width': "100%",
+    'height': "100%",
+    'legend': 'right'
+  };
+
+  var chart = new dex.component(userConfig, defaults);
+  var internalChart;
+
+  chart.render = function render() {
+    d3 = dex.charts.d3.d3v3;
+    var config = chart.config;
+    var csv = config.csv;
+
+    d3.select(config.parent).selectAll("*").remove();
+
+    //dex.console.log("CSV", csv, dex.csv.group(csv, [0]));
+    var groups = dex.csv.group(csv, [0]);
+    var nvd3Data = groups.map(function (group) {
+      //dex.console.log("KEY", group.key, group);
+      return {
+        'key': group.key,
+        'values': group.csv.data.map(function (row) {
+          return [+row[1], +row[2]];
+        })
+      }
+    });
+
+    //dex.console.log("NVDDATA", nvdData);
+
+    var nvd3Chart = nv.models.stackedAreaChart()
+      .x(function (d) {
+        return d[0]
+      })
+      .y(function (d) {
+        return d[1]
+      })
+      .clipEdge(true)
+      .useInteractiveGuideline(true);
+
+    nvd3Chart.xAxis
+      .showMaxMin(false)
+      .tickFormat(function (d) {
+        return d3.time.format('%x')(new Date(d))
+      });
+
+    nvd3Chart.yAxis
+      .tickFormat(d3.format(',.2f'));
+
+    var svg = d3.select(config.parent)
+      .append("svg")
+      .attr("id", config["id"])
+      .attr("class", config["class"])
+      .attr('width', config.width)
+      .attr('height', config.height)
+      .datum(nvd3Data)
+      .transition()
+      .duration(500)
+      .call(nvd3Chart);
+
+    nv.utils.windowResize(nvd3Chart.update);
+
+    internalChart = nv.addGraph(function () {
+      return nvd3Chart;
+    }, function () {
+      d3.selectAll(".nv-legend-symbol").on('click',
+        function () {
+          dex.console.log("Clicked Legend Of", nvd3Chart.datum());
+        });
+    });
+
+    return chart;
+  };
+
+  chart.update = function () {
+    d3 = dex.charts.d3.d3v3;
+    //internalChart.load({'columns': chart.config.csv.data});
+  };
+
+  $(document).ready(function () {
+    // Make the entire chart draggable.
+    if (chart.config.draggable) {
+      $(chart.config.parent).draggable();
+    }
+  });
+
+  return chart;
+};
+
+module.exports = stackedareachart;
 },{}],43:[function(require,module,exports){
 /**
  *
- * This module provides routines for dealing with arrays.
+ * This module provides NVD3 based visualization components.
  *
- * @module dex/charts/google
- * @name google
- * @memberOf dex.charts
+ * @module dex/charts/nvd3
  *
  */
-var google = {};
+var nvd3 = {};
 
-google.DiffBarChart = require("./DiffBarChart");
-google.DiffPieChart = require("./DiffPieChart");
-google.PieChart = require("./PieChart");
-google.Timeline = require("./Timeline");
-google.WordTree = require("./WordTree");
+nvd3.StackedAreaChart = require("./StackedAreaChart");
+nvd3.BubbleChart = require("./BubbleChart");
 
-module.exports = google;
-},{"./DiffBarChart":38,"./DiffPieChart":39,"./PieChart":40,"./Timeline":41,"./WordTree":42}],44:[function(require,module,exports){
+module.exports = nvd3;
+},{"./BubbleChart":41,"./StackedAreaChart":42}],44:[function(require,module,exports){
 var scatterplot = function (userConfig) {
   var defaults = {
     // The parent container of this chart.
@@ -10166,8 +8017,6 @@ module.exports = scatterplot;
  * This module provides ThreeJS/WebGL based visualization components.
  *
  * @module dex/charts/threejs
- * @name d3plus
- * @memberOf dex.charts
  *
  */
 var threejs = {};
@@ -10240,7 +8089,7 @@ var network = function (userConfig) {
   var chart = new dex.component(userConfig, defaults);
 
   chart.resize = function resize() {
-    dex.console.log("PARENT: '" + chart.config.parent + "'");
+    //dex.console.log("PARENT: '" + chart.config.parent + "'");
     if (chart.config.resizable) {
       var width = $("" + chart.config.parent).width();
       var height = $("" + chart.config.parent).height();
@@ -10278,7 +8127,6 @@ var network = function (userConfig) {
   };
 
   chart.createData = function() {
-    "use strict";
 
     var nodes = null;
     var edges = null;
@@ -10387,7 +8235,7 @@ var network = function (userConfig) {
         'font'  : {'align': 'middle'} });
     }
 
-    dex.console.log("NODES", nodes, "EDGES", edges);
+    //dex.console.log("NODES", nodes, "EDGES", edges);
 
     return {
       nodes: nodes,
@@ -10405,8 +8253,6 @@ module.exports = network;
  * This module provides routines for dealing with arrays.
  *
  * @module dex/charts/vis
- * @name vis
- * @memberOf dex.charts
  *
  */
 var vis = {};
@@ -10415,15 +8261,55 @@ vis.Network = require("./Network");
 
 module.exports = vis;
 },{"./Network":46}],48:[function(require,module,exports){
-"use strict";
-
 /**
  *
  * This module provides routines for dealing with colors.
  *
  * @module dex/color
- * @name color
- * @memberOf dex
+ *
+ * @property {string[]} palette.c64Dark           - The commodore 64 dark palette.
+ * @property {string[]} palette.c64Light          - The commodore 64 light palette.
+ * @property {string[]} palette.divergingDark12   - Diverging dark colors.
+ * @property {string[]} palette.divergingPastel12 - Diverging pastelles.
+ * @property {string[]} palette.hueSoft128        - 128 colors with soft separation.
+ * @property {string[]} palette.hueHard128        - 128 colors with hard separation.
+ * @property {string[]} palette.crayola8          - The original 8 crayola colors.
+ * @property {string[]} palette.crayola120        - 120 crayola colors.
+ * @property {string[]} palette.YlGn              - Colorbrewer YlGn palettes 3-9.
+ * @property {string[]} palette.YlGnBu            - Colorbrewer YlGnBu palettes 3-9.
+ * @property {string[]} palette.GnBu              - Colorbrewer GnBu palettes 3-9.
+ * @property {string[]} palette.BuGn              - Colorbrewer BuGn palettes 3-9.
+ * @property {string[]} palette.PuBuGn            - Colorbrewer PuBuGn palettes 3-9.
+ * @property {string[]} palette.PuBu              - Colorbrewer PuBu palettes 3-9.
+ * @property {string[]} palette.BuPu              - Colorbrewer BuPu palettes 3-9.
+ * @property {string[]} palette.RdPu              - Colorbrewer RdPu palettes 3-9.
+ * @property {string[]} palette.PuRd              - Colorbrewer PuRd palettes 3-9.
+ * @property {string[]} palette.OrRd              - Colorbrewer OrRd palettes 3-9.
+ * @property {string[]} palette.YlOrRd            - Colorbrewer YlOrRd palettes 3-9.
+ * @property {string[]} palette.YlOrBr            - Colorbrewer YlOrBr palettes 3-9.
+ * @property {string[]} palette.Purples           - Colorbrewer Purples palettes 3-9.
+ * @property {string[]} palette.Blues             - Colorbrewer Blues palettes 3-9.
+ * @property {string[]} palette.Greens            - Colorbrewer Greens palettes 3-9.
+ * @property {string[]} palette.Oranges           - Colorbrewer Oranges palettes 3-9.
+ * @property {string[]} palette.Reds              - Colorbrewer Reds palettes 3-9.
+ * @property {string[]} palette.Greys             - Colorbrewer Greys palettes 3-9.
+ * @property {string[]} palette.PuOr              - Colorbrewer PuOr palettes 3-11.
+ * @property {string[]} palette.BrBG              - Colorbrewer BrBG palettes 3-11.
+ * @property {string[]} palette.PRGn              - Colorbrewer PRGn palettes 3-11.
+ * @property {string[]} palette.PiYG              - Colorbrewer PiYG palettes 3-11.
+ * @property {string[]} palette.RdBu              - Colorbrewer RdBu palettes 3-11.
+ * @property {string[]} palette.RdGy              - Colorbrewer RdGy palettes 3-11.
+ * @property {string[]} palette.RdYlBu            - Colorbrewer RdYlBu palettes 3-11.
+ * @property {string[]} palette.Spectral          - Colorbrewer Spectral palettes 3-11.
+ * @property {string[]} palette.RdYlGn            - Colorbrewer RdYlGn palettes 3-11.
+ * @property {string[]} palette.Accent            - Colorbrewer Accent palettes 3-8.
+ * @property {string[]} palette.Dark2             - Colorbrewer Dark2 palettes 3-8.
+ * @property {string[]} palette.Paired            - Colorbrewer Paired palettes 3-12.
+ * @property {string[]} palette.Pastel1           - Colorbrewer Pastel1 palettes 3-9.
+ * @property {string[]} palette.Pastel2           - Colorbrewer Pastel2 palettes 3-8.
+ * @property {string[]} palette.Set1              - Colorbrewer Set1 palettes 3-9.
+ * @property {string[]} palette.Set2              - Colorbrewer Set2 palettes 3-8.
+ * @property {string[]} palette.Set3              - Colorbrewer Set3 palettes 3-12.
  *
  */
 
@@ -10432,88 +8318,10 @@ module.exports = function color(dex) {
   return {
     /**
      *
-     * This routine converts a rgb(red, green, blue) color to it's
-     * equivalent #ffffff hexadecimal form.
-     *
-     * @param color The color we wish to convert to hex.
-     * @returns {*}
-     */
-    'toHex': function (color) {
-      if (color.substr(0, 1) === '#') {
-        return color;
-      }
-      //console.log("COLOR: " + color)
-      var digits = /rgb\((\d+),(\d+),(\d+)\)/.exec(color);
-      //console.log("DIGITS: " + digits);
-      var red = parseInt(digits[1]);
-      var green = parseInt(digits[2]);
-      var blue = parseInt(digits[3]);
-
-      var rgb = blue | (green << 8) | (red << 16);
-      return '#' + rgb.toString(16);
-    },
-
-    /**
-     *
-     * This routine returns the requested named color scheme with
-     * the requested number of colors.
-     *
-     * @param colorScheme The named color schemes: cat10, cat20, cat20b, cat20c, HiContrast or
-     * any of the named colors from colorbrewer.
-     * @param numColors The number of colors being requested.
-     *
-     * @returns {*} The array of colors.
-     */
-    'colorScheme': function (colorScheme, numColors) {
-      if (colorScheme === "cat10" || colorScheme == "1") {
-        return d3.scale.category10();
-      }
-      else if (colorScheme === "cat20" || colorScheme == "2") {
-        return d3.scale.category20();
-      }
-      else if (colorScheme === "cat20b" || colorScheme == "3") {
-        return d3.scale.category20b();
-      }
-      else if (colorScheme === "cat20c" || colorScheme == "4") {
-        return d3.scale.category20c();
-      }
-      else if (colorScheme == "HiContrast") {
-        return d3.scale.ordinal().range(colorbrewer[colorScheme][9]);
-      }
-      else if (colorScheme in colorbrewer) {
-        //console.log("LENGTH: " + len);
-        var c;
-        var effColors = Math.pow(2, Math.ceil(Math.log(numColors) / Math.log(2)));
-        //console.log("EFF LENGTH: " + len);
-
-        // Find the best cmap:
-        if (effColors > 128) {
-          effColors = 256;
-        }
-
-        for (c = effColors; c >= 2; c--) {
-          if (colorbrewer[colorScheme][c]) {
-            return d3.scale.ordinal().range(colorbrewer[colorScheme][c]);
-          }
-        }
-        for (c = effColors; c <= 256; c++) {
-          if (colorbrewer[colorScheme][c]) {
-            return d3.scale.ordinal().range(colorbrewer[colorScheme][c]);
-          }
-        }
-        return d3.scale.category20();
-      }
-      else {
-        return d3.scale.category20();
-      }
-    },
-
-    /**
-     *
      * Given a color, lighten or darken it by the requested percent.
      *
-     * @param color The color to modify.
-     * @param percent A floating point number in the range of [-1.0, 1.0].  Negative
+     * @param {string} color The color to modify.
+     * @param {number} percent A floating point number in the range of [-1.0, 1.0].  Negative
      * values will lighten the color, positive values will darken it.
      *
      * @returns {string} The lightened or darkened color in the form of #ffffff.
@@ -10547,479 +8355,477 @@ module.exports = function color(dex) {
         (Math.round((G2 - G1) * percent) + G1) * 0x100 +
         (Math.round((B2 - B1) * percent) + B1)).toString(16).slice(1);
     },
-
     /**
      *
-     * @param color
-     * @param percent
-     * @returns {string}
+     * Given an palette or array of colors and some optional color
+     * assignmeents, create a colormap.
+     *
+     * @param {string[]} palette An array of colors within this colormap.
+     * @param {object} presets An optional mapping of domain values and
+     * preset color assignments.
+     *
+     * @returns {Function} Returns the colormap function.
+     *
+     * @example
+     * // Assigns a colormap of red, white and blue
+     * var usColormap = dex.color.colormap(['red', 'white', 'blue']);
+     * @example
+     * // Assigns a colormap of grey, brown and yellow and reserves red for
+     * // Republicans and blue for Democrats.
+     * var usPartyColors = dex.color.colormap(['grey', 'brown', 'yellow'],
+     *   { 'Republican' : 'red', 'Democrat' : 'blue' });
+     *
      */
-    'shadeRGBColor': function (color, percent) {
-      var f = color.split(","), t = percent < 0 ? 0 : 255,
-        p = percent < 0 ? percent * -1 : percent, R = parseInt(f[0].slice(4)),
-        G = parseInt(f[1]), B = parseInt(f[2]);
-      return "rgb(" + (Math.round((t - R) * p) + R) + "," +
-        (Math.round((t - G) * p) + G) + "," +
-        (Math.round((t - B) * p) + B) + ")";
+    'colormap': function (palette, presets) {
+      var numColors = palette.length;
+      var data2Color = presets || {};
+      var currentColor = 0;
+
+      return function (d) {
+        if (data2Color[d]) {
+          //dex.console.log("Existing Color: " + d + " = " + data2Color[d]);
+          return data2Color[d];
+        }
+        else {
+          data2Color[d] = palette[currentColor % numColors];
+          //dex.console.log("New Color[" + currentColor + "]: " + d + " = " + data2Color[d]);
+          currentColor++;
+          return data2Color[d];
+        }
+      };
     },
-
     /**
      *
-     * @param color1
-     * @param color2
-     * @param percent
-     * @returns {string}
+     * Return the list of available named colormaps.
+     *
+     * @return {string[]} The list of available colormaps.
+     *
      */
-    'blendRGBColors': function (color1, color2, percent) {
-      var f = color1.split(","), t = color2.split(","), R = parseInt(f[0].slice(4)),
-        G = parseInt(f[1]), B = parseInt(f[2]);
-      return "rgb(" + (Math.round((parseInt(t[0].slice(4)) - R) * p) + R) + "," +
-        (Math.round((parseInt(t[1]) - G) * percent) + G) + "," +
-        (Math.round((parseInt(t[2]) - B) * percent) + B) + ")";
+    'colormaps': function () {
+      return dex.colors.palette.keys;
     },
-
     /**
      *
-     * @param color
-     * @param percent
-     * @returns {*}
+     * Given a domain of 2 or more items and a range of 2 colors,
+     * return a categorical interpolation across the two colors
+     * based upon the supplied range.
+     *
+     * @param {string[]} domain 2 or more items in a categorical domain.
+     * @param {string[]} range An array of 2 colors.
+     * @returns {Function} A colormap function.
+     *
      */
-    'shade': function (color, percent) {
-      if (color.length > 7) return shadeRGBColor(color, percent);
-      else return shadeColor2(color, percent);
+    'interpolateCategorical': function (domain, range) {
+      var color = d3.scale.ordinal()
+        .domain(domain)
+        .range(d3.range(domain.length).map(d3.scale.linear()
+          .domain([0, domain.length - 1])
+          .range(range)
+          .interpolate(d3.interpolateLab)));
+
+      return function (d) {
+        return color(d);
+      };
     },
-
     /**
      *
-     * @param color1
-     * @param color2
-     * @param percent
+     * Get the named colormap with the assigned presets.
+     *
+     * @param paletteName The name of the color palette to be used.
+     * @param presets Optional user defined color presets which are
+     * assigned via categorial domain.
+     *
+     * @returns {Function} The colormap function.
+     *
      */
-    'blend': function (color1, color2, percent) {
-      if (color1.length > 7) return blendRGBColors(color1, color2, percent);
-      else return blendColors(color1, color2, percent);
+    'getColormap': function (paletteName, presets) {
+      var colormap = dex.color.colormap(dex.color.palette[paletteName], presets);
+      return function (d) {
+        return colormap(d);
+      };
     },
-
-    /**
-     *
-     * Given a color and a percent to lighten or darken it.
-     *
-     * @param color The base color.
-     * @param percent The pecentage to lighten (negative) or darken (positive) the color.
-     *
-     * @returns {string} The computed color.
-     *
-     */
-    /*
-     exports.shadeColor = function (color, percent) {
-     var R = parseInt(color.substring(1, 3), 16)
-     var G = parseInt(color.substring(3, 5), 16)
-     var B = parseInt(color.substring(5, 7), 16);
-
-     R = parseInt(R * (100 + percent) / 100);
-     G = parseInt(G * (100 + percent) / 100);
-     B = parseInt(B * (100 + percent) / 100);
-
-     R = (R < 255) ? R : 255;
-     G = (G < 255) ? G : 255;
-     B = (B < 255) ? B : 255;
-
-     var RR = ((R.toString(16).length == 1) ? "0" + R.toString(16) : R.toString(16));
-     var GG = ((G.toString(16).length == 1) ? "0" + G.toString(16) : G.toString(16));
-     var BB = ((B.toString(16).length == 1) ? "0" + B.toString(16) : B.toString(16));
-
-     return "#" + RR + GG + BB;
-     };
-     */
-
-    'gradient': function (baseColor) {
-      if (baseColor.charAt(0) == 'r') {
-        baseColor = colorToHex(baseColor);
-      }
-      var gradientId;
-      gradientId = "gradient" + baseColor.substring(1)
-      console.log("GradientId: " + gradientId);
-      console.log("BaseColor : " + baseColor);
-
-      //var lightColor = shadeColor(baseColor, -10)
-      var darkColor = shadeColor(baseColor, -20)
-
-      var grad = d3.select("#gradients").selectAll("#" + gradientId)
-        .data([gradientId])
-        .enter()
-        .append("radialGradient")
-        .attr("class", "colorGradient")
-        .attr("id", gradientId)
-        .attr("gradientUnits", "objectBoundingBox")
-        .attr("fx", "30%")
-        .attr("fy", "30%")
-
-      grad.append("stop")
-        .attr("offset", "0%")
-        .attr("style", "stop-color:#FFFFFF")
-
-      // Middle
-      grad.append("stop")
-        .attr("offset", "40%")
-        .attr("style", "stop-color:" + baseColor)
-
-      // Outer Edges
-      grad.append("stop")
-        .attr("offset", "100%")
-        .attr("style", "stop-color:" + darkColor)
-
-      return "url(#" + gradientId + ")";
+    'palette': {
+      'c64Dark': [
+        '#000000', '#880000', '#AAFFEE', '#CC44CC', '#00CC55',
+        '#0000AA', '#EEEE77', '#DD8855', '#664400', '#FF7777',
+        '#333333', '#777777', '#AAFF66', '#0088FF', '#BBBBBB'
+      ],
+      'c64Light': [
+        '#FFFFFF', '#880000', '#AAFFEE', '#CC44CC', '#00CC55',
+        '#0000AA', '#EEEE77', '#DD8855', '#664400', '#FF7777',
+        '#333333', '#777777', '#AAFF66', '#0088FF', '#BBBBBB'
+      ],
+      'divergingDark12': [
+        '#a6cee3', '#1f78b4', '#b2df8a', '#33a02c', '#fb9a99',
+        '#e31a1c', '#fdbf6f', '#ff7f00', '#cab2d6', '#6a3d9a',
+        '#ffff99', '#b15928'],
+      'divergingPastel12': [
+        '#8dd3c7', '#ffffb3', '#bebada', '#fb8072', '#80b1d3',
+        '#fdb462', '#b3de69', '#fccde5', '#d9d9d9', '#bc80bd',
+        '#ccebc5', '#ffed6f'],
+      'hueSoft128': [
+        "#62a96c", "#9844ed", "#37b335", "#6334ce", "#6cac16",
+        "#3c4ce7", "#5e9222", "#6d19b6", "#66b450", "#b229cc",
+        "#348f2d", "#de50ee", "#23af6d", "#e72fc2", "#8ea42f",
+        "#2d2bb8", "#ae9620", "#7a62f3", "#d5942b", "#3c52d6",
+        "#e47b24", "#542da9", "#84a953", "#a35de9", "#768930",
+        "#a047c8", "#2d8346", "#f128a4", "#558338", "#d75eda",
+        "#355f17", "#9d229f", "#9f8d30", "#534bbf", "#ed5322",
+        "#4483f2", "#dc312d", "#5d70e7", "#ad7523", "#a272e8",
+        "#6c6e1a", "#68208f", "#ada257", "#26439f", "#ba3a1e",
+        "#4397dd", "#e72754", "#48a9a2", "#ed2f74", "#3d8d67",
+        "#e75abe", "#305d3b", "#b82891", "#86a46f", "#7c41a4",
+        "#d28047", "#5556b3", "#b0531f", "#6a8fe0", "#8d2f0d",
+        "#3ba8c4", "#ce3f4c", "#3783a3", "#e97059", "#3e69b6",
+        "#a18447", "#ba71d5", "#4d4f22", "#bc4eae", "#6ba385",
+        "#df3d80", "#43857c", "#eb57a1", "#1c5b5a", "#be297b",
+        "#6d7d4c", "#837edd", "#805f27", "#b38ad8", "#704117",
+        "#9f95db", "#94292c", "#70a2c7", "#b52c58", "#48706b",
+        "#ee6b99", "#344b46", "#e56177", "#376093", "#c36758",
+        "#31477e", "#bb8965", "#554286", "#a19b6f", "#6f1f6a",
+        "#7b9587", "#8f3888", "#505a47", "#cd7ec9", "#6e6246",
+        "#ab579c", "#55412f", "#dd79b2", "#305061", "#c05081",
+        "#7f98a6", "#982256", "#506c7f", "#793626", "#6e82b0",
+        "#7f3441", "#7e64a9", "#845941", "#7d2453", "#af9992",
+        "#80416f", "#847063", "#a76794", "#434460", "#ce8d8f",
+        "#603d63", "#d17b92", "#623e43", "#a58bad", "#a16460",
+        "#746687", "#a45269", "#886574"],
+      'hueHard128': [
+        "#74b6b1", "#5500bb", "#47c323", "#9a2bdf", "#47a100",
+        "#1d1ab7", "#00a646", "#d629e2", "#79bc4c", "#d34fff",
+        "#8d9c00", "#a253ff", "#5a7c00", "#ff3cde", "#176100",
+        "#c100b2", "#007533", "#f400a3", "#54be82", "#5c0392",
+        "#e39800", "#005ae1", "#ff8902", "#3685ff", "#fc6900",
+        "#00329f", "#cea635", "#986fff", "#a18600", "#c872ff",
+        "#777800", "#6d7dff", "#dca036", "#0048a4", "#ed001d",
+        "#02b1f9", "#ba0000", "#55aeff", "#d03e00", "#649aff",
+        "#ca5a00", "#0061c1", "#f49339", "#472881", "#93b65a",
+        "#b5009a", "#017745", "#ff52ca", "#335500", "#fd77f6",
+        "#009377", "#d20096", "#00babf", "#dc003d", "#00a9a5",
+        "#ff3a5d", "#37b9d7", "#e10058", "#017c7b", "#ff5a4b",
+        "#018dd1", "#c36c00", "#9d95ff", "#9e6f00", "#de89fe",
+        "#7c5c00", "#73007f", "#bdab5a", "#ff64c6", "#0e4527",
+        "#cf0069", "#77b899", "#c50070", "#005c48", "#ff6199",
+        "#017690", "#a20016", "#5eb3ec", "#882300", "#016bb8",
+        "#ff8557", "#153a73", "#f69158", "#004875", "#ff5f63",
+        "#0088b6", "#ff7962", "#016291", "#d5a255", "#6e0e5d",
+        "#a2b177", "#91005c", "#b2ac87", "#ac004f", "#005264",
+        "#ff5f84", "#353e31", "#de8ee6", "#5a4a00", "#bf9af1",
+        "#834700", "#98aada", "#7a0c0b", "#90aec8", "#900036",
+        "#abad94", "#433268", "#d4a16d", "#2f3a5d", "#ff6d7b",
+        "#433c10", "#e48ed2", "#523609", "#f887b5", "#483a20",
+        "#f68aa5", "#44364f", "#e89770", "#5f284c", "#b0aaa6",
+        "#6e1f29", "#c1a0c8", "#652a13", "#c7a0b3", "#4d3636",
+        "#fa8b8e", "#582f3e", "#df989e"
+      ],
+      'crayola8': [
+        'red', 'yellow', 'blue', 'green',
+        'orange', 'brown', 'violet', 'black'],
+      'crayola120': [
+        '#EFDBC5', '#CD9575', '#FDD9B5', '#78DBE2',
+        '#87A96B', '#FFA474', '#FAE7B5', '#9F8170',
+        '#FD7C6E', '#232323', '#1F75FE', '#ADADD6',
+        '#199EBD', '#7366BD', '#DE5D83', '#CB4154',
+        '#B4674D', '#FF7F49', '#EA7E5D', '#B0B7C6',
+        '#FFFF99', '#1CD3A2', '#FFAACC', '#DD4492',
+        '#1DACD6', '#BC5D58', '#DD9475', '#9ACEEB',
+        '#FFBCD9', '#FDDB6D', '#2B6CC4', '#EFCDB8',
+        '#6E5160', '#1DF914', '#71BC78', '#6DAE81',
+        '#C364C5', '#CC6666', '#E7C697', '#FCD975',
+        '#A8E4A0', '#95918C', '#1CAC78', '#F0E891',
+        '#FF1DCE', '#B2EC5D', '#5D76CB', '#CA3767',
+        '#3BB08F', '#FDFC74', '#FCB4D5', '#FFBD88',
+        '#F664AF', '#CD4A4A', '#979AAA', '#FF8243',
+        '#C8385A', '#EF98AA', '#FDBCB4', '#1A4876',
+        '#30BA8F', '#1974D2', '#FFA343', '#BAB86C',
+        '#FF7538', '#E6A8D7', '#414A4C', '#FF6E4A',
+        '#1CA9C9', '#FFCFAB', '#C5D0E6', '#FDD7E4',
+        '#158078', '#FC74FD', '#F780A1', '#8E4585',
+        '#7442C8', '#9D81BA', '#FF1DCE', '#FF496C',
+        '#D68A59', '#FF48D0', '#E3256B', '#EE204D',
+        '#FF5349', '#C0448F', '#1FCECB', '#7851A9',
+        '#FF9BAA', '#FC2847', '#76FF7A', '#9FE2BF',
+        '#A5694F', '#8A795D', '#45CEA2', '#FB7EFD',
+        '#CDC5C2', '#80DAEB', '#ECEABE', '#FFCF48',
+        '#FD5E53', '#FAA76C', '#FC89AC', '#DBD7D2',
+        '#17806D', '#DEAA88', '#77DDE7', '#FDFC74',
+        '#926EAE', '#F75394', '#FFA089', '#8F509D',
+        '#EDEDED', '#A2ADD0', '#FF43A4', '#FC6C85',
+        '#CDA4DE', '#FCE883', '#C5E384', '#FFB653'
+      ],
+      "YlGn_3": ["#f7fcb9", "#addd8e", "#31a354"],
+      "YlGn_4": ["#ffffcc", "#c2e699", "#78c679", "#238443"],
+      "YlGn_5": ["#ffffcc", "#c2e699", "#78c679", "#31a354", "#006837"],
+      "YlGn_6": ["#ffffcc", "#d9f0a3", "#addd8e", "#78c679", "#31a354", "#006837"],
+      "YlGn_7": ["#ffffcc", "#d9f0a3", "#addd8e", "#78c679", "#41ab5d", "#238443", "#005a32"],
+      "YlGn_8": ["#ffffe5", "#f7fcb9", "#d9f0a3", "#addd8e", "#78c679", "#41ab5d", "#238443", "#005a32"],
+      "YlGn_9": ["#ffffe5", "#f7fcb9", "#d9f0a3", "#addd8e", "#78c679", "#41ab5d", "#238443", "#006837", "#004529"],
+      "YlGnBu_3": ["#edf8b1", "#7fcdbb", "#2c7fb8"],
+      "YlGnBu_4": ["#ffffcc", "#a1dab4", "#41b6c4", "#225ea8"],
+      "YlGnBu_5": ["#ffffcc", "#a1dab4", "#41b6c4", "#2c7fb8", "#253494"],
+      "YlGnBu_6": ["#ffffcc", "#c7e9b4", "#7fcdbb", "#41b6c4", "#2c7fb8", "#253494"],
+      "YlGnBu_7": ["#ffffcc", "#c7e9b4", "#7fcdbb", "#41b6c4", "#1d91c0", "#225ea8", "#0c2c84"],
+      "YlGnBu_8": ["#ffffd9", "#edf8b1", "#c7e9b4", "#7fcdbb", "#41b6c4", "#1d91c0", "#225ea8", "#0c2c84"],
+      "YlGnBu_9": ["#ffffd9", "#edf8b1", "#c7e9b4", "#7fcdbb", "#41b6c4", "#1d91c0", "#225ea8", "#253494", "#081d58"],
+      "GnBu_3": ["#e0f3db", "#a8ddb5", "#43a2ca"],
+      "GnBu_4": ["#f0f9e8", "#bae4bc", "#7bccc4", "#2b8cbe"],
+      "GnBu_5": ["#f0f9e8", "#bae4bc", "#7bccc4", "#43a2ca", "#0868ac"],
+      "GnBu_6": ["#f0f9e8", "#ccebc5", "#a8ddb5", "#7bccc4", "#43a2ca", "#0868ac"],
+      "GnBu_7": ["#f0f9e8", "#ccebc5", "#a8ddb5", "#7bccc4", "#4eb3d3", "#2b8cbe", "#08589e"],
+      "GnBu_8": ["#f7fcf0", "#e0f3db", "#ccebc5", "#a8ddb5", "#7bccc4", "#4eb3d3", "#2b8cbe", "#08589e"],
+      "GnBu_9": ["#f7fcf0", "#e0f3db", "#ccebc5", "#a8ddb5", "#7bccc4", "#4eb3d3", "#2b8cbe", "#0868ac", "#084081"],
+      "BuGn_3": ["#e5f5f9", "#99d8c9", "#2ca25f"],
+      "BuGn_4": ["#edf8fb", "#b2e2e2", "#66c2a4", "#238b45"],
+      "BuGn_5": ["#edf8fb", "#b2e2e2", "#66c2a4", "#2ca25f", "#006d2c"],
+      "BuGn_6": ["#edf8fb", "#ccece6", "#99d8c9", "#66c2a4", "#2ca25f", "#006d2c"],
+      "BuGn_7": ["#edf8fb", "#ccece6", "#99d8c9", "#66c2a4", "#41ae76", "#238b45", "#005824"],
+      "BuGn_8": ["#f7fcfd", "#e5f5f9", "#ccece6", "#99d8c9", "#66c2a4", "#41ae76", "#238b45", "#005824"],
+      "BuGn_9": ["#f7fcfd", "#e5f5f9", "#ccece6", "#99d8c9", "#66c2a4", "#41ae76", "#238b45", "#006d2c", "#00441b"],
+      "PuBuGn_3": ["#ece2f0", "#a6bddb", "#1c9099"],
+      "PuBuGn_4": ["#f6eff7", "#bdc9e1", "#67a9cf", "#02818a"],
+      "PuBuGn_5": ["#f6eff7", "#bdc9e1", "#67a9cf", "#1c9099", "#016c59"],
+      "PuBuGn_6": ["#f6eff7", "#d0d1e6", "#a6bddb", "#67a9cf", "#1c9099", "#016c59"],
+      "PuBuGn_7": ["#f6eff7", "#d0d1e6", "#a6bddb", "#67a9cf", "#3690c0", "#02818a", "#016450"],
+      "PuBuGn_8": ["#fff7fb", "#ece2f0", "#d0d1e6", "#a6bddb", "#67a9cf", "#3690c0", "#02818a", "#016450"],
+      "PuBuGn_9": ["#fff7fb", "#ece2f0", "#d0d1e6", "#a6bddb", "#67a9cf", "#3690c0", "#02818a", "#016c59", "#014636"],
+      "PuBu_3": ["#ece7f2", "#a6bddb", "#2b8cbe"],
+      "PuBu_4": ["#f1eef6", "#bdc9e1", "#74a9cf", "#0570b0"],
+      "PuBu_5": ["#f1eef6", "#bdc9e1", "#74a9cf", "#2b8cbe", "#045a8d"],
+      "PuBu_6": ["#f1eef6", "#d0d1e6", "#a6bddb", "#74a9cf", "#2b8cbe", "#045a8d"],
+      "PuBu_7": ["#f1eef6", "#d0d1e6", "#a6bddb", "#74a9cf", "#3690c0", "#0570b0", "#034e7b"],
+      "PuBu_8": ["#fff7fb", "#ece7f2", "#d0d1e6", "#a6bddb", "#74a9cf", "#3690c0", "#0570b0", "#034e7b"],
+      "PuBu_9": ["#fff7fb", "#ece7f2", "#d0d1e6", "#a6bddb", "#74a9cf", "#3690c0", "#0570b0", "#045a8d", "#023858"],
+      "BuPu_3": ["#e0ecf4", "#9ebcda", "#8856a7"],
+      "BuPu_4": ["#edf8fb", "#b3cde3", "#8c96c6", "#88419d"],
+      "BuPu_5": ["#edf8fb", "#b3cde3", "#8c96c6", "#8856a7", "#810f7c"],
+      "BuPu_6": ["#edf8fb", "#bfd3e6", "#9ebcda", "#8c96c6", "#8856a7", "#810f7c"],
+      "BuPu_7": ["#edf8fb", "#bfd3e6", "#9ebcda", "#8c96c6", "#8c6bb1", "#88419d", "#6e016b"],
+      "BuPu_8": ["#f7fcfd", "#e0ecf4", "#bfd3e6", "#9ebcda", "#8c96c6", "#8c6bb1", "#88419d", "#6e016b"],
+      "BuPu_9": ["#f7fcfd", "#e0ecf4", "#bfd3e6", "#9ebcda", "#8c96c6", "#8c6bb1", "#88419d", "#810f7c", "#4d004b"],
+      "RdPu_3": ["#fde0dd", "#fa9fb5", "#c51b8a"],
+      "RdPu_4": ["#feebe2", "#fbb4b9", "#f768a1", "#ae017e"],
+      "RdPu_5": ["#feebe2", "#fbb4b9", "#f768a1", "#c51b8a", "#7a0177"],
+      "RdPu_6": ["#feebe2", "#fcc5c0", "#fa9fb5", "#f768a1", "#c51b8a", "#7a0177"],
+      "RdPu_7": ["#feebe2", "#fcc5c0", "#fa9fb5", "#f768a1", "#dd3497", "#ae017e", "#7a0177"],
+      "RdPu_8": ["#fff7f3", "#fde0dd", "#fcc5c0", "#fa9fb5", "#f768a1", "#dd3497", "#ae017e", "#7a0177"],
+      "RdPu_9": ["#fff7f3", "#fde0dd", "#fcc5c0", "#fa9fb5", "#f768a1", "#dd3497", "#ae017e", "#7a0177", "#49006a"],
+      "PuRd_3": ["#e7e1ef", "#c994c7", "#dd1c77"],
+      "PuRd_4": ["#f1eef6", "#d7b5d8", "#df65b0", "#ce1256"],
+      "PuRd_5": ["#f1eef6", "#d7b5d8", "#df65b0", "#dd1c77", "#980043"],
+      "PuRd_6": ["#f1eef6", "#d4b9da", "#c994c7", "#df65b0", "#dd1c77", "#980043"],
+      "PuRd_7": ["#f1eef6", "#d4b9da", "#c994c7", "#df65b0", "#e7298a", "#ce1256", "#91003f"],
+      "PuRd_8": ["#f7f4f9", "#e7e1ef", "#d4b9da", "#c994c7", "#df65b0", "#e7298a", "#ce1256", "#91003f"],
+      "PuRd_9": ["#f7f4f9", "#e7e1ef", "#d4b9da", "#c994c7", "#df65b0", "#e7298a", "#ce1256", "#980043", "#67001f"],
+      "OrRd_3": ["#fee8c8", "#fdbb84", "#e34a33"],
+      "OrRd_4": ["#fef0d9", "#fdcc8a", "#fc8d59", "#d7301f"],
+      "OrRd_5": ["#fef0d9", "#fdcc8a", "#fc8d59", "#e34a33", "#b30000"],
+      "OrRd_6": ["#fef0d9", "#fdd49e", "#fdbb84", "#fc8d59", "#e34a33", "#b30000"],
+      "OrRd_7": ["#fef0d9", "#fdd49e", "#fdbb84", "#fc8d59", "#ef6548", "#d7301f", "#990000"],
+      "OrRd_8": ["#fff7ec", "#fee8c8", "#fdd49e", "#fdbb84", "#fc8d59", "#ef6548", "#d7301f", "#990000"],
+      "OrRd_9": ["#fff7ec", "#fee8c8", "#fdd49e", "#fdbb84", "#fc8d59", "#ef6548", "#d7301f", "#b30000", "#7f0000"],
+      "YlOrRd_3": ["#ffeda0", "#feb24c", "#f03b20"],
+      "YlOrRd_4": ["#ffffb2", "#fecc5c", "#fd8d3c", "#e31a1c"],
+      "YlOrRd_5": ["#ffffb2", "#fecc5c", "#fd8d3c", "#f03b20", "#bd0026"],
+      "YlOrRd_6": ["#ffffb2", "#fed976", "#feb24c", "#fd8d3c", "#f03b20", "#bd0026"],
+      "YlOrRd_7": ["#ffffb2", "#fed976", "#feb24c", "#fd8d3c", "#fc4e2a", "#e31a1c", "#b10026"],
+      "YlOrRd_8": ["#ffffcc", "#ffeda0", "#fed976", "#feb24c", "#fd8d3c", "#fc4e2a", "#e31a1c", "#b10026"],
+      "YlOrRd_9": ["#ffffcc", "#ffeda0", "#fed976", "#feb24c", "#fd8d3c", "#fc4e2a", "#e31a1c", "#bd0026", "#800026"],
+      "YlOrBr_3": ["#fff7bc", "#fec44f", "#d95f0e"],
+      "YlOrBr_4": ["#ffffd4", "#fed98e", "#fe9929", "#cc4c02"],
+      "YlOrBr_5": ["#ffffd4", "#fed98e", "#fe9929", "#d95f0e", "#993404"],
+      "YlOrBr_6": ["#ffffd4", "#fee391", "#fec44f", "#fe9929", "#d95f0e", "#993404"],
+      "YlOrBr_7": ["#ffffd4", "#fee391", "#fec44f", "#fe9929", "#ec7014", "#cc4c02", "#8c2d04"],
+      "YlOrBr_8": ["#ffffe5", "#fff7bc", "#fee391", "#fec44f", "#fe9929", "#ec7014", "#cc4c02", "#8c2d04"],
+      "YlOrBr_9": ["#ffffe5", "#fff7bc", "#fee391", "#fec44f", "#fe9929", "#ec7014", "#cc4c02", "#993404", "#662506"],
+      "Purples_3": ["#efedf5", "#bcbddc", "#756bb1"],
+      "Purples_4": ["#f2f0f7", "#cbc9e2", "#9e9ac8", "#6a51a3"],
+      "Purples_5": ["#f2f0f7", "#cbc9e2", "#9e9ac8", "#756bb1", "#54278f"],
+      "Purples_6": ["#f2f0f7", "#dadaeb", "#bcbddc", "#9e9ac8", "#756bb1", "#54278f"],
+      "Purples_7": ["#f2f0f7", "#dadaeb", "#bcbddc", "#9e9ac8", "#807dba", "#6a51a3", "#4a1486"],
+      "Purples_8": ["#fcfbfd", "#efedf5", "#dadaeb", "#bcbddc", "#9e9ac8", "#807dba", "#6a51a3", "#4a1486"],
+      "Purples_9": ["#fcfbfd", "#efedf5", "#dadaeb", "#bcbddc", "#9e9ac8", "#807dba", "#6a51a3", "#54278f", "#3f007d"],
+      "Blues_3": ["#deebf7", "#9ecae1", "#3182bd"],
+      "Blues_4": ["#eff3ff", "#bdd7e7", "#6baed6", "#2171b5"],
+      "Blues_5": ["#eff3ff", "#bdd7e7", "#6baed6", "#3182bd", "#08519c"],
+      "Blues_6": ["#eff3ff", "#c6dbef", "#9ecae1", "#6baed6", "#3182bd", "#08519c"],
+      "Blues_7": ["#eff3ff", "#c6dbef", "#9ecae1", "#6baed6", "#4292c6", "#2171b5", "#084594"],
+      "Blues_8": ["#f7fbff", "#deebf7", "#c6dbef", "#9ecae1", "#6baed6", "#4292c6", "#2171b5", "#084594"],
+      "Blues_9": ["#f7fbff", "#deebf7", "#c6dbef", "#9ecae1", "#6baed6", "#4292c6", "#2171b5", "#08519c", "#08306b"],
+      "Greens_3": ["#e5f5e0", "#a1d99b", "#31a354"],
+      "Greens_4": ["#edf8e9", "#bae4b3", "#74c476", "#238b45"],
+      "Greens_5": ["#edf8e9", "#bae4b3", "#74c476", "#31a354", "#006d2c"],
+      "Greens_6": ["#edf8e9", "#c7e9c0", "#a1d99b", "#74c476", "#31a354", "#006d2c"],
+      "Greens_7": ["#edf8e9", "#c7e9c0", "#a1d99b", "#74c476", "#41ab5d", "#238b45", "#005a32"],
+      "Greens_8": ["#f7fcf5", "#e5f5e0", "#c7e9c0", "#a1d99b", "#74c476", "#41ab5d", "#238b45", "#005a32"],
+      "Greens_9": ["#f7fcf5", "#e5f5e0", "#c7e9c0", "#a1d99b", "#74c476", "#41ab5d", "#238b45", "#006d2c", "#00441b"],
+      "Oranges_3": ["#fee6ce", "#fdae6b", "#e6550d"],
+      "Oranges_4": ["#feedde", "#fdbe85", "#fd8d3c", "#d94701"],
+      "Oranges_5": ["#feedde", "#fdbe85", "#fd8d3c", "#e6550d", "#a63603"],
+      "Oranges_6": ["#feedde", "#fdd0a2", "#fdae6b", "#fd8d3c", "#e6550d", "#a63603"],
+      "Oranges_7": ["#feedde", "#fdd0a2", "#fdae6b", "#fd8d3c", "#f16913", "#d94801", "#8c2d04"],
+      "Oranges_8": ["#fff5eb", "#fee6ce", "#fdd0a2", "#fdae6b", "#fd8d3c", "#f16913", "#d94801", "#8c2d04"],
+      "Oranges_9": ["#fff5eb", "#fee6ce", "#fdd0a2", "#fdae6b", "#fd8d3c", "#f16913", "#d94801", "#a63603", "#7f2704"],
+      "Reds_3": ["#fee0d2", "#fc9272", "#de2d26"],
+      "Reds_4": ["#fee5d9", "#fcae91", "#fb6a4a", "#cb181d"],
+      "Reds_5": ["#fee5d9", "#fcae91", "#fb6a4a", "#de2d26", "#a50f15"],
+      "Reds_6": ["#fee5d9", "#fcbba1", "#fc9272", "#fb6a4a", "#de2d26", "#a50f15"],
+      "Reds_7": ["#fee5d9", "#fcbba1", "#fc9272", "#fb6a4a", "#ef3b2c", "#cb181d", "#99000d"],
+      "Reds_8": ["#fff5f0", "#fee0d2", "#fcbba1", "#fc9272", "#fb6a4a", "#ef3b2c", "#cb181d", "#99000d"],
+      "Reds_9": ["#fff5f0", "#fee0d2", "#fcbba1", "#fc9272", "#fb6a4a", "#ef3b2c", "#cb181d", "#a50f15", "#67000d"],
+      "Greys_3": ["#f0f0f0", "#bdbdbd", "#636363"],
+      "Greys_4": ["#f7f7f7", "#cccccc", "#969696", "#525252"],
+      "Greys_5": ["#f7f7f7", "#cccccc", "#969696", "#636363", "#252525"],
+      "Greys_6": ["#f7f7f7", "#d9d9d9", "#bdbdbd", "#969696", "#636363", "#252525"],
+      "Greys_7": ["#f7f7f7", "#d9d9d9", "#bdbdbd", "#969696", "#737373", "#525252", "#252525"],
+      "Greys_8": ["#ffffff", "#f0f0f0", "#d9d9d9", "#bdbdbd", "#969696", "#737373", "#525252", "#252525"],
+      "Greys_9": ["#ffffff", "#f0f0f0", "#d9d9d9", "#bdbdbd", "#969696", "#737373", "#525252", "#252525", "#000000"],
+      "PuOr_3": ["#f1a340", "#f7f7f7", "#998ec3"],
+      "PuOr_4": ["#e66101", "#fdb863", "#b2abd2", "#5e3c99"],
+      "PuOr_5": ["#e66101", "#fdb863", "#f7f7f7", "#b2abd2", "#5e3c99"],
+      "PuOr_6": ["#b35806", "#f1a340", "#fee0b6", "#d8daeb", "#998ec3", "#542788"],
+      "PuOr_7": ["#b35806", "#f1a340", "#fee0b6", "#f7f7f7", "#d8daeb", "#998ec3", "#542788"],
+      "PuOr_8": ["#b35806", "#e08214", "#fdb863", "#fee0b6", "#d8daeb", "#b2abd2", "#8073ac", "#542788"],
+      "PuOr_9": ["#b35806", "#e08214", "#fdb863", "#fee0b6", "#f7f7f7", "#d8daeb", "#b2abd2", "#8073ac", "#542788"],
+      "PuOr_10": ["#7f3b08", "#b35806", "#e08214", "#fdb863", "#fee0b6", "#d8daeb", "#b2abd2", "#8073ac", "#542788", "#2d004b"],
+      "PuOr_11": ["#7f3b08", "#b35806", "#e08214", "#fdb863", "#fee0b6", "#f7f7f7", "#d8daeb", "#b2abd2", "#8073ac", "#542788", "#2d004b"],
+      "BrBG_3": ["#d8b365", "#f5f5f5", "#5ab4ac"],
+      "BrBG_4": ["#a6611a", "#dfc27d", "#80cdc1", "#018571"],
+      "BrBG_5": ["#a6611a", "#dfc27d", "#f5f5f5", "#80cdc1", "#018571"],
+      "BrBG_6": ["#8c510a", "#d8b365", "#f6e8c3", "#c7eae5", "#5ab4ac", "#01665e"],
+      "BrBG_7": ["#8c510a", "#d8b365", "#f6e8c3", "#f5f5f5", "#c7eae5", "#5ab4ac", "#01665e"],
+      "BrBG_8": ["#8c510a", "#bf812d", "#dfc27d", "#f6e8c3", "#c7eae5", "#80cdc1", "#35978f", "#01665e"],
+      "BrBG_9": ["#8c510a", "#bf812d", "#dfc27d", "#f6e8c3", "#f5f5f5", "#c7eae5", "#80cdc1", "#35978f", "#01665e"],
+      "BrBG_10": ["#543005", "#8c510a", "#bf812d", "#dfc27d", "#f6e8c3", "#c7eae5", "#80cdc1", "#35978f", "#01665e", "#003c30"],
+      "BrBG_11": ["#543005", "#8c510a", "#bf812d", "#dfc27d", "#f6e8c3", "#f5f5f5", "#c7eae5", "#80cdc1", "#35978f", "#01665e", "#003c30"],
+      "PRGn_3": ["#af8dc3", "#f7f7f7", "#7fbf7b"],
+      "PRGn_4": ["#7b3294", "#c2a5cf", "#a6dba0", "#008837"],
+      "PRGn_5": ["#7b3294", "#c2a5cf", "#f7f7f7", "#a6dba0", "#008837"],
+      "PRGn_6": ["#762a83", "#af8dc3", "#e7d4e8", "#d9f0d3", "#7fbf7b", "#1b7837"],
+      "PRGn_7": ["#762a83", "#af8dc3", "#e7d4e8", "#f7f7f7", "#d9f0d3", "#7fbf7b", "#1b7837"],
+      "PRGn_8": ["#762a83", "#9970ab", "#c2a5cf", "#e7d4e8", "#d9f0d3", "#a6dba0", "#5aae61", "#1b7837"],
+      "PRGn_9": ["#762a83", "#9970ab", "#c2a5cf", "#e7d4e8", "#f7f7f7", "#d9f0d3", "#a6dba0", "#5aae61", "#1b7837"],
+      "PRGn_10": ["#40004b", "#762a83", "#9970ab", "#c2a5cf", "#e7d4e8", "#d9f0d3", "#a6dba0", "#5aae61", "#1b7837", "#00441b"],
+      "PRGn_11": ["#40004b", "#762a83", "#9970ab", "#c2a5cf", "#e7d4e8", "#f7f7f7", "#d9f0d3", "#a6dba0", "#5aae61", "#1b7837", "#00441b"],
+      "PiYG_3": ["#e9a3c9", "#f7f7f7", "#a1d76a"],
+      "PiYG_4": ["#d01c8b", "#f1b6da", "#b8e186", "#4dac26"],
+      "PiYG_5": ["#d01c8b", "#f1b6da", "#f7f7f7", "#b8e186", "#4dac26"],
+      "PiYG_6": ["#c51b7d", "#e9a3c9", "#fde0ef", "#e6f5d0", "#a1d76a", "#4d9221"],
+      "PiYG_7": ["#c51b7d", "#e9a3c9", "#fde0ef", "#f7f7f7", "#e6f5d0", "#a1d76a", "#4d9221"],
+      "PiYG_8": ["#c51b7d", "#de77ae", "#f1b6da", "#fde0ef", "#e6f5d0", "#b8e186", "#7fbc41", "#4d9221"],
+      "PiYG_9": ["#c51b7d", "#de77ae", "#f1b6da", "#fde0ef", "#f7f7f7", "#e6f5d0", "#b8e186", "#7fbc41", "#4d9221"],
+      "PiYG_10": ["#8e0152", "#c51b7d", "#de77ae", "#f1b6da", "#fde0ef", "#e6f5d0", "#b8e186", "#7fbc41", "#4d9221", "#276419"],
+      "PiYG_11": ["#8e0152", "#c51b7d", "#de77ae", "#f1b6da", "#fde0ef", "#f7f7f7", "#e6f5d0", "#b8e186", "#7fbc41", "#4d9221", "#276419"],
+      "RdBu_3": ["#ef8a62", "#f7f7f7", "#67a9cf"],
+      "RdBu_4": ["#ca0020", "#f4a582", "#92c5de", "#0571b0"],
+      "RdBu_5": ["#ca0020", "#f4a582", "#f7f7f7", "#92c5de", "#0571b0"],
+      "RdBu_6": ["#b2182b", "#ef8a62", "#fddbc7", "#d1e5f0", "#67a9cf", "#2166ac"],
+      "RdBu_7": ["#b2182b", "#ef8a62", "#fddbc7", "#f7f7f7", "#d1e5f0", "#67a9cf", "#2166ac"],
+      "RdBu_8": ["#b2182b", "#d6604d", "#f4a582", "#fddbc7", "#d1e5f0", "#92c5de", "#4393c3", "#2166ac"],
+      "RdBu_9": ["#b2182b", "#d6604d", "#f4a582", "#fddbc7", "#f7f7f7", "#d1e5f0", "#92c5de", "#4393c3", "#2166ac"],
+      "RdBu_10": ["#67001f", "#b2182b", "#d6604d", "#f4a582", "#fddbc7", "#d1e5f0", "#92c5de", "#4393c3", "#2166ac", "#053061"],
+      "RdBu_11": ["#67001f", "#b2182b", "#d6604d", "#f4a582", "#fddbc7", "#f7f7f7", "#d1e5f0", "#92c5de", "#4393c3", "#2166ac", "#053061"],
+      "RdGy_3": ["#ef8a62", "#ffffff", "#999999"],
+      "RdGy_4": ["#ca0020", "#f4a582", "#bababa", "#404040"],
+      "RdGy_5": ["#ca0020", "#f4a582", "#ffffff", "#bababa", "#404040"],
+      "RdGy_6": ["#b2182b", "#ef8a62", "#fddbc7", "#e0e0e0", "#999999", "#4d4d4d"],
+      "RdGy_7": ["#b2182b", "#ef8a62", "#fddbc7", "#ffffff", "#e0e0e0", "#999999", "#4d4d4d"],
+      "RdGy_8": ["#b2182b", "#d6604d", "#f4a582", "#fddbc7", "#e0e0e0", "#bababa", "#878787", "#4d4d4d"],
+      "RdGy_9": ["#b2182b", "#d6604d", "#f4a582", "#fddbc7", "#ffffff", "#e0e0e0", "#bababa", "#878787", "#4d4d4d"],
+      "RdGy_10": ["#67001f", "#b2182b", "#d6604d", "#f4a582", "#fddbc7", "#e0e0e0", "#bababa", "#878787", "#4d4d4d", "#1a1a1a"],
+      "RdGy_11": ["#67001f", "#b2182b", "#d6604d", "#f4a582", "#fddbc7", "#ffffff", "#e0e0e0", "#bababa", "#878787", "#4d4d4d", "#1a1a1a"],
+      "RdYlBu_3": ["#fc8d59", "#ffffbf", "#91bfdb"],
+      "RdYlBu_4": ["#d7191c", "#fdae61", "#abd9e9", "#2c7bb6"],
+      "RdYlBu_5": ["#d7191c", "#fdae61", "#ffffbf", "#abd9e9", "#2c7bb6"],
+      "RdYlBu_6": ["#d73027", "#fc8d59", "#fee090", "#e0f3f8", "#91bfdb", "#4575b4"],
+      "RdYlBu_7": ["#d73027", "#fc8d59", "#fee090", "#ffffbf", "#e0f3f8", "#91bfdb", "#4575b4"],
+      "RdYlBu_8": ["#d73027", "#f46d43", "#fdae61", "#fee090", "#e0f3f8", "#abd9e9", "#74add1", "#4575b4"],
+      "RdYlBu_9": ["#d73027", "#f46d43", "#fdae61", "#fee090", "#ffffbf", "#e0f3f8", "#abd9e9", "#74add1", "#4575b4"],
+      "RdYlBu_10": ["#a50026", "#d73027", "#f46d43", "#fdae61", "#fee090", "#e0f3f8", "#abd9e9", "#74add1", "#4575b4", "#313695"],
+      "RdYlBu_11": ["#a50026", "#d73027", "#f46d43", "#fdae61", "#fee090", "#ffffbf", "#e0f3f8", "#abd9e9", "#74add1", "#4575b4", "#313695"],
+      "Spectral_3": ["#fc8d59", "#ffffbf", "#99d594"],
+      "Spectral_4": ["#d7191c", "#fdae61", "#abdda4", "#2b83ba"],
+      "Spectral_5": ["#d7191c", "#fdae61", "#ffffbf", "#abdda4", "#2b83ba"],
+      "Spectral_6": ["#d53e4f", "#fc8d59", "#fee08b", "#e6f598", "#99d594", "#3288bd"],
+      "Spectral_7": ["#d53e4f", "#fc8d59", "#fee08b", "#ffffbf", "#e6f598", "#99d594", "#3288bd"],
+      "Spectral_8": ["#d53e4f", "#f46d43", "#fdae61", "#fee08b", "#e6f598", "#abdda4", "#66c2a5", "#3288bd"],
+      "Spectral_9": ["#d53e4f", "#f46d43", "#fdae61", "#fee08b", "#ffffbf", "#e6f598", "#abdda4", "#66c2a5", "#3288bd"],
+      "Spectral_10": ["#9e0142", "#d53e4f", "#f46d43", "#fdae61", "#fee08b", "#e6f598", "#abdda4", "#66c2a5", "#3288bd", "#5e4fa2"],
+      "Spectral_11": ["#9e0142", "#d53e4f", "#f46d43", "#fdae61", "#fee08b", "#ffffbf", "#e6f598", "#abdda4", "#66c2a5", "#3288bd", "#5e4fa2"],
+      "RdYlGn_3": ["#fc8d59", "#ffffbf", "#91cf60"],
+      "RdYlGn_4": ["#d7191c", "#fdae61", "#a6d96a", "#1a9641"],
+      "RdYlGn_5": ["#d7191c", "#fdae61", "#ffffbf", "#a6d96a", "#1a9641"],
+      "RdYlGn_6": ["#d73027", "#fc8d59", "#fee08b", "#d9ef8b", "#91cf60", "#1a9850"],
+      "RdYlGn_7": ["#d73027", "#fc8d59", "#fee08b", "#ffffbf", "#d9ef8b", "#91cf60", "#1a9850"],
+      "RdYlGn_8": ["#d73027", "#f46d43", "#fdae61", "#fee08b", "#d9ef8b", "#a6d96a", "#66bd63", "#1a9850"],
+      "RdYlGn_9": ["#d73027", "#f46d43", "#fdae61", "#fee08b", "#ffffbf", "#d9ef8b", "#a6d96a", "#66bd63", "#1a9850"],
+      "RdYlGn_10": ["#a50026", "#d73027", "#f46d43", "#fdae61", "#fee08b", "#d9ef8b", "#a6d96a", "#66bd63", "#1a9850", "#006837"],
+      "RdYlGn_11": ["#a50026", "#d73027", "#f46d43", "#fdae61", "#fee08b", "#ffffbf", "#d9ef8b", "#a6d96a", "#66bd63", "#1a9850", "#006837"],
+      "Accent_3": ["#7fc97f", "#beaed4", "#fdc086"],
+      "Accent_4": ["#7fc97f", "#beaed4", "#fdc086", "#ffff99"],
+      "Accent_5": ["#7fc97f", "#beaed4", "#fdc086", "#ffff99", "#386cb0"],
+      "Accent_6": ["#7fc97f", "#beaed4", "#fdc086", "#ffff99", "#386cb0", "#f0027f"],
+      "Accent_7": ["#7fc97f", "#beaed4", "#fdc086", "#ffff99", "#386cb0", "#f0027f", "#bf5b17"],
+      "Accent_8": ["#7fc97f", "#beaed4", "#fdc086", "#ffff99", "#386cb0", "#f0027f", "#bf5b17", "#666666"],
+      "Dark2_3": ["#1b9e77", "#d95f02", "#7570b3"],
+      "Dark2_4": ["#1b9e77", "#d95f02", "#7570b3", "#e7298a"],
+      "Dark2_5": ["#1b9e77", "#d95f02", "#7570b3", "#e7298a", "#66a61e"],
+      "Dark2_6": ["#1b9e77", "#d95f02", "#7570b3", "#e7298a", "#66a61e", "#e6ab02"],
+      "Dark2_7": ["#1b9e77", "#d95f02", "#7570b3", "#e7298a", "#66a61e", "#e6ab02", "#a6761d"],
+      "Dark2_8": ["#1b9e77", "#d95f02", "#7570b3", "#e7298a", "#66a61e", "#e6ab02", "#a6761d", "#666666"],
+      "Paired_3": ["#a6cee3", "#1f78b4", "#b2df8a"],
+      "Paired_4": ["#a6cee3", "#1f78b4", "#b2df8a", "#33a02c"],
+      "Paired_5": ["#a6cee3", "#1f78b4", "#b2df8a", "#33a02c", "#fb9a99"],
+      "Paired_6": ["#a6cee3", "#1f78b4", "#b2df8a", "#33a02c", "#fb9a99", "#e31a1c"],
+      "Paired_7": ["#a6cee3", "#1f78b4", "#b2df8a", "#33a02c", "#fb9a99", "#e31a1c", "#fdbf6f"],
+      "Paired_8": ["#a6cee3", "#1f78b4", "#b2df8a", "#33a02c", "#fb9a99", "#e31a1c", "#fdbf6f", "#ff7f00"],
+      "Paired_9": ["#a6cee3", "#1f78b4", "#b2df8a", "#33a02c", "#fb9a99", "#e31a1c", "#fdbf6f", "#ff7f00", "#cab2d6"],
+      "Paired_10": ["#a6cee3", "#1f78b4", "#b2df8a", "#33a02c", "#fb9a99", "#e31a1c", "#fdbf6f", "#ff7f00", "#cab2d6", "#6a3d9a"],
+      "Paired_11": ["#a6cee3", "#1f78b4", "#b2df8a", "#33a02c", "#fb9a99", "#e31a1c", "#fdbf6f", "#ff7f00", "#cab2d6", "#6a3d9a", "#ffff99"],
+      "Paired_12": ["#a6cee3", "#1f78b4", "#b2df8a", "#33a02c", "#fb9a99", "#e31a1c", "#fdbf6f", "#ff7f00", "#cab2d6", "#6a3d9a", "#ffff99", "#b15928"],
+      "Pastel1_3": ["#fbb4ae", "#b3cde3", "#ccebc5"],
+      "Pastel1_4": ["#fbb4ae", "#b3cde3", "#ccebc5", "#decbe4"],
+      "Pastel1_5": ["#fbb4ae", "#b3cde3", "#ccebc5", "#decbe4", "#fed9a6"],
+      "Pastel1_6": ["#fbb4ae", "#b3cde3", "#ccebc5", "#decbe4", "#fed9a6", "#ffffcc"],
+      "Pastel1_7": ["#fbb4ae", "#b3cde3", "#ccebc5", "#decbe4", "#fed9a6", "#ffffcc", "#e5d8bd"],
+      "Pastel1_8": ["#fbb4ae", "#b3cde3", "#ccebc5", "#decbe4", "#fed9a6", "#ffffcc", "#e5d8bd", "#fddaec"],
+      "Pastel1_9": ["#fbb4ae", "#b3cde3", "#ccebc5", "#decbe4", "#fed9a6", "#ffffcc", "#e5d8bd", "#fddaec", "#f2f2f2"],
+      "Pastel2_3": ["#b3e2cd", "#fdcdac", "#cbd5e8"],
+      "Pastel2_4": ["#b3e2cd", "#fdcdac", "#cbd5e8", "#f4cae4"],
+      "Pastel2_5": ["#b3e2cd", "#fdcdac", "#cbd5e8", "#f4cae4", "#e6f5c9"],
+      "Pastel2_6": ["#b3e2cd", "#fdcdac", "#cbd5e8", "#f4cae4", "#e6f5c9", "#fff2ae"],
+      "Pastel2_7": ["#b3e2cd", "#fdcdac", "#cbd5e8", "#f4cae4", "#e6f5c9", "#fff2ae", "#f1e2cc"],
+      "Pastel2_8": ["#b3e2cd", "#fdcdac", "#cbd5e8", "#f4cae4", "#e6f5c9", "#fff2ae", "#f1e2cc", "#cccccc"],
+      "Set1_3": ["#e41a1c", "#377eb8", "#4daf4a"],
+      "Set1_4": ["#e41a1c", "#377eb8", "#4daf4a", "#984ea3"],
+      "Set1_5": ["#e41a1c", "#377eb8", "#4daf4a", "#984ea3", "#ff7f00"],
+      "Set1_6": ["#e41a1c", "#377eb8", "#4daf4a", "#984ea3", "#ff7f00", "#ffff33"],
+      "Set1_7": ["#e41a1c", "#377eb8", "#4daf4a", "#984ea3", "#ff7f00", "#ffff33", "#a65628"],
+      "Set1_8": ["#e41a1c", "#377eb8", "#4daf4a", "#984ea3", "#ff7f00", "#ffff33", "#a65628", "#f781bf"],
+      "Set1_9": ["#e41a1c", "#377eb8", "#4daf4a", "#984ea3", "#ff7f00", "#ffff33", "#a65628", "#f781bf", "#999999"],
+      "Set2_3": ["#66c2a5", "#fc8d62", "#8da0cb"],
+      "Set2_4": ["#66c2a5", "#fc8d62", "#8da0cb", "#e78ac3"],
+      "Set2_5": ["#66c2a5", "#fc8d62", "#8da0cb", "#e78ac3", "#a6d854"],
+      "Set2_6": ["#66c2a5", "#fc8d62", "#8da0cb", "#e78ac3", "#a6d854", "#ffd92f"],
+      "Set2_7": ["#66c2a5", "#fc8d62", "#8da0cb", "#e78ac3", "#a6d854", "#ffd92f", "#e5c494"],
+      "Set2_8": ["#66c2a5", "#fc8d62", "#8da0cb", "#e78ac3", "#a6d854", "#ffd92f", "#e5c494", "#b3b3b3"],
+      "Set3_3": ["#8dd3c7", "#ffffb3", "#bebada"],
+      "Set3_4": ["#8dd3c7", "#ffffb3", "#bebada", "#fb8072"],
+      "Set3_5": ["#8dd3c7", "#ffffb3", "#bebada", "#fb8072", "#80b1d3"],
+      "Set3_6": ["#8dd3c7", "#ffffb3", "#bebada", "#fb8072", "#80b1d3", "#fdb462"],
+      "Set3_7": ["#8dd3c7", "#ffffb3", "#bebada", "#fb8072", "#80b1d3", "#fdb462", "#b3de69"],
+      "Set3_8": ["#8dd3c7", "#ffffb3", "#bebada", "#fb8072", "#80b1d3", "#fdb462", "#b3de69", "#fccde5"],
+      "Set3_9": ["#8dd3c7", "#ffffb3", "#bebada", "#fb8072", "#80b1d3", "#fdb462", "#b3de69", "#fccde5", "#d9d9d9"],
+      "Set3_10": ["#8dd3c7", "#ffffb3", "#bebada", "#fb8072", "#80b1d3", "#fdb462", "#b3de69", "#fccde5", "#d9d9d9", "#bc80bd"],
+      "Set3_11": ["#8dd3c7", "#ffffb3", "#bebada", "#fb8072", "#80b1d3", "#fdb462", "#b3de69", "#fccde5", "#d9d9d9", "#bc80bd", "#ccebc5"],
+      "Set3_12": ["#8dd3c7", "#ffffb3", "#bebada", "#fb8072",
+        "#80b1d3", "#fdb462", "#b3de69", "#fccde5", "#d9d9d9", "#bc80bd", "#ccebc5", "#ffed6f"]
     }
   };
 };
 
 },{}],49:[function(require,module,exports){
-/**
- *
- * This module provides base capabilities which are available to all dex components.
- *
- * @interface
- *
- */
-
-/**
- *
- * A matrix is a two dimensional array of values.  It's a data structure
- * which is a key component of a csv which is used extensively
- * throughout DexJs.  The data portion of a csv is simply a matrix.
- * A csv is the standard form of data input expected by dex components.
- *
- * @typedef {Array.<Array.<Object>>} matrix
- * @example {@lang javascript}
- * // A 2x2 matrix of numbers.
- * var matrix1 = [[1, 2], [3, 4]];
- *
- * // A 2x2 matrix of strings.
- * var matrix2 = [['Pat', 'Martin'], ['Mike', 'Parton']];
- */
-
-/**
- * A CSV data structure.
- *
- * @typedef {Object} csv
- *
- * @property {Array} header - An array containing the headings for this csv.
- * @property {matrix} data - A matrix containing the data for this csv.
- * @example {@lang javascript}
- * var myCsv = { header : [ "FirstName", "LastName" ],
- *               data   : [[ "Bob", "Jones" ], [ "Ricky", "Bobby" ]] };
- *
- */
-
-/**
- * A D3 axis specification.
- * @typedef {Object} d3axis_spec
- *
- * @property {d3scale} [scale=dex.config.scale({type:'linear'})] - The scale to be used for this axis.
- * @property {String} [orient=bottom] - The orientation of the axis. (left|right|top|bottom)
- * @property {String} [ticks] - The number of ticks to generate for this axis.
- * @property {Array} [tickValues] - Supply specific places to draw the ticks.
- * @property {String} [tickSize=[6,6]] - Sets the length of both the inner and outer ticks.
- * @property {String} [innerTickSize=d] - Sets the length of inner ticks.
- * @property {String} [outerTickSize=6] - Sets the length of outer ticks.
- * @property {String} [tickPadding=3] - Sets the tick padding in pixels.
- * @property {String} [tickFormat] - Sets the format of tick labels. ex: d3.format(",.0f")
- *
- */
-
-/**
- *
- * A D3 scale specification.
- *
- * @typedef {Object} d3scale_spec
- *
- * @property {string} [type=linear] - The type of scale to create.  Valid types are
- * (linear|sqrt|pow|time|log|ordinal|quantile|quantize|identity)
- * @property {Array} [domain=[0, 100]] - The domain for this scale.
- * @property {Array} [range=[0, 800]] - The range for this scale.
- * @property {Array} [rangeRound] - Sets the scale's output range to the specified array of values, while also
- * setting the scale's interpolator to d3.interpolateRound.
- * @property {String} [interpolate] - When supplied, sets the scale's output
- * interpolator using the specified factory.
- * @property {String} [clamp] - Set to true in order to enable clamping, false to disable
- * it.  Ensures interpolation/extrapolation does not generate values outside of this
- * scale's range.
- * @property {String} [nice] - If true, will extend the scale's domain to begin and
- * end on nice round integer values.
- * @property {string} [tickFormat] - Only applies to time scales.  Set's the tick
- * format.
- *
- */
-
-/**
- *
- * A D3 font specification.  More information can be found in the {@link http://www.w3.org/TR/SVG/text.html|W3C SVG 1.1 Text Specification}.
- *
- * @typedef {Object} d3font_spec
- *
- * @property {string} [decoration=none] - This property describes decorations that are added to the text of an element.
- * Valid values: ( none | underline | overline | line-through | blink | inherit )
- * @property {string} [family=sans-serif] - This property indicates which font family is to be used to render the text.
- * @property {string} [letterSpacing=normal] -
- * @property {integer} [size=14] - The size of the font.
- * @property {string} [style=normal] - This property specifies whether the text is to be rendered using a normal,
- * italic or oblique face. Valid values are: ( normal | italic | oblique | inherit ).
- * @property {string} [weight=normal] - This property indicates whether the text is to be rendered using the normal glyphs
- * for lowercase characters or using small-caps glyphs for lowercase characters.  Valid values for this field are:
- * ( normal | bold | lighter | 100 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 900 | inherit)
- * @property {string|integer} [wordSpacing=normal] - Specifies the amount of space that is to be added between text characters.
- * Valid values: ( auto | <integer-length> | inherit )
- * @property {string} [variant=normal] - his property indicates whether the text is to be rendered using
- * the normal glyphs for lowercase characters or using small-caps glyphs for lowercase characters.
- * Valid values: ( normal | small-caps | inherit )
- *
- */
-
-/**
- *
- * A D3 stroke specification.
- *
- * @typedef {Object} d3stroke_spec
- *
- * @property {float} [width=1] - The width (in pixels) of this stroke.
- * @property {string} [color=black] - The color of this stroke.
- * @property {float} [opacity=1] - The opacity of this stroke in the range of
- * where 0 is invisible and 1 represents 100% opaque stroke. [0, 1]
- * @property {string} [dasharray] - Used to draw dashed lines.  Ex: "1 1" will draw
- * a dashed line which consists of single pixel dashes separated by 1 empty pixel.
- * @property {string} [transform] - A transform to be applied to the stroke.
- *
- */
-
-/**
- *
- * A D3 text specification.
- *
- * @typedef {Object} d3text_spec
- *
- * @property {d3font_spec} [font] - The d3 font specification for this stroke.
- * @property {integer} [x=0] - The x coordinate for the first character of this text.
- * @property {integer} [y=0] - The y coordinate for the first character of this text.
- * @property {integer} [textLength] - The author's estimation of the length of this text.
- * The system will use this as a preference and attempt to size the text to this length.
- * @property {integer} [lengthAdjust] - Indicates the type of adjustments which the user
- * agent shall make to make the rendered length of the text match the value specified on
- * the textLength attribute.  Valid values: ( spacing | spacingAndGlyphs )
- * @property {string} [transform] - Any extra transformations to be applied to this
- * text.
- * @property {string} [glyphOrientationVertical] - Allows the user to control the
- * orientation of text.  Valid values: ( auto | <angle> | inherit ).  Angle may be expressed
- * in degrees, radians, or as a gradient.
- * @property {string} [text] - The text we are representing.
- * @property {integer} [dx=0] - An x-axis offset to be applied to this text.
- * @property {integer} [dy=0] - A y-axis offset to be applied to this text.
- * @property {string} [writingMode] - Specifies whether text flows left to right,
- * right to left, top to bottom or bottom to top.  Valid values: ( lr-tb, rl-tb, tb-rl,
- * lr, rl, tb, inherit )
- * @property {string} [anchor=start] - Specifies where this text should be anchored to.
- * Valid values: ( start | middle | end )
- * @property {d3fill_spec} [fill] - The fill to be applied to this text.
- * @property {string} [format] - A d3 format to be applied to the text.
- *
- */
-
-/**
- *
- * A D3 rectangle specification.
- *
- * @typedef {Object} d3rect_spec
- *
- * @property {number} [width=50] - The width of this rectangle.
- * @property {number} [height=50] - The height of this rectangle.
- * @property {number} [x=0] - The x coordinate of the top left corner of this rectangle.
- * @property {number} [y=0] - The y coordinate of the top left corner of this rectangle.
- * @property {number} [rx=0] - For rounded rectangles, the x-axis radius of the ellipse
- * used to round off the corners of the rectangle.
- * @property {number} [ry=0] - For rounded rectangles, the y-axis radius of the ellipse
- * used to round off the corners of the rectangle.
- * @property {d3stroke_spec} [stroke] - The stroke which will be used to draw the rectangle.
- * @property {number} [opacity=1] - The opacity for this rectangle expressed as a floating
- * point number in the range of [ 0.0, 1.0 ] where 0 is transparent, 1 is opaque, and all
- * others are somewhere in between fully transparent and fully opaque.
- * @property {d3colorscale} [color=d3.scale.category20()] - The color scale which we will
- * to color this rectangle.
- * @property {string} [transform] - A transform, if any, to be applied to this rectangle.
- * @property {events_spec} [events] - Any events which we wish to respond to.
- *
- */
-
-/**
- *
- * An events specification.  Many events are supported, the ones listed here are a subset
- * of all of the possible events.  For a complete list, refer to Mozilla's developer documentation
- * concerning {@link https://developer.mozilla.org/en-US/docs/Web/Events#Standard_events|standard events}.
- *
- * @typedef {Object} dexevents_spec
- *
- * @property {string} [mousedown] - Handles events generated when a pointing device button (usually a mouse)
- * is pressed on an element.
- * @property {string} [mouseenter] - Handles mouseover events generated when a pointing device is moved onto
- * the element that has the listener attached.
- * @property {string} [mouseleave] - Handles mouseover events generated when a pointing device is moved off
- * the element that has the listener attached.
- * @property {string} [mousemove] - Handles mouseover events generated when a pointing device is moved over
- * an element.
- * @property {string} [mouseout] - Handles mouseover events generated when a pointing device is moved off
- * the element that has the listener attached or off one of its children.
- * @property {string} [mouseover] - Handles mouseover events generated when a pointing device is moved
- * onto the element that has the listener attached or onto one of its children.
- * @property {string} [mouseup] - Handles mouseover events generated when a pointing device button is
- * released over an element.
- * @property {string} [dblclick] - Handles mouseover events generated when a pointing device is quickly
- * clicked twice on an element.
- * @property {string} [wheel] - The mouse wheel of a pointing device has been rotated in any direction.
- * @property {string} [keydown] - Handles mouseover events generated when a key is pressed down.
- * @property {string} [keypress] - Handles mouseover events generated when a key is pressed down
- * and that key normally produces a character value.
- * @property {string} [keyup] - Handles mouseover events generated when a key is released.
- * @property {string} [message] - A message is received from something.  ie: WebSocket, Web Worker,
- * iframe, parent window or other event source.
- * @property {string} [drag] - Handles mouseover events generated when an element or text selection
- * is being dragged (every 350ms).
- * @property {string} [dragend] - Handles mouseover events generated when a drag operation is being
- * ended (by releasing a mouse button or hitting the escape key).
- * @property {string} [dragenter] - Handles mouseover events generated when a dragged element or
- * text selection enters a valid drop target.
- * @property {string} [dragleave] - Handles mouseover events generated when a dragged element or
- * text selection leaves a valid drop target.
- * @property {string} [dragover] - Handles mouseover events generated when an n element or text
- * selection is being dragged over a valid drop target (every 350ms).
- * @property {string} [dragstart] - Handles mouseover events generated when the user starts
- * dragging an element or text selection.
- * @property {string} [drop] - Handles mouseover events generated when an element is dropped
- * on a valid drop target.
- *
- * @property {string} [touchcancel] - Handles mouseover events generated when a touch point
- * has been disrupted in an implementation-specific manners (too many touch points for example).
- * @property {string} [touchend] - Handles mouseover events generated when a touch point is
- * removed from the touch surface.
- * @property {string} [touchenter] - Handles mouseover events generated when a touch point
- * is moved onto the interactive area of an element.
- * @property {string} [touchleave] - Handles mouseover events generated when a touch point
- * is moved off the interactive area of an element.
- * @property {string} [touchmove] - Handles mouseover events generated when a touch point
- * is moved along the touch surface.
- * @property {string} [touchstart] - Handles mouseover events generated when a touch point
- * is placed on the touch surface.
- *
- */
-
-
-/**
- *
- * A D3 line specification.
- *
- * @typedef {Object} d3line_spec
- *
- * @property {d3point_spec} [start] - The starting point for this line.
- * @property {d3_point_spec} [end] - The ending point for this line.
- * @property {d3stroke_spec} [strokc] - The stroke to be used when drawing this line.
- *
- */
-
-/**
- *
- * A D3 point specification.
- *
- * @typedef {Object} d3point_spec
- *
- * @property {number} [x] - The starting point for this line.
- * @property {number} [y] - The ending point for this line.
- *
- */
-
-/**
- *
- * A D3 circle specification.
- *
- * @typedef {Object} d3point_spec
- *
- * @property {number} [cx] - The x-coordinate of the center point of this circle.
- * @property {number} [cy] - The y-coordinate of the center point of this circle.
- * @property {number} [r] - The radius of the circle.
- * @property {d3fill_spec} [fill] - The circle's fill.
- * @property {d3stroke_spec} [stroke] - The circle's stroke.
- * @property {string} [transform] - A transform, if any, to be applied to this circle.
- * @property {string} [title] - The title of the circle.
- * @property {d3events_spec} [events] - Any events to be associated with this circle.
- *
- */
-
-/**
- *
- * A D3 tick specification.
- *
- * @typedef {Object} d3tick_spec
- *
- * @property {number} [count] - The number of ticks to dra.
- * @property {object} [size] - The size of the tick.
- * @property {number} [size.major] - The length of the major ticks.
- * @property {number} [size.minor] - The length of the minor ticks.
- * @property {number} [size.end] - The length of the ticks at the ends of the axis.
- * @property {number} [padding] - The padding for ticks.
- * @property {string} [format] - The format to be applied to each tick label.
- * @property {d3text_spec} [label] - The specification for the appearance of tick
- * labels.
- *
- */
-
-/**
- *
- * A D3 path specification.
- *
- * @typedef {Object} d3path_spec
- *
- * @property {d3fill_spec} [fill] - The fill to apply when drawing this path.
- * @property {d3stroke_spec} [stroke] - The stroke to use when drawing this path.
- *
- */
-
-/**
- *
- * A D3 fill specification.
- * @typedef {Object} d3fill_spec
- *
- * @property {string} [fillColor=grey] - The color of this fill.
- * @property {float} [opacity=1] - The opacity of this fill in the range of
- * where 0 is invisible and 1 represents 100% opaque fill. [0, 1]
- *
- */
-
-/**
- *
- * A D3 link specification.
- * @typedef {Object} d3link_spec
- *
- * @property {d3fill} [fill] - The fill to be used for this link.
- * @property {d3stroke} [stroke] - The stroke to be used for this link.
- * @property {string} [transform] - The transform to apply to this link.
- * @property {object} d - The data to associate with this link.
- * @property {d3events} [events] - The events to associate with this link.
- *
- */
-
-/**
- *
- * This is the base constructor for all dex components.  It provides some of the common
- * functionality such as attribute getters/setters, ability to publish and subscribe
- * events as well as the ability for the user to provide customized settings for any
- * component configuration value.
- *
- * @constructor
- * @classdesc This interface provides a contract for dex components to implement.
- *
- * @name dex.component
- *
- * @param userConfig A map containing the various options the user wishes to override.
- * @param defaultConfig A map containing the default configuration for this component.
- *
- */
 module.exports = function (dex) {
+
   return function (userConfig, defaultConfig) {
     userConfig = userConfig || {};
     defaultConfig = defaultConfig || {};
@@ -11035,54 +8841,13 @@ module.exports = function (dex) {
       this.config = dex.config.expandAndOverlay(userConfig, defaultConfig);
     }
 
-    dex.console.log("dex.component Configuration", this.config);
+    dex.console.debug("dex.component Configuration", this.config);
 
     if (!this.config.channel) {
       this.config.channel = (this.config.parent || "#parent") + "/" +
         (this.config.id || "unknown-id");
     }
 
-    /**
-     * This method provides getter/setter access for the configuration of a
-     * DexComponent.
-     *
-     * Names can express hierarchy.  An attribute named 'a' may have a
-     * child attribute named 'b'.  In this case, the name of attribute
-     * 'a' is simply 'a'.  The name of attribute 'b' would be 'a.b'.
-     *
-     * attr(name) Retrieve retrieve the current value of the attribute with
-     * matching name.
-     *
-     * attr(name, value) Set the attribute with the matching name to the
-     * specified value.
-     *
-     * @method dex.component.attr
-     *
-     * @param name The name of the attribute.
-     * @param value The value of the attribute.
-     *
-     * @example {@lang javascript}
-     * // Set an attribute named "foo" to "bar"
-     * myComponent.attr("foo", "bar");
-     *
-     * // Returns "bar"
-     * myComponent.attr("foo");
-     *
-     * // Set an attribute named "foo" which belongs to an object named
-     * // nested which in turn belongs to myComponent.
-     * myComponent.attr("nested.foo", "bar");
-     *
-     * // Returns "bar"
-     * myComponent.attr("nested.foo");
-     *
-     * // Does nothing, returns myComponent
-     * myComponent.attr();
-     *
-     * @returns {string|component} If only name is provided, attr will return the value of
-     * the requested attribute.  If both name and value are provided, then
-     * the attribute corresponding to the name will be set to the supplied
-     * value and the component itself will be returned.
-     */
     this.attr = function (name, value) {
       if (arguments.length == 0) {
         return this.config;
@@ -11101,23 +8866,6 @@ module.exports = function (dex) {
       return this;
     };
 
-    /**
-     * Subscribe this component to the events of type eventTYpe
-     * generated by the source this.  When events are received,
-     * invoke the callback.
-     *
-     * @method dex.this.subscribe
-     *
-     * @param {component} source - The source component
-     * @param {string} eventType - The name of the event we are subscribing to.
-     * @param callback - The function to be invoked when this event is
-     * received.
-     *
-     * @returns {handle|false} False if function is called incorrectly.
-     * Otherwise, the function returns a handle which can later be used
-     * to unsubscribe to the events.
-     *
-     */
     this.subscribe = function (source, eventType, callback) {
       if (arguments.length == 3) {
         var channel = source.config.channel + '/' + eventType;
@@ -11145,6 +8893,7 @@ module.exports = function (dex) {
      */
     this.unsubscribe = function (handle) {
       dex.bus.unsubscribe(handle);
+      return this;
     };
 
     /**
@@ -11170,35 +8919,11 @@ module.exports = function (dex) {
       }
       else {
         channel = this.config.channel + '/' + event.type;
-        dex.console.log("publish to " + channel);
+        dex.console.debug("publish to " + channel);
         dex.bus.publish(channel, event);
       }
+      return this;
     };
-
-    this.resize = function resize(chart) {
-      return function() {
-        if (chart.config && chart.config.resizable) {
-          var width = d3.select(chart.config.parent).property("clientWidth");
-          var height = d3.select(chart.config.parent).property("clientHeight");
-
-          dex.console.log("Resizing: " + chart.config.parent + " to (" +
-            width + "w x " + height + "h");
-
-          if (!_.isNumber(height)) {
-            height = "100%";
-          }
-
-          if (!_.isNumber(width)) {
-            width = "100%";
-          }
-
-          return chart.attr("width", width).attr("height", height).update();
-        }
-        else {
-          return chart.update();
-        }
-      };
-    }
 
     /**
      *
@@ -11212,6 +8937,7 @@ module.exports = function (dex) {
      */
     this.render = function () {
       console.log("Unimplemented routine: render()");
+      return this;
     };
 
     /**
@@ -11227,6 +8953,60 @@ module.exports = function (dex) {
       return this;
     };
 
+    // Generic routine for resizing a chart instance.
+    this.resize = function (chart) {
+      return function () {
+        if (chart.config && chart.config.resizable) {
+          var width = d3.select(chart.config.parent).property("clientWidth");
+          var height = d3.select(chart.config.parent).property("clientHeight");
+
+          dex.console.debug("Resizing: " + chart.config.parent + ">" + chart.config.id +
+            "." + chart.config.class + " to (" +
+            width + "w x " + height + "h)");
+
+          if (!_.isNumber(height)) {
+            height = "100%";
+          }
+
+          if (!_.isNumber(width)) {
+            width = "100%";
+          }
+
+          if (width == 0)
+          {
+            width = 200;
+          }
+
+          if (height == 0)
+          {
+            height = 200;
+          }
+
+          return chart.attr("width", width)
+            .attr("height", height)
+            .update();
+        }
+        else {
+          return chart.update();
+        }
+      };
+    };
+
+    this.deleteChart = function (chart) {
+      return function () {
+        if (window.attachEvent) {
+          window.detachEvent('onresize', chart.resize);
+        }
+        else if (window.removeEventListener) {
+          dex.console.debug("window.removeEventListener");
+          window.removeEventListener('resize', chart.resize, true);
+        }
+        else {
+          dex.console.log("window does not support event binding");
+        }
+      };
+    };
+    // Used for external entities to configure the chart.
     this.configure = function (config) {
       dex.console.log("Configuration", "new", config, "current", this.config);
       this.config = dex.config.expandAndOverlay(config, this.config);
@@ -11234,6 +9014,7 @@ module.exports = function (dex) {
       return this;
     };
 
+    // Used to load chart state from the DOM.
     this.load = function (location) {
       var config = {};
 
@@ -11243,10 +9024,11 @@ module.exports = function (dex) {
         config[$(this).attr('id')] = $(this).attr('value');
       });
 
-      dex.console.log("Loaded Configuration:", config);
+      dex.console.debug("Loaded Configuration:", config);
       return this.configure(config);
     };
 
+    // Used to save chart state within the DOM.
     this.save = function (location, config) {
       dex.console.log("Saving Configuration To: " + location, config);
       $(location).children().remove();
@@ -11255,6 +9037,23 @@ module.exports = function (dex) {
       });
       return this;
     };
+
+    this.deleteChart = this.deleteChart(this);
+    this.resize = this.resize(this);
+
+    if (window.attachEvent) {
+      dex.console.debug("window.attachEvent");
+      window.attachEvent('onresize', this.resize);
+    }
+    else if (window.addEventListener) {
+      dex.console.debug("window.addEventListener");
+      window.addEventListener('resize', this.resize, true);
+    }
+    else {
+      dex.console.log("window does not support event binding");
+    }
+
+    return this;
   };
 };
 },{}],50:[function(require,module,exports){
@@ -11262,8 +9061,6 @@ module.exports = function (dex) {
  *
  * Config module.
  * @module dex/config
- * @name config
- * @memberOf dex
  *
  */
 
@@ -11356,65 +9153,6 @@ module.exports = function config(dex) {
 
     /**
      *
-     * This routine will expand hiearchically delimited names such as
-     * foo.bar into a structure { foo : { bar : value}}.  It will delete
-     * the hierarchical name and overwrite the value into the proper
-     * location leaving any previous object properties undisturbed.
-     *
-     * @param {Object} config The configuration which we will expand.
-     *
-     */
-
-    /*
-     exports.expand_deprecate = function expand(config) {
-     var name,
-     ci,
-     expanded;
-
-     // We have nothing, return nothing.
-     if (!config) {
-     return config;
-     }
-
-     //dex.console.log("dex.config.expand(config=", config);
-
-     // Make a clone of the previous configuration.
-     expanded = dex.object.clone(config);
-
-     // Iterate over the property names.
-     for (name in config) {
-     // If this is our property the process it, otherwise ignore.
-     if (config.hasOwnProperty(name)) {
-     // The property name is non-null.
-     if (name) {
-     // Determine character index.
-     ci = name.indexOf('.');
-     }
-     else {
-     // Default to -1
-     ci = -1;
-     }
-
-     // if Character index is > -1, we have a hierarchical name.
-     // Otherwise do nothing, copying was already handled in the
-     // cloning activity.
-     if (ci > -1) {
-     // Set it...
-     dex.object.setHierarchical(expanded, name,
-     dex.object.clone(expanded[name]), '.');
-     // Delete the old name.
-     delete expanded[name];
-     }
-     }
-     }
-
-     //dex.console.log("CONFIG", config, "EXPANDED", expanded);
-     return expanded;
-     };
-     */
-
-    /**
-     *
      * This routine will take two hierarchies, top and bottom, and expand dot ('.')
      * delimited names such as: 'foo.bar.biz.baz' into a structure:
      * { 'foo' : { 'bar' : { 'biz' : 'baz' }}}
@@ -11439,6 +9177,30 @@ module.exports = function config(dex) {
         dex.config.expand(bottom));
     },
 
+    'apply': function apply(chart) {
+      var config = chart.config;
+
+      var node = d3.select(config.parent).select("svg");
+      //dex.console.log("APPLYING STYLE TO NODE:", node);
+      if (node && config && config.apply) {
+        config.apply.forEach(function(applyConfig) {
+          var affectedNodes = node.selectAll(applyConfig["select"]);
+
+          if (applyConfig && applyConfig.styles) {
+            for (styleName in applyConfig.styles) {
+              affectedNodes.style(styleName, applyConfig.styles[styleName]);
+            }
+          }
+
+          if (applyConfig && applyConfig.attributes) {
+            for (attributeName in applyConfig.attributes) {
+              affectedNodes.attr(attributeName, applyConfig.attributes[attributeName]);
+            }
+          }
+        });
+      }
+    },
+
     /**
      *
      * Return the configuration for a font after the user's customizations
@@ -11450,17 +9212,16 @@ module.exports = function config(dex) {
      *
      */
     'font': function font(custom) {
-      var defaults =
-        {
-          'decoration': 'none',
-          'family': 'sans-serif',
-          'letterSpacing': 'normal',
-          'size': 14,
-          'style': 'normal',
-          'weight': 'normal',
-          'wordSpacing': 'normal',
-          'variant': 'normal'
-        };
+      var defaults = {
+        'decoration': 'none',
+        'family': 'sans-serif',
+        'letterSpacing': 'normal',
+        'size': 14,
+        'style': 'normal',
+        'weight': 'normal',
+        'wordSpacing': 'normal',
+        'variant': 'normal'
+      };
 
       var fontSpec = dex.config.expandAndOverlay(custom, defaults);
       return fontSpec;
@@ -11514,6 +9275,7 @@ module.exports = function config(dex) {
           'transform': '',
           'glyphOrientationVertical': undefined,
           'text': undefined,
+          "decoration" : "none",
           'dx': 0,
           'dy': 0,
           'writingMode': undefined,
@@ -11552,6 +9314,7 @@ module.exports = function config(dex) {
         dex.config.setAttr(node, 'transform', textSpec.transform, i);
         dex.config.setAttr(node, 'glyph-orientation-vertical',
           textSpec.glyphOrientationVertical, i);
+        dex.config.setStyle(node, "text-decoration", textSpec.decoration, i);
         dex.config.setAttr(node, 'writing-mode', textSpec.writingMode, i);
         dex.config.callIfDefined(node, 'text', textSpec.text, i);
         dex.config.configureFill(node, textSpec.fill, i);
@@ -11577,7 +9340,10 @@ module.exports = function config(dex) {
           'color': "black",
           'opacity': 1,
           'dasharray': '',
-          'transform': ''
+          'transform': '',
+          'lineCap' : '',
+          'lineJoin' : '',
+          'miterLimit' : ''
         };
 
       var config = dex.config.expandAndOverlay(strokeSpec, defaults);
@@ -11598,6 +9364,9 @@ module.exports = function config(dex) {
         dex.config.setStyle(node, 'stroke-width', strokeSpec.width, i);
         dex.config.setStyle(node, 'stroke-opacity', strokeSpec.opacity, i);
         dex.config.setStyle(node, 'stroke-dasharray', strokeSpec.dasharray, i);
+        dex.config.setStyle(node, 'stroke-linecap', strokeSpec.lineCap, i);
+        dex.config.setStyle(node, 'stroke-linejoin', strokeSpec.lineJoin, i);
+        dex.config.setStyle(node, 'stroke-miterlimit', strokeSpec.miterLimit, i);
         dex.config.setAttr(node, 'transform', strokeSpec.transform, i);
       }
       return node;
@@ -12036,17 +9805,16 @@ module.exports = function config(dex) {
      *
      */
     'circle': function circle(custom) {
-      var config =
-        {
-          'cx': 0,
-          'cy': 0,
-          'r': 10,
-          'fill': dex.config.fill(),
-          'stroke': dex.config.stroke(),
-          'transform': '',
-          'title': '',
-          'events': dex.config.events()
-        };
+      var config = {
+        'cx': 0,
+        'cy': 0,
+        'r': 10,
+        'fill': dex.config.fill(),
+        'stroke': dex.config.stroke(),
+        'transform': '',
+        'title': '',
+        'events': dex.config.events()
+      };
       if (custom) {
         config = dex.object.overlay(custom, config);
       }
@@ -12067,37 +9835,6 @@ module.exports = function config(dex) {
       return node;
     },
 
-    /*
-     exports.configureAxis_deprecated = function configureAxis_deprecated(config) {
-     var axis;
-
-     if (config) {
-     var axis = d3.svg.axis()
-     .ticks(config.tick.count)
-     .tickSubdivide(config.tick.subdivide)
-     .tickSize(config.tick.size.major, config.tick.size.minor,
-     config.tick.size.end)
-     .tickPadding(config.tick.padding);
-
-     // REM: Horrible way of doing this.  Need a function which
-     // is more generic and smarter to short circuit stuff like
-     // this.  But...for now it does what I want.
-     if (!dex.object.isFunction(config.tick.format)) {
-     axis.tickFormat(config.tick.format);
-     }
-
-     axis
-     .orient(config.orient)
-     .scale(config.scale);
-     }
-     else {
-     axis = d3.svg.axis();
-     }
-     //axis.scale = config.scale;
-     return axis;
-     };
-     */
-
     /**
      *
      * Construct an tick specification which allows the user to override any
@@ -12110,56 +9847,24 @@ module.exports = function config(dex) {
      *
      */
     'tick': function tick(custom) {
-      var config =
-        {
-          'count': 5,
-          //'tickValues'  : undefined,
-          'subdivide': 3,
-          'size': {
-            'major': 5,
-            'minor': 3,
-            'end': 5
-          },
-          'padding': 5,
-          'format': d3.format(",d"),
-          'label': dex.config.text()
-        };
+      var config = {
+        'count': 5,
+        //'tickValues'  : undefined,
+        'subdivide': 3,
+        'size': {
+          'major': 5,
+          'minor': 3,
+          'end': 5
+        },
+        'padding': 5,
+        'format': d3.format(",d"),
+        'label': dex.config.text()
+      };
       if (custom) {
         config = dex.object.overlay(custom, config);
       }
       return config;
     },
-
-    /*
-     exports.xaxis_deprecate = function (custom) {
-     var config =
-     {
-     'scale'  : d3.scale.linear(),
-     'orient' : "bottom",
-     'tick'   : this.tick(),
-     'label'  : dex.config.text()
-     };
-     if (custom) {
-     config = dex.object.overlay(custom, config);
-     }
-     return config;
-     };
-
-     exports.yaxis_deprecate = function (custom) {
-     var config =
-     {
-     'scale'  : d3.scale.linear(),
-     'orient' : 'left',
-     'tick'   : this.tick(),
-     'label'  : dex.config.text({'transform' : 'rotate(-90)'})
-     };
-     if (custom) {
-     config = dex.object.overlay(custom, config);
-     }
-     return config;
-     };
-     */
-
     'callConditionally': function callConditionally(fn, value, i) {
       //dex.console.log("- FN:" + fn);
       //dex.console.log("- VALUE:" + value);
@@ -12189,22 +9894,21 @@ module.exports = function config(dex) {
      *
      */
     'axis': function axis(custom) {
-      var defaults =
-        {
-          'scale': dex.config.scale({'type': 'linear'}),
-          'orient': 'bottom',
-          'ticks': undefined,
-          'tickValues': undefined,
-          'tickSize': undefined,
-          'innerTickSize': undefined,
-          'outerTickSize': undefined,
-          'tickPadding': undefined,
-          'tickFormat': undefined
-          //'label'         : dex.config.text()
-        };
+      var defaults = {
+        'scale': dex.config.scale({'type': 'linear'}),
+        'orient': 'bottom',
+        'ticks': undefined,
+        'tickValues': undefined,
+        'tickSize': undefined,
+        'innerTickSize': undefined,
+        'outerTickSize': undefined,
+        'tickPadding': undefined,
+        'tickFormat': undefined
+        //'label'         : dex.config.text()
+      };
 
-      var axisSpec = dex.config.expandAndOverlay(custom, defaults);
-      return axisSpec;
+      var config = dex.config.expandAndOverlay(custom, defaults);
+      return config;
     },
 
     /**
@@ -12550,8 +10254,6 @@ module.exports = function config(dex) {
  * This module provides console logging capabilities.
  *
  * @module dex/console
- * @name console
- * @memberOf dex
  *
  */
 
@@ -12690,8 +10392,6 @@ module.exports = function (dex) {
  * is the core datatype on which dexjs components operate.
  *
  * @module dex/csv
- * @name csv
- * @memberOf dex
  *
  */
 
@@ -12705,11 +10405,10 @@ module.exports = function csv(dex) {
      * @returns {{header: *, data: *}}
      */
     'csv': function (header, data) {
-      var csv =
-        {
-          "header": header,
-          "data": data
-        };
+      var csv = {
+        "header": header,
+        "data": data
+      };
 
       return csv;
     },
@@ -12789,28 +10488,91 @@ module.exports = function csv(dex) {
       return connectionMatrix;
     },
 
+    'getColumnNumber': function (csv, colIndex) {
+      if (colIndex === undefined) {
+        return -1;
+      }
+
+      var colNum = csv.header.indexOf(colIndex);
+
+      if (colNum >= 0) {
+        return colNum;
+      }
+
+      if (colIndex >= 0 && colIndex < csv.header.length) {
+        return colIndex;
+      }
+
+      return -1;
+    },
+
+    /**
+     *  Given a csv and a column index, return the name of the column.
+     *  If a string is supplied, return the string if it is the name
+     *  of a header.  If an integer is supplied, return the name of
+     *  the header if that header exists.  This allows us to enable
+     *  users to index columns via header name or by index.
+     *
+     * @param csv The csv for which we're retrieving the column name.
+     * @param colIndex The name of the column header or its index.
+     *
+     * @returns {*} Null if the column index does not exist, the name
+     * of the corresponding header otherwise.
+     */
+    'getColumnName': function (csv, colIndex) {
+      if (colIndex === undefined) {
+        return null;
+      }
+
+      if (colIndex >= 0 && colIndex < csv.header.length) {
+        return csv.header[colIndex];
+      }
+
+      if (csv.header.indexOf(colIndex) >= 0) {
+        return colIndex;
+      }
+
+      return null;
+    },
+
+    /**
+     *
+     * Retrieve the column referred to by the column index.  The
+     * column index can be a header name or a value column number.
+     *
+     * @param csv The csv we're retrieving the data from.
+     * @param colIndex The index of the column we wish to retrieve.
+     *
+     */
+    'getColumnData': function (csv, colIndex) {
+      var i = dex.csv.getColumnNumber(csv, colIndex);
+
+      return csv.data.map(function (row) {
+        return row[i];
+      });
+    },
+
     /**
      *
      * @param csv
-     * @param keyIndex
+     * @param keyIndex - Numerical header index or name.
      * @returns {{}}
      */
     'createMap': function (csv, keyIndex) {
-      var ri, ci, rowMap, map =
-        {};
-
-      for (ri = 0; ri < csv.data.length; ri += 1) {
-        if (csv.data[ri].length === csv.header.length) {
-          rowMap =
-            {};
-
-          for (ci = 0; ci < csv.header.length; ci += 1) {
-            rowMap[csv.header[ci]] = csv.data[ri][ci];
-          }
-          map[csv.data[ri][keyIndex]] = rowMap;
-        }
+      // CSV undefined
+      if (csv === undefined) {
+        throw "dex.csv.createMap(csv, keyIndex) : csv is undefined.";
       }
-      return map;
+      if (keyIndex === undefined) {
+        keyIndex = 0;
+      }
+      else {
+        // 0 : number
+        // [0] : object
+        // '0' : string
+        dex.console.log("UNKNOWN-TYPE", typeof(keyIndex));
+      }
+      return {};
     },
 
     'json2Csv': function (json) {
@@ -12894,8 +10656,10 @@ module.exports = function csv(dex) {
 
     /**
      *
-     * @param csv
-     * @returns {{header: *, data: *}}
+     * Make a copy of this csv.
+     *
+     * @param {csv} csv The csv to copy.
+     * @returns {csv} A copy of the original csv.
      *
      */
     'copy': function (csv) {
@@ -13050,8 +10814,12 @@ module.exports = function csv(dex) {
      */
     'columnSlice': function (csv, columns) {
       var slice = {};
-      slice.header = dex.array.slice(csv.header, columns);
-      slice.data = dex.matrix.slice(csv.data, columns);
+      var columnNumbers = columns.map(function (column) {
+        return dex.csv.getColumnNumber(csv, column);
+      });
+
+      slice.header = dex.array.slice(csv.header, columnNumbers);
+      slice.data = dex.matrix.slice(csv.data, columnNumbers);
 
       return slice;
     },
@@ -13150,7 +10918,6 @@ module.exports = function csv(dex) {
       for (var i = 0; i < types.length; i++) {
         if (types[i] == 'date') {
           csv.data.forEach(function (row, ri) {
-            dex.console.log("row[" + ri + "]=" + row[ri]);
             csv.data[ri][i] = new Date(csv.data[ri][i]);
           })
         }
@@ -13167,9 +10934,67 @@ module.exports = function csv(dex) {
       return csv;
     },
 
+    'getRankedCsv': function (csv, nameIndex, sequenceIndex, valueIndex, options) {
+      var rankedCsv = dex.csv.copy(csv);
+      var opts = options || {};
+      var orderDescending = opts.descending || false;
+
+      var si = dex.csv.getColumnNumber(csv, sequenceIndex);
+      var ni = dex.csv.getColumnNumber(csv, nameIndex);
+      var vi = dex.csv.getColumnNumber(csv, valueIndex);
+
+      rankedCsv.data.sort(function (row1, row2) {
+        if (+row1[si] == +row2[si]) {
+          if (+row1[vi] == +row2[vi]) {
+            if (row1[ni] < row2[ni]) {
+              return -1;
+            }
+            else if (row1[ni] > row2[ni]) {
+              return 1;
+            }
+            else {
+              return 0;
+            }
+          }
+          else {
+            if (orderDescending) {
+              return +row2[vi] - +row1[vi];
+            }
+            else {
+              return +row1[vi] - +row2[vi];
+            }
+          }
+        }
+        else {
+          return +row1[si] - +row2[si];
+        }
+      });
+
+      rankedCsv.header.push("rank");
+      var rank = 0;
+      var prev = undefined;
+      rankedCsv.data.forEach(function (row) {
+        if (prev == row[si]) {
+          rank++;
+          row.push(rank);
+        }
+        else {
+          row.push(1);
+          rank = 1;
+        }
+        prev = row[si];
+      });
+
+      return rankedCsv;
+    },
+
     'uniqueArray': function (csv, columnIndex) {
       return dex.array.unique(dex.matrix.flatten(
         dex.matrix.slice(csv.data, [columnIndex])));
+    },
+
+    'uniques': function (csv, columns) {
+      return dex.matrix.uniques(csv.data, columns);
     },
 
     'selectRows': function (csv, fn) {
@@ -13181,6 +11006,10 @@ module.exports = function csv(dex) {
       });
 
       return {'header': csv.header, 'data': subset};
+    },
+
+    'extent': function (csv, columns) {
+      return dex.matrix.extent(csv.data, columns);
     },
 
     /**
@@ -13250,6 +11079,69 @@ module.exports = function csv(dex) {
         'frameIndices': frameIndices,
         'frames': frames
       }
+    },
+
+    /**
+     *
+     * Frame out a csv based on non-distinct permutations.  Exclude the
+     * column pointed to by groupIndex from the permutations.  This will
+     * be used to group and typically color the various series contained
+     * within the frames.  A set of frames suitable for SPLOM might be
+     * generated via a call of getPermutationFrames(csv, 2).  However, as
+     * this is written generically, it will also support higher order
+     * dimensions as well.
+     *
+     * @param csv The csv we wish to frame.
+     * @param permutationSize The length of the desired permutations.
+     * @param groupIndex The index of we are grouping upon.
+     * @returns {{frameIndices: Array, frames: Array}}
+     *
+     */
+
+    'getPermutationFrames': function (csv, permutationSize, groupIndex) {
+      var gi = dex.csv.getColumnNumber(csv, groupIndex);
+
+      var plist = dex.range(0, csv.header.length - 1);
+      if (gi >= 0) {
+        plist.splice(gi, 1);
+      }
+      var permutations = dex.array.getPermutations(plist, permutationSize);
+
+      return dex.csv.getFrames(csv, permutations, gi);
+    },
+
+    'getCombinationFrames': function (csv, comboFrames, groupIndex) {
+      var gi = dex.csv.getColumnNumber(csv, groupIndex);
+
+      var plist = dex.range(0, csv.header.length - 1);
+      if (gi >= 0) {
+        plist.splice(gi, 1);
+      }
+      var combos = dex.array.getCombinations(plist, comboFrames);
+
+      return dex.csv.getFrames(csv, combos, gi);
+    },
+
+    'getFrames': function (csv, permutations, groupIndex) {
+      var frameIndices = [];
+      var frames = [];
+      var gi = dex.csv.getColumnNumber(csv, groupIndex);
+
+      permutations.forEach(function (permutation) {
+
+        frameIndices.push(permutation.map(function (hi) {
+          return csv.header[hi];
+        }).join(" vs "));
+
+        var columnIndices = dex.array.copy(permutation);
+        if (gi >= 0) {
+          columnIndices.unshift(gi);
+        }
+
+        frames.push(dex.csv.columnSlice(csv, columnIndices));
+      });
+
+      return {'frameIndices': frameIndices, 'frames': frames};
     },
 
     /**
@@ -13332,6 +11224,71 @@ module.exports = function csv(dex) {
         }
       }
       return true;
+    },
+
+    /**
+     *
+     * Given a series of categorical indices into a csv which
+     * contains some numeric data, create a new CSV where the
+     * first column is the aggregated categorical indices and
+     * the contents are the sum of numeric columns matching the
+     * aggregated categories.
+     *
+     * @param csv The csv to summarize.
+     * @param columnIndexes The indices to be used in summarization.
+     *
+     * @returns {{header, data: Array}}
+     */
+    'summary': function (csv, columnIndexes) {
+      // Create summary data groups csv.
+      var summaryGroups = dex.csv.columnSlice(csv, columnIndexes);
+
+      // Calculate the indices we will be summarizing.  Omit any
+      // numeric indices contained in the grouping.
+      var summaryIndices = dex.csv.getNumericIndices(csv)
+        .filter(function (el) {
+          return columnIndexes.indexOf(el) < 0;
+        });
+
+      // Extract a csv containing only what we are summarizing.
+      var ncsv = dex.csv.columnSlice(csv, summaryIndices);
+
+      // Initialize a name value pair structure where the key is
+      // the aggregated group values.
+      var summaryMap = {};
+      summaryGroups.data.forEach(function (row) {
+        if (!summaryMap[row.join(":")]) {
+          summaryMap[row.join(":")] =
+            Array.apply(null, Array(summaryIndices.length))
+              .map(Number.prototype.valueOf, 0);
+        }
+      });
+
+      // Add up the summary.
+      for (var i = 0; i < ncsv.data.length; i++) {
+        var key = summaryGroups.data[i].join(":");
+        for (var j = 0; j < ncsv.data[i].length; j++) {
+          summaryMap[key][j] += ncsv.data[i][j];
+        }
+      }
+
+      // Create the base summary csv.
+      var summary = {
+        "header": ncsv.header,
+        "data": []
+      };
+      // Prepend the aggregated summary name to the csv header.
+      summary.header.unshift(summaryGroups.header.join(":"));
+
+      // Iterate over each summary entry creating a row for each.
+      for (key in summaryMap) {
+        var data = summaryMap[key];
+        data.unshift(key);
+        summary.data.push(data);
+      }
+
+      // Return it back to the user.
+      return summary;
     },
 
     /**
@@ -13452,10 +11409,6 @@ module.exports = function csv(dex) {
       return dex.csv.columnSlice(csv, dex.csv.getCategoricalIndices(csv));
     },
 
-    /*
-     var data =
-
-     */
     'toJsonHierarchy': function (csv, ci) {
       // If 1 argument, then setup and call with 2.
       if (arguments.length == 1) {
@@ -13594,18 +11547,14 @@ module.exports = function csv(dex) {
 
       return rootMap;
     }
-  }
-    ;
-}
-;
+  };
+};
 },{}],53:[function(require,module,exports){
 /**
  *
  * This module provides support for creating various datasets.
  *
  * @module dex/datagen
- * @name datagen
- * @memberOf dex
  *
  */
 
@@ -13657,6 +11606,24 @@ module.exports = function datagen(dex) {
       return matrix;
     },
 
+
+    'randomIndexedIntegerMatrix': function (spec) {
+      var ri, ci;
+
+      //{rows:10, columns: 4, min, 0, max:100})
+      var matrix = [];
+      var range = spec.max - spec.min;
+      for (ri = 0; ri < spec.rows; ri++) {
+        var row = [];
+
+        row.push(ri + 1);
+        for (ci = 0; ci < spec.columns - 1; ci++) {
+          row.push(Math.round(Math.random() * range + spec.min));
+        }
+        matrix.push(row);
+      }
+      return matrix;
+    },
     'randomIntegerMatrix': function (spec) {
       var ri, ci;
 
@@ -13732,7 +11699,7 @@ module.exports = function datagen(dex) {
      * @returns {Array} Returns an array of the specified columns.
      *
      */
-    'PPPidentityHeader': function (spec) {
+    'identityHeader': function (spec) {
       return dex.range(1, spec.columns).map(function (i) {
         return "C" + i;
       });
@@ -14009,12 +11976,24 @@ module.exports = function datagen(dex) {
  * The main dexjs module.
  *
  * @module dex
- * @name dex
  *
  * @requires d3
  * @requires jquery
  * @requires jqueryui
  * @requires underscore
+ *
+ * @property {string}              version   - Returns the version of dex.js being used.
+ * @property {module:dex/bus}      bus       - A module providing a communication bus for charts.
+ * @property {module:dex/array}    array     - A module for dealing with arrays.
+ * @property {module:dex/csv}      csv       - A module for dealing with csv.
+ * @property {module:dex/matrix}   matrix    - A module for dealing with matrices.
+ * @property {module:dex/object}   object    - A module for dealing with objects.
+ * @property {module:dex/charts}   charts    - The module which provides the various charts.
+ * @property {module:dex/color}    color     - A module for dealing with colors.
+ * @property {module:dex/datagen}  datagen   - A module for generating data.
+ * @property {module:dex/json}     json      - A module for dealing with json.
+ * @property {module:dex/charts}   ui        - A module providing ui components.
+ * @property {dex/component} component - The base class for all charting components.
  *
  */
 var dex = {};
@@ -14056,8 +12035,62 @@ dex.range = function (start, len) {
  * @param obj
  * @returns {*}
  */
-dex.copy = function(obj) {
+dex.copy = function (obj) {
   return _.copy(obj);
+};
+
+dex.executeFunctionByName = function (functionName, context) {
+  var args = [].slice.call(arguments).splice(2);
+  var namespaces = functionName.split(".");
+  var func = namespaces.pop();
+  for (var i = 0; i < namespaces.length; i++) {
+    context = context[namespaces[i]];
+  }
+  return context[func].apply(context, args);
+};
+
+dex.actions = {
+  'setSelected': function (src, dest) {
+    return function(msg) {
+      dest.attr('csv', msg.selected).update();
+    }
+  }
+};
+
+dex.createComponent = function (config) {
+    return dex.executeFunctionByName(config.class, window, config.config);
+};
+
+dex.create = function (config) {
+  var components = [];
+  var cmap = {};
+  dex.console.log("Creating Config:", config);
+  config.components.forEach(function (component) {
+    dex.console.log("COMPONENT:", component);
+    cmap[component.name] = dex.executeFunctionByName(component.class, window, component.config);
+    components.push(cmap[component.name]);
+  });
+
+  if (config.interactions != undefined) {
+    config.interactions.forEach(function (interaction) {
+      interaction.sources.forEach(function (source) {
+        interaction.destinations.forEach(function (destination) {
+          cmap[destination].subscribe(cmap[source], interaction.event,
+            dex.actions[interaction.action](cmap[source], cmap[destination]));
+        })
+      })
+    })
+  }
+
+  return components;
+};
+
+dex.render = function (config) {
+  var components = dex.create(config);
+  components.forEach(function (component) {
+    component.render();
+  });
+  return components;
 };
 
 /**
@@ -14070,12 +12103,6 @@ dex.copy = function(obj) {
  *
  */
 dex.bus = require("../lib/pubsub");
-
-// Kai's parallel coordinates needs this, but seems to break
-// in D4
-//require('../lib/d3.svg.multibrush');
-//require('../lib/d3.selection');
-//dex.pc = require('../lib/d3.parcoords');
 
 dex.util = require('./util/util')(dex);
 
@@ -14202,14 +12229,12 @@ $.widget.bridge('uitooltip', $.ui.tooltip);
 $.widget.bridge('uibutton', $.ui.button);
 
 module.exports = dex;
-},{"../lib/pubsub":3,"./array/array":4,"./charts/charts":11,"./color/color":48,"./component/component":49,"./config/config":50,"./console/console":51,"./csv/csv":52,"./datagen/datagen":53,"./json/json":55,"./matrix/matrix":56,"./object/object":57,"./ui/ui":67,"./util/util":68}],55:[function(require,module,exports){
+},{"../lib/pubsub":3,"./array/array":4,"./charts/charts":15,"./color/color":48,"./component/component":49,"./config/config":50,"./console/console":51,"./csv/csv":52,"./datagen/datagen":53,"./json/json":55,"./matrix/matrix":56,"./object/object":57,"./ui/ui":67,"./util/util":68}],55:[function(require,module,exports){
 /**
  *
  * This module provides routines dealing with json data.
  *
  * @module dex/json
- * @name json
- * @memberOf dex
  *
  */
 
@@ -14295,6 +12320,14 @@ module.exports = function json(dex) {
       }
 
       return keys;
+    },
+
+    'toString' : function(json) {
+      return JSON.stringify(json);
+    },
+
+    'log' : function(json) {
+      dex.console.log(dex.json.toString(json));
     }
   };
 };
@@ -14305,8 +12338,6 @@ module.exports = function json(dex) {
  * This module provides routines dealing with matrices.
  *
  * @module dex/matrix
- * @name matrix
- * @memberOf dex
  *
  */
 
@@ -14351,12 +12382,23 @@ module.exports = function matrix(dex) {
      * column.
      *
      * @param {matrix} matrix The matrix to evaluate.
+     * @param columns The column or array of columns indexes to slice.
      *
      * @returns {Array.<Array.<Object>>} The unique values relative to each column. In the form
      * of [[ column 1 unique values], [column 2 unique values], ...]]
      *
      */
-    'uniques': function (matrix) {
+    'uniques': function (matrix, columns) {
+
+      if (arguments.length === 2) {
+        if (dex.object.isNumeric(columns)) {
+          return dex.matrix.uniques(dex.matrix.slice(matrix, [columns]))[0];
+        }
+        else {
+          return dex.matrix.uniques(dex.matrix.slice(matrix, columns));
+        }
+      }
+
       var ci;
       var uniques = [];
       var tmatrix = dex.matrix.transpose(matrix);
@@ -14437,8 +12479,14 @@ module.exports = function matrix(dex) {
      */
     'extent': function (matrix, indices) {
       var values = matrix;
+
       if (arguments.length === 2) {
-        values = dex.matrix.flatten(dex.matrix.slice(matrix, indices));
+        if (dex.object.isNumeric(indices)) {
+          values = dex.matrix.flatten(dex.matrix.slice(matrix, [indices]));
+        }
+        else {
+          values = dex.matrix.flatten(dex.matrix.slice(matrix, indices));
+        }
         var max = Math.max.apply(null, values);
         var min = Math.min.apply(null, values);
         return [min, max];
@@ -14604,9 +12652,7 @@ module.exports = function matrix(dex) {
  *
  * This module provides routines dealing with javascript objects.
  *
- * @module dex:object
- * @name object
- * @memberOf dex
+ * @module dex/object
  *
  */
 
@@ -15303,8 +13349,8 @@ var player = function (userConfig) {
     'delay': 1000,
     'frameIndex': 0,
     'csv': {
-      header : ['C1', 'C2', 'C3' ],
-      data : [
+      header: ['C1', 'C2', 'C3'],
+      data: [
         [1, 2, 3],
         [2, 3, 4],
         [3, 4, 5]
@@ -15314,20 +13360,65 @@ var player = function (userConfig) {
 
   var chart = new dex.component(userConfig, defaults);
   var config = chart.config;
-  var frames = dex.csv.getFramesByIndex(config.csv, config.frameIndex);
+  var frames;
   var frameNum = 0;
-  chart.attr("frames", frames);
 
   chart.render = function () {
     var timer;
     var state = "stopped";
     frames = dex.csv.getFramesByIndex(config.csv, config.frameIndex);
-    dex.console.log(frames);
     chart.attr("frames", frames);
 
-    dex.console.log("FRAMES:", frames);
+    dex.console.debug("FRAMES:", frames);
+
+    $(config.parent)
+      .append('<div><label>Frame:</label>' +
+        '<label id="frameNumber">1 (' + frames.frames[0].header[config.frameIndex] + ')</label>')
+      .css('display', 'block')
+      .css('text-align', 'center');
+    $(config.parent)
+      .append("<div id='slider'></div>")
+      .css("width", (chart.config.width / 2) + "px")
+      .css("margin", "auto");
+    // Add our buttons.
+    $(config.parent)
+      .append("<div id='controls'></div>")
+      .css("display", "block")
+      .css("text-align", "center");
+    $("#controls")
+      .append("<button id='beginning'>go to beginning</button>");
+    $("#controls")
+      .append("<button id='previous'>previous</button>");
+    $("#controls")
+      .append("<button id='play'>play</button>");
+    $("#controls")
+      .append("<button id='next'>next</button>");
+    $("#controls")
+      .append("<button id='end'>go to end</button>");
 
     $(function () {
+
+      $("#slider").slider({
+        value: 1,
+        min: 1,
+        max: frames.frames.length,
+        step: 1,
+        classes: {
+          "ui-slider": "highlight"
+        },
+        'slide': function (event, ui) {
+          $("#frameNumber").html(ui.value + "foobar")
+          gotoFrame(ui.value - 1);
+
+          // Stop playing
+          clearTimeout(timer);
+          $("#play").button({
+            "label": "play",
+            "icons": {"primary": "ui-icon-play"}
+          });
+        }
+      });
+
       $("#beginning").button({
         text: false,
         icons: {
@@ -15345,11 +13436,11 @@ var player = function (userConfig) {
         previous();
       });
       $("#play").button({
-          text: false,
-          icons: {
-            primary: "ui-icon-play"
-          }
-        })
+        text: false,
+        icons: {
+          primary: "ui-icon-play"
+        }
+      })
         .click(function () {
           var options;
           if ($(this).text() === "play") {
@@ -15386,7 +13477,7 @@ var player = function (userConfig) {
           primary: "ui-icon-seek-end"
         }
       }).click(function () {
-        gotoFrame(frames.frames.length-1);
+        gotoFrame(frames.frames.length - 1);
       });
     });
 
@@ -15399,6 +13490,8 @@ var player = function (userConfig) {
     }
 
     gotoFrame(0);
+
+    return chart;
   };
 
   chart.update = function () {
@@ -15408,7 +13501,7 @@ var player = function (userConfig) {
   };
 
   function previous() {
-    gotoFrame(frameNum > 0 ? (frameNum-1) : 0)
+    gotoFrame(frameNum > 0 ? (frameNum - 1) : 0)
   }
 
   function next() {
@@ -15417,13 +13510,18 @@ var player = function (userConfig) {
 
   function gotoFrame(frameIndex) {
     frameNum = frameIndex;
+    if ($("#slider").is(":ui-slider")) {
+      $("#slider").slider({ "value" : frameNum + 1 });
+      $("#frameNumber").html("" + (frameNum + 1) + " (" + frames.frames[frameNum].data[0][config.frameIndex] + ")");
+    }
     chart.publish({
-      "type"  : "new-frame",
-      "data"  : frames.frames[frameNum],
-      "name"  : frames.frameIndices[frameNum],
-      "frameBy" : csv.header[config.frameIndex] }
+        "type": "new-frame",
+        "data": frames.frames[frameNum],
+        "name": frames.frameIndices[frameNum],
+        "frameBy": chart.config.csv.header[config.frameIndex]
+      }
     );
-    dex.console.log("Displaying frame: " + frameNum);
+    //dex.console.log("Displaying frame: " + frameNum);
   }
 
   $(document).ready(function () {
@@ -15734,8 +13832,6 @@ module.exports = tabs;
  * This module provides ui components based upon jquery-ui.
  *
  * @module dex/ui/jqueryui
- * @name jqueryui
- * @memberOf dex.ui
  *
  */
 
@@ -15753,9 +13849,7 @@ module.exports = function jqueryui(dex) {
  *
  * This module provides ui components from a variety of sources.
  *
- * @module dex/ui
- * @name ui
- * @memberOf dex
+ @module dex/ui
  *
  */
 
@@ -15777,34 +13871,33 @@ module.exports = function ui(dex) {
   };
 };
 },{"./SqlQuery":58,"./Table":59,"./TypesTable":60,"./jqueryui/jqueryui":66}],68:[function(require,module,exports){
-"use strict";
-
 /**
  *
  * This module provides utility routines.
  *
- * @module dex:util
- * @name util
- * @memberOf dex
+ * @module dex/util
  *
  */
 
 module.exports = function util(dex) {
 
   return {
-    // Things pertaining to charts.
-    'chart': {
-      // Chart creation hooks:
-      'factory': {
-        // Kai S Chang aka: @syntagmatic's d3 parallel coordinates
-        'd3': {
-          //'parcoords': function (config) {
-          //  return require('../../lib/d3.parcoords')()(config.parent);
-          //}
-        }
-      }
-    },
+    /**
+     *
+     * @module dex/util/d3
+     */
     'd3': {
+      /**
+       *
+       * Given a d3 element, this routine will determine the parent's
+       * bounding box and annotate information related to the bounds
+       * in which this element can expand.
+       *
+       * @memberOf dex/util/d3
+       * @param d The d3 element we wish to size.
+       * @returns The annotated d3 element.
+       *
+       */
       'autosize': function (d) {
         var bbox = this.getBBox();
         var cbbox = this.parentNode.getBBox();
@@ -15813,7 +13906,6 @@ module.exports = function util(dex) {
         var wscale = Math.min((cbbox.width - wMargin) / bbox.width);
         var hscale = Math.min((cbbox.height - hMargin) / bbox.height);
 
-
         d.bounds = {
           'container-bounds': cbbox,
           'bounds': bbox,
@@ -15821,6 +13913,32 @@ module.exports = function util(dex) {
           'height-scale': hscale,
           'width-scale': wscale
         };
+      },
+      'addRadialGradients': function (svg, id, data, colorScheme) {
+        var defs = svg.selectAll("defs")
+          .data(['defs'])
+          .enter()
+          .append("defs");
+
+        var grads = defs.selectAll("radialGradient")
+          .data(data)
+          .enter()
+          .append("radialGradient")
+          .attr("gradientUnits", "userSpaceOnUse")
+          .attr("cx", 0)
+          .attr("cy", 0)
+          .attr("r", "100%")
+          .attr("id", function (d, i) {
+            return id + "_" + i;
+          });
+
+        grads.append("stop").attr("offset", "15%").style("stop-color", function (d, i) {
+          return colorScheme(i);
+        });
+        grads.append("stop").attr("offset", "20%").style("stop-color", "white");
+        grads.append("stop").attr("offset", "27%").style("stop-color", function (d, i) {
+          return colorScheme(i);
+        });
       }
     }
   };
