@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+  html,body,#ChartArea{
+    height : 100%;
+    min-height : 100%;
+    width : 100%;
+    min-width : 100%;
+  }
+  
+<%
+  println new File("javascript/c3/latest/c3.min.css").text
+  println new File("javascript/jqueryui/latest/jquery-ui.min.css").text
+  println new File("javascript/jqueryui/latest/jquery-ui.theme.min.css").text
+%>
+</style>
+<html>
+  <head>
+    <title>dex.js : Area Chart</title>
+  </head>
+  <body>
+  <div id="config" style="visibility: hidden">
+  </div>
+  <div id="ChartArea"></div>
+<script>
+<%
+  println new File("javascript/c3/latest/c3.min.js").text
+  println new File("javascript/jquery/latest/jquery-2.1.3.min.js").text
+  println new File("javascript/jqueryui/latest/jquery-ui.min.js").text
+  println new File("javascript/underscore/latest/underscore-min.js").text
+  println new File("javascript/dexjs/latest/dex.min.js").text
+%>
+</script>
+<script>
+<%
+  println dexData.toCsvString();
+%>
+
+function setConfiguration(config)
+{
+  stackedAreaChart.configure(config);
+}
+
+var stackedAreaChart = dex.charts.c3.StackedAreaChart({
+  parent : "#ChartArea",
+  "options.subchart.show": true,
+  "options.point.show": false,
+  csv : csv
+});
+
+stackedAreaChart.load('#config');
+stackedAreaChart.render();
+
+</script>
+</body>
+</html>

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+  html,body,#TimelineParent{
+    height : 100%;
+    min-height : 100%;
+    width : 100%;
+    min-width : 100%;
+  }
+</style>
+<script>
+<%
+  println new File("javascript/c3/latest/c3.min.js").text
+  println new File("javascript/jquery/latest/jquery-2.1.3.min.js").text
+  println new File("javascript/jqueryui/latest/jquery-ui.min.js").text
+  println new File("javascript/underscore/latest/underscore-min.js").text
+  println new File("javascript/dexjs/latest/dex.min.js").text
+%>
+</script>
+<html>
+  <head>
+    <title>Google : Timeline</title>
+  </head>
+  <body>
+  <div id="config" style="visibility: hidden">
+  </div>
+  <div id="TimelineParent"></div>
+
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script type="text/javascript">
+  google.charts.load('current', {packages:['timeline']});
+  google.charts.setOnLoadCallback(drawChart);
+
+<%
+  println dexData.toCsvString();
+%>
+
+  function drawChart() {
+    var container = document.getElementById('TimelineParent');
+    var chart = new google.visualization.Timeline(container);
+    var dataTable = new google.visualization.DataTable();
+
+    var categoryIndex;
+    var fromIndex;
+    var toIndex;
+
+    var types = dex.csv.guessTypes(csv);
+
+    categoryIndex = types.indexOf('string');
+    fromIndex = types.indexOf('date');
+    toIndex = types.indexOf('date', fromIndex + 1);
+
+    if (categoryIndex == -1 || fromIndex == -1) {
+      return;
+    }
+    var rows;
+    
+    if (toIndex == -1) {
+      rows = csv.data.map(function(row) {
+        var toDate = new Date(row[fromIndex]);
+        toDate.setDate(toDate.getDate() + 1);
+        return [ row[categoryIndex], new Date(row[fromIndex]), toDate];
+      });
+    }
+    else {
+      rows = csv.data.map(function(row) {
+        return [ row[categoryIndex], new Date(row[fromIndex]),
+          new Date(row[toIndex])];
+      });
+    }
+
+    dataTable.addColumn({ type: 'string', id: csv.header[categoryIndex] });
+    dataTable.addColumn({ type: 'date', id: 'Start' });
+    dataTable.addColumn({ type: 'date', id: 'End' });
+    dataTable.addRows(rows);
+    
+    
+    var options = {
+    };
+    chart.draw(dataTable, options);
+  }
+
+  function setConfiguration(config)
+  {
+    // What to do?
+  }
+</script>
+</body>
+</html>

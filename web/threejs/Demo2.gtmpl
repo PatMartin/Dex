@@ -10,7 +10,7 @@
 	</body>
 <script type="text/javascript">
 <%
-  println new File("javascript/three/r53/three.min.js").text
+  println new File("javascript/three/latest/three.min.js").text
 %>
 </script>
 

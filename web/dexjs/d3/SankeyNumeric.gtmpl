@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+.node rect {
+  cursor: move;
+  fill-opacity: .9;
+  shape-rendering: crispEdges;
+}
+ 
+.node text {
+  pointer-events: none;
+  text-shadow: 0 1px 0 #fff;
+}
+
+</style>
+<body>
+<svg id="ChartArea" width="100%" height="100%"></svg>
+<script src="http://d3js.org/d3.v3.js"></script>
+<script>
+<%
+  println new File("javascript/dexjs/latest/dex.js").text
+%>
+
+<%
+  def headerStr = "[" + header.collect { return "\"$it\"" }.join(',') + "]"
+  def dataRows = []
+  data.eachWithIndex
+  {
+    row, ri ->
+    dataRows << "[" + row.collect { return "\"$it\"" }.join(',') + "]"
+  }
+  println "var csv = { 'header' : $headerStr,\n 'data' : [" + dataRows.join(',\n') + "] };";
+%>
+
+var color = d3.scale.category10();
+
+relationships = [];
+
+//dex.console.log("IS COLUMN " + (csv.header.length-1) + "NUMERIC? " + dex.csv.isColumnNumeric(csv, csv.header.length-1));
+
+var numeric = dex.csv.getNumericIndices(csv);
+dex.console.log("NUMERIC", numeric);
+      
+function getRelationship(i)
+{
+    return {
+      'source'   : function(csv, ri) {
+        if (numeric.indexOf(i) >= 0)
+        {
+          return {
+            'nodeName' : csv.header[i],
+            'name'     : csv.header[i],
+            'column'   : i+1,
+          };
+        }
+        else
+        {
+          return {
+            'nodeName' : csv.header[i] + "=" + csv.data[ri][i],
+            'name'     : csv.data[ri][i],
+            'column'   : i+1
+          };
+        }
+      },
+      'target' : function(csv, ri) {
+        if (numeric.indexOf(i+1) >= 0)
+        {
+          return {
+            'nodeName' : csv.header[i+1],
+            'name'     : csv.header[i+1],
+            'column'   : i+2,
+          };
+        }
+        else
+        {
+          return {
+            'nodeName' : csv.header[i+1] + "=" + csv.data[ri][i+1],
+            'name'     : csv.data[ri][i+1],
+            'column'   : i+2,
+          };
+        }
+      },
+      'category' : function(csv, ri) { return csv.data[ri][0]; },
+      'value'    : function(csv, ri)
+      {
+        if (numeric.indexOf(i+1) >= 0)
+        {
+          return csv.data[ri][i+1];
+        }
+        else
+        {
+          return 1;
+        }
+      }
+    };
+}
+
+for (i=0; i<csv.header.length-1; i++)
+{
+  relationships.push(getRelationship(i));
+}
+
+dex.console.log("RELATIONSHIPS", relationships);
+
+// Configure a chart.
+var sankey = new Sankey(
+{
+  'parent'  : "#ChartArea",
+  'color'   : d3.scale.category20c(),
+  'xoffset' : 0,
+  'yoffset' : 0,
+  'csv'     : csv,
+  'transform' : 'translate(0,2) scale(.8)',
+  'link.stroke.color' : function(d)
+  {
+    return color(d.category);
+  },
+  'link.stroke.opacity' : .3,
+  'link.fillOpacity' : .1,
+  'relationships' : relationships,
+  'node.rectangle.width' : 30,
+  'node.rectangle.color' : function(d)
+  {
+    return color(d.name);
+  },
+  'node.padding' : 11,
+  'manualColumnLayout' : true,
+  'columnTitle.font.size' : 24,
+  'columnTitle.font.weight' : 'bold',
+  'columnTitle.color'  : 'black',
+  'columnTitle.opacity' : 1,
+});
+
+dex.console.log("CONFIG", sankey.attr());
+sankey.render();
+
+</script>

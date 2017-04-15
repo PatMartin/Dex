@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+  html,body,#ChartArea{
+    height : 100%;
+    min-height : 100%;
+    width : 100%;
+    min-width : 100%;
+  }
+
+<%
+  println new File("javascript/jqueryui/latest/jquery-ui.min.css").text
+  println new File("javascript/jqueryui/latest/jquery-ui.theme.min.css").text
+%>
+
+
+</style>
+<html>
+  <head>
+<script>
+<%
+  println new File("javascript/jquery/latest/jquery-2.1.3.min.js").text
+  println new File("javascript/jqueryui/latest/jquery-ui.min.js").text
+  println new File("javascript/underscore/latest/underscore-min.js").text
+  println new File("javascript/dexjs/latest/dex.js").text
+%>
+</script>
+<title>DexCharts : Parallel Coordinates</title>
+  </head>
+  <body>
+  <div id="config" style="visibility: hidden"></div>
+  <svg id="ChartArea"></svg>
+<script>
+
+function setConfiguration(config)
+{
+  chart.configure(config).update();
+}
+
+<%
+  println dexData.toCsvString()
+%>
+
+var chart = dex.charts.d3.ParallelCoordinates({
+  parent : "#ChartArea",
+  csv : csv
+}).render();
+
+</script>
+</body>
+</html>

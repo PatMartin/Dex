@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+  html,body,#WordTreeParent{
+    height : 100%;
+    min-height : 100%;
+    width : 100%;
+    min-width : 100%;
+  }
+</style>
+<html>
+  <head>
+    <title>Google : Word Tree</title>
+  </head>
+  <body>
+  <div id="config" style="visibility: hidden">
+  </div>
+  <div id="WordTreeParent"></div>
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script type="text/javascript">
+  google.charts.load('current', {packages:['wordtree']});
+  google.charts.setOnLoadCallback(drawChart);
+
+<%
+  println dexData.toCsvString();
+%>
+
+  var phrases = [["Phrases"]];
+  var wordCount = {};
+
+  csv.data.forEach(function(row) {
+    phrases.push([row.join(" ")]);
+    row.forEach(function(phrase) {
+      phrase.split(" ").forEach(function(word) {
+        if (wordCount[word]) {
+          wordCount[word]++;
+        }
+        else { wordCount[word] = 1; }
+      });
+    });
+  });
+
+  // Sorting based on word frequency.  words[0] will be our default
+  // initial connection.
+  var words = Object.keys(wordCount);
+  words.sort(function(a, b) {
+    return wordCount[b] - wordCount[a];
+  });
+
+  function drawChart() {
+    var data = google.visualization.arrayToDataTable(
+          phrases);
+
+        var options = {
+          wordtree: {
+            format: 'implicit',
+            word: words[0],
+            type: "double"
+          }
+        };
+
+        var chart = new google.visualization.WordTree(document.getElementById('WordTreeParent'));
+        chart.draw(data, options);
+      }
+    </script>
+<script>
+
+function setConfiguration(config)
+{
+  // What to do?
+}
+
+</script>
+</body>
+</html>
