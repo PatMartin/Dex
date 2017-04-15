@@ -13,7 +13,6 @@
 		<mkdir dir="${dist}" />
 		<mkdir dir="${dist}/data" />
 		<mkdir dir="${dist}/lib" />
-		<mkdir dir="${dist}/lib/processing" />
 		<mkdir dir="${dist}/lib/selenium" />
 		<mkdir dir="${dist}/lib/rserve" />
 		<mkdir dir="${dist}/output" />
@@ -32,9 +31,6 @@
 
 		<copy todir="${dist}/lib">
 			<fileset dir="lib" includes="**.jar" />
-		</copy>
-		<copy todir="${dist}/lib/processing">
-			<fileset dir="lib/processing" includes="**.jar" />
 		</copy>
 		<copy todir="${dist}/lib/selenium">
 			<fileset dir="lib/selenium" includes="**.jar" />
