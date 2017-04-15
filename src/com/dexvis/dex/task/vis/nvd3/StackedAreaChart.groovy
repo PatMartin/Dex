@@ -11,9 +11,9 @@ class StackedAreaChart extends WebTask
 {
   public StackedAreaChart()
   {
-    super("Visualization: NVD3", "Stacked Area Chart",
+    super("Visualization: NVD3", "NVD3 Stacked Area Chart",
       "visualization/nvd3/StackedAreaChart.html",
-      "web/nvd3/StackedAreaChart.gtmpl")
+      "web/dexjs/nvd3/StackedAreaChart.gtmpl")
     setSaveDynamic(true)
   }
 }

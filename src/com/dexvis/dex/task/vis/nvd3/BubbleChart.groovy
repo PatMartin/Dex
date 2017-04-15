@@ -11,8 +11,8 @@ class BubbleChart extends WebTask
 {
   public BubbleChart()
   {
-    super("Visualization: NVD3", "BubbleChart",
+    super("Visualization: NVD3", "NVD3 Bubble Chart",
       "visualization/nvd3/BubbleChart.html",
-      "web/nvd3/BubbleChart.gtmpl")
+      "web/dexjs/nvd3/BubbleChart.gtmpl")
   }
 }
