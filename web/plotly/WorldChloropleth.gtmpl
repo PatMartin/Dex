@@ -1,0 +1,126 @@
+<head>
+  <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.css">
+  <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/jquery-ui.theme.min.css">
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+  <script src="http://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
+</head>
+<style>
+    html, body {
+        height: 100%;
+        min-height: 100%;
+        width: 100%;
+        min-width: 100%;
+    }
+
+    #globe {
+        height: 80%;
+        min-height: 80%;
+        width: 100%;
+        min-width: 80%;
+    }
+
+    .center {
+      margin: auto;
+      width: 250px;
+      border: 3px solid grey;
+      background: silver;
+      padding: 5px;
+    }
+</style>
+<body>
+<!-- Plotly chart will be drawn inside this DIV -->
+<div id="globe"></div>
+<div id="toolbar" class="center">
+  <button id="beginning">go to beginning</button>
+  <button id="previous">previous</button>
+  <button id="play">play</button>
+  <button id="next">next</button>
+  <button id="end">go to end</button>
+</div>
+<script>
+<%
+  println new File("javascript/underscore/latest/underscore-min.js").text
+  println new File("javascript/d3/latest/d3.min.js").text
+  println new File("javascript/dexjs/latest/dex.js").text
+%>
+</script>
+<script>
+<%
+  println dexData.toCsvString();
+%>
+
+//dex.console.log("CSV", csv);
+
+function drawGlobe(csv, title) {
+
+  //dex.console.log("DrawGlobe.csv", csv);
+
+  function unpack(csv, index) {
+    return csv.data.map(function(row) { return row[index]; });
+  }
+
+  var data = [{
+    type: 'choropleth',
+    //locationmode: 'country names',
+    locationmode: 'ISO-3',
+    locations: unpack(csv, 0),
+    z: unpack(csv, 1),
+    text: unpack(csv, 0),
+    autocolorscale: true
+  }];
+
+  var layout = {
+    title: title,
+    geo: {
+      projection: {
+        type: 'robinson'
+        //type: 'stereographic'
+      }
+    }
+  };
+  
+  Plotly.plot(globe, data, layout, {showLink: false});
+}
+
+function redrawGlobe(csv, title)
+{
+  var globe = document.getElementById('globe');
+  //dex.console.log("REDRAW-GLOBE.csv", csv);
+
+  function unpack(csv, index) {
+    return csv.data.map(function(row) { return row[index]; });
+  }
+
+  globe.data = [{
+    type: 'choropleth',
+    locationmode: 'country names',
+    locations: unpack(csv, 0),
+    z: unpack(csv, 1),
+    text: unpack(csv, 0),
+    autocolorscale: true
+  }];
+  
+  globe.layout.title = title;
+  
+  Plotly.redraw(globe);
+}
+
+var player = new dex.ui.jqueryui.Player({
+  'parent' : '#toolbar',
+  'csv' : csv,
+  'delay' : 500
+});
+
+// The globe isn't a dex component, so let's let the player talk
+// to itself and trigger events manually.
+player.subscribe(player, "new-frame", function(msg) {
+  dex.console.log("MESSAGE:", msg);
+  redrawGlobe(msg.data, csv.header[0] + ": " + msg.name);
+});
+
+player.render();
+drawGlobe(player.attr("frames").frames[0], csv.header[0] + ": " + player.attr("frames").frameIndices[0]);
+
+</script>
+</body>
