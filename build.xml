@@ -69,7 +69,17 @@
 		<copy file="data/diffdata.csv" todir="${dist}/data" />
 		<copy file="data/bank-data.csv" todir="${dist}/data" />
 		<copy file="data/quartet.csv" todir="${dist}/data" />
-
+		<copy file="data/population.csv" todir="${dist}/data" />
+		<copy file="data/thrones.csv" todir="${dist}/data" />
+		<copy file="data/drwho.csv" todir="${dist}/data" />
+		<copy file="data/alcohol_by_country.csv" todir="${dist}/data" />
+		<copy file="data/OJ_Timeline.csv" todir="${dist}/data" />
+		<copy file="data/WWI_Timeline.csv" todir="${dist}/data" />
+		<copy file="data/crime.csv" todir="${dist}/data" />
+		<copy file="data/cars2013.csv" todir="${dist}/data" />
+		<copy file="data/CircularHeat.csv" todir="${dist}/data" />
+		<copy file="data/president_timeline.csv" todir="${dist}/data" />
+		
 		<copy todir="${dist}/web">
 			<fileset dir="web" />
 		</copy>
@@ -129,6 +139,18 @@
 		</copy>
 		<copy todir="${dist}/javascript/codemirror/latest">
 			<fileset dir="javascript/codemirror/latest" />
+		</copy>
+		<copy todir="${dist}/javascript/echarts/latest">
+			<fileset dir="javascript/echarts/latest" />
+		</copy>
+		<copy todir="${dist}/javascript/elegans/latest">
+			<fileset dir="javascript/elegans/latest" />
+		</copy>
+		<copy todir="${dist}/javascript/sql/latest">
+			<fileset dir="javascript/sql/latest" />
+		</copy>
+		<copy todir="${dist}/javascript/jqGrid/latest">
+			<fileset dir="javascript/jqGrid/latest" />
 		</copy>
 	</target>
 
