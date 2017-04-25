@@ -1,0 +1,47 @@
+// import apache regression routines:
+import org.apache.commons.math3.stat.regression.SimpleRegression;
+
+analyze = [ 1]
+
+// Initialize our regression list to empty.
+regressions = []
+
+// For each column to be analyzed...
+analyze.each
+{ 
+  // Append a header named: REGRESSION plus whatever the orignal column
+  // name happened to be.
+  header << "REGRESSION" + header[it]
+  // Create a new empty regression.
+  regressions << new SimpleRegression()
+}
+
+// Process each row of our data...
+data.each
+{
+  row ->
+  // For each analysis we are performing
+  analyze.eachWithIndex
+  {
+     // Store it's value and index of the regression this value relates to
+     val, i ->
+     // Add a regression point
+     regressions[i].addData(Double.parseDouble(row[0]), Double.parseDouble(row[val]))
+  }
+}
+
+// Once more loop over the data:
+data.each
+{
+  // Remember the row
+  row ->
+  // For each analysis
+  analyze.eachWithIndex
+  {
+    // Remember it's column and index within the analysis
+    val, i ->
+    // Calculate ther regression value for the current row:  The formula for a line = y = mx + b and
+    // this is a linear regression to apply the formula to determine the appropriate value.
+    row << (regressions[i].slope * Double.parseDouble(row[0]) + regressions[i].intercept).toString()
+  }
+}
