@@ -1,0 +1,73 @@
+<dex-project version="0.8">
+   <tasks class="java.util.ArrayList">
+      <task-item name="Read CSV" active="true">
+         <task class="com.dexvis.dex.task.input.ReadCsv">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+            <fileText>data\drwho.csv</fileText>
+            <limitRows>false</limitRows>
+            <rowLimitText>0</rowLimitText>
+            <lastDir>C:\dex2ws\Dex\data</lastDir>
+         </task>
+      </task-item>
+      <task-item name="View Data" active="true">
+         <task class="com.dexvis.dex.task.utilities.ViewData">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+         </task>
+      </task-item>
+      <task-item name="Select Columns" active="true">
+         <task class="com.dexvis.dex.task.tablemanipulation.SelectColumns">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+            <columnList>&lt;com.dexvis.simple.types.SimpleListSelectionView&gt;
+  &lt;sourceList&gt;
+    &lt;string&gt;No Villains&lt;/string&gt;
+    &lt;string&gt;% of Villains&lt;/string&gt;
+    &lt;string&gt;Doc. no.&lt;/string&gt;
+    &lt;string&gt;ID&lt;/string&gt;
+    &lt;string&gt;Episodes&lt;/string&gt;
+    &lt;string&gt;Stories  total&lt;/string&gt;
+    &lt;string&gt;Doctor actor&lt;/string&gt;
+  &lt;/sourceList&gt;
+  &lt;targetList&gt;
+    &lt;string&gt;Villain&lt;/string&gt;
+    &lt;string&gt;Story titles&lt;/string&gt;
+    &lt;string&gt;Motivation&lt;/string&gt;
+  &lt;/targetList&gt;
+&lt;/com.dexvis.simple.types.SimpleListSelectionView&gt;</columnList>
+         </task>
+      </task-item>
+      <task-item name="Prefuse Graph View" active="true">
+         <task class="com.dexvis.dex.task.vis.prefuse.PrefuseGraphView">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+         </task>
+      </task-item>
+      <task-item name="Prefuse Radial Graph View" active="true">
+         <task class="com.dexvis.dex.task.vis.prefuse.PrefuseRadialGraphView">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+         </task>
+      </task-item>
+      <task-item name="Prefuse Starburst" active="true">
+         <task class="com.dexvis.dex.task.vis.prefuse.PrefuseStarburst">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+         </task>
+      </task-item>
+      <task-item name="Prefuse Tree View" active="true">
+         <task class="com.dexvis.dex.task.vis.prefuse.PrefuseTreeView">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+         </task>
+      </task-item>
+   </tasks>
+</dex-project>

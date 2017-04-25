@@ -1,0 +1,101 @@
+<dex-project version="0.8">
+   <tasks class="java.util.ArrayList">
+      <task-item name="Read CSV" active="true">
+         <task class="com.dexvis.dex.task.input.ReadCsv">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+            <fileText>data\president_timeline.csv</fileText>
+            <limitRows>false</limitRows>
+            <rowLimitText>0</rowLimitText>
+            <lastDir>C:\dex2ws\Dex\data</lastDir>
+         </task>
+      </task-item>
+      <task-item name="Select Columns" active="true">
+         <task class="com.dexvis.dex.task.tablemanipulation.SelectColumns">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+            <columnList>&lt;com.dexvis.simple.types.SimpleListSelectionView&gt;
+  &lt;sourceList&gt;
+    &lt;string&gt;Presidency &lt;/string&gt;
+    &lt;string&gt;Party &lt;/string&gt;
+    &lt;string&gt;Home State&lt;/string&gt;
+  &lt;/sourceList&gt;
+  &lt;targetList&gt;
+    &lt;string&gt;President &lt;/string&gt;
+    &lt;string&gt;Took office &lt;/string&gt;
+    &lt;string&gt;Left office &lt;/string&gt;
+  &lt;/targetList&gt;
+&lt;/com.dexvis.simple.types.SimpleListSelectionView&gt;</columnList>
+         </task>
+      </task-item>
+      <task-item name="Trim Columns" active="true">
+         <task class="com.dexvis.dex.task.tablemanipulation.TrimColumns">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+         </task>
+      </task-item>
+      <task-item name="Groovy Script" active="true">
+         <task class="com.dexvis.dex.task.prg.GroovyScript">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+            <processbytable>&lt;map&gt;
+  &lt;entry&gt;
+    &lt;string&gt;text&lt;/string&gt;
+    &lt;string&gt;Table&lt;/string&gt;
+  &lt;/entry&gt;
+  &lt;entry&gt;
+    &lt;string&gt;selected&lt;/string&gt;
+    &lt;boolean&gt;true&lt;/boolean&gt;
+  &lt;/entry&gt;
+&lt;/map&gt;</processbytable>
+            <processbyrow>&lt;map&gt;
+  &lt;entry&gt;
+    &lt;string&gt;text&lt;/string&gt;
+    &lt;string&gt;Row&lt;/string&gt;
+  &lt;/entry&gt;
+&lt;/map&gt;</processbyrow>
+            <processbycolumn>&lt;map&gt;
+  &lt;entry&gt;
+    &lt;string&gt;text&lt;/string&gt;
+    &lt;string&gt;Column&lt;/string&gt;
+  &lt;/entry&gt;
+&lt;/map&gt;</processbycolumn>
+            <groovyCode class="javafx.beans.property.SimpleStringProperty">def ddmmyyyyFormat = ~/^(\d{1,2})\/(\d{1,2})\/(\d{4,4})$/
+
+data.eachWithIndex {
+  row, ri -&gt;
+  if (row[2] == &quot;Incumbent&quot;) {
+    data[ri][2] = &quot;20/01/2017&quot;
+  }
+  
+  def matcher = (row[1] =~ ddmmyyyyFormat);
+  if (matcher.matches()) {
+    data[ri][1] = matcher[0][2] + &quot;/&quot; + matcher[0][1] + &quot;/&quot; + matcher[0][3];
+  }
+  matcher = (row[2] =~ ddmmyyyyFormat);
+  if (matcher.matches()) {
+    data[ri][2] = matcher[0][2] + &quot;/&quot; + matcher[0][1] + &quot;/&quot; + matcher[0][3];
+  }
+}</groovyCode>
+         </task>
+      </task-item>
+      <task-item name="View Data" active="true">
+         <task class="com.dexvis.dex.task.utilities.ViewData">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+         </task>
+      </task-item>
+      <task-item name="Timeline" active="true">
+         <task class="com.dexvis.dex.task.vis.google.Timeline">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+         </task>
+      </task-item>
+   </tasks>
+</dex-project>

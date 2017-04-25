@@ -1,0 +1,1822 @@
+<dex-project version="0.8">
+   <tasks class="java.util.ArrayList">
+      <task-item name="Documentation" active="true">
+         <task class="com.dexvis.dex.task.utilities.Documentation">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+            <editor>&lt;html dir=&quot;ltr&quot;&gt;&lt;head&gt;&lt;/head&gt;&lt;body contenteditable=&quot;true&quot;&gt;&lt;h1&gt;&lt;font face=&quot;Segoe UI&quot; size=&quot;6&quot;&gt;Motion Bar Chart&lt;/font&gt;&lt;/h1&gt;&lt;p&gt;&lt;font face=&quot;Segoe UI&quot;&gt;This demo showcases the motion bar chart as well as a few other interesting aspects of Dex such as:&lt;/font&gt;&lt;/p&gt;&lt;p&gt;&lt;ol&gt;&lt;li&gt;&lt;font face=&quot;Segoe UI&quot;&gt;The ability to document a flow as you see here&lt;/font&gt;&lt;/li&gt;&lt;li&gt;&lt;font face=&quot;Segoe UI&quot;&gt;The ability to read in CSV data into an in-memory table.&lt;/font&gt;&lt;/li&gt;&lt;li&gt;&lt;font face=&quot;Segoe UI&quot;&gt;The ability to query this data in different ways to feed multiple charts.&lt;/font&gt;&lt;/li&gt;&lt;/ol&gt;&lt;p&gt;&lt;font face=&quot;Segoe UI&quot;&gt;The motion bar chart expects a table of at least 4 columns. &amp;nbsp;Any columns after the 3rd is ignored.&lt;/font&gt;&lt;/p&gt;&lt;p&gt;&lt;ul&gt;&lt;li&gt;&lt;font face=&quot;Segoe UI&quot;&gt;COLUMN 1 : The category (categorical)&lt;/font&gt;&lt;/li&gt;&lt;li&gt;&lt;font face=&quot;Segoe UI&quot;&gt;COLUMN 2 : The x axis value. &amp;nbsp;(quantitative, with 1 entry per categorical entry)&lt;/font&gt;&lt;/li&gt;&lt;li&gt;&lt;font face=&quot;Segoe UI&quot;&gt;COLUMN 3 : The y axis value (quantitative)&lt;/font&gt;&lt;/li&gt;&lt;/ul&gt;&lt;/p&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</editor>
+            <docFileText></docFileText>
+         </task>
+      </task-item>
+      <task-item name="Read CSV" active="true">
+         <task class="com.dexvis.dex.task.input.ReadCsv">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+            <fileText>data\BirthsAndDeaths.csv</fileText>
+            <limitRows>false</limitRows>
+            <rowLimitText>0</rowLimitText>
+            <lastDir>C:\dex2ws\Dex\data</lastDir>
+         </task>
+      </task-item>
+      <task-item name="Create Jdbc Table" active="true">
+         <task class="com.dexvis.dex.task.database.CreateJdbcTable">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+            <dbtype>&lt;map&gt;
+  &lt;entry&gt;
+    &lt;string&gt;items&lt;/string&gt;
+    &lt;list&gt;
+      &lt;string&gt;Oracle&lt;/string&gt;
+      &lt;string&gt;MySql&lt;/string&gt;
+      &lt;string&gt;Sqlite&lt;/string&gt;
+      &lt;string&gt;Neo4J&lt;/string&gt;
+      &lt;string&gt;HyperSql&lt;/string&gt;
+      &lt;string&gt;Other&lt;/string&gt;
+    &lt;/list&gt;
+  &lt;/entry&gt;
+  &lt;entry&gt;
+    &lt;string&gt;selected&lt;/string&gt;
+    &lt;string&gt;HyperSql&lt;/string&gt;
+  &lt;/entry&gt;
+&lt;/map&gt;</dbtype>
+            <driver>org.hsqldb.jdbc.JDBCDriver</driver>
+            <url>jdbc:hsqldb:mem:csvdb</url>
+            <password></password>
+            <username>sa</username>
+            <table>CSV</table>
+            <batch>false</batch>
+            <right_sizing>false</right_sizing>
+            <strict>false</strict>
+            <string_min>16</string_min>
+            <string_max>256</string_max>
+         </task>
+      </task-item>
+      <task-item name="Query Jdbc" active="true">
+         <task class="com.dexvis.dex.task.database.QueryJdbc">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+            <sqlScript class="javafx.beans.property.SimpleStringProperty">SELECT COUNTRYABBREVIATION, YEAR, POPULATION FROM CSV;</sqlScript>
+            <dbtype>&lt;map&gt;
+  &lt;entry&gt;
+    &lt;string&gt;items&lt;/string&gt;
+    &lt;list&gt;
+      &lt;string&gt;HyperSql&lt;/string&gt;
+      &lt;string&gt;Oracle&lt;/string&gt;
+      &lt;string&gt;MySql&lt;/string&gt;
+      &lt;string&gt;Sqlite&lt;/string&gt;
+    &lt;/list&gt;
+  &lt;/entry&gt;
+  &lt;entry&gt;
+    &lt;string&gt;selected&lt;/string&gt;
+    &lt;string&gt;HyperSql&lt;/string&gt;
+  &lt;/entry&gt;
+&lt;/map&gt;</dbtype>
+            <driver>org.hsqldb.jdbc.JDBCDriver</driver>
+            <url>jdbc:hsqldb:mem:csvdb</url>
+            <password></password>
+            <username>sa</username>
+         </task>
+      </task-item>
+      <task-item name="View Data" active="true">
+         <task class="com.dexvis.dex.task.utilities.ViewData">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+         </task>
+      </task-item>
+      <task-item name="Motion Bar Chart" active="true">
+         <task class="com.dexvis.dex.task.vis.dexjs.MotionBarChart">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper">
+                  <property>
+                     <name>Height</name>
+                     <target>height</target>
+                     <category>Dimensions</category>
+                     <value class="java.lang.Integer">600</value>
+                  </property>
+                  <property>
+                     <name>Width</name>
+                     <target>width</target>
+                     <category>Dimensions</category>
+                     <value class="java.lang.Integer">800</value>
+                  </property>
+                  <property>
+                     <name>Left</name>
+                     <target>margin.left</target>
+                     <category>Margins</category>
+                     <value class="java.lang.Integer">100</value>
+                  </property>
+                  <property>
+                     <name>Right</name>
+                     <target>margin.right</target>
+                     <category>Margins</category>
+                     <value class="java.lang.Integer">50</value>
+                  </property>
+                  <property>
+                     <name>Top</name>
+                     <target>margin.top</target>
+                     <category>Margins</category>
+                     <value class="java.lang.Integer">50</value>
+                  </property>
+                  <property>
+                     <name>Bottom</name>
+                     <target>margin.bottom</target>
+                     <category>Margins</category>
+                     <value class="java.lang.Integer">100</value>
+                  </property>
+                  <property>
+                     <name>Transform</name>
+                     <target>transform</target>
+                     <category>Dimensions</category>
+                  </property>
+                  <property>
+                     <name>Name</name>
+                     <target>index.name</target>
+                     <category>Source Columns</category>
+                     <value class="java.lang.Integer">0</value>
+                  </property>
+                  <property>
+                     <name>Color</name>
+                     <target>index.color</target>
+                     <category>Source Columns</category>
+                     <value class="java.lang.Integer">0</value>
+                  </property>
+                  <property>
+                     <name>Time</name>
+                     <target>index.time</target>
+                     <category>Source Columns</category>
+                     <value class="java.lang.Integer">1</value>
+                  </property>
+                  <property>
+                     <name>Bar Height</name>
+                     <target>index.y</target>
+                     <category>Source Columns</category>
+                     <value class="java.lang.Integer">2</value>
+                  </property>
+                  <property>
+                     <name>Duration</name>
+                     <target>duration</target>
+                     <category>General</category>
+                     <value class="java.lang.Integer">10000</value>
+                  </property>
+                  <property>
+                     <name>Rectangle Width</name>
+                     <target>bar.width</target>
+                     <category>Bars</category>
+                  </property>
+                  <property>
+                     <name>Rectangle Height</name>
+                     <target>bar.height</target>
+                     <category>Bars</category>
+                  </property>
+                  <property>
+                     <name>Rectangle X</name>
+                     <target>bar.x</target>
+                     <category>Bars</category>
+                  </property>
+                  <property>
+                     <name>Rectangle Y</name>
+                     <target>bar.y</target>
+                     <category>Bars</category>
+                  </property>
+                  <property>
+                     <name>Rectangle RX</name>
+                     <target>bar.rx</target>
+                     <category>Bars</category>
+                  </property>
+                  <property>
+                     <name>Rectangle RY</name>
+                     <target>bar.ry</target>
+                     <category>Bars</category>
+                  </property>
+                  <property>
+                     <name>Rectangle Opacity</name>
+                     <target>bar.opacity</target>
+                     <category>Bars</category>
+                  </property>
+                  <property>
+                     <name>Rectangle Color</name>
+                     <target>bar.color</target>
+                     <category>Bars</category>
+                  </property>
+                  <property>
+                     <name>Rectangle Transform</name>
+                     <target>bar.transform</target>
+                     <category>Bars</category>
+                  </property>
+                  <property>
+                     <name>Stroke Color</name>
+                     <target>bar.stroke.color</target>
+                     <category>Bars</category>
+                  </property>
+                  <property>
+                     <name>Stroke Width</name>
+                     <target>bar.stroke.width</target>
+                     <category>Bars</category>
+                  </property>
+                  <property>
+                     <name>Stroke Dash Array</name>
+                     <target>bar.stroke.dasharray</target>
+                     <category>Bars</category>
+                  </property>
+                  <property>
+                     <name>Stroke Opacity</name>
+                     <target>bar.stroke.opacity</target>
+                     <category>Bars</category>
+                  </property>
+                  <property>
+                     <name>Stroke Transform</name>
+                     <target>bar.stroke.transform</target>
+                     <category>Bars</category>
+                  </property>
+                  <property>
+                     <name>Text Length</name>
+                     <target>bar.textLength</target>
+                     <category>Label</category>
+                  </property>
+                  <property>
+                     <name>Text Length Adjust</name>
+                     <target>bar.lengthAdjust</target>
+                     <category>Label</category>
+                  </property>
+                  <property>
+                     <name>Vertical Orientation</name>
+                     <target>bar.verticalOrientation</target>
+                     <category>Label</category>
+                  </property>
+                  <property>
+                     <name>DX</name>
+                     <target>bar.dx</target>
+                     <category>Label</category>
+                  </property>
+                  <property>
+                     <name>DY</name>
+                     <target>bar.dy</target>
+                     <category>Label</category>
+                  </property>
+                  <property>
+                     <name>Writing Mode</name>
+                     <target>bar.writingMode</target>
+                     <category>Label</category>
+                  </property>
+                  <property>
+                     <name>Anchor</name>
+                     <target>bar.anchor</target>
+                     <category>Label</category>
+                  </property>
+                  <property>
+                     <name>Opacity</name>
+                     <target>bar.fill.fillOpacity</target>
+                     <category>Label</category>
+                  </property>
+                  <property>
+                     <name>Color</name>
+                     <target>bar.fill.fillColor</target>
+                     <category>Label</category>
+                  </property>
+                  <property>
+                     <name>Format</name>
+                     <target>bar.format</target>
+                     <category>Label</category>
+                  </property>
+                  <property>
+                     <name>Decoration</name>
+                     <target>bar.font.decoration</target>
+                     <category>Label</category>
+                  </property>
+                  <property>
+                     <name>Family</name>
+                     <target>bar.font.family</target>
+                     <category>Label</category>
+                  </property>
+                  <property>
+                     <name>Letter Spacing</name>
+                     <target>bar.font.letterSpacing</target>
+                     <category>Label</category>
+                  </property>
+                  <property>
+                     <name>Size</name>
+                     <target>bar.font.size</target>
+                     <category>Label</category>
+                  </property>
+                  <property>
+                     <name>Style</name>
+                     <target>bar.font.style</target>
+                     <category>Label</category>
+                  </property>
+                  <property>
+                     <name>Weight</name>
+                     <target>bar.font.weight</target>
+                     <category>Label</category>
+                  </property>
+                  <property>
+                     <name>Word Spacing</name>
+                     <target>bar.font.wordSpacing</target>
+                     <category>Label</category>
+                  </property>
+                  <property>
+                     <name>Variant</name>
+                     <target>bar.font.variant</target>
+                     <category>Label</category>
+                  </property>
+                  <property>
+                     <name>Orient</name>
+                     <target>xaxis.orient</target>
+                     <category>X-Axis</category>
+                  </property>
+                  <property>
+                     <name>Ticks</name>
+                     <target>xaxis.ticks</target>
+                     <category>X-Axis</category>
+                  </property>
+                  <property>
+                     <name>Tick Values</name>
+                     <target>xaxis.tickValues</target>
+                     <category>X-Axis</category>
+                  </property>
+                  <property>
+                     <name>Tick Size</name>
+                     <target>xaxis.tickSize</target>
+                     <category>X-Axis</category>
+                  </property>
+                  <property>
+                     <name>Inner Tick Size</name>
+                     <target>xaxis.innerTickSize</target>
+                     <category>X-Axis</category>
+                  </property>
+                  <property>
+                     <name>Outer Tick Size</name>
+                     <target>xaxis.outerTickSize</target>
+                     <category>X-Axis</category>
+                  </property>
+                  <property>
+                     <name>Tick Padding</name>
+                     <target>xaxis.tickPadding</target>
+                     <category>X-Axis</category>
+                  </property>
+                  <property>
+                     <name>Tick Format</name>
+                     <target>xaxis.tickFormat</target>
+                     <category>X-Axis</category>
+                  </property>
+                  <property>
+                     <name>Stroke Color</name>
+                     <target>xaxis.stroke.color</target>
+                     <category>X-Axis</category>
+                  </property>
+                  <property>
+                     <name>Stroke Width</name>
+                     <target>xaxis.stroke.width</target>
+                     <category>X-Axis</category>
+                  </property>
+                  <property>
+                     <name>Stroke Dash Array</name>
+                     <target>xaxis.stroke.dasharray</target>
+                     <category>X-Axis</category>
+                  </property>
+                  <property>
+                     <name>Stroke Opacity</name>
+                     <target>xaxis.stroke.opacity</target>
+                     <category>X-Axis</category>
+                  </property>
+                  <property>
+                     <name>Stroke Transform</name>
+                     <target>xaxis.stroke.transform</target>
+                     <category>X-Axis</category>
+                  </property>
+                  <property>
+                     <name>Fill Color</name>
+                     <target>xaxis.fill.fillColor</target>
+                     <category>X-Axis</category>
+                  </property>
+                  <property>
+                     <name>Fill Opacity</name>
+                     <target>xaxis.fill.fillOpacity</target>
+                     <category>X-Axis</category>
+                  </property>
+                  <property>
+                     <name>Orient</name>
+                     <target>yaxis.orient</target>
+                     <category>Y-Axis</category>
+                  </property>
+                  <property>
+                     <name>Ticks</name>
+                     <target>yaxis.ticks</target>
+                     <category>Y-Axis</category>
+                  </property>
+                  <property>
+                     <name>Tick Values</name>
+                     <target>yaxis.tickValues</target>
+                     <category>Y-Axis</category>
+                  </property>
+                  <property>
+                     <name>Tick Size</name>
+                     <target>yaxis.tickSize</target>
+                     <category>Y-Axis</category>
+                  </property>
+                  <property>
+                     <name>Inner Tick Size</name>
+                     <target>yaxis.innerTickSize</target>
+                     <category>Y-Axis</category>
+                  </property>
+                  <property>
+                     <name>Outer Tick Size</name>
+                     <target>yaxis.outerTickSize</target>
+                     <category>Y-Axis</category>
+                  </property>
+                  <property>
+                     <name>Tick Padding</name>
+                     <target>yaxis.tickPadding</target>
+                     <category>Y-Axis</category>
+                  </property>
+                  <property>
+                     <name>Tick Format</name>
+                     <target>yaxis.tickFormat</target>
+                     <category>Y-Axis</category>
+                  </property>
+                  <property>
+                     <name>Stroke Color</name>
+                     <target>yaxis.stroke.color</target>
+                     <category>Y-Axis</category>
+                  </property>
+                  <property>
+                     <name>Stroke Width</name>
+                     <target>yaxis.stroke.width</target>
+                     <category>Y-Axis</category>
+                  </property>
+                  <property>
+                     <name>Stroke Dash Array</name>
+                     <target>yaxis.stroke.dasharray</target>
+                     <category>Y-Axis</category>
+                  </property>
+                  <property>
+                     <name>Stroke Opacity</name>
+                     <target>yaxis.stroke.opacity</target>
+                     <category>Y-Axis</category>
+                  </property>
+                  <property>
+                     <name>Stroke Transform</name>
+                     <target>yaxis.stroke.transform</target>
+                     <category>Y-Axis</category>
+                  </property>
+                  <property>
+                     <name>Fill Color</name>
+                     <target>yaxis.fill.fillColor</target>
+                     <category>Y-Axis</category>
+                  </property>
+                  <property>
+                     <name>Fill Opacity</name>
+                     <target>yaxis.fill.fillOpacity</target>
+                     <category>Y-Axis</category>
+                  </property>
+                  <property>
+                     <name>Stroke Color</name>
+                     <target>axisLine.stroke.color</target>
+                     <category>Axis Lines</category>
+                  </property>
+                  <property>
+                     <name>Stroke Width</name>
+                     <target>axisLine.stroke.width</target>
+                     <category>Axis Lines</category>
+                  </property>
+                  <property>
+                     <name>Stroke Dash Array</name>
+                     <target>axisLine.stroke.dasharray</target>
+                     <category>Axis Lines</category>
+                  </property>
+                  <property>
+                     <name>Stroke Opacity</name>
+                     <target>axisLine.stroke.opacity</target>
+                     <category>Axis Lines</category>
+                  </property>
+                  <property>
+                     <name>Stroke Transform</name>
+                     <target>axisLine.stroke.transform</target>
+                     <category>Axis Lines</category>
+                  </property>
+                  <property>
+                     <name>Fill Color</name>
+                     <target>axisLine.fill.fillColor</target>
+                     <category>Axis Lines</category>
+                  </property>
+                  <property>
+                     <name>Fill Opacity</name>
+                     <target>axisLine.fill.fillOpacity</target>
+                     <category>Axis Lines</category>
+                  </property>
+                  <property>
+                     <name>Stroke Color</name>
+                     <target>tick.stroke.color</target>
+                     <category>Axis Ticks</category>
+                  </property>
+                  <property>
+                     <name>Stroke Width</name>
+                     <target>tick.stroke.width</target>
+                     <category>Axis Ticks</category>
+                  </property>
+                  <property>
+                     <name>Stroke Dash Array</name>
+                     <target>tick.stroke.dasharray</target>
+                     <category>Axis Ticks</category>
+                  </property>
+                  <property>
+                     <name>Stroke Opacity</name>
+                     <target>tick.stroke.opacity</target>
+                     <category>Axis Ticks</category>
+                  </property>
+                  <property>
+                     <name>Stroke Transform</name>
+                     <target>tick.stroke.transform</target>
+                     <category>Axis Ticks</category>
+                  </property>
+                  <property>
+                     <name>X</name>
+                     <target>xaxis.label.x</target>
+                     <category>X Axis Labels</category>
+                  </property>
+                  <property>
+                     <name>Y</name>
+                     <target>xaxis.label.y</target>
+                     <category>X Axis Labels</category>
+                  </property>
+                  <property>
+                     <name>Text Length</name>
+                     <target>xaxis.label.textLength</target>
+                     <category>X Axis Labels</category>
+                  </property>
+                  <property>
+                     <name>Text Length Adjust</name>
+                     <target>xaxis.label.lengthAdjust</target>
+                     <category>X Axis Labels</category>
+                  </property>
+                  <property>
+                     <name>Transform</name>
+                     <target>xaxis.label.transform</target>
+                     <category>X Axis Labels</category>
+                  </property>
+                  <property>
+                     <name>Vertical Orientation</name>
+                     <target>xaxis.label.verticalOrientation</target>
+                     <category>X Axis Labels</category>
+                  </property>
+                  <property>
+                     <name>DX</name>
+                     <target>xaxis.label.dx</target>
+                     <category>X Axis Labels</category>
+                  </property>
+                  <property>
+                     <name>DY</name>
+                     <target>xaxis.label.dy</target>
+                     <category>X Axis Labels</category>
+                  </property>
+                  <property>
+                     <name>Writing Mode</name>
+                     <target>xaxis.label.writingMode</target>
+                     <category>X Axis Labels</category>
+                  </property>
+                  <property>
+                     <name>Anchor</name>
+                     <target>xaxis.label.anchor</target>
+                     <category>X Axis Labels</category>
+                  </property>
+                  <property>
+                     <name>Opacity</name>
+                     <target>xaxis.label.fill.fillOpacity</target>
+                     <category>X Axis Labels</category>
+                  </property>
+                  <property>
+                     <name>Color</name>
+                     <target>xaxis.label.fill.fillColor</target>
+                     <category>X Axis Labels</category>
+                  </property>
+                  <property>
+                     <name>Format</name>
+                     <target>xaxis.label.format</target>
+                     <category>X Axis Labels</category>
+                  </property>
+                  <property>
+                     <name>Decoration</name>
+                     <target>xaxis.label.font.decoration</target>
+                     <category>X Axis Labels</category>
+                  </property>
+                  <property>
+                     <name>Family</name>
+                     <target>xaxis.label.font.family</target>
+                     <category>X Axis Labels</category>
+                  </property>
+                  <property>
+                     <name>Letter Spacing</name>
+                     <target>xaxis.label.font.letterSpacing</target>
+                     <category>X Axis Labels</category>
+                  </property>
+                  <property>
+                     <name>Size</name>
+                     <target>xaxis.label.font.size</target>
+                     <category>X Axis Labels</category>
+                  </property>
+                  <property>
+                     <name>Style</name>
+                     <target>xaxis.label.font.style</target>
+                     <category>X Axis Labels</category>
+                  </property>
+                  <property>
+                     <name>Weight</name>
+                     <target>xaxis.label.font.weight</target>
+                     <category>X Axis Labels</category>
+                  </property>
+                  <property>
+                     <name>Word Spacing</name>
+                     <target>xaxis.label.font.wordSpacing</target>
+                     <category>X Axis Labels</category>
+                  </property>
+                  <property>
+                     <name>Variant</name>
+                     <target>xaxis.label.font.variant</target>
+                     <category>X Axis Labels</category>
+                  </property>
+               </properties>
+            </prop-sheet>
+         </task>
+      </task-item>
+      <task-item name="Query Jdbc" active="true">
+         <task class="com.dexvis.dex.task.database.QueryJdbc">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+            <sqlScript class="javafx.beans.property.SimpleStringProperty">SELECT COUNTRYABBREVIATION, YEAR, BIRTHSPER1000PEOPLE FROM CSV;</sqlScript>
+            <dbtype>&lt;map&gt;
+  &lt;entry&gt;
+    &lt;string&gt;items&lt;/string&gt;
+    &lt;list&gt;
+      &lt;string&gt;HyperSql&lt;/string&gt;
+      &lt;string&gt;Oracle&lt;/string&gt;
+      &lt;string&gt;MySql&lt;/string&gt;
+      &lt;string&gt;Sqlite&lt;/string&gt;
+    &lt;/list&gt;
+  &lt;/entry&gt;
+  &lt;entry&gt;
+    &lt;string&gt;selected&lt;/string&gt;
+    &lt;string&gt;HyperSql&lt;/string&gt;
+  &lt;/entry&gt;
+&lt;/map&gt;</dbtype>
+            <driver>org.hsqldb.jdbc.JDBCDriver</driver>
+            <url>jdbc:hsqldb:mem:csvdb</url>
+            <password></password>
+            <username>sa</username>
+         </task>
+      </task-item>
+      <task-item name="View Data" active="true">
+         <task class="com.dexvis.dex.task.utilities.ViewData">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+         </task>
+      </task-item>
+      <task-item name="Motion Bar Chart" active="true">
+         <task class="com.dexvis.dex.task.vis.dexjs.MotionBarChart">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper">
+                  <property>
+                     <name>Height</name>
+                     <target>height</target>
+                     <category>Dimensions</category>
+                     <value class="java.lang.Integer">600</value>
+                  </property>
+                  <property>
+                     <name>Width</name>
+                     <target>width</target>
+                     <category>Dimensions</category>
+                     <value class="java.lang.Integer">800</value>
+                  </property>
+                  <property>
+                     <name>Left</name>
+                     <target>margin.left</target>
+                     <category>Margins</category>
+                     <value class="java.lang.Integer">100</value>
+                  </property>
+                  <property>
+                     <name>Right</name>
+                     <target>margin.right</target>
+                     <category>Margins</category>
+                     <value class="java.lang.Integer">50</value>
+                  </property>
+                  <property>
+                     <name>Top</name>
+                     <target>margin.top</target>
+                     <category>Margins</category>
+                     <value class="java.lang.Integer">50</value>
+                  </property>
+                  <property>
+                     <name>Bottom</name>
+                     <target>margin.bottom</target>
+                     <category>Margins</category>
+                     <value class="java.lang.Integer">100</value>
+                  </property>
+                  <property>
+                     <name>Transform</name>
+                     <target>transform</target>
+                     <category>Dimensions</category>
+                  </property>
+                  <property>
+                     <name>Name</name>
+                     <target>index.name</target>
+                     <category>Source Columns</category>
+                     <value class="java.lang.Integer">0</value>
+                  </property>
+                  <property>
+                     <name>Color</name>
+                     <target>index.color</target>
+                     <category>Source Columns</category>
+                     <value class="java.lang.Integer">0</value>
+                  </property>
+                  <property>
+                     <name>Time</name>
+                     <target>index.time</target>
+                     <category>Source Columns</category>
+                     <value class="java.lang.Integer">1</value>
+                  </property>
+                  <property>
+                     <name>Bar Height</name>
+                     <target>index.y</target>
+                     <category>Source Columns</category>
+                     <value class="java.lang.Integer">2</value>
+                  </property>
+                  <property>
+                     <name>Duration</name>
+                     <target>duration</target>
+                     <category>General</category>
+                     <value class="java.lang.Integer">10000</value>
+                  </property>
+                  <property>
+                     <name>Rectangle Width</name>
+                     <target>bar.width</target>
+                     <category>Bars</category>
+                  </property>
+                  <property>
+                     <name>Rectangle Height</name>
+                     <target>bar.height</target>
+                     <category>Bars</category>
+                  </property>
+                  <property>
+                     <name>Rectangle X</name>
+                     <target>bar.x</target>
+                     <category>Bars</category>
+                  </property>
+                  <property>
+                     <name>Rectangle Y</name>
+                     <target>bar.y</target>
+                     <category>Bars</category>
+                  </property>
+                  <property>
+                     <name>Rectangle RX</name>
+                     <target>bar.rx</target>
+                     <category>Bars</category>
+                  </property>
+                  <property>
+                     <name>Rectangle RY</name>
+                     <target>bar.ry</target>
+                     <category>Bars</category>
+                  </property>
+                  <property>
+                     <name>Rectangle Opacity</name>
+                     <target>bar.opacity</target>
+                     <category>Bars</category>
+                  </property>
+                  <property>
+                     <name>Rectangle Color</name>
+                     <target>bar.color</target>
+                     <category>Bars</category>
+                  </property>
+                  <property>
+                     <name>Rectangle Transform</name>
+                     <target>bar.transform</target>
+                     <category>Bars</category>
+                  </property>
+                  <property>
+                     <name>Stroke Color</name>
+                     <target>bar.stroke.color</target>
+                     <category>Bars</category>
+                  </property>
+                  <property>
+                     <name>Stroke Width</name>
+                     <target>bar.stroke.width</target>
+                     <category>Bars</category>
+                  </property>
+                  <property>
+                     <name>Stroke Dash Array</name>
+                     <target>bar.stroke.dasharray</target>
+                     <category>Bars</category>
+                  </property>
+                  <property>
+                     <name>Stroke Opacity</name>
+                     <target>bar.stroke.opacity</target>
+                     <category>Bars</category>
+                  </property>
+                  <property>
+                     <name>Stroke Transform</name>
+                     <target>bar.stroke.transform</target>
+                     <category>Bars</category>
+                  </property>
+                  <property>
+                     <name>Text Length</name>
+                     <target>bar.textLength</target>
+                     <category>Label</category>
+                  </property>
+                  <property>
+                     <name>Text Length Adjust</name>
+                     <target>bar.lengthAdjust</target>
+                     <category>Label</category>
+                  </property>
+                  <property>
+                     <name>Vertical Orientation</name>
+                     <target>bar.verticalOrientation</target>
+                     <category>Label</category>
+                  </property>
+                  <property>
+                     <name>DX</name>
+                     <target>bar.dx</target>
+                     <category>Label</category>
+                  </property>
+                  <property>
+                     <name>DY</name>
+                     <target>bar.dy</target>
+                     <category>Label</category>
+                  </property>
+                  <property>
+                     <name>Writing Mode</name>
+                     <target>bar.writingMode</target>
+                     <category>Label</category>
+                  </property>
+                  <property>
+                     <name>Anchor</name>
+                     <target>bar.anchor</target>
+                     <category>Label</category>
+                  </property>
+                  <property>
+                     <name>Opacity</name>
+                     <target>bar.fill.fillOpacity</target>
+                     <category>Label</category>
+                  </property>
+                  <property>
+                     <name>Color</name>
+                     <target>bar.fill.fillColor</target>
+                     <category>Label</category>
+                  </property>
+                  <property>
+                     <name>Format</name>
+                     <target>bar.format</target>
+                     <category>Label</category>
+                  </property>
+                  <property>
+                     <name>Decoration</name>
+                     <target>bar.font.decoration</target>
+                     <category>Label</category>
+                  </property>
+                  <property>
+                     <name>Family</name>
+                     <target>bar.font.family</target>
+                     <category>Label</category>
+                  </property>
+                  <property>
+                     <name>Letter Spacing</name>
+                     <target>bar.font.letterSpacing</target>
+                     <category>Label</category>
+                  </property>
+                  <property>
+                     <name>Size</name>
+                     <target>bar.font.size</target>
+                     <category>Label</category>
+                  </property>
+                  <property>
+                     <name>Style</name>
+                     <target>bar.font.style</target>
+                     <category>Label</category>
+                  </property>
+                  <property>
+                     <name>Weight</name>
+                     <target>bar.font.weight</target>
+                     <category>Label</category>
+                  </property>
+                  <property>
+                     <name>Word Spacing</name>
+                     <target>bar.font.wordSpacing</target>
+                     <category>Label</category>
+                  </property>
+                  <property>
+                     <name>Variant</name>
+                     <target>bar.font.variant</target>
+                     <category>Label</category>
+                  </property>
+                  <property>
+                     <name>Orient</name>
+                     <target>xaxis.orient</target>
+                     <category>X-Axis</category>
+                  </property>
+                  <property>
+                     <name>Ticks</name>
+                     <target>xaxis.ticks</target>
+                     <category>X-Axis</category>
+                  </property>
+                  <property>
+                     <name>Tick Values</name>
+                     <target>xaxis.tickValues</target>
+                     <category>X-Axis</category>
+                  </property>
+                  <property>
+                     <name>Tick Size</name>
+                     <target>xaxis.tickSize</target>
+                     <category>X-Axis</category>
+                  </property>
+                  <property>
+                     <name>Inner Tick Size</name>
+                     <target>xaxis.innerTickSize</target>
+                     <category>X-Axis</category>
+                  </property>
+                  <property>
+                     <name>Outer Tick Size</name>
+                     <target>xaxis.outerTickSize</target>
+                     <category>X-Axis</category>
+                  </property>
+                  <property>
+                     <name>Tick Padding</name>
+                     <target>xaxis.tickPadding</target>
+                     <category>X-Axis</category>
+                  </property>
+                  <property>
+                     <name>Tick Format</name>
+                     <target>xaxis.tickFormat</target>
+                     <category>X-Axis</category>
+                  </property>
+                  <property>
+                     <name>Stroke Color</name>
+                     <target>xaxis.stroke.color</target>
+                     <category>X-Axis</category>
+                  </property>
+                  <property>
+                     <name>Stroke Width</name>
+                     <target>xaxis.stroke.width</target>
+                     <category>X-Axis</category>
+                  </property>
+                  <property>
+                     <name>Stroke Dash Array</name>
+                     <target>xaxis.stroke.dasharray</target>
+                     <category>X-Axis</category>
+                  </property>
+                  <property>
+                     <name>Stroke Opacity</name>
+                     <target>xaxis.stroke.opacity</target>
+                     <category>X-Axis</category>
+                  </property>
+                  <property>
+                     <name>Stroke Transform</name>
+                     <target>xaxis.stroke.transform</target>
+                     <category>X-Axis</category>
+                  </property>
+                  <property>
+                     <name>Fill Color</name>
+                     <target>xaxis.fill.fillColor</target>
+                     <category>X-Axis</category>
+                  </property>
+                  <property>
+                     <name>Fill Opacity</name>
+                     <target>xaxis.fill.fillOpacity</target>
+                     <category>X-Axis</category>
+                  </property>
+                  <property>
+                     <name>Orient</name>
+                     <target>yaxis.orient</target>
+                     <category>Y-Axis</category>
+                  </property>
+                  <property>
+                     <name>Ticks</name>
+                     <target>yaxis.ticks</target>
+                     <category>Y-Axis</category>
+                  </property>
+                  <property>
+                     <name>Tick Values</name>
+                     <target>yaxis.tickValues</target>
+                     <category>Y-Axis</category>
+                  </property>
+                  <property>
+                     <name>Tick Size</name>
+                     <target>yaxis.tickSize</target>
+                     <category>Y-Axis</category>
+                  </property>
+                  <property>
+                     <name>Inner Tick Size</name>
+                     <target>yaxis.innerTickSize</target>
+                     <category>Y-Axis</category>
+                  </property>
+                  <property>
+                     <name>Outer Tick Size</name>
+                     <target>yaxis.outerTickSize</target>
+                     <category>Y-Axis</category>
+                  </property>
+                  <property>
+                     <name>Tick Padding</name>
+                     <target>yaxis.tickPadding</target>
+                     <category>Y-Axis</category>
+                  </property>
+                  <property>
+                     <name>Tick Format</name>
+                     <target>yaxis.tickFormat</target>
+                     <category>Y-Axis</category>
+                  </property>
+                  <property>
+                     <name>Stroke Color</name>
+                     <target>yaxis.stroke.color</target>
+                     <category>Y-Axis</category>
+                  </property>
+                  <property>
+                     <name>Stroke Width</name>
+                     <target>yaxis.stroke.width</target>
+                     <category>Y-Axis</category>
+                  </property>
+                  <property>
+                     <name>Stroke Dash Array</name>
+                     <target>yaxis.stroke.dasharray</target>
+                     <category>Y-Axis</category>
+                  </property>
+                  <property>
+                     <name>Stroke Opacity</name>
+                     <target>yaxis.stroke.opacity</target>
+                     <category>Y-Axis</category>
+                  </property>
+                  <property>
+                     <name>Stroke Transform</name>
+                     <target>yaxis.stroke.transform</target>
+                     <category>Y-Axis</category>
+                  </property>
+                  <property>
+                     <name>Fill Color</name>
+                     <target>yaxis.fill.fillColor</target>
+                     <category>Y-Axis</category>
+                  </property>
+                  <property>
+                     <name>Fill Opacity</name>
+                     <target>yaxis.fill.fillOpacity</target>
+                     <category>Y-Axis</category>
+                  </property>
+                  <property>
+                     <name>Stroke Color</name>
+                     <target>axisLine.stroke.color</target>
+                     <category>Axis Lines</category>
+                  </property>
+                  <property>
+                     <name>Stroke Width</name>
+                     <target>axisLine.stroke.width</target>
+                     <category>Axis Lines</category>
+                  </property>
+                  <property>
+                     <name>Stroke Dash Array</name>
+                     <target>axisLine.stroke.dasharray</target>
+                     <category>Axis Lines</category>
+                  </property>
+                  <property>
+                     <name>Stroke Opacity</name>
+                     <target>axisLine.stroke.opacity</target>
+                     <category>Axis Lines</category>
+                  </property>
+                  <property>
+                     <name>Stroke Transform</name>
+                     <target>axisLine.stroke.transform</target>
+                     <category>Axis Lines</category>
+                  </property>
+                  <property>
+                     <name>Fill Color</name>
+                     <target>axisLine.fill.fillColor</target>
+                     <category>Axis Lines</category>
+                  </property>
+                  <property>
+                     <name>Fill Opacity</name>
+                     <target>axisLine.fill.fillOpacity</target>
+                     <category>Axis Lines</category>
+                  </property>
+                  <property>
+                     <name>Stroke Color</name>
+                     <target>tick.stroke.color</target>
+                     <category>Axis Ticks</category>
+                  </property>
+                  <property>
+                     <name>Stroke Width</name>
+                     <target>tick.stroke.width</target>
+                     <category>Axis Ticks</category>
+                  </property>
+                  <property>
+                     <name>Stroke Dash Array</name>
+                     <target>tick.stroke.dasharray</target>
+                     <category>Axis Ticks</category>
+                  </property>
+                  <property>
+                     <name>Stroke Opacity</name>
+                     <target>tick.stroke.opacity</target>
+                     <category>Axis Ticks</category>
+                  </property>
+                  <property>
+                     <name>Stroke Transform</name>
+                     <target>tick.stroke.transform</target>
+                     <category>Axis Ticks</category>
+                  </property>
+                  <property>
+                     <name>X</name>
+                     <target>xaxis.label.x</target>
+                     <category>X Axis Labels</category>
+                  </property>
+                  <property>
+                     <name>Y</name>
+                     <target>xaxis.label.y</target>
+                     <category>X Axis Labels</category>
+                  </property>
+                  <property>
+                     <name>Text Length</name>
+                     <target>xaxis.label.textLength</target>
+                     <category>X Axis Labels</category>
+                  </property>
+                  <property>
+                     <name>Text Length Adjust</name>
+                     <target>xaxis.label.lengthAdjust</target>
+                     <category>X Axis Labels</category>
+                  </property>
+                  <property>
+                     <name>Transform</name>
+                     <target>xaxis.label.transform</target>
+                     <category>X Axis Labels</category>
+                  </property>
+                  <property>
+                     <name>Vertical Orientation</name>
+                     <target>xaxis.label.verticalOrientation</target>
+                     <category>X Axis Labels</category>
+                  </property>
+                  <property>
+                     <name>DX</name>
+                     <target>xaxis.label.dx</target>
+                     <category>X Axis Labels</category>
+                  </property>
+                  <property>
+                     <name>DY</name>
+                     <target>xaxis.label.dy</target>
+                     <category>X Axis Labels</category>
+                  </property>
+                  <property>
+                     <name>Writing Mode</name>
+                     <target>xaxis.label.writingMode</target>
+                     <category>X Axis Labels</category>
+                  </property>
+                  <property>
+                     <name>Anchor</name>
+                     <target>xaxis.label.anchor</target>
+                     <category>X Axis Labels</category>
+                  </property>
+                  <property>
+                     <name>Opacity</name>
+                     <target>xaxis.label.fill.fillOpacity</target>
+                     <category>X Axis Labels</category>
+                  </property>
+                  <property>
+                     <name>Color</name>
+                     <target>xaxis.label.fill.fillColor</target>
+                     <category>X Axis Labels</category>
+                  </property>
+                  <property>
+                     <name>Format</name>
+                     <target>xaxis.label.format</target>
+                     <category>X Axis Labels</category>
+                  </property>
+                  <property>
+                     <name>Decoration</name>
+                     <target>xaxis.label.font.decoration</target>
+                     <category>X Axis Labels</category>
+                  </property>
+                  <property>
+                     <name>Family</name>
+                     <target>xaxis.label.font.family</target>
+                     <category>X Axis Labels</category>
+                  </property>
+                  <property>
+                     <name>Letter Spacing</name>
+                     <target>xaxis.label.font.letterSpacing</target>
+                     <category>X Axis Labels</category>
+                  </property>
+                  <property>
+                     <name>Size</name>
+                     <target>xaxis.label.font.size</target>
+                     <category>X Axis Labels</category>
+                  </property>
+                  <property>
+                     <name>Style</name>
+                     <target>xaxis.label.font.style</target>
+                     <category>X Axis Labels</category>
+                  </property>
+                  <property>
+                     <name>Weight</name>
+                     <target>xaxis.label.font.weight</target>
+                     <category>X Axis Labels</category>
+                  </property>
+                  <property>
+                     <name>Word Spacing</name>
+                     <target>xaxis.label.font.wordSpacing</target>
+                     <category>X Axis Labels</category>
+                  </property>
+                  <property>
+                     <name>Variant</name>
+                     <target>xaxis.label.font.variant</target>
+                     <category>X Axis Labels</category>
+                  </property>
+               </properties>
+            </prop-sheet>
+         </task>
+      </task-item>
+      <task-item name="Query Jdbc" active="true">
+         <task class="com.dexvis.dex.task.database.QueryJdbc">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+            <sqlScript class="javafx.beans.property.SimpleStringProperty">SELECT COUNTRYABBREVIATION, YEAR, DEATHSPER1000PEOPLE FROM CSV;</sqlScript>
+            <dbtype>&lt;map&gt;
+  &lt;entry&gt;
+    &lt;string&gt;items&lt;/string&gt;
+    &lt;list&gt;
+      &lt;string&gt;HyperSql&lt;/string&gt;
+      &lt;string&gt;Oracle&lt;/string&gt;
+      &lt;string&gt;MySql&lt;/string&gt;
+      &lt;string&gt;Sqlite&lt;/string&gt;
+    &lt;/list&gt;
+  &lt;/entry&gt;
+  &lt;entry&gt;
+    &lt;string&gt;selected&lt;/string&gt;
+    &lt;string&gt;HyperSql&lt;/string&gt;
+  &lt;/entry&gt;
+&lt;/map&gt;</dbtype>
+            <driver>org.hsqldb.jdbc.JDBCDriver</driver>
+            <url>jdbc:hsqldb:mem:csvdb</url>
+            <password></password>
+            <username>sa</username>
+         </task>
+      </task-item>
+      <task-item name="View Data" active="true">
+         <task class="com.dexvis.dex.task.utilities.ViewData">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+         </task>
+      </task-item>
+      <task-item name="Motion Bar Chart" active="true">
+         <task class="com.dexvis.dex.task.vis.dexjs.MotionBarChart">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper">
+                  <property>
+                     <name>Height</name>
+                     <target>height</target>
+                     <category>Dimensions</category>
+                     <value class="java.lang.Integer">600</value>
+                  </property>
+                  <property>
+                     <name>Width</name>
+                     <target>width</target>
+                     <category>Dimensions</category>
+                     <value class="java.lang.Integer">800</value>
+                  </property>
+                  <property>
+                     <name>Left</name>
+                     <target>margin.left</target>
+                     <category>Margins</category>
+                     <value class="java.lang.Integer">100</value>
+                  </property>
+                  <property>
+                     <name>Right</name>
+                     <target>margin.right</target>
+                     <category>Margins</category>
+                     <value class="java.lang.Integer">50</value>
+                  </property>
+                  <property>
+                     <name>Top</name>
+                     <target>margin.top</target>
+                     <category>Margins</category>
+                     <value class="java.lang.Integer">50</value>
+                  </property>
+                  <property>
+                     <name>Bottom</name>
+                     <target>margin.bottom</target>
+                     <category>Margins</category>
+                     <value class="java.lang.Integer">100</value>
+                  </property>
+                  <property>
+                     <name>Transform</name>
+                     <target>transform</target>
+                     <category>Dimensions</category>
+                  </property>
+                  <property>
+                     <name>Name</name>
+                     <target>index.name</target>
+                     <category>Source Columns</category>
+                     <value class="java.lang.Integer">0</value>
+                  </property>
+                  <property>
+                     <name>Color</name>
+                     <target>index.color</target>
+                     <category>Source Columns</category>
+                     <value class="java.lang.Integer">0</value>
+                  </property>
+                  <property>
+                     <name>Time</name>
+                     <target>index.time</target>
+                     <category>Source Columns</category>
+                     <value class="java.lang.Integer">1</value>
+                  </property>
+                  <property>
+                     <name>Bar Height</name>
+                     <target>index.y</target>
+                     <category>Source Columns</category>
+                     <value class="java.lang.Integer">2</value>
+                  </property>
+                  <property>
+                     <name>Duration</name>
+                     <target>duration</target>
+                     <category>General</category>
+                     <value class="java.lang.Integer">10000</value>
+                  </property>
+                  <property>
+                     <name>Rectangle Width</name>
+                     <target>bar.width</target>
+                     <category>Bars</category>
+                  </property>
+                  <property>
+                     <name>Rectangle Height</name>
+                     <target>bar.height</target>
+                     <category>Bars</category>
+                  </property>
+                  <property>
+                     <name>Rectangle X</name>
+                     <target>bar.x</target>
+                     <category>Bars</category>
+                  </property>
+                  <property>
+                     <name>Rectangle Y</name>
+                     <target>bar.y</target>
+                     <category>Bars</category>
+                  </property>
+                  <property>
+                     <name>Rectangle RX</name>
+                     <target>bar.rx</target>
+                     <category>Bars</category>
+                  </property>
+                  <property>
+                     <name>Rectangle RY</name>
+                     <target>bar.ry</target>
+                     <category>Bars</category>
+                  </property>
+                  <property>
+                     <name>Rectangle Opacity</name>
+                     <target>bar.opacity</target>
+                     <category>Bars</category>
+                  </property>
+                  <property>
+                     <name>Rectangle Color</name>
+                     <target>bar.color</target>
+                     <category>Bars</category>
+                  </property>
+                  <property>
+                     <name>Rectangle Transform</name>
+                     <target>bar.transform</target>
+                     <category>Bars</category>
+                  </property>
+                  <property>
+                     <name>Stroke Color</name>
+                     <target>bar.stroke.color</target>
+                     <category>Bars</category>
+                  </property>
+                  <property>
+                     <name>Stroke Width</name>
+                     <target>bar.stroke.width</target>
+                     <category>Bars</category>
+                  </property>
+                  <property>
+                     <name>Stroke Dash Array</name>
+                     <target>bar.stroke.dasharray</target>
+                     <category>Bars</category>
+                  </property>
+                  <property>
+                     <name>Stroke Opacity</name>
+                     <target>bar.stroke.opacity</target>
+                     <category>Bars</category>
+                  </property>
+                  <property>
+                     <name>Stroke Transform</name>
+                     <target>bar.stroke.transform</target>
+                     <category>Bars</category>
+                  </property>
+                  <property>
+                     <name>Text Length</name>
+                     <target>bar.textLength</target>
+                     <category>Label</category>
+                  </property>
+                  <property>
+                     <name>Text Length Adjust</name>
+                     <target>bar.lengthAdjust</target>
+                     <category>Label</category>
+                  </property>
+                  <property>
+                     <name>Vertical Orientation</name>
+                     <target>bar.verticalOrientation</target>
+                     <category>Label</category>
+                  </property>
+                  <property>
+                     <name>DX</name>
+                     <target>bar.dx</target>
+                     <category>Label</category>
+                  </property>
+                  <property>
+                     <name>DY</name>
+                     <target>bar.dy</target>
+                     <category>Label</category>
+                  </property>
+                  <property>
+                     <name>Writing Mode</name>
+                     <target>bar.writingMode</target>
+                     <category>Label</category>
+                  </property>
+                  <property>
+                     <name>Anchor</name>
+                     <target>bar.anchor</target>
+                     <category>Label</category>
+                  </property>
+                  <property>
+                     <name>Opacity</name>
+                     <target>bar.fill.fillOpacity</target>
+                     <category>Label</category>
+                  </property>
+                  <property>
+                     <name>Color</name>
+                     <target>bar.fill.fillColor</target>
+                     <category>Label</category>
+                  </property>
+                  <property>
+                     <name>Format</name>
+                     <target>bar.format</target>
+                     <category>Label</category>
+                  </property>
+                  <property>
+                     <name>Decoration</name>
+                     <target>bar.font.decoration</target>
+                     <category>Label</category>
+                  </property>
+                  <property>
+                     <name>Family</name>
+                     <target>bar.font.family</target>
+                     <category>Label</category>
+                  </property>
+                  <property>
+                     <name>Letter Spacing</name>
+                     <target>bar.font.letterSpacing</target>
+                     <category>Label</category>
+                  </property>
+                  <property>
+                     <name>Size</name>
+                     <target>bar.font.size</target>
+                     <category>Label</category>
+                  </property>
+                  <property>
+                     <name>Style</name>
+                     <target>bar.font.style</target>
+                     <category>Label</category>
+                  </property>
+                  <property>
+                     <name>Weight</name>
+                     <target>bar.font.weight</target>
+                     <category>Label</category>
+                  </property>
+                  <property>
+                     <name>Word Spacing</name>
+                     <target>bar.font.wordSpacing</target>
+                     <category>Label</category>
+                  </property>
+                  <property>
+                     <name>Variant</name>
+                     <target>bar.font.variant</target>
+                     <category>Label</category>
+                  </property>
+                  <property>
+                     <name>Orient</name>
+                     <target>xaxis.orient</target>
+                     <category>X-Axis</category>
+                  </property>
+                  <property>
+                     <name>Ticks</name>
+                     <target>xaxis.ticks</target>
+                     <category>X-Axis</category>
+                  </property>
+                  <property>
+                     <name>Tick Values</name>
+                     <target>xaxis.tickValues</target>
+                     <category>X-Axis</category>
+                  </property>
+                  <property>
+                     <name>Tick Size</name>
+                     <target>xaxis.tickSize</target>
+                     <category>X-Axis</category>
+                  </property>
+                  <property>
+                     <name>Inner Tick Size</name>
+                     <target>xaxis.innerTickSize</target>
+                     <category>X-Axis</category>
+                  </property>
+                  <property>
+                     <name>Outer Tick Size</name>
+                     <target>xaxis.outerTickSize</target>
+                     <category>X-Axis</category>
+                  </property>
+                  <property>
+                     <name>Tick Padding</name>
+                     <target>xaxis.tickPadding</target>
+                     <category>X-Axis</category>
+                  </property>
+                  <property>
+                     <name>Tick Format</name>
+                     <target>xaxis.tickFormat</target>
+                     <category>X-Axis</category>
+                  </property>
+                  <property>
+                     <name>Stroke Color</name>
+                     <target>xaxis.stroke.color</target>
+                     <category>X-Axis</category>
+                  </property>
+                  <property>
+                     <name>Stroke Width</name>
+                     <target>xaxis.stroke.width</target>
+                     <category>X-Axis</category>
+                  </property>
+                  <property>
+                     <name>Stroke Dash Array</name>
+                     <target>xaxis.stroke.dasharray</target>
+                     <category>X-Axis</category>
+                  </property>
+                  <property>
+                     <name>Stroke Opacity</name>
+                     <target>xaxis.stroke.opacity</target>
+                     <category>X-Axis</category>
+                  </property>
+                  <property>
+                     <name>Stroke Transform</name>
+                     <target>xaxis.stroke.transform</target>
+                     <category>X-Axis</category>
+                  </property>
+                  <property>
+                     <name>Fill Color</name>
+                     <target>xaxis.fill.fillColor</target>
+                     <category>X-Axis</category>
+                  </property>
+                  <property>
+                     <name>Fill Opacity</name>
+                     <target>xaxis.fill.fillOpacity</target>
+                     <category>X-Axis</category>
+                  </property>
+                  <property>
+                     <name>Orient</name>
+                     <target>yaxis.orient</target>
+                     <category>Y-Axis</category>
+                  </property>
+                  <property>
+                     <name>Ticks</name>
+                     <target>yaxis.ticks</target>
+                     <category>Y-Axis</category>
+                  </property>
+                  <property>
+                     <name>Tick Values</name>
+                     <target>yaxis.tickValues</target>
+                     <category>Y-Axis</category>
+                  </property>
+                  <property>
+                     <name>Tick Size</name>
+                     <target>yaxis.tickSize</target>
+                     <category>Y-Axis</category>
+                  </property>
+                  <property>
+                     <name>Inner Tick Size</name>
+                     <target>yaxis.innerTickSize</target>
+                     <category>Y-Axis</category>
+                  </property>
+                  <property>
+                     <name>Outer Tick Size</name>
+                     <target>yaxis.outerTickSize</target>
+                     <category>Y-Axis</category>
+                  </property>
+                  <property>
+                     <name>Tick Padding</name>
+                     <target>yaxis.tickPadding</target>
+                     <category>Y-Axis</category>
+                  </property>
+                  <property>
+                     <name>Tick Format</name>
+                     <target>yaxis.tickFormat</target>
+                     <category>Y-Axis</category>
+                  </property>
+                  <property>
+                     <name>Stroke Color</name>
+                     <target>yaxis.stroke.color</target>
+                     <category>Y-Axis</category>
+                  </property>
+                  <property>
+                     <name>Stroke Width</name>
+                     <target>yaxis.stroke.width</target>
+                     <category>Y-Axis</category>
+                  </property>
+                  <property>
+                     <name>Stroke Dash Array</name>
+                     <target>yaxis.stroke.dasharray</target>
+                     <category>Y-Axis</category>
+                  </property>
+                  <property>
+                     <name>Stroke Opacity</name>
+                     <target>yaxis.stroke.opacity</target>
+                     <category>Y-Axis</category>
+                  </property>
+                  <property>
+                     <name>Stroke Transform</name>
+                     <target>yaxis.stroke.transform</target>
+                     <category>Y-Axis</category>
+                  </property>
+                  <property>
+                     <name>Fill Color</name>
+                     <target>yaxis.fill.fillColor</target>
+                     <category>Y-Axis</category>
+                  </property>
+                  <property>
+                     <name>Fill Opacity</name>
+                     <target>yaxis.fill.fillOpacity</target>
+                     <category>Y-Axis</category>
+                  </property>
+                  <property>
+                     <name>Stroke Color</name>
+                     <target>axisLine.stroke.color</target>
+                     <category>Axis Lines</category>
+                  </property>
+                  <property>
+                     <name>Stroke Width</name>
+                     <target>axisLine.stroke.width</target>
+                     <category>Axis Lines</category>
+                  </property>
+                  <property>
+                     <name>Stroke Dash Array</name>
+                     <target>axisLine.stroke.dasharray</target>
+                     <category>Axis Lines</category>
+                  </property>
+                  <property>
+                     <name>Stroke Opacity</name>
+                     <target>axisLine.stroke.opacity</target>
+                     <category>Axis Lines</category>
+                  </property>
+                  <property>
+                     <name>Stroke Transform</name>
+                     <target>axisLine.stroke.transform</target>
+                     <category>Axis Lines</category>
+                  </property>
+                  <property>
+                     <name>Fill Color</name>
+                     <target>axisLine.fill.fillColor</target>
+                     <category>Axis Lines</category>
+                  </property>
+                  <property>
+                     <name>Fill Opacity</name>
+                     <target>axisLine.fill.fillOpacity</target>
+                     <category>Axis Lines</category>
+                  </property>
+                  <property>
+                     <name>Stroke Color</name>
+                     <target>tick.stroke.color</target>
+                     <category>Axis Ticks</category>
+                  </property>
+                  <property>
+                     <name>Stroke Width</name>
+                     <target>tick.stroke.width</target>
+                     <category>Axis Ticks</category>
+                  </property>
+                  <property>
+                     <name>Stroke Dash Array</name>
+                     <target>tick.stroke.dasharray</target>
+                     <category>Axis Ticks</category>
+                  </property>
+                  <property>
+                     <name>Stroke Opacity</name>
+                     <target>tick.stroke.opacity</target>
+                     <category>Axis Ticks</category>
+                  </property>
+                  <property>
+                     <name>Stroke Transform</name>
+                     <target>tick.stroke.transform</target>
+                     <category>Axis Ticks</category>
+                  </property>
+                  <property>
+                     <name>X</name>
+                     <target>xaxis.label.x</target>
+                     <category>X Axis Labels</category>
+                  </property>
+                  <property>
+                     <name>Y</name>
+                     <target>xaxis.label.y</target>
+                     <category>X Axis Labels</category>
+                  </property>
+                  <property>
+                     <name>Text Length</name>
+                     <target>xaxis.label.textLength</target>
+                     <category>X Axis Labels</category>
+                  </property>
+                  <property>
+                     <name>Text Length Adjust</name>
+                     <target>xaxis.label.lengthAdjust</target>
+                     <category>X Axis Labels</category>
+                  </property>
+                  <property>
+                     <name>Transform</name>
+                     <target>xaxis.label.transform</target>
+                     <category>X Axis Labels</category>
+                  </property>
+                  <property>
+                     <name>Vertical Orientation</name>
+                     <target>xaxis.label.verticalOrientation</target>
+                     <category>X Axis Labels</category>
+                  </property>
+                  <property>
+                     <name>DX</name>
+                     <target>xaxis.label.dx</target>
+                     <category>X Axis Labels</category>
+                  </property>
+                  <property>
+                     <name>DY</name>
+                     <target>xaxis.label.dy</target>
+                     <category>X Axis Labels</category>
+                  </property>
+                  <property>
+                     <name>Writing Mode</name>
+                     <target>xaxis.label.writingMode</target>
+                     <category>X Axis Labels</category>
+                  </property>
+                  <property>
+                     <name>Anchor</name>
+                     <target>xaxis.label.anchor</target>
+                     <category>X Axis Labels</category>
+                  </property>
+                  <property>
+                     <name>Opacity</name>
+                     <target>xaxis.label.fill.fillOpacity</target>
+                     <category>X Axis Labels</category>
+                  </property>
+                  <property>
+                     <name>Color</name>
+                     <target>xaxis.label.fill.fillColor</target>
+                     <category>X Axis Labels</category>
+                  </property>
+                  <property>
+                     <name>Format</name>
+                     <target>xaxis.label.format</target>
+                     <category>X Axis Labels</category>
+                  </property>
+                  <property>
+                     <name>Decoration</name>
+                     <target>xaxis.label.font.decoration</target>
+                     <category>X Axis Labels</category>
+                  </property>
+                  <property>
+                     <name>Family</name>
+                     <target>xaxis.label.font.family</target>
+                     <category>X Axis Labels</category>
+                  </property>
+                  <property>
+                     <name>Letter Spacing</name>
+                     <target>xaxis.label.font.letterSpacing</target>
+                     <category>X Axis Labels</category>
+                  </property>
+                  <property>
+                     <name>Size</name>
+                     <target>xaxis.label.font.size</target>
+                     <category>X Axis Labels</category>
+                  </property>
+                  <property>
+                     <name>Style</name>
+                     <target>xaxis.label.font.style</target>
+                     <category>X Axis Labels</category>
+                  </property>
+                  <property>
+                     <name>Weight</name>
+                     <target>xaxis.label.font.weight</target>
+                     <category>X Axis Labels</category>
+                  </property>
+                  <property>
+                     <name>Word Spacing</name>
+                     <target>xaxis.label.font.wordSpacing</target>
+                     <category>X Axis Labels</category>
+                  </property>
+                  <property>
+                     <name>Variant</name>
+                     <target>xaxis.label.font.variant</target>
+                     <category>X Axis Labels</category>
+                  </property>
+               </properties>
+            </prop-sheet>
+         </task>
+      </task-item>
+   </tasks>
+</dex-project>

@@ -1,0 +1,74 @@
+<dex-project version="0.8">
+   <tasks class="java.util.ArrayList">
+      <task-item name="Read CSV" active="true">
+         <task class="com.dexvis.dex.task.input.ReadCsv">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+            <fileText>data\gc.csv</fileText>
+            <limitRows>false</limitRows>
+            <rowLimitText>0</rowLimitText>
+            <lastDir>C:\dex2ws\Dex\data</lastDir>
+         </task>
+      </task-item>
+      <task-item name="View Data" active="true">
+         <task class="com.dexvis.dex.task.utilities.ViewData">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+         </task>
+      </task-item>
+      <task-item name="Group Columns" active="true">
+         <task class="com.dexvis.dex.task.tablemanipulation.GroupColumns">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+            <groupName>METRIC</groupName>
+            <columnList>&lt;com.dexvis.simple.types.SimpleListSelectionView&gt;
+  &lt;sourceList&gt;
+    &lt;string&gt;Timestamp&lt;/string&gt;
+  &lt;/sourceList&gt;
+  &lt;targetList&gt;
+    &lt;string&gt;S0C&lt;/string&gt;
+    &lt;string&gt;S1C&lt;/string&gt;
+    &lt;string&gt;S0U&lt;/string&gt;
+    &lt;string&gt;S1U&lt;/string&gt;
+    &lt;string&gt;EC&lt;/string&gt;
+    &lt;string&gt;EU&lt;/string&gt;
+    &lt;string&gt;OC&lt;/string&gt;
+    &lt;string&gt;OU&lt;/string&gt;
+    &lt;string&gt;PC&lt;/string&gt;
+    &lt;string&gt;PU&lt;/string&gt;
+    &lt;string&gt;YGC&lt;/string&gt;
+    &lt;string&gt;YGCT&lt;/string&gt;
+    &lt;string&gt;FGC&lt;/string&gt;
+    &lt;string&gt;FGCT&lt;/string&gt;
+    &lt;string&gt;GCT&lt;/string&gt;
+  &lt;/targetList&gt;
+&lt;/com.dexvis.simple.types.SimpleListSelectionView&gt;</columnList>
+         </task>
+      </task-item>
+      <task-item name="Select Columns" active="true">
+         <task class="com.dexvis.dex.task.tablemanipulation.SelectColumns">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+            <columnList>&lt;com.dexvis.simple.types.SimpleListSelectionView&gt;
+  &lt;sourceList/&gt;
+  &lt;targetList&gt;
+    &lt;string&gt;METRIC&lt;/string&gt;
+    &lt;string&gt;Timestamp&lt;/string&gt;
+    &lt;string&gt;METRIC_VALUE&lt;/string&gt;
+  &lt;/targetList&gt;
+&lt;/com.dexvis.simple.types.SimpleListSelectionView&gt;</columnList>
+         </task>
+      </task-item>
+      <task-item name="NVD3 Stacked Area Chart" active="true">
+         <task class="com.dexvis.dex.task.vis.nvd3.StackedAreaChart">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+         </task>
+      </task-item>
+   </tasks>
+</dex-project>

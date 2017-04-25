@@ -1,0 +1,51 @@
+<dex-project version="0.8">
+   <tasks class="java.util.ArrayList">
+      <task-item name="Read CSV" active="true">
+         <task class="com.dexvis.dex.task.input.ReadCsv">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+            <fileText>data\WWI_Timeline.csv</fileText>
+            <limitRows>false</limitRows>
+            <rowLimitText>0</rowLimitText>
+            <lastDir>C:\dex2ws\Dex\data</lastDir>
+         </task>
+      </task-item>
+      <task-item name="View Data" active="true">
+         <task class="com.dexvis.dex.task.utilities.ViewData">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+         </task>
+      </task-item>
+      <task-item name="Select Columns" active="true">
+         <task class="com.dexvis.dex.task.tablemanipulation.SelectColumns">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+            <columnList>&lt;com.dexvis.simple.types.SimpleListSelectionView&gt;
+  &lt;sourceList&gt;
+    &lt;string&gt;DATE&lt;/string&gt;
+  &lt;/sourceList&gt;
+  &lt;targetList&gt;
+    &lt;string&gt;EVENT&lt;/string&gt;
+  &lt;/targetList&gt;
+&lt;/com.dexvis.simple.types.SimpleListSelectionView&gt;</columnList>
+         </task>
+      </task-item>
+      <task-item name="View Data" active="true">
+         <task class="com.dexvis.dex.task.utilities.ViewData">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+         </task>
+      </task-item>
+      <task-item name="Word Tree" active="true">
+         <task class="com.dexvis.dex.task.vis.google.WordTree">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+         </task>
+      </task-item>
+   </tasks>
+</dex-project>

@@ -1,0 +1,144 @@
+<dex-project version="0.8">
+   <tasks class="java.util.ArrayList">
+      <task-item name="Text Input" active="true">
+         <task class="com.dexvis.dex.task.input.TextInput">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+            <inputText>It was many and many a year ago,
+﻿In a kingdom by the sea,
+That a maiden there lived whom you may know
+﻿By the name of Annabel Lee;
+And this maiden she lived with no other thought
+﻿Than to love and be loved by me.
+I was a child and she was a child,
+﻿In this kingdom by the sea:
+But we loved with a love that was more than love—
+﻿I and my Annabel Lee;
+With a love that the winged seraphs of heaven
+﻿Coveted her and me.
+And this was the reason that, long ago,
+﻿In this kingdom by the sea,
+A wind blew out of a cloud, chilling
+﻿My beautiful Annabel Lee;
+So that her highborn kinsman came
+﻿And bore her away from me,
+To shut her up in a sepulchre
+﻿In this kingdom by the sea.
+The angels, not half so happy in heaven,
+﻿Went envying her and me—
+Yes!—that was the reason (as all men know,
+﻿In this kingdom by the sea)
+That the wind came out of the cloud by night,
+﻿Chilling and killing my Annabel Lee.
+But our love it was stronger by far than the love
+﻿Of those who were older than we—
+﻿Of many far wiser than we—
+And neither the angels in heaven above,
+﻿Nor the demons down under the sea,
+Can ever dissever my soul from the soul
+﻿Of the beautiful Annabel Lee:
+For the moon never beams, without bringing me dreams
+﻿Of the beautiful Annabel Lee;
+And the stars never rise, but I feel the bright eyes
+﻿Of the beautiful Annabel Lee;
+And so, all the night-tide, I lie down by the side
+Of my darling—my darling—my life and my bride,
+﻿In the sepulchre there by the sea,
+﻿In her tomb by the sounding sea.</inputText>
+         </task>
+      </task-item>
+      <task-item name="Groovy Filter" active="true">
+         <task class="com.dexvis.dex.task.utilities.GroovyFilter">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+            <operationCB>&lt;map&gt;
+  &lt;entry&gt;
+    &lt;string&gt;items&lt;/string&gt;
+    &lt;list&gt;
+      &lt;string&gt;INCLUDE&lt;/string&gt;
+      &lt;string&gt;EXCLUDE&lt;/string&gt;
+    &lt;/list&gt;
+  &lt;/entry&gt;
+  &lt;entry&gt;
+    &lt;string&gt;selected&lt;/string&gt;
+    &lt;string&gt;INCLUDE&lt;/string&gt;
+  &lt;/entry&gt;
+&lt;/map&gt;</operationCB>
+            <conditionCB>&lt;map&gt;
+  &lt;entry&gt;
+    &lt;string&gt;items&lt;/string&gt;
+    &lt;list&gt;
+      &lt;string&gt;IF&lt;/string&gt;
+      &lt;string&gt;UNLESS&lt;/string&gt;
+    &lt;/list&gt;
+  &lt;/entry&gt;
+  &lt;entry&gt;
+    &lt;string&gt;selected&lt;/string&gt;
+    &lt;string&gt;IF&lt;/string&gt;
+  &lt;/entry&gt;
+&lt;/map&gt;</conditionCB>
+            <groovyExpText>col.LINE.trim().length() &gt; 0</groovyExpText>
+         </task>
+      </task-item>
+      <task-item name="Replace All" active="true">
+         <task class="com.dexvis.dex.task.tablemanipulation.ReplaceAll">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+            <replace>^\s+</replace>
+            <with></with>
+         </task>
+      </task-item>
+      <task-item name="Replace All" active="true">
+         <task class="com.dexvis.dex.task.tablemanipulation.ReplaceAll">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+            <replace>&quot;</replace>
+            <with></with>
+         </task>
+      </task-item>
+      <task-item name="Replace All" active="true">
+         <task class="com.dexvis.dex.task.tablemanipulation.ReplaceAll">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+            <replace>—</replace>
+            <with> </with>
+         </task>
+      </task-item>
+      <task-item name="Replace All" active="true">
+         <task class="com.dexvis.dex.task.tablemanipulation.ReplaceAll">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+            <replace>�</replace>
+            <with> </with>
+         </task>
+      </task-item>
+      <task-item name="Select Columns" active="true">
+         <task class="com.dexvis.dex.task.tablemanipulation.SelectColumns">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+            <columnList>&lt;com.dexvis.simple.types.SimpleListSelectionView&gt;
+  &lt;sourceList&gt;
+    &lt;string&gt;NUM&lt;/string&gt;
+  &lt;/sourceList&gt;
+  &lt;targetList&gt;
+    &lt;string&gt;LINE&lt;/string&gt;
+  &lt;/targetList&gt;
+&lt;/com.dexvis.simple.types.SimpleListSelectionView&gt;</columnList>
+         </task>
+      </task-item>
+      <task-item name="Word Tree" active="true">
+         <task class="com.dexvis.dex.task.vis.google.WordTree">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+         </task>
+      </task-item>
+   </tasks>
+</dex-project>

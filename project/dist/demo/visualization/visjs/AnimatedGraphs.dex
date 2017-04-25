@@ -1,0 +1,286 @@
+<dex-project version="0.8">
+   <tasks class="java.util.ArrayList">
+      <task-item name="Equation1" active="false">
+         <task class="com.dexvis.dex.task.prg.GroovyScript">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+            <processbytable>&lt;map&gt;
+  &lt;entry&gt;
+    &lt;string&gt;text&lt;/string&gt;
+    &lt;string&gt;Table&lt;/string&gt;
+  &lt;/entry&gt;
+  &lt;entry&gt;
+    &lt;string&gt;selected&lt;/string&gt;
+    &lt;boolean&gt;true&lt;/boolean&gt;
+  &lt;/entry&gt;
+&lt;/map&gt;</processbytable>
+            <processbyrow>&lt;map&gt;
+  &lt;entry&gt;
+    &lt;string&gt;text&lt;/string&gt;
+    &lt;string&gt;Row&lt;/string&gt;
+  &lt;/entry&gt;
+&lt;/map&gt;</processbyrow>
+            <processbycolumn>&lt;map&gt;
+  &lt;entry&gt;
+    &lt;string&gt;text&lt;/string&gt;
+    &lt;string&gt;Column&lt;/string&gt;
+  &lt;/entry&gt;
+&lt;/map&gt;</processbycolumn>
+            <groovyCode class="javafx.beans.property.SimpleStringProperty">header = [ &quot;T&quot;, &quot;X&quot;, &quot;Y&quot;, &quot;Z&quot; ]
+data = []
+
+(0..10).each
+{ t -&gt;
+  (0..10).each {
+    x -&gt;
+    (0..10).each {
+      y -&gt;
+      data &lt;&lt; [ t, x, y, t ]
+    }
+  }
+}
+</groovyCode>
+         </task>
+      </task-item>
+      <task-item name="Equation2" active="true">
+         <task class="com.dexvis.dex.task.prg.GroovyScript">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+            <processbytable>&lt;map&gt;
+  &lt;entry&gt;
+    &lt;string&gt;text&lt;/string&gt;
+    &lt;string&gt;Table&lt;/string&gt;
+  &lt;/entry&gt;
+  &lt;entry&gt;
+    &lt;string&gt;selected&lt;/string&gt;
+    &lt;boolean&gt;true&lt;/boolean&gt;
+  &lt;/entry&gt;
+&lt;/map&gt;</processbytable>
+            <processbyrow>&lt;map&gt;
+  &lt;entry&gt;
+    &lt;string&gt;text&lt;/string&gt;
+    &lt;string&gt;Row&lt;/string&gt;
+  &lt;/entry&gt;
+&lt;/map&gt;</processbyrow>
+            <processbycolumn>&lt;map&gt;
+  &lt;entry&gt;
+    &lt;string&gt;text&lt;/string&gt;
+    &lt;string&gt;Column&lt;/string&gt;
+  &lt;/entry&gt;
+&lt;/map&gt;</processbycolumn>
+            <groovyCode class="javafx.beans.property.SimpleStringProperty">header = [ &quot;T&quot;, &quot;X&quot;, &quot;Y&quot;, &quot;Z&quot; ]
+(0..20).each
+{ t -&gt;
+  (0..20).each {
+    x -&gt;
+    (0..20).each {
+      y -&gt;
+      data &lt;&lt; [ t, x, y, Math.sin(x + t) * Math.cos(y + t) * 50 + 50 ]
+    }
+  }
+}
+
+</groovyCode>
+         </task>
+      </task-item>
+      <task-item name="Elastic Plane" active="false">
+         <task class="com.dexvis.dex.task.prg.GroovyScript">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+            <processbytable>&lt;map&gt;
+  &lt;entry&gt;
+    &lt;string&gt;text&lt;/string&gt;
+    &lt;string&gt;Table&lt;/string&gt;
+  &lt;/entry&gt;
+  &lt;entry&gt;
+    &lt;string&gt;selected&lt;/string&gt;
+    &lt;boolean&gt;true&lt;/boolean&gt;
+  &lt;/entry&gt;
+&lt;/map&gt;</processbytable>
+            <processbyrow>&lt;map&gt;
+  &lt;entry&gt;
+    &lt;string&gt;text&lt;/string&gt;
+    &lt;string&gt;Row&lt;/string&gt;
+  &lt;/entry&gt;
+&lt;/map&gt;</processbyrow>
+            <processbycolumn>&lt;map&gt;
+  &lt;entry&gt;
+    &lt;string&gt;text&lt;/string&gt;
+    &lt;string&gt;Column&lt;/string&gt;
+  &lt;/entry&gt;
+&lt;/map&gt;</processbycolumn>
+            <groovyCode class="javafx.beans.property.SimpleStringProperty">header = [ &quot;T&quot;, &quot;X&quot;, &quot;Y&quot;, &quot;Z&quot; ]
+(0..20).each
+{ t -&gt;
+  (0..20).each {
+    x -&gt;
+    (0..20).each {
+      y -&gt;
+      data &lt;&lt; [ t, x, y, t*t*x*x ]
+    }
+  }
+}
+
+</groovyCode>
+         </task>
+      </task-item>
+      <task-item name="Elliptic Paraboloid" active="false">
+         <task class="com.dexvis.dex.task.prg.GroovyScript">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+            <processbytable>&lt;map&gt;
+  &lt;entry&gt;
+    &lt;string&gt;text&lt;/string&gt;
+    &lt;string&gt;Table&lt;/string&gt;
+  &lt;/entry&gt;
+  &lt;entry&gt;
+    &lt;string&gt;selected&lt;/string&gt;
+    &lt;boolean&gt;true&lt;/boolean&gt;
+  &lt;/entry&gt;
+&lt;/map&gt;</processbytable>
+            <processbyrow>&lt;map&gt;
+  &lt;entry&gt;
+    &lt;string&gt;text&lt;/string&gt;
+    &lt;string&gt;Row&lt;/string&gt;
+  &lt;/entry&gt;
+&lt;/map&gt;</processbyrow>
+            <processbycolumn>&lt;map&gt;
+  &lt;entry&gt;
+    &lt;string&gt;text&lt;/string&gt;
+    &lt;string&gt;Column&lt;/string&gt;
+  &lt;/entry&gt;
+&lt;/map&gt;</processbycolumn>
+            <groovyCode class="javafx.beans.property.SimpleStringProperty">header = [ &quot;T&quot;, &quot;X&quot;, &quot;Y&quot;, &quot;Z&quot; ]
+(1).each
+{ t -&gt;
+  (-30..30).each {
+    x -&gt;
+    (-30..30).each {
+      y -&gt;
+      data &lt;&lt; [ t, x, y, (x*x)+(y*y) ]
+    }
+  }
+}
+</groovyCode>
+         </task>
+      </task-item>
+      <task-item name="Hyperbolic Paraboloid" active="false">
+         <task class="com.dexvis.dex.task.prg.GroovyScript">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+            <processbytable>&lt;map&gt;
+  &lt;entry&gt;
+    &lt;string&gt;text&lt;/string&gt;
+    &lt;string&gt;Table&lt;/string&gt;
+  &lt;/entry&gt;
+  &lt;entry&gt;
+    &lt;string&gt;selected&lt;/string&gt;
+    &lt;boolean&gt;true&lt;/boolean&gt;
+  &lt;/entry&gt;
+&lt;/map&gt;</processbytable>
+            <processbyrow>&lt;map&gt;
+  &lt;entry&gt;
+    &lt;string&gt;text&lt;/string&gt;
+    &lt;string&gt;Row&lt;/string&gt;
+  &lt;/entry&gt;
+&lt;/map&gt;</processbyrow>
+            <processbycolumn>&lt;map&gt;
+  &lt;entry&gt;
+    &lt;string&gt;text&lt;/string&gt;
+    &lt;string&gt;Column&lt;/string&gt;
+  &lt;/entry&gt;
+&lt;/map&gt;</processbycolumn>
+            <groovyCode class="javafx.beans.property.SimpleStringProperty">header = [ &quot;T&quot;, &quot;X&quot;, &quot;Y&quot;, &quot;Z&quot; ]
+(1).each
+{ t -&gt;
+  (-30..30).each {
+    x -&gt;
+    (-30..30).each {
+      y -&gt;
+      data &lt;&lt; [ t, x, y, (x*x)-(y*y) ]
+    }
+  }
+}
+</groovyCode>
+         </task>
+      </task-item>
+      <task-item name="Cone" active="false">
+         <task class="com.dexvis.dex.task.prg.GroovyScript">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+            <processbytable>&lt;map&gt;
+  &lt;entry&gt;
+    &lt;string&gt;text&lt;/string&gt;
+    &lt;string&gt;Table&lt;/string&gt;
+  &lt;/entry&gt;
+  &lt;entry&gt;
+    &lt;string&gt;selected&lt;/string&gt;
+    &lt;boolean&gt;true&lt;/boolean&gt;
+  &lt;/entry&gt;
+&lt;/map&gt;</processbytable>
+            <processbyrow>&lt;map&gt;
+  &lt;entry&gt;
+    &lt;string&gt;text&lt;/string&gt;
+    &lt;string&gt;Row&lt;/string&gt;
+  &lt;/entry&gt;
+&lt;/map&gt;</processbyrow>
+            <processbycolumn>&lt;map&gt;
+  &lt;entry&gt;
+    &lt;string&gt;text&lt;/string&gt;
+    &lt;string&gt;Column&lt;/string&gt;
+  &lt;/entry&gt;
+&lt;/map&gt;</processbycolumn>
+            <groovyCode class="javafx.beans.property.SimpleStringProperty">header = [ &quot;T&quot;, &quot;X&quot;, &quot;Y&quot;, &quot;Z&quot; ]
+(1..10).each
+{ t -&gt;
+  (-20..20).each {
+    x -&gt;
+    (-20..20).each {
+      y -&gt;
+      data &lt;&lt; [ t, x, y, Math.sqrt((t*x*x)+(t*y*y)) ]
+      //data &lt;&lt; [ t, x, y, -10000*Math.sqrt((x*x)+(y*y)) ]
+    }
+  }
+}
+</groovyCode>
+         </task>
+      </task-item>
+      <task-item name="Animated 3D Graph" active="true">
+         <task class="com.dexvis.dex.task.vis.visjs.AnimatedGraph3D">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper">
+                  <property>
+                     <name>Height</name>
+                     <target>height</target>
+                     <category>Dimensions</category>
+                     <value class="java.lang.Integer">600</value>
+                  </property>
+                  <property>
+                     <name>Width</name>
+                     <target>width</target>
+                     <category>Dimensions</category>
+                     <value class="java.lang.Integer">800</value>
+                  </property>
+                  <property>
+                     <name>Transform</name>
+                     <target>transform</target>
+                     <category>Dimensions</category>
+                  </property>
+                  <property>
+                     <name>Resizable</name>
+                     <target>resizable</target>
+                     <category>Dimensions</category>
+                     <value class="java.lang.Boolean">true</value>
+                  </property>
+               </properties>
+            </prop-sheet>
+         </task>
+      </task-item>
+   </tasks>
+</dex-project>
