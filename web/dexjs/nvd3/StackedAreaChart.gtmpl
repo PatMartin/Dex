@@ -1,124 +1,59 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
-
 <style>
-
-        text {
-            font: 12px sans-serif;
-        }
-        svg {
-            display: block;
-        }
-        html, body, #chart, svg {
-            margin: 0px;
-            padding: 0px;
-            height: 100%;
-            width: 100%;
-        }
-
-<% println new File("javascript/nvd3/latest/nv.d3.min.css").text %>
-
+  html,body,#ChartArea{
+    height : 100%;
+    min-height : 100%;
+    width : 100%;
+    min-width : 100%;
+  }
+  
+<%
+  println new File("javascript/jqueryui/latest/jquery-ui.min.css").text
+  println new File("javascript/jqueryui/latest/jquery-ui.theme.min.css").text
+  println new File("javascript/nvd3/latest/nv.d3.min.css").text
+%>
 </style>
-
-<body>
-
-  <div id="chart">
-    <svg></svg>
+<html>
+  <head>
+    <title>DexJS : NVD3 Stacked Area Chart</title>
+  </head>
+  <body>
+  <div id="config" style="visibility: hidden">
   </div>
-
+  <div id="ChartArea"></div>
 <script>
 <%
-  println new File("javascript/d3/latest/d3.min.js").text
-  println new File("javascript/nvd3/latest/nv.d3.min.js").text
-  //println new File("javascript/dexjs/latest/dex.js").text
+  println new File("javascript/jquery/latest/jquery-2.1.3.min.js").text
+  println new File("javascript/jqueryui/latest/jquery-ui.min.js").text
+  println new File("javascript/underscore/latest/underscore-min.js").text
+  println new File("javascript/dexjs/latest/dex.min.js").text
 %>
 </script>
-
-<script type="text/javascript">
-
-var chartData = [
+<script>d3 = dex.charts.d3.d3v3;</script>
+<script>
 <%
-def entries = []
-def invalids = [ 0 ]
-def series = [:]
-
-header.eachWithIndex { h, i -> if (!(i in invalids)) series[h] = [] }
-
-// Data check to see which data is invalid:
-data.eachWithIndex
-{
-  row, ri ->
-  row.eachWithIndex
-  {
-    col, ci ->
-    if (!(ci in invalids))
-    {
-      try
-      {
-        Double.parseDouble(col);
-      }
-      catch (Exception ex)
-      {
-        invalids << ci
-      }
-    }
-  }
-}
-
-data.each
-{
-  row ->
-  row.eachWithIndex
-  {
-    col, ci ->
-    if (!(ci in invalids))
-    {
-      series[header[ci]] << [ row[0], col ];
-    }
-  }
-}
-
-series.each
-{
-  seriesName, seriesValues ->
-
-  def entry = "{\"key\":\"$seriesName\",\"values\":"
-
-  entry += seriesValues.toString() + "}"
-  entries << entry
-}
-print entries.join(",\n")
+  println new File("javascript/nvd3/latest/nv.d3.min.js").text
 %>
-];
+</script>
+<script>
+<%
+  println dexData.toCsvString();
+%>
 
-var colors = d3.scale.category20();
-keyColor = function(d, i) {return colors(d.key)};
+function setConfiguration(config)
+{
+  stackedArea.configure(config);
+}
 
-nv.addGraph(function() {
-  var chart = nv.models.stackedAreaChart()
-    .margin({left: 100, bottom: 40, top:40, right:40})
-                .x(function(d) { return d[0] })
-                .y(function(d) { return d[1] })
-                .color(keyColor)
-                //.clipEdge(true);
-
-//  chart.xAxis
-//      .tickFormat(function(d) { return d3.time.format('%x')(new Date(d)) });
-
-  chart.xAxis
-      .tickFormat(function(d) { return d });
-      
-  chart.yAxis
-      .tickFormat(d3.format(',f'));
-  
-  d3.select("#chart svg")
-    .datum(chartData)
-      .transition().duration(500).call(chart);
-
-  nv.utils.windowResize(chart.update);
-
-  return chart;
+var stackedArea = new dex.charts.nvd3.StackedAreaChart({
+  parent : "#ChartArea",
+  csv : csv
 });
 
+stackedArea.load('#config');
+stackedArea.render();
+
 </script>
-</body></html>
+</body>
+</html>

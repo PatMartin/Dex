@@ -1,90 +1,54 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
-
 <style>
-
-        text {
-            font: 12px sans-serif;
-        }
-        svg {
-            display: block;
-        }
-        html, body, #chart, svg {
-            margin: 0px;
-            padding: 0px;
-            height: 100%;
-            width: 100%;
-        }
-
-<% println new File("javascript/nvd3/latest/nv.d3.min.css").text %>
-
+  html,body,#ChartArea{
+    height : 100%;
+    min-height : 100%;
+    width : 100%;
+    min-width : 100%;
+  }
+  
+<%
+  println new File("javascript/jqueryui/latest/jquery-ui.min.css").text
+  println new File("javascript/jqueryui/latest/jquery-ui.theme.min.css").text
+  println new File("javascript/nvd3/latest/nv.d3.min.css").text
+%>
 </style>
-
-<body>
-
-  <div id="chart">
-    <svg></svg>
+<html>
+  <head>
+    <title>DexJS : NVD3 Bubble Chart</title>
+  </head>
+  <body>
+  <div id="config" style="visibility: hidden">
   </div>
-
+  <div id="ChartArea"></div>
 <script>
 <%
-  println new File("javascript/d3/latest/d3.min.js").text
+  println new File("javascript/jquery/latest/jquery-2.1.3.min.js").text
+  println new File("javascript/jqueryui/latest/jquery-ui.min.js").text
+  println new File("javascript/underscore/latest/underscore-min.js").text
+  println new File("javascript/dexjs/latest/dex.min.js").text
   println new File("javascript/nvd3/latest/nv.d3.min.js").text
-  //println new File("javascript/dexjs/latest/dex.js").text
 %>
 </script>
-
+<script>
 <%
-  def dexHeader = dexData.getNumericColumns()
-  def colMap = dexData.getColumnMap()
+  println dexData.toCsvString();
 %>
 
-<script type="text/javascript">
+function setConfiguration(config)
+{
+  bubbleChart.configure(config);
+}
 
-var data = [
-<%
-  def seriesList = []
-  def si = dexHeader.size()-1;
+var bubbleChart = new dex.charts.nvd3.BubbleChart({
+  parent : "#ChartArea",
+  csv : csv
+});
 
-  xCol = colMap[dexHeader[0]]
-  sizeCol = colMap[dexHeader[-1]]
-
-  (1..(si-1)).each
-  {
-    i ->
-    def series = "{key: '${dexHeader[i]}', values: ["
-    def points = []
-    colMap[dexHeader[i]].eachWithIndex
-    {
-      col, ri ->
-      points << "{x:${xCol[ri]},y:${col},size:${sizeCol[ri]}}"
-    }
-    series += points.join(",") + "]}";
-    seriesList << series;
-  }
-  println seriesList.join(",\n")
-%>
-];
-
- nv.addGraph(function() {
-    var chart = nv.models.scatterChart()
-      .margin({left:100, right:40, top:40, bottom:40})
-                  .showDistX(true)
-                  .showDistY(true)
-                  .color(d3.scale.category10().range());
-  
-    chart.xAxis.tickFormat(d3.format('.0f'))
-    chart.yAxis.tickFormat(d3.format('.0f'))
-  
-   d3.select('#chart svg')
-       .datum(data)
-     .transition().duration(500)
-       .call(chart);
- 
-   nv.utils.windowResize(chart.update);
- 
-   return chart;
- });
-
+bubbleChart.load('#config');
+bubbleChart.render();
 
 </script>
+</body>
+</html>
