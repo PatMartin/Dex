@@ -699,6 +699,10 @@ var c3chart = function (userConfig) {
     return chart;
   };
 
+    chart.clone = function clone(override) {
+        return c3chart(dex.config.expandAndOverlay(override, userConfig));
+    };
+
   $(document).ready(function () {
     if (chart.config.draggable) {
       $("#" + chart.config.id).draggable();
@@ -916,390 +920,395 @@ module.exports = c3;
  */
 module.exports = function charts() {
   return {
-    'c3'      : require("./c3/c3"),
-    'd3'      : require("./d3/d3"),
-    'd3plus'  : require("./d3plus/d3plus"),
-    'echarts' : require("./echarts/echarts"),
-    'elegans' : require("./elegans/elegans"),
-    'nvd3'    : require("./nvd3/nvd3"),
-    'threejs' : require("./threejs/threejs"),
-    'vis'     : require("./vis/vis")
+    'c3'       : require("./c3/c3"),
+    'd3'       : require("./d3/d3"),
+    'd3plus'   : require("./d3plus/d3plus"),
+    'echarts'  : require("./echarts/echarts"),
+    'elegans'  : require("./elegans/elegans"),
+    'multiples' : require("./multiples/multiples"),
+    'nvd3'     : require("./nvd3/nvd3"),
+    'threejs'  : require("./threejs/threejs"),
+    'vis'      : require("./vis/vis")
   };
 };
-},{"./c3/c3":14,"./d3/d3":33,"./d3plus/d3plus":35,"./echarts/echarts":38,"./elegans/elegans":40,"./nvd3/nvd3":43,"./threejs/threejs":45,"./vis/vis":47}],16:[function(require,module,exports){
+},{"./c3/c3":14,"./d3/d3":33,"./d3plus/d3plus":35,"./echarts/echarts":38,"./elegans/elegans":40,"./multiples/multiples":42,"./nvd3/nvd3":45,"./threejs/threejs":47,"./vis/vis":49}],16:[function(require,module,exports){
 var bumpchart = function (userConfig) {
-  d3 = dex.charts.d3.d3v3;
-  var chart;
-
-  var defaults = {
-    'parent': '#BumpChartParent',
-    'id': 'BumpChartId',
-    'class': 'BumpChartClass',
-    'resizable': true,
-    // Sample data...
-    'csv': {
-      'header': ["category", "sequence", "rank"],
-      'data': [
-        ["Team 1", 1, 1],
-        ["Team 1", 2, 2],
-        ["Team 1", 3, 3],
-        ["Team 2", 1, 2],
-        ["Team 2", 2, 1],
-        ["Team 2", 3, 2],
-        ["Team 3", 1, 3],
-        ["Team 3", 2, 3],
-        ["Team 3", 3, 1]
-      ]
-    },
-    'width': "100%",
-    'height': "100%",
-    'margin': {
-      'left': 140,
-      'right': 160,
-      'top': 50,
-      'bottom': 50
-    },
-    'transform': "",
-    'color': d3.scale.category10(),
-    'format': d3.format("d"),
-    'key': {'category': 0, 'sequence': 1, 'rank': 2},
-    'chartLabel': dex.config.text({
-      'text': "",
-      'x': function () {
-        return (chart.config.width - chart.config.margin.left -
-          chart.config.margin.right) / 2;
-      },
-      'y': function (d) {
-        return chart.config.height -
-          (.5 * chart.config.margin.bottom);
-      },
-      'font': dex.config.font({
-        'fontSize': '32px'
-      }),
-      'fill.fillColor': 'steelblue',
-      'anchor': 'middle'
-    }),
-    'categoryLabel': dex.config.text({
-      'x': 8,
-      'dy': ".31em",
-      'cursor': "pointer",
-      'font': dex.config.font({
-        'size': 16,
-        'weight': 'bold',
-      }),
-      'fill.fillColor': function (d) {
-        return chart.config.color(
-          d.key);
-      }
-    }),
-    'sequenceLabel': dex.config.text({
-      'dx': 0,
-      'anchor': 'middle',
-      'dy': ".31em",
-      'cursor': "pointer",
-      'font': dex.config.font({
-        'size': 32,
-        'weight': 'bold',
-      }),
-      'fill.fillColor': function (d) {
-        return "black";
-      }
-    }),
-    'circle': dex.config.circle({
-      'r': 6,
-      'stroke': dex.config.stroke({
-        'color': function (d) {
-          return chart.config.color(d.key);
-        },
-        'width': 4,
-      }),
-      'fill.fillColor': 'white'
-    }),
-    'line': dex.config.line({
-      'stroke': dex.config.stroke({
-        'color': function (d) {
-          return chart.config.color(d.key);
-        },
-        'width': 3,
-        //'dasharray' : "1 1"
-      }),
-      'fill.fillColor': 'none'
-    })
-  };
-
-  chart = new dex.component(userConfig, defaults);
-
-  chart.render = function render() {
     d3 = dex.charts.d3.d3v3;
-    chart.resize();
-    dex.config.apply(chart);
+    var chart;
+
+    var defaults = {
+        'parent': '#BumpChartParent',
+        'id': 'BumpChartId',
+        'class': 'BumpChartClass',
+        'resizable': true,
+        // Sample data...
+        'csv': {
+            'header': ["category", "sequence", "rank"],
+            'data': [
+                ["Team 1", 1, 1],
+                ["Team 1", 2, 2],
+                ["Team 1", 3, 3],
+                ["Team 2", 1, 2],
+                ["Team 2", 2, 1],
+                ["Team 2", 3, 2],
+                ["Team 3", 1, 3],
+                ["Team 3", 2, 3],
+                ["Team 3", 3, 1]
+            ]
+        },
+        'width': "100%",
+        'height': "100%",
+        'margin': {
+            'left': 140,
+            'right': 160,
+            'top': 50,
+            'bottom': 50
+        },
+        'transform': "",
+        'color': d3.scale.category10(),
+        'format': d3.format("d"),
+        'key': {'category': 0, 'sequence': 1, 'rank': 2},
+        'chartLabel': dex.config.text({
+            'text': "",
+            'x': function () {
+                return (chart.config.width - chart.config.margin.left -
+                    chart.config.margin.right) / 2;
+            },
+            'y': function (d) {
+                return chart.config.height -
+                    (.5 * chart.config.margin.bottom);
+            },
+            'font': dex.config.font({
+                'fontSize': '32px'
+            }),
+            'fill.fillColor': 'steelblue',
+            'anchor': 'middle'
+        }),
+        'categoryLabel': dex.config.text({
+            'x': 8,
+            'dy': ".31em",
+            'cursor': "pointer",
+            'font': dex.config.font({
+                'size': 16,
+                'weight': 'bold',
+            }),
+            'fill.fillColor': function (d) {
+                return chart.config.color(
+                    d.key);
+            }
+        }),
+        'sequenceLabel': dex.config.text({
+            'dx': 0,
+            'anchor': 'middle',
+            'dy': ".31em",
+            'cursor': "pointer",
+            'font': dex.config.font({
+                'size': 32,
+                'weight': 'bold',
+            }),
+            'fill.fillColor': function (d) {
+                return "black";
+            }
+        }),
+        'circle': dex.config.circle({
+            'r': 6,
+            'stroke': dex.config.stroke({
+                'color': function (d) {
+                    return chart.config.color(d.key);
+                },
+                'width': 4,
+            }),
+            'fill.fillColor': 'white'
+        }),
+        'line': dex.config.line({
+            'stroke': dex.config.stroke({
+                'color': function (d) {
+                    return chart.config.color(d.key);
+                },
+                'width': 3,
+                //'dasharray' : "1 1"
+            }),
+            'fill.fillColor': 'none'
+        })
+    };
+
+    chart = new dex.component(userConfig, defaults);
+
+    chart.render = function render() {
+        d3 = dex.charts.d3.d3v3;
+        chart.resize();
+        dex.config.apply(chart);
+        return chart;
+    };
+
+    chart.update = function () {
+        d3 = dex.charts.d3.d3v3;
+        var chart = this;
+        var config = chart.config;
+        var csv = config.csv;
+        var margin = config.margin;
+        var width = config.width - margin.left - margin.right;
+        var height = config.height - margin.top - margin.bottom;
+
+        var categoryKey = dex.csv.getColumnName(csv, config.key.category);
+        var sequenceKey = dex.csv.getColumnName(csv, config.key.sequence);
+        var rankKey = dex.csv.getColumnName(csv, config.key.rank);
+
+        var categoryIndex = dex.csv.getColumnNumber(csv, config.key.category);
+        var sequenceIndex = dex.csv.getColumnNumber(csv, config.key.sequence);
+        var rankIndex = dex.csv.getColumnNumber(csv, config.key.rank);
+
+        //dex.console.log("cat", categoryKey, "sequence", sequenceKey, "rank", rankKey);
+
+        d3.selectAll(config.parent).selectAll("*").remove();
+
+        var svg = d3.select(config.parent)
+            .append("svg")
+            .attr("id", config["id"])
+            .attr("class", config["class"])
+            .attr('width', config.width)
+            .attr('height', config.height);
+
+        var rootG = svg.append('g')
+            .attr('transform', 'translate(' +
+                margin.left + ',' + margin.top + ') ' +
+                config.transform);
+
+        var data = dex.csv.toJson(csv);
+        //dex.console.log("JSON", JSON.stringify(data));
+
+        var dataNest = d3.nest()
+            .key(function (d) {
+                return d[csv.header[categoryIndex]];
+            })
+            .entries(data);
+
+        data = dataNest;
+
+        var speed = 100;
+
+        var x = d3.scale.linear()
+            .range([0, width]);
+
+        var clippingIndex = d3.scale.linear()
+            .range([0, width]);
+
+        var y = d3.scale.ordinal()
+            .rangeRoundBands([height, 0], .1);
+
+        var xAxis = d3.svg.axis()
+            .scale(x)
+            .tickSize(0)
+            .tickFormat(d3.format("d"))
+            .orient("bottom")
+            .ticks(10);
+
+        var xAxis1 = d3.svg.axis()
+            .scale(x)
+            .tickSize(0)
+            .tickFormat(d3.format("d"))
+            .orient("top")
+            .ticks(10);
+
+        var yAxis = d3.svg.axis()
+            .scale(y)
+            .tickSize(-width)
+            .tickPadding(10)
+            .tickFormat(d3.format("d"))
+            .orient("left");
+
+        var line = d3.svg.line()
+            .x(function (d) {
+                return x(+d[sequenceKey]);
+            })
+            .y(function (d) {
+                return y(+d[rankKey]) + y.rangeBand() / 2;
+            });
+
+        var clip = svg.append("clipPath")
+            .attr("id", "clip")
+            .append("rect")
+            .attr("width", 0)
+            .attr("height", height);
+
+        y.domain(d3.range(d3.min(data, function (series) {
+                return d3.min(series.values, function (d) {
+                    return +d[rankKey];
+                });
+            }),
+                d3.max(data, function (series) {
+                    return d3.max(series.values, function (d) {
+                        return +d[rankKey];
+                    });
+                }) + 1)
+                .reverse()
+        );
+
+        x.domain(d3.extent(data[0].values.map(function (d) {
+            return +d[sequenceKey];
+        })));
+
+        clippingIndex.domain([1, data[0].values.length]);
+
+        //set y axis
+        rootG.append("g")
+            .attr("class", "y axis")
+            .call(yAxis)
+            .style('fill', 'none');
+
+        //set bottom axis y
+        rootG.append("g")
+            .attr("class", "x axis")
+            .attr("transform", "translate(" + 0 + "," + height + ")")
+            .call(xAxis);
+
+        //set top axis
+        rootG.append("g")
+            .attr("class", "x axis")
+            .call(xAxis1);
+
+        // Style the axis labels.
+        rootG.selectAll(".axis").filter(".x").selectAll(".tick").select("text")
+            .call(dex.config.configureText, config.sequenceLabel);
+
+        var key = rootG.selectAll(".key")
+            .data(data)
+            .enter().append("g")
+            .attr("class", "key");
+
+        var path = key.append("path")
+            .attr("class", "line")
+            .call(dex.config.configureLine, config.line)
+            .attr("clip-path", function (d) {
+                return "url(#clip)";
+            })
+            .attr("d", function (d) {
+                return line(d.values);
+            })
+            .on("mouseover", function (d) {
+                key.style("opacity", 0.2);
+                key.filter(function (path) {
+                    return path.key === d.key;
+                }).style("opacity", 1);
+            })
+            .on("mouseout", function (d) {
+                key.style("opacity", 1);
+            });
+
+        var circleStart = key.append("circle")
+            .call(dex.config.configureCircle, config.circle)
+            .attr("cx", function (d) {
+                return x(+d.values[0][sequenceKey]);
+            })
+            .attr("cy", function (d) {
+                return y(+d.values[0][rankKey]) + y.rangeBand() / 2;
+            })
+            //    .style("fill", function(d) { return d.color; })
+            .on("mouseover", function (d) {
+                key.style("opacity", 0.2);
+                key.filter(function (path) {
+                    return path.key === d.key;
+                }).style("opacity", 1);
+            })
+            .on("mouseout", function (d) {
+                key.style("opacity", 1);
+            });
+
+        var circleEnd = key.append("circle")
+            .call(dex.config.configureCircle, config.circle)
+            .attr("cx", function (d) {
+                return x(+d.values[0][sequenceKey]);
+            })
+            .attr("cy", function (d) {
+                return y(+d.values[0][rankKey]) + y.rangeBand() / 2;
+            })
+            .on("mouseover", function (d) {
+                key.style("opacity", 0.2);
+                key.filter(function (path) {
+                    return path.key === d.key;
+                }).style("opacity", 1);
+            })
+            .on("mouseout", function (d) {
+                key.style("opacity", 1);
+            });
+
+        // text label for the chart
+        rootG.append("text")
+            .call(dex.config.configureText, config.chartLabel);
+
+        var label = key.append("text")
+            .attr("transform", function (d) {
+                //dex.console.log("D", d, sequenceKey);
+                return "translate(" + (+x(d.values[0][sequenceKey])) +
+                    "," + (+y(d.values[0][rankKey]) + y.rangeBand() / 2) + ")";
+            })
+            .call(dex.config.configureText, config.categoryLabel)
+            .on("mouseover", function (d) {
+                key.style("opacity", 0.2);
+                key.filter(function (path) {
+                    return path.key === d.key;
+                }).style("opacity", 1);
+            })
+            .on("mouseout", function (d) {
+                key.style("opacity", 1);
+            })
+            .text(function (d) {
+                return " " + d.values[0][rankKey] + ". " + d.key;
+            });
+
+        var xIndex = 1;
+
+        var transition = d3.transition()
+            .duration(speed)
+            .each("start", function start() {
+                label.transition()
+                    .duration(speed)
+                    .ease('linear')
+                    .attr("transform", function (d) {
+                        //dex.console.log("D:" + xIndex, d, sequenceKey);
+                        return "translate(" + x(+d.values[xIndex][sequenceKey]) + "," + (y(+d.values[xIndex][rankKey]) + y.rangeBand() / 2) + ")";
+                    })
+                    .text(function (d) {
+                        return " " + d.values[xIndex][rankKey] + ". " + d.key;
+                    });
+
+                circleEnd.transition()
+                    .duration(speed)
+                    .ease('linear')
+                    .attr("cx", function (d) {
+                        return x(+(d.values[xIndex][sequenceKey]));
+                    })
+                    .attr("cy", function (d) {
+                        return y(+(d.values[xIndex][rankKey])) + y.rangeBand() / 2;
+                    });
+
+                clip.transition()
+                    .duration(speed)
+                    .ease('linear')
+                    .attr("width", clippingIndex(xIndex + 1))
+                    .attr("height", height);
+
+                xIndex += 1;
+
+                if (xIndex !== data[0].values.length) transition = transition.transition().each("start", start);
+
+            });
+        // Allow method chaining
+        return chart;
+    };
+
+    chart.clone = function clone(override) {
+        return bumpchart(dex.config.expandAndOverlay(override, userConfig));
+    };
+
+    $(document).ready(function () {
+        // Make the entire chart draggable.
+        if (chart.config.draggable) {
+            $(chart.config.parent).draggable();
+        }
+    });
+
     return chart;
-  };
-
-  chart.update = function () {
-    d3 = dex.charts.d3.d3v3;
-    var chart = this;
-    var config = chart.config;
-    var csv = config.csv;
-    var margin = config.margin;
-    var width = config.width - margin.left - margin.right;
-    var height = config.height - margin.top - margin.bottom;
-
-    var categoryKey = dex.csv.getColumnName(csv, config.key.category);
-    var sequenceKey = dex.csv.getColumnName(csv, config.key.sequence);
-    var rankKey = dex.csv.getColumnName(csv, config.key.rank);
-
-    var categoryIndex = dex.csv.getColumnNumber(csv, config.key.category);
-    var sequenceIndex = dex.csv.getColumnNumber(csv, config.key.sequence);
-    var rankIndex = dex.csv.getColumnNumber(csv, config.key.rank);
-
-    //dex.console.log("cat", categoryKey, "sequence", sequenceKey, "rank", rankKey);
-
-    d3.selectAll(config.parent).selectAll("*").remove();
-
-    var svg = d3.select(config.parent)
-      .append("svg")
-      .attr("id", config["id"])
-      .attr("class", config["class"])
-      .attr('width', config.width)
-      .attr('height', config.height);
-
-    var rootG = svg.append('g')
-      .attr('transform', 'translate(' +
-        margin.left + ',' + margin.top + ') ' +
-        config.transform);
-
-    var data = dex.csv.toJson(csv);
-    //dex.console.log("JSON", JSON.stringify(data));
-
-    var dataNest = d3.nest()
-      .key(function (d) {
-        return d[csv.header[categoryIndex]];
-      })
-      .entries(data);
-
-    data = dataNest;
-
-    var speed = 100;
-
-    var x = d3.scale.linear()
-      .range([0, width]);
-
-    var clippingIndex = d3.scale.linear()
-      .range([0, width]);
-
-    var y = d3.scale.ordinal()
-      .rangeRoundBands([height, 0], .1);
-
-    var xAxis = d3.svg.axis()
-      .scale(x)
-      .tickSize(0)
-      .tickFormat(d3.format("d"))
-      .orient("bottom")
-      .ticks(10);
-
-    var xAxis1 = d3.svg.axis()
-      .scale(x)
-      .tickSize(0)
-      .tickFormat(d3.format("d"))
-      .orient("top")
-      .ticks(10);
-
-    var yAxis = d3.svg.axis()
-      .scale(y)
-      .tickSize(-width)
-      .tickPadding(10)
-      .tickFormat(d3.format("d"))
-      .orient("left");
-
-    var line = d3.svg.line()
-      .x(function (d) {
-        return x(+d[sequenceKey]);
-      })
-      .y(function (d) {
-        return y(+d[rankKey]) + y.rangeBand() / 2;
-      });
-
-    var clip = svg.append("clipPath")
-      .attr("id", "clip")
-      .append("rect")
-      .attr("width", 0)
-      .attr("height", height);
-
-    y.domain(d3.range(d3.min(data, function (series) {
-        return d3.min(series.values, function (d) {
-          return +d[rankKey];
-        });
-      }),
-        d3.max(data, function (series) {
-          return d3.max(series.values, function (d) {
-            return +d[rankKey];
-          });
-        }) + 1)
-        .reverse()
-    );
-
-    x.domain(d3.extent(data[0].values.map(function (d) {
-      return +d[sequenceKey];
-    })));
-
-    clippingIndex.domain([1, data[0].values.length]);
-
-    //set y axis
-    rootG.append("g")
-      .attr("class", "y axis")
-      .call(yAxis)
-      .style('fill', 'none');
-
-    //set bottom axis y
-    rootG.append("g")
-      .attr("class", "x axis")
-      .attr("transform", "translate(" + 0 + "," + height + ")")
-      .call(xAxis);
-
-    //set top axis
-    rootG.append("g")
-      .attr("class", "x axis")
-      .call(xAxis1);
-
-    // Style the axis labels.
-    rootG.selectAll(".axis").filter(".x").selectAll(".tick").select("text")
-      .call(dex.config.configureText, config.sequenceLabel);
-
-    var key = rootG.selectAll(".key")
-      .data(data)
-      .enter().append("g")
-      .attr("class", "key");
-
-    var path = key.append("path")
-      .attr("class", "line")
-      .call(dex.config.configureLine, config.line)
-      .attr("clip-path", function (d) {
-        return "url(#clip)";
-      })
-      .attr("d", function (d) {
-        return line(d.values);
-      })
-      .on("mouseover", function (d) {
-        key.style("opacity", 0.2);
-        key.filter(function (path) {
-          return path.key === d.key;
-        }).style("opacity", 1);
-      })
-      .on("mouseout", function (d) {
-        key.style("opacity", 1);
-      });
-
-    var circleStart = key.append("circle")
-      .call(dex.config.configureCircle, config.circle)
-      .attr("cx", function (d) {
-        return x(+d.values[0][sequenceKey]);
-      })
-      .attr("cy", function (d) {
-        return y(+d.values[0][rankKey]) + y.rangeBand() / 2;
-      })
-      //    .style("fill", function(d) { return d.color; })
-      .on("mouseover", function (d) {
-        key.style("opacity", 0.2);
-        key.filter(function (path) {
-          return path.key === d.key;
-        }).style("opacity", 1);
-      })
-      .on("mouseout", function (d) {
-        key.style("opacity", 1);
-      });
-
-    var circleEnd = key.append("circle")
-      .call(dex.config.configureCircle, config.circle)
-      .attr("cx", function (d) {
-        return x(+d.values[0][sequenceKey]);
-      })
-      .attr("cy", function (d) {
-        return y(+d.values[0][rankKey]) + y.rangeBand() / 2;
-      })
-      .on("mouseover", function (d) {
-        key.style("opacity", 0.2);
-        key.filter(function (path) {
-          return path.key === d.key;
-        }).style("opacity", 1);
-      })
-      .on("mouseout", function (d) {
-        key.style("opacity", 1);
-      });
-
-    // text label for the chart
-    rootG.append("text")
-      .call(dex.config.configureText, config.chartLabel);
-
-    var label = key.append("text")
-      .attr("transform", function (d) {
-        //dex.console.log("D", d, sequenceKey);
-        return "translate(" + (+x(d.values[0][sequenceKey])) +
-          "," + (+y(d.values[0][rankKey]) + y.rangeBand() / 2) + ")";
-      })
-      .call(dex.config.configureText, config.categoryLabel)
-      .on("mouseover", function (d) {
-        key.style("opacity", 0.2);
-        key.filter(function (path) {
-          return path.key === d.key;
-        }).style("opacity", 1);
-      })
-      .on("mouseout", function (d) {
-        key.style("opacity", 1);
-      })
-      .text(function (d) {
-        return " " + d.values[0][rankKey] + ". " + d.key;
-      });
-
-    var xIndex = 1;
-
-    var transition = d3.transition()
-      .duration(speed)
-      .each("start", function start() {
-        label.transition()
-          .duration(speed)
-          .ease('linear')
-          .attr("transform", function (d) {
-            //dex.console.log("D:" + xIndex, d, sequenceKey);
-            return "translate(" + x(+d.values[xIndex][sequenceKey]) + "," + (y(+d.values[xIndex][rankKey]) + y.rangeBand() / 2) + ")";
-          })
-          .text(function (d) {
-            return " " + d.values[xIndex][rankKey] + ". " + d.key;
-          });
-
-        circleEnd.transition()
-          .duration(speed)
-          .ease('linear')
-          .attr("cx", function (d) {
-            return x(+(d.values[xIndex][sequenceKey]));
-          })
-          .attr("cy", function (d) {
-            return y(+(d.values[xIndex][rankKey])) + y.rangeBand() / 2;
-          });
-
-        clip.transition()
-          .duration(speed)
-          .ease('linear')
-          .attr("width", clippingIndex(xIndex + 1))
-          .attr("height", height);
-
-        xIndex += 1;
-
-        if (xIndex !== data[0].values.length) transition = transition.transition().each("start", start);
-
-      });
-    // Allow method chaining
-    return chart;
-  };
-
-  $(document).ready(function () {
-    // Make the entire chart draggable.
-    if (chart.config.draggable) {
-      $(chart.config.parent).draggable();
-    }
-  });
-
-  return chart;
 };
 
 module.exports = bumpchart;
@@ -1566,6 +1575,10 @@ var chord = function (userConfig) {
     // Allow method chaining
     return chart;
   };
+
+    chart.clone = function clone(override) {
+        return chord(dex.config.expandAndOverlay(override, userConfig));
+    };
 
   $(document).ready(function () {
     // Make the entire chart draggable.
@@ -1834,6 +1847,10 @@ var clusteredforce = function (userConfig) {
       };
     }
   };
+
+    chart.clone = function clone(override) {
+        return clusteredforce(dex.config.expandAndOverlay(override, userConfig));
+    };
 
   $(document).ready(function () {
     $(chart.config.parent).uitooltip({
@@ -2242,6 +2259,10 @@ var dendrogram = function Dendrogram(userConfig) {
     dex.config.apply(chart);
     return chart;
   };
+
+    chart.clone = function clone(override) {
+        return dendrogram(dex.config.expandAndOverlay(override, userConfig));
+    };
 
   $(document).ready(function () {
     // Make the entire chart draggable.
@@ -2771,6 +2792,10 @@ var motionbarchart = function (userConfig) {
     }
   };
 
+    chart.clone = function clone(override) {
+        return motionbarchart(dex.config.expandAndOverlay(override, userConfig));
+    };
+
   $(document).ready(function () {
 
     // Add tooltips
@@ -3139,6 +3164,10 @@ var orbitallayout = function (userConfig) {
       d3.selectAll("g.node > circle").style("stroke", "none").style("stroke-width", 0);
     }
   };
+
+    chart.clone = function clone(override) {
+        return orbitallayout(dex.config.expandAndOverlay(override, userConfig));
+    };
 
   $(document).ready(function () {
     // Make the entire chart draggable.
@@ -3577,6 +3606,10 @@ var parallelcoordinates = function (userConfig) {
 
     return chart;
   };
+
+    chart.clone = function clone(override) {
+        return parallelcoordinates(dex.config.expandAndOverlay(override, userConfig));
+    };
 
   $(document).ready(function () {
     $(document).uitooltip({
@@ -4065,6 +4098,10 @@ var radarchart = function (userConfig) {
     return chart;
   };
 
+    chart.clone = function clone(override) {
+        return radarchart(dex.config.expandAndOverlay(override, userConfig));
+    };
+
   $(document).ready(function () {
     // Make the entire chart draggable.
     //$(chart.config.parent).draggable();
@@ -4283,7 +4320,11 @@ var radialtree = function (userConfig) {
     }
 
     return chart;
-  }
+  };
+
+    chart.clone = function clone(override) {
+        return radialtree(dex.config.expandAndOverlay(override, userConfig));
+    };
 
   function project(x, y) {
     //dex.console.log('project(x,y)', x, y);
@@ -4304,918 +4345,922 @@ module.exports = radialtree;
 
 },{}],26:[function(require,module,exports){
 var sankey = function (userConfig) {
-  d3 = dex.charts.d3.d3v3;
-  var defaultColor = d3.scale.category20c();
-  var chart;
+    d3 = dex.charts.d3.d3v3;
+    var defaultColor = d3.scale.category20c();
+    var chart;
 
-  var defaults = {
-    // The parent container of this chart.
-    'parent': '#SankeyParent',
-    // Set these when you need to CSS style components independently.
-    'id': 'SankeyId',
-    'class': 'SankeyClass',
-    'resizable': true,
-    'width': "100%",
-    'height': "100%",
-    'margin': {
-      'left': 100,
-      'right': 100,
-      'top': 50,
-      'bottom': 50
-    },
-    'transform': "",
-    // Our data...
-    'csv': {
-      // Give folks without data something to look at anyhow.
-      'header': ["X", "Y", "WEIGHT"],
-      'data': [
-        ["A1", "A2", 1],
-        ["B1", "B2", 2],
-        ["C1", "C2", 2],
-        ["C2", "C3", 4]
-      ]
-    },
-    'relationships': null,
-    'layoutIterations': 32,
-    'columnTitle': dex.config.text({
-        'fill.fillColor': 'black',
-        'x': function (d) {
-          var center = window.innerWidth / 2;
-          //var center = (typeof userConfig.width !== 'undefined' ?
-          //  userConfig.width : defaults.width) / 2;
-
-          var nodeWidth = (userConfig.mouseout && userConfig.mouseout.node &&
-          userConfig.mouseout.node.rectangle && userConfig.mouseout.node.rectangle.width) ?
-            userConfig.mouseout.node.rectangle.width : defaults.mouseout.node.rectangle.width;
-
-          var nodePadding = (userConfig.mouseout && userConfig.mouseout.node &&
-          userConfig.mouseout.node.padding) ?
-            userConfig.mouseout.node.padding : defaults.mouseout.node.padding;
-
-          //dex.console.log("d.x=" + d.x + ", width=" + window.innerWidth + ", nodeWidth=" + nodeWidth +
-          //  ", nodePadding=" + nodePadding + ", center=" + center);
-          if (+d > center) {
-            //return +d-nodePadding-nodeWidth;
-            return +d + nodeWidth / 2;
-          }
-          else {
-            //return +d + nodeWidth + nodePadding;
-            return +d + nodeWidth / 2;
-          }
+    var defaults = {
+        // The parent container of this chart.
+        'parent': '#SankeyParent',
+        // Set these when you need to CSS style components independently.
+        'id': 'SankeyId',
+        'class': 'SankeyClass',
+        'resizable': true,
+        'width': "100%",
+        'height': "100%",
+        'margin': {
+            'left': 100,
+            'right': 100,
+            'top': 50,
+            'bottom': 50
         },
-        "y": 10,
-        "writingMode": "tb",
-        "glyphOrientationVertical": 0,
-        "anchor": function (d, i) {
-          //var center = (typeof userConfig.width !== 'undefined' ?
-          // userConfig.width : defaults.width) / 2;
-          var center = window.innerWidth / 2;
-
-          if (+d > center) {
-            // End if horizontal
-            return "start";
-          }
-          else {
-            return "start";
-          }
+        'transform': "",
+        // Our data...
+        'csv': {
+            // Give folks without data something to look at anyhow.
+            'header': ["X", "Y", "WEIGHT"],
+            'data': [
+                ["A1", "A2", 1],
+                ["B1", "B2", 2],
+                ["C1", "C2", 2],
+                ["C2", "C3", 4]
+            ]
         },
-        "text": function (d, i) {
-          return d + ", i" + i;
-        }
-      }
-    ),
-    'label': dex.config.text({
-      'fill.fillColor': 'black',
-      'x': function (d) {
-        var center = window.innerWidth / 2;
-        //var center = (typeof userConfig.width !== 'undefined' ?
-        //  userConfig.width : defaults.width) / 2;
+        'relationships': null,
+        'layoutIterations': 32,
+        'columnTitle': dex.config.text({
+                'fill.fillColor': 'black',
+                'x': function (d) {
+                    var center = window.innerWidth / 2;
+                    //var center = (typeof userConfig.width !== 'undefined' ?
+                    //  userConfig.width : defaults.width) / 2;
 
-        var nodeWidth = (userConfig.mouseout && userConfig.mouseout.node &&
-        userConfig.mouseout.node.rectangle &&
-        userConfig.mouseout.node.rectangle.width) ?
-          userConfig.mouseout.node.rectangle.width : defaults.mouseout.node.rectangle.width;
+                    var nodeWidth = (userConfig.mouseout && userConfig.mouseout.node &&
+                    userConfig.mouseout.node.rectangle && userConfig.mouseout.node.rectangle.width) ?
+                        userConfig.mouseout.node.rectangle.width : defaults.mouseout.node.rectangle.width;
 
-        var nodePadding = (userConfig.mouseout && userConfig.mouseout.node &&
-        userConfig.mouseout.node.padding) ?
-          userConfig.mouseout.node.padding : defaults.mouseout.node.padding;
+                    var nodePadding = (userConfig.mouseout && userConfig.mouseout.node &&
+                    userConfig.mouseout.node.padding) ?
+                        userConfig.mouseout.node.padding : defaults.mouseout.node.padding;
 
-        //dex.console.log("d.x=" + d.x + ", width=" + window.innerWidth + ", nodeWidth=" + nodeWidth +
-        //  ", nodePadding=" + nodePadding + ", center=" + center);
-        if (d.x > center) {
-          return -nodePadding;
-        }
-        else {
-          return nodeWidth + nodePadding;
-        }
-      },
-      'y': function (d) {
-        return d.dy / 2;
-      },
-      'transform': null,
-      'dy': '.35em',
-      'anchor': function (d, i) {
-        //var center = (typeof userConfig.width !== 'undefined' ?
-        // userConfig.width : defaults.width) / 2;
-        var center = window.innerWidth / 2;
+                    //dex.console.log("d.x=" + d.x + ", width=" + window.innerWidth + ", nodeWidth=" + nodeWidth +
+                    //  ", nodePadding=" + nodePadding + ", center=" + center);
+                    if (+d > center) {
+                        //return +d-nodePadding-nodeWidth;
+                        return +d + nodeWidth / 2;
+                    }
+                    else {
+                        //return +d + nodeWidth + nodePadding;
+                        return +d + nodeWidth / 2;
+                    }
+                },
+                "y": 10,
+                "writingMode": "tb",
+                "glyphOrientationVertical": 0,
+                "anchor": function (d, i) {
+                    //var center = (typeof userConfig.width !== 'undefined' ?
+                    // userConfig.width : defaults.width) / 2;
+                    var center = window.innerWidth / 2;
 
-        if (d.x > center) {
-          return "end";
-        }
-        else {
-          return "start";
-        }
-      },
-      'font': {
-        'size': 14
-      },
-      'color': "black",
-      'opacity': 1,
-      'text': function (d) {
-        return d.name;
-      }
-    }),
-    //'columnLayout' : function(node, nodeMap) { return nodeMap[node.name].column },
-    'mouseout': {
-      'link': {
-        'stroke': dex.config.stroke({
-          'opacity': .2,
-          'color': function (d) {
-            return defaultColor(d.category);
-          },
-          'width': function (d) {
-            //return 0;
-            return Math.max(1, d.dy);
-          }
-        }),
-        'fill': dex.config.fill({
-          'fillColor': 'none',
-          'fillOpacity': .4
-        }),
-        'curvature': 0.5
-      },
-      'node': {
-        'padding': 4,
-        'rectangle': dex.config.rectangle(
-          {
-            'width': 32,
-            'color': function (d) {
-              return defaultColor(d.name.replace(/ .*/, ""));
+                    if (+d > center) {
+                        // End if horizontal
+                        return "start";
+                    }
+                    else {
+                        return "start";
+                    }
+                },
+                "text": function (d, i) {
+                    return d + ", i" + i;
+                }
+            }
+        ),
+        'label': dex.config.text({
+            'fill.fillColor': 'black',
+            'x': function (d) {
+                var center = window.innerWidth / 2;
+                //var center = (typeof userConfig.width !== 'undefined' ?
+                //  userConfig.width : defaults.width) / 2;
+
+                var nodeWidth = (userConfig.mouseout && userConfig.mouseout.node &&
+                userConfig.mouseout.node.rectangle &&
+                userConfig.mouseout.node.rectangle.width) ?
+                    userConfig.mouseout.node.rectangle.width : defaults.mouseout.node.rectangle.width;
+
+                var nodePadding = (userConfig.mouseout && userConfig.mouseout.node &&
+                userConfig.mouseout.node.padding) ?
+                    userConfig.mouseout.node.padding : defaults.mouseout.node.padding;
+
+                //dex.console.log("d.x=" + d.x + ", width=" + window.innerWidth + ", nodeWidth=" + nodeWidth +
+                //  ", nodePadding=" + nodePadding + ", center=" + center);
+                if (d.x > center) {
+                    return -nodePadding;
+                }
+                else {
+                    return nodeWidth + nodePadding;
+                }
             },
-            'height': function (d) {
-              return d.dy;
+            'y': function (d) {
+                return d.dy / 2;
             },
-            'stroke': dex.config.stroke({
-              'color': function (d) {
-                return d3.rgb(d.color).darker(2);
-              }
+            'transform': null,
+            'dy': '.35em',
+            'anchor': function (d, i) {
+                //var center = (typeof userConfig.width !== 'undefined' ?
+                // userConfig.width : defaults.width) / 2;
+                var center = window.innerWidth / 2;
+
+                if (d.x > center) {
+                    return "end";
+                }
+                else {
+                    return "start";
+                }
+            },
+            'font': {
+                'size': 14
+            },
+            'color': "black",
+            'opacity': 1,
+            'text': function (d) {
+                return d.name;
+            }
+        }),
+        //'columnLayout' : function(node, nodeMap) { return nodeMap[node.name].column },
+        'mouseout': {
+            'link': {
+                'stroke': dex.config.stroke({
+                    'opacity': .2,
+                    'color': function (d) {
+                        return defaultColor(d.category);
+                    },
+                    'width': function (d) {
+                        //return 0;
+                        return Math.max(1, d.dy);
+                    }
+                }),
+                'fill': dex.config.fill({
+                    'fillColor': 'none',
+                    'fillOpacity': .4
+                }),
+                'curvature': 0.5
+            },
+            'node': {
+                'padding': 4,
+                'rectangle': dex.config.rectangle(
+                    {
+                        'width': 32,
+                        'color': function (d) {
+                            return defaultColor(d.name.replace(/ .*/, ""));
+                        },
+                        'height': function (d) {
+                            return d.dy;
+                        },
+                        'stroke': dex.config.stroke({
+                            'color': function (d) {
+                                return d3.rgb(d.color).darker(2);
+                            }
+                        })
+                    })
+            }
+        },
+        'mouseover': {
+            'link': {
+                'stroke': dex.config.stroke({
+                    'opacity': .8,
+                    'width': function (d) {
+                        return Math.max(1, d.dy);
+                    },
+                    'color': function (d) {
+                        return defaultColor(d.category);
+                    }
+                }),
+                'fill': dex.config.fill({
+                    'fillColor': 'none',
+                    'fillOpacity': .8
+                }),
+            },
+            'node': {
+                'stroke': dex.config.stroke({
+                    'opacity': .8,
+                    'width': function (d) {
+                        return Math.max(1, d.dy);
+                    },
+                    'color': function (d) {
+                        return defaultColor(d.category);
+                    }
+                }),
+                'fill': dex.config.fill({
+                    'fillColor': 'none',
+                    'fillOpacity': .8
+                })
+            }
+        },
+        'node': {
+            'padding': 4,
+            'rectangle': dex.config.rectangle({
+                'width': 32,
+                'color': function (d) {
+                    return defaultColor(d.name.replace(/ .*/, ""));
+                },
+                'height': function (d) {
+                    return d.dy;
+                },
+                'stroke': dex.config.stroke({
+                    'color': function (d) {
+                        return d3.rgb(d.color).darker(2);
+                    }
+                })
             })
-          })
-      }
-    },
-    'mouseover': {
-      'link': {
-        'stroke': dex.config.stroke({
-          'opacity': .8,
-          'width': function (d) {
-            return Math.max(1, d.dy);
-          },
-          'color': function (d) {
-            return defaultColor(d.category);
-          }
-        }),
-        'fill': dex.config.fill({
-          'fillColor': 'none',
-          'fillOpacity': .8
-        }),
-      },
-      'node': {
-        'stroke': dex.config.stroke({
-          'opacity': .8,
-          'width': function (d) {
-            return Math.max(1, d.dy);
-          },
-          'color': function (d) {
-            return defaultColor(d.category);
-          }
-        }),
-        'fill': dex.config.fill({
-          'fillColor': 'none',
-          'fillOpacity': .8
-        })
-      }
-    },
-    'node': {
-      'padding': 4,
-      'rectangle': dex.config.rectangle({
-        'width': 32,
-        'color': function (d) {
-          return defaultColor(d.name.replace(/ .*/, ""));
         },
-        'height': function (d) {
-          return d.dy;
-        },
-        'stroke': dex.config.stroke({
-          'color': function (d) {
-            return d3.rgb(d.color).darker(2);
-          }
-        })
-      })
-    },
-    "manualColumnLayout": false
-  };
-
-  var chart = new dex.component(userConfig, defaults);
-
-  // If we do not have specifically defined relationship fields, then lets
-  // try to make an educated guess about what to do with them.  If the last
-  // column is numeric, we will assume that this is to be used as a weight.
-  // Otherwise, we will use a uniform weighting of 1 for each link.
-  if (!chart.config.relationships) {
-    // If we have less than 3 columns or the last column does not contain
-    // numerics then we will create a set of relationships for each column
-    // with a standard weight of 1 and a single category of 1.
-    if (chart.config.csv.header.length < 3 || !dex.csv.isColumnNumeric(chart.config.csv, chart.config.csv.header.length - 1)) {
-      chart.config.relationships = [];
-
-      for (i = 1; i < chart.config.csv.header.length; i++) {
-        chart.config.relationships.push(
-          {
-            'source': i - 1,
-            'target': i,
-            'value': function (csv, ri) {
-              return 1;
-            },
-            'category': function (csv, ri) {
-              return 1;
-            },
-            'column': function (csv, ri, ci) {
-              return i;
-            }
-          });
-      }
-    }
-    // If we fall through here, then the last column is numeric.  We will
-    // use this for our weight.
-    else {
-      chart.config.relationships = [];
-
-      for (i = 1; i < chart.config.csv.header.length - 1; i++) {
-        chart.config.relationships.push(
-          {
-            'source': i - 1,
-            'target': i,
-            'value': function (csv, ri) {
-              return csv.data[ri][csv.header.length - 1];
-            },
-            'category': function (csv, ri) {
-              return 1;
-            },
-            'column': function (csv, ri, ci) {
-              return i;
-            }
-          });
-      }
-    }
-  }
-
-  chart.render = function render() {
-    d3 = dex.charts.d3.d3v3;
-    return chart.resize();
-  };
-
-  chart.update = function () {
-    d3 = dex.charts.d3.d3v3;
-    var config = chart.config;
-    var margin = config.margin;
-    var csv = config.csv;
-
-    var width = config.width - margin.left - margin.right;
-    var height = config.height - margin.top - margin.bottom;
-
-    d3.selectAll(config.parent).selectAll('*').remove();
-
-    var svg = d3.select(config.parent)
-      .append("svg")
-      .attr("id", config["id"])
-      .attr("class", config["class"])
-      .attr('width', config.width)
-      .attr('height', config.height);
-
-    var rootG = svg
-      .append('g')
-      .attr('transform', 'translate(' +
-        margin.left + ',' + margin.top + ') ' +
-        config.transform);
-
-    var sankeyData = [];
-
-    var nodeMap = {};
-
-    for (ri = 0; ri < config.relationships.length; ri++) {
-      for (i = 0; i < config.csv.data.length; i++) {
-        var relation = [];
-        var source;
-        var target;
-
-        if (dex.object.isFunction(config.relationships[ri].source)) {
-          source = config.relationships[ri].source(config.csv, i);
-        }
-        else {
-          source =
-            {
-              'nodeName': config.csv.data[i][config.relationships[ri].source],
-              'name': config.csv.data[i][config.relationships[ri].source],
-              'column': (config.relationships[ri].column) ?
-                config.relationships[ri].column(csv, i, config.relationships[ri].source) :
-                config.relationships[ri].source
-            };
-        }
-
-        if (dex.object.isFunction(config.relationships[ri].target)) {
-          target = config.relationships[ri].target(config.csv, i);
-        }
-        else {
-          target =
-            {
-              'nodeName': config.csv.data[i][config.relationships[ri].target],
-              'name': config.csv.data[i][config.relationships[ri].target],
-              'column': (config.relationships[ri].column) ?
-                config.relationships[ri].column(csv, i, config.relationships[ri].target) :
-                config.relationships[ri].target
-            }
-        }
-
-        relation.source = source.nodeName;
-        relation.target = target.nodeName;
-
-        // Store this to translate nodenames back to display names.
-        nodeMap[source.nodeName] = source;
-        nodeMap[target.nodeName] = target;
-
-        // Wrap source and target info:
-        //dex.console.log("RELATION", config.relationships[ri]);
-        if (typeof config.relationships[ri].category === "undefined") {
-          //relation.category = csv.data[i][config.relationships[ri].source];
-          relation.category = 1;
-        }
-        else if (dex.object.isFunction(config.relationships[ri].category)) {
-          relation.category = config.relationships[ri].category(config.csv, i);
-        }
-        else {
-          relation.category = config.relationships[ri].category;
-        }
-
-        relation.linkid = "L" + i;
-
-        if (typeof config.relationships[ri].value === "undefined") {
-          relation.value = 1;
-        }
-        else if (dex.object.isFunction(config.relationships[ri].value)) {
-          relation.value = config.relationships[ri].value(config.csv, i);
-        }
-        else {
-          relation.value = config.relationships[ri].value;
-        }
-
-        sankeyData.push(relation);
-      }
-    }
-    //dex.console.log("sankeyData", sankeyData);
-    var units = "Units";
-
-    var formatNumber = d3.format(",.0f"),    // zero decimal places
-      format = function (d) {
-        return formatNumber(d) + " " + units;
-      };
-
-    function manualColumnLayout(nodes, nodeWidth, size) {
-      var numSinks = 1;
-
-      nodes.forEach(function (node) {
-        //node.x = (nodeMap[node.name].column) * nodeWidth;
-        node.x = (nodeMap[node.name].column - 1) * nodeWidth;
-        numSinks = Math.max(numSinks, node.x);
-        node.dx = nodeWidth;
-      });
-
-      var nodeBreadth = (size[0] - nodeWidth) / (numSinks - 1);
-      nodes.forEach(function (node) {
-        node.x *= nodeBreadth;
-      });
-    }
-
-    // Set the sankey diagram properties
-    var sankey = d3sankey()
-      .nodeWidth(config.mouseout.node.rectangle.width)
-      .nodePadding(config.mouseout.node.padding)
-      .size([width - config.mouseout.node.padding, height - config.mouseout.node.padding]);
-
-    if (config.manualColumnLayout) {
-      sankey.columnLayout(manualColumnLayout);
-    }
-
-    var path = sankey.link();
-
-    //set up graph in same style as original example but empty
-    graph = {"nodes": [], "links": []};
-
-    sankeyData.forEach(function (d, i) {
-      graph.nodes.push({"name": d.source});
-      graph.nodes.push({"name": d.target});
-      graph.links.push({
-        "source": d.source, "target": d.target, "value": +d.value,
-        "category": d.category, "linkid": d.linkid
-      });
-    });
-
-    //dex.console.log("GRAPH NODES 1", graph.nodes);
-
-    //thanks Mike Bostock https://groups.google.com/d/msg/d3-js/pl297cFtIQk/Eso4q_eBu1IJ
-    //this handy little function returns only the distinct / unique nodes
-    graph.nodes = d3.keys(d3.nest()
-      .key(function (d) {
-        return d.name;
-      })
-      .map(graph.nodes));
-
-    //dex.console.log("GRAPH NODES 2", graph.nodes);
-
-    // it appears d3 with force layout wants a numeric source and target
-    // so loop through each link replacing the text with its index from node
-    graph.links.forEach(function (d, i) {
-      graph.links[i].source = graph.nodes.indexOf(graph.links[i].source);
-      graph.links[i].target = graph.nodes.indexOf(graph.links[i].target);
-    });
-
-    //now loop through each nodes to make nodes an array of objects rather than an array of strings
-    graph.nodes.forEach(function (d, i) {
-      graph.nodes[i] = {"name": d};
-    });
-
-    sankey
-      .nodes(graph.nodes)
-      .links(graph.links)
-      .curvature(config.mouseout.link.curvature)
-      .layout(config.layoutIterations);
-
-    // add in the links
-    var link = rootG.append("g").selectAll(".link")
-      .data(graph.links)
-      .enter().append("path")
-      .attr("class", "link")
-      .attr("id", function (d) {
-        return d.linkid;
-      })
-      .attr("d", path)
-      .call(dex.config.configureLink, config.mouseout.link)
-      .sort(function (a, b) {
-        return b.dy - a.dy;
-      })
-      .on("mouseover", function (d) {
-        rootG.selectAll("#" + d.linkid)//.style("stroke-opacity", 1)
-          .call(dex.config.configureLink, config.mouseover.link);
-      })
-      .on("mouseout", function (d) {
-        rootG.selectAll("#" + d.linkid)//.style("stroke-opacity", config.link.stroke.opacity);
-          .call(dex.config.configureLink, config.mouseout.link);
-      });
-
-    // add the link titles
-    link.append("tooltip-content")
-      .text(function (d) {
-        return nodeMap[d.source.name].name + " -> " +
-          nodeMap[d.target.name].name + "\n" + format(d.value);
-      });
-
-    // add in the nodes
-    var node = rootG.append("g").selectAll(".node")
-      .data(graph.nodes)
-      .enter().append("g")
-      .attr("class", "node")
-      .attr("transform", function (d) {
-        return "translate(" + d.x + "," + d.y + ")";
-      })
-      .call(d3.behavior.drag()
-        .origin(function (d) {
-          return d;
-        })
-        .on("dragstart", function () {
-          this.parentNode.appendChild(this);
-        })
-        .on("drag", dragmove));
-
-    // add the rectangles for the nodes
-    node.append("rect")
-      .call(dex.config.configureRectangle, config.mouseout.node.rectangle)
-      .on("mouseover", function (d) {
-        var links = (d.sourceLinks.length > 0) ?
-          d.sourceLinks : d.targetLinks;
-
-        links.forEach(function (link) {
-          rootG.selectAll("#" + link.linkid)
-            .call(dex.config.configureLink, config.mouseover.node);
-        });
-      })
-      .on("mouseout", function (d) {
-
-        var links = (d.sourceLinks.length > 0) ?
-          d.sourceLinks : d.targetLinks;
-        links.forEach(function (link) {
-          rootG.selectAll("#" + link.linkid)
-            .call(dex.config.configureLink, config.mouseout.link);
-        });
-      })
-      .append("title")
-      .text(function (d) {
-        return nodeMap[d.name].name + "\n" + format(d.value);
-      });
-
-    config.label.text = function (d) {
-      return nodeMap[d.name].name;
+        "manualColumnLayout": false
     };
 
-    /////////// A HACK TO ADD TITLE LABELS
-    var locations = {};
-    var rects = rootG.selectAll("rect").each(function (rect) {
-      locations[rect.x] = true;
-    });
+    var chart = new dex.component(userConfig, defaults);
 
-    var orderedLocations = dex.object.keys(locations).sort(function (a, b) {
-      return a - b;
-    });
+    // If we do not have specifically defined relationship fields, then lets
+    // try to make an educated guess about what to do with them.  If the last
+    // column is numeric, we will assume that this is to be used as a weight.
+    // Otherwise, we will use a uniform weighting of 1 for each link.
+    if (!chart.config.relationships) {
+        // If we have less than 3 columns or the last column does not contain
+        // numerics then we will create a set of relationships for each column
+        // with a standard weight of 1 and a single category of 1.
+        if (chart.config.csv.header.length < 3 || !dex.csv.isColumnNumeric(chart.config.csv, chart.config.csv.header.length - 1)) {
+            chart.config.relationships = [];
 
-    //var locationWidth = (orderedLocations[1] - orderedLocations[0]) / 2;
+            for (i = 1; i < chart.config.csv.header.length; i++) {
+                chart.config.relationships.push(
+                    {
+                        'source': i - 1,
+                        'target': i,
+                        'value': function (csv, ri) {
+                            return 1;
+                        },
+                        'category': function (csv, ri) {
+                            return 1;
+                        },
+                        'column': function (csv, ri, ci) {
+                            return i;
+                        }
+                    });
+            }
+        }
+        // If we fall through here, then the last column is numeric.  We will
+        // use this for our weight.
+        else {
+            chart.config.relationships = [];
 
-    //orderedLocations = orderedLocations.map(function(d) { return +d + locationWidth});
-
-    var titles = rootG.append("g").selectAll("text")
-      .data(orderedLocations)
-      .enter()
-      .append("text")
-      .call(dex.config.configureText, config.columnTitle)
-      .text(function (d, i) {
-        return csv.header[i];
-      });
-
-    //////////// END OF HACK
-
-    // add in the title for the nodes
-    node.append("text")
-      .call(dex.config.configureText, config.label);
-
-    // the function for moving the nodes
-    function dragmove(d) {
-      d3.select(this).attr("transform",
-        "translate(" + (
-          d.x = Math.max(0, Math.min(width - d.dx, d3.event.x))
-        ) + "," + (
-          d.y = Math.max(0, Math.min(height - d.dy, d3.event.y))
-        ) + ")");
-      sankey.relayout();
-      link.attr("d", path);
+            for (i = 1; i < chart.config.csv.header.length - 1; i++) {
+                chart.config.relationships.push(
+                    {
+                        'source': i - 1,
+                        'target': i,
+                        'value': function (csv, ri) {
+                            return csv.data[ri][csv.header.length - 1];
+                        },
+                        'category': function (csv, ri) {
+                            return 1;
+                        },
+                        'column': function (csv, ri, ci) {
+                            return i;
+                        }
+                    });
+            }
+        }
     }
-  };
 
-  return chart;
+    chart.render = function render() {
+        d3 = dex.charts.d3.d3v3;
+        return chart.resize();
+    };
+
+    chart.update = function () {
+        d3 = dex.charts.d3.d3v3;
+        var config = chart.config;
+        var margin = config.margin;
+        var csv = config.csv;
+
+        var width = config.width - margin.left - margin.right;
+        var height = config.height - margin.top - margin.bottom;
+
+        d3.selectAll(config.parent).selectAll('*').remove();
+
+        var svg = d3.select(config.parent)
+            .append("svg")
+            .attr("id", config["id"])
+            .attr("class", config["class"])
+            .attr('width', config.width)
+            .attr('height', config.height);
+
+        var rootG = svg
+            .append('g')
+            .attr('transform', 'translate(' +
+                margin.left + ',' + margin.top + ') ' +
+                config.transform);
+
+        var sankeyData = [];
+
+        var nodeMap = {};
+
+        for (ri = 0; ri < config.relationships.length; ri++) {
+            for (i = 0; i < config.csv.data.length; i++) {
+                var relation = [];
+                var source;
+                var target;
+
+                if (dex.object.isFunction(config.relationships[ri].source)) {
+                    source = config.relationships[ri].source(config.csv, i);
+                }
+                else {
+                    source =
+                        {
+                            'nodeName': config.csv.data[i][config.relationships[ri].source],
+                            'name': config.csv.data[i][config.relationships[ri].source],
+                            'column': (config.relationships[ri].column) ?
+                                config.relationships[ri].column(csv, i, config.relationships[ri].source) :
+                                config.relationships[ri].source
+                        };
+                }
+
+                if (dex.object.isFunction(config.relationships[ri].target)) {
+                    target = config.relationships[ri].target(config.csv, i);
+                }
+                else {
+                    target =
+                        {
+                            'nodeName': config.csv.data[i][config.relationships[ri].target],
+                            'name': config.csv.data[i][config.relationships[ri].target],
+                            'column': (config.relationships[ri].column) ?
+                                config.relationships[ri].column(csv, i, config.relationships[ri].target) :
+                                config.relationships[ri].target
+                        }
+                }
+
+                relation.source = source.nodeName;
+                relation.target = target.nodeName;
+
+                // Store this to translate nodenames back to display names.
+                nodeMap[source.nodeName] = source;
+                nodeMap[target.nodeName] = target;
+
+                // Wrap source and target info:
+                //dex.console.log("RELATION", config.relationships[ri]);
+                if (typeof config.relationships[ri].category === "undefined") {
+                    //relation.category = csv.data[i][config.relationships[ri].source];
+                    relation.category = 1;
+                }
+                else if (dex.object.isFunction(config.relationships[ri].category)) {
+                    relation.category = config.relationships[ri].category(config.csv, i);
+                }
+                else {
+                    relation.category = config.relationships[ri].category;
+                }
+
+                relation.linkid = "L" + i;
+
+                if (typeof config.relationships[ri].value === "undefined") {
+                    relation.value = 1;
+                }
+                else if (dex.object.isFunction(config.relationships[ri].value)) {
+                    relation.value = config.relationships[ri].value(config.csv, i);
+                }
+                else {
+                    relation.value = config.relationships[ri].value;
+                }
+
+                sankeyData.push(relation);
+            }
+        }
+        //dex.console.log("sankeyData", sankeyData);
+        var units = "Units";
+
+        var formatNumber = d3.format(",.0f"),    // zero decimal places
+            format = function (d) {
+                return formatNumber(d) + " " + units;
+            };
+
+        function manualColumnLayout(nodes, nodeWidth, size) {
+            var numSinks = 1;
+
+            nodes.forEach(function (node) {
+                //node.x = (nodeMap[node.name].column) * nodeWidth;
+                node.x = (nodeMap[node.name].column - 1) * nodeWidth;
+                numSinks = Math.max(numSinks, node.x);
+                node.dx = nodeWidth;
+            });
+
+            var nodeBreadth = (size[0] - nodeWidth) / (numSinks - 1);
+            nodes.forEach(function (node) {
+                node.x *= nodeBreadth;
+            });
+        }
+
+        // Set the sankey diagram properties
+        var sankey = d3sankey()
+            .nodeWidth(config.mouseout.node.rectangle.width)
+            .nodePadding(config.mouseout.node.padding)
+            .size([width - config.mouseout.node.padding, height - config.mouseout.node.padding]);
+
+        if (config.manualColumnLayout) {
+            sankey.columnLayout(manualColumnLayout);
+        }
+
+        var path = sankey.link();
+
+        //set up graph in same style as original example but empty
+        graph = {"nodes": [], "links": []};
+
+        sankeyData.forEach(function (d, i) {
+            graph.nodes.push({"name": d.source});
+            graph.nodes.push({"name": d.target});
+            graph.links.push({
+                "source": d.source, "target": d.target, "value": +d.value,
+                "category": d.category, "linkid": d.linkid
+            });
+        });
+
+        //dex.console.log("GRAPH NODES 1", graph.nodes);
+
+        //thanks Mike Bostock https://groups.google.com/d/msg/d3-js/pl297cFtIQk/Eso4q_eBu1IJ
+        //this handy little function returns only the distinct / unique nodes
+        graph.nodes = d3.keys(d3.nest()
+            .key(function (d) {
+                return d.name;
+            })
+            .map(graph.nodes));
+
+        //dex.console.log("GRAPH NODES 2", graph.nodes);
+
+        // it appears d3 with force layout wants a numeric source and target
+        // so loop through each link replacing the text with its index from node
+        graph.links.forEach(function (d, i) {
+            graph.links[i].source = graph.nodes.indexOf(graph.links[i].source);
+            graph.links[i].target = graph.nodes.indexOf(graph.links[i].target);
+        });
+
+        //now loop through each nodes to make nodes an array of objects rather than an array of strings
+        graph.nodes.forEach(function (d, i) {
+            graph.nodes[i] = {"name": d};
+        });
+
+        sankey
+            .nodes(graph.nodes)
+            .links(graph.links)
+            .curvature(config.mouseout.link.curvature)
+            .layout(config.layoutIterations);
+
+        // add in the links
+        var link = rootG.append("g").selectAll(".link")
+            .data(graph.links)
+            .enter().append("path")
+            .attr("class", "link")
+            .attr("id", function (d) {
+                return d.linkid;
+            })
+            .attr("d", path)
+            .call(dex.config.configureLink, config.mouseout.link)
+            .sort(function (a, b) {
+                return b.dy - a.dy;
+            })
+            .on("mouseover", function (d) {
+                rootG.selectAll("#" + d.linkid)//.style("stroke-opacity", 1)
+                    .call(dex.config.configureLink, config.mouseover.link);
+            })
+            .on("mouseout", function (d) {
+                rootG.selectAll("#" + d.linkid)//.style("stroke-opacity", config.link.stroke.opacity);
+                    .call(dex.config.configureLink, config.mouseout.link);
+            });
+
+        // add the link titles
+        link.append("tooltip-content")
+            .text(function (d) {
+                return nodeMap[d.source.name].name + " -> " +
+                    nodeMap[d.target.name].name + "\n" + format(d.value);
+            });
+
+        // add in the nodes
+        var node = rootG.append("g").selectAll(".node")
+            .data(graph.nodes)
+            .enter().append("g")
+            .attr("class", "node")
+            .attr("transform", function (d) {
+                return "translate(" + d.x + "," + d.y + ")";
+            })
+            .call(d3.behavior.drag()
+                .origin(function (d) {
+                    return d;
+                })
+                .on("dragstart", function () {
+                    this.parentNode.appendChild(this);
+                })
+                .on("drag", dragmove));
+
+        // add the rectangles for the nodes
+        node.append("rect")
+            .call(dex.config.configureRectangle, config.mouseout.node.rectangle)
+            .on("mouseover", function (d) {
+                var links = (d.sourceLinks.length > 0) ?
+                    d.sourceLinks : d.targetLinks;
+
+                links.forEach(function (link) {
+                    rootG.selectAll("#" + link.linkid)
+                        .call(dex.config.configureLink, config.mouseover.node);
+                });
+            })
+            .on("mouseout", function (d) {
+
+                var links = (d.sourceLinks.length > 0) ?
+                    d.sourceLinks : d.targetLinks;
+                links.forEach(function (link) {
+                    rootG.selectAll("#" + link.linkid)
+                        .call(dex.config.configureLink, config.mouseout.link);
+                });
+            })
+            .append("title")
+            .text(function (d) {
+                return nodeMap[d.name].name + "\n" + format(d.value);
+            });
+
+        config.label.text = function (d) {
+            return nodeMap[d.name].name;
+        };
+
+        /////////// A HACK TO ADD TITLE LABELS
+        var locations = {};
+        var rects = rootG.selectAll("rect").each(function (rect) {
+            locations[rect.x] = true;
+        });
+
+        var orderedLocations = dex.object.keys(locations).sort(function (a, b) {
+            return a - b;
+        });
+
+        //var locationWidth = (orderedLocations[1] - orderedLocations[0]) / 2;
+
+        //orderedLocations = orderedLocations.map(function(d) { return +d + locationWidth});
+
+        var titles = rootG.append("g").selectAll("text")
+            .data(orderedLocations)
+            .enter()
+            .append("text")
+            .call(dex.config.configureText, config.columnTitle)
+            .text(function (d, i) {
+                return csv.header[i];
+            });
+
+        //////////// END OF HACK
+
+        // add in the title for the nodes
+        node.append("text")
+            .call(dex.config.configureText, config.label);
+
+        // the function for moving the nodes
+        function dragmove(d) {
+            d3.select(this).attr("transform",
+                "translate(" + (
+                    d.x = Math.max(0, Math.min(width - d.dx, d3.event.x))
+                ) + "," + (
+                    d.y = Math.max(0, Math.min(height - d.dy, d3.event.y))
+                ) + ")");
+            sankey.relayout();
+            link.attr("d", path);
+        }
+    };
+
+    chart.clone = function clone(override) {
+        return sankey(dex.config.expandAndOverlay(override, userConfig));
+    };
+
+    return chart;
 }
 
 // SANKEY.JS : from Mike Bostock
 d3sankey = function () {
-  var sankey = {},
-    nodeWidth = 24,
-    nodePadding = 8,
-    columnLayout = defaultColumnLayout,
-    curvature = .5,
-    size = [1, 1],
-    nodes = [],
-    links = [];
+    var sankey = {},
+        nodeWidth = 24,
+        nodePadding = 8,
+        columnLayout = defaultColumnLayout,
+        curvature = .5,
+        size = [1, 1],
+        nodes = [],
+        links = [];
 
-  sankey.columnLayout = function (_) {
-    if (!arguments.length) return columnLayout;
-    columnLayout = _;
-    return sankey;
-  };
-
-  sankey.curvature = function (_) {
-    if (!arguments.length) return curvature;
-    curvature = +_;
-    return sankey;
-  };
-
-  sankey.nodeWidth = function (_) {
-    if (!arguments.length) return nodeWidth;
-    nodeWidth = +_;
-    return sankey;
-  };
-
-  sankey.nodePadding = function (_) {
-    if (!arguments.length) return nodePadding;
-    nodePadding = +_;
-    return sankey;
-  };
-
-  sankey.nodes = function (_) {
-    if (!arguments.length) return nodes;
-    nodes = _;
-    return sankey;
-  };
-
-  sankey.links = function (_) {
-    if (!arguments.length) return links;
-    links = _;
-    return sankey;
-  };
-
-  sankey.size = function (_) {
-    if (!arguments.length) return size;
-    size = _;
-    return sankey;
-  };
-
-  sankey.layout = function (iterations) {
-    computeNodeLinks();
-    computeNodeValues();
-    computeNodeBreadths(nodes);
-    computeNodeDepths(iterations);
-    computeLinkDepths();
-    return sankey;
-  };
-
-  sankey.relayout = function () {
-    computeLinkDepths();
-    return sankey;
-  };
-
-  sankey.link = function () {
-//    var curvature = .5;
-
-    function link(d) {
-      var x0 = d.source.x + d.source.dx,
-        x1 = d.target.x,
-        xi = d3.interpolateNumber(x0, x1),
-        x2 = xi(curvature),
-        x3 = xi(1 - curvature),
-        y0 = d.source.y + d.sy + d.dy / 2,
-        y1 = d.target.y + d.ty + d.dy / 2;
-      return "M" + x0 + "," + y0
-        + "C" + x2 + "," + y0
-        + " " + x3 + "," + y1
-        + " " + x1 + "," + y1;
-    }
-
-    link.curvature = function (_) {
-      if (!arguments.length) return curvature;
-      curvature = +_;
-      return link;
+    sankey.columnLayout = function (_) {
+        if (!arguments.length) return columnLayout;
+        columnLayout = _;
+        return sankey;
     };
 
-    return link;
-  };
+    sankey.curvature = function (_) {
+        if (!arguments.length) return curvature;
+        curvature = +_;
+        return sankey;
+    };
 
-  // Populate the sourceLinks and targetLinks for each node.
-  // Also, if the source and target are not objects, assume they are indices.
-  function computeNodeLinks() {
-    nodes.forEach(function (node) {
-      node.sourceLinks = [];
-      node.targetLinks = [];
-    });
-    links.forEach(function (link) {
-      var source = link.source,
-        target = link.target;
-      if (typeof source === "number") source = link.source = nodes[link.source];
-      if (typeof target === "number") target = link.target = nodes[link.target];
-      source.sourceLinks.push(link);
-      target.targetLinks.push(link);
-    });
-  }
+    sankey.nodeWidth = function (_) {
+        if (!arguments.length) return nodeWidth;
+        nodeWidth = +_;
+        return sankey;
+    };
 
-  // Compute the value (size) of each node by summing the associated links.
-  function computeNodeValues() {
-    nodes.forEach(function (node) {
-      node.value = Math.max(
-        d3.sum(node.sourceLinks, value),
-        d3.sum(node.targetLinks, value)
-      );
-    });
-  }
+    sankey.nodePadding = function (_) {
+        if (!arguments.length) return nodePadding;
+        nodePadding = +_;
+        return sankey;
+    };
 
-  // Iteratively assign the breadth (x-position) for each node.
-  // Nodes are assigned the maximum breadth of incoming neighbors plus one;
-  // nodes with no incoming links are assigned breadth zero, while
-  // nodes with no outgoing links are assigned the maximum breadth.
-  function computeNodeBreadths() {
-    columnLayout(nodes, nodeWidth, size);
-  }
+    sankey.nodes = function (_) {
+        if (!arguments.length) return nodes;
+        nodes = _;
+        return sankey;
+    };
 
-  function defaultColumnLayout(nodes, nodeWidth, size) {
-    var remainingNodes = nodes,
-      visited = {},
-      x = 0;
+    sankey.links = function (_) {
+        if (!arguments.length) return links;
+        links = _;
+        return sankey;
+    };
 
-    //dex.console.log("NODE", nodes[0]);
-    while (remainingNodes.length) {
-      nextNodes = [];
-      visited[remainingNodes[0].name] = true;
-      remainingNodes.forEach(function (node) {
-        node.x = x;
-        node.dx = nodeWidth;
-        node.sourceLinks.forEach(function (link) {
-          if (!visited[link.target.name]) {
-            nextNodes.push(link.target);
-          }
-          else {
-            dex.console.log("CYCLE DETECTED AT: " + node.name + "->" + link.target.name);
-          }
-        });
-      });
-      remainingNodes = nextNodes;
-      ++x;
-    }
+    sankey.size = function (_) {
+        if (!arguments.length) return size;
+        size = _;
+        return sankey;
+    };
 
-    moveSinksRight(x);
-    scaleNodeBreadths((size[0] - nodeWidth) / (x - 1));
-  }
+    sankey.layout = function (iterations) {
+        computeNodeLinks();
+        computeNodeValues();
+        computeNodeBreadths(nodes);
+        computeNodeDepths(iterations);
+        computeLinkDepths();
+        return sankey;
+    };
 
-  function moveSourcesRight() {
-    nodes.forEach(function (node) {
-      if (!node.targetLinks.length) {
-        node.x = d3.min(node.sourceLinks, function (d) {
-            return d.target.x;
-          }) - 1;
-      }
-    });
-  }
+    sankey.relayout = function () {
+        computeLinkDepths();
+        return sankey;
+    };
 
-  function moveSinksRight(x) {
-    nodes.forEach(function (node) {
-      if (!node.sourceLinks.length) {
-        node.x = x - 1;
-      }
-    });
-  }
+    sankey.link = function () {
+//    var curvature = .5;
 
-  function scaleNodeBreadths(kx) {
-    nodes.forEach(function (node) {
-      node.x *= kx;
-    });
-  }
-
-  function computeNodeDepths(iterations) {
-    var nodesByBreadth = d3.nest()
-      .key(function (d) {
-        return d.x;
-      })
-      .sortKeys(d3.ascending)
-      .entries(nodes)
-      .map(function (d) {
-        return d.values;
-      });
-
-    //
-    initializeNodeDepth();
-    resolveCollisions();
-    for (var alpha = 1; iterations > 0; --iterations) {
-      relaxRightToLeft(alpha *= .99);
-      resolveCollisions();
-      relaxLeftToRight(alpha);
-      resolveCollisions();
-    }
-
-    function initializeNodeDepth() {
-      var ky = d3.min(nodesByBreadth, function (nodes) {
-        return (size[1] - (nodes.length - 1) * nodePadding) / d3.sum(nodes, value);
-      });
-
-      nodesByBreadth.forEach(function (nodes) {
-        nodes.forEach(function (node, i) {
-          node.y = i;
-          node.dy = node.value * ky;
-        });
-      });
-
-      links.forEach(function (link) {
-        link.dy = link.value * ky;
-      });
-    }
-
-    function relaxLeftToRight(alpha) {
-      nodesByBreadth.forEach(function (nodes, breadth) {
-        nodes.forEach(function (node) {
-          if (node.targetLinks.length) {
-            var y = d3.sum(node.targetLinks, weightedSource) / d3.sum(node.targetLinks, value);
-            node.y += (y - center(node)) * alpha;
-          }
-        });
-      });
-
-      function weightedSource(link) {
-        return center(link.source) * link.value;
-      }
-    }
-
-    function relaxRightToLeft(alpha) {
-      nodesByBreadth.slice().reverse().forEach(function (nodes) {
-        nodes.forEach(function (node) {
-          if (node.sourceLinks.length) {
-            var y = d3.sum(node.sourceLinks, weightedTarget) / d3.sum(node.sourceLinks, value);
-            node.y += (y - center(node)) * alpha;
-          }
-        });
-      });
-
-      function weightedTarget(link) {
-        return center(link.target) * link.value;
-      }
-    }
-
-    function resolveCollisions() {
-      nodesByBreadth.forEach(function (nodes) {
-        var node,
-          dy,
-          y0 = 0,
-          n = nodes.length,
-          i;
-
-        // Push any overlapping nodes down.
-        nodes.sort(ascendingDepth);
-        for (i = 0; i < n; ++i) {
-          node = nodes[i];
-          dy = y0 - node.y;
-          if (dy > 0) node.y += dy;
-          y0 = node.y + node.dy + nodePadding;
+        function link(d) {
+            var x0 = d.source.x + d.source.dx,
+                x1 = d.target.x,
+                xi = d3.interpolateNumber(x0, x1),
+                x2 = xi(curvature),
+                x3 = xi(1 - curvature),
+                y0 = d.source.y + d.sy + d.dy / 2,
+                y1 = d.target.y + d.ty + d.dy / 2;
+            return "M" + x0 + "," + y0
+                + "C" + x2 + "," + y0
+                + " " + x3 + "," + y1
+                + " " + x1 + "," + y1;
         }
 
-        // If the bottommost node goes outside the bounds, push it back up.
-        dy = y0 - nodePadding - size[1];
-        if (dy > 0) {
-          y0 = node.y -= dy;
+        link.curvature = function (_) {
+            if (!arguments.length) return curvature;
+            curvature = +_;
+            return link;
+        };
 
-          // Push any overlapping nodes back up.
-          for (i = n - 2; i >= 0; --i) {
-            node = nodes[i];
-            dy = node.y + node.dy + nodePadding - y0;
-            if (dy > 0) node.y -= dy;
-            y0 = node.y;
-          }
+        return link;
+    };
+
+    // Populate the sourceLinks and targetLinks for each node.
+    // Also, if the source and target are not objects, assume they are indices.
+    function computeNodeLinks() {
+        nodes.forEach(function (node) {
+            node.sourceLinks = [];
+            node.targetLinks = [];
+        });
+        links.forEach(function (link) {
+            var source = link.source,
+                target = link.target;
+            if (typeof source === "number") source = link.source = nodes[link.source];
+            if (typeof target === "number") target = link.target = nodes[link.target];
+            source.sourceLinks.push(link);
+            target.targetLinks.push(link);
+        });
+    }
+
+    // Compute the value (size) of each node by summing the associated links.
+    function computeNodeValues() {
+        nodes.forEach(function (node) {
+            node.value = Math.max(
+                d3.sum(node.sourceLinks, value),
+                d3.sum(node.targetLinks, value)
+            );
+        });
+    }
+
+    // Iteratively assign the breadth (x-position) for each node.
+    // Nodes are assigned the maximum breadth of incoming neighbors plus one;
+    // nodes with no incoming links are assigned breadth zero, while
+    // nodes with no outgoing links are assigned the maximum breadth.
+    function computeNodeBreadths() {
+        columnLayout(nodes, nodeWidth, size);
+    }
+
+    function defaultColumnLayout(nodes, nodeWidth, size) {
+        var remainingNodes = nodes,
+            visited = {},
+            x = 0;
+
+        //dex.console.log("NODE", nodes[0]);
+        while (remainingNodes.length) {
+            nextNodes = [];
+            visited[remainingNodes[0].name] = true;
+            remainingNodes.forEach(function (node) {
+                node.x = x;
+                node.dx = nodeWidth;
+                node.sourceLinks.forEach(function (link) {
+                    if (!visited[link.target.name]) {
+                        nextNodes.push(link.target);
+                    }
+                    else {
+                        dex.console.log("CYCLE DETECTED AT: " + node.name + "->" + link.target.name);
+                    }
+                });
+            });
+            remainingNodes = nextNodes;
+            ++x;
         }
-      });
+
+        moveSinksRight(x);
+        scaleNodeBreadths((size[0] - nodeWidth) / (x - 1));
     }
 
-    function ascendingDepth(a, b) {
-      return a.y - b.y;
+    function moveSourcesRight() {
+        nodes.forEach(function (node) {
+            if (!node.targetLinks.length) {
+                node.x = d3.min(node.sourceLinks, function (d) {
+                        return d.target.x;
+                    }) - 1;
+            }
+        });
     }
-  }
 
-  function computeLinkDepths() {
-    nodes.forEach(function (node) {
-      node.sourceLinks.sort(ascendingTargetDepth);
-      node.targetLinks.sort(ascendingSourceDepth);
+    function moveSinksRight(x) {
+        nodes.forEach(function (node) {
+            if (!node.sourceLinks.length) {
+                node.x = x - 1;
+            }
+        });
+    }
+
+    function scaleNodeBreadths(kx) {
+        nodes.forEach(function (node) {
+            node.x *= kx;
+        });
+    }
+
+    function computeNodeDepths(iterations) {
+        var nodesByBreadth = d3.nest()
+            .key(function (d) {
+                return d.x;
+            })
+            .sortKeys(d3.ascending)
+            .entries(nodes)
+            .map(function (d) {
+                return d.values;
+            });
+
+        //
+        initializeNodeDepth();
+        resolveCollisions();
+        for (var alpha = 1; iterations > 0; --iterations) {
+            relaxRightToLeft(alpha *= .99);
+            resolveCollisions();
+            relaxLeftToRight(alpha);
+            resolveCollisions();
+        }
+
+        function initializeNodeDepth() {
+            var ky = d3.min(nodesByBreadth, function (nodes) {
+                return (size[1] - (nodes.length - 1) * nodePadding) / d3.sum(nodes, value);
+            });
+
+            nodesByBreadth.forEach(function (nodes) {
+                nodes.forEach(function (node, i) {
+                    node.y = i;
+                    node.dy = node.value * ky;
+                });
+            });
+
+            links.forEach(function (link) {
+                link.dy = link.value * ky;
+            });
+        }
+
+        function relaxLeftToRight(alpha) {
+            nodesByBreadth.forEach(function (nodes, breadth) {
+                nodes.forEach(function (node) {
+                    if (node.targetLinks.length) {
+                        var y = d3.sum(node.targetLinks, weightedSource) / d3.sum(node.targetLinks, value);
+                        node.y += (y - center(node)) * alpha;
+                    }
+                });
+            });
+
+            function weightedSource(link) {
+                return center(link.source) * link.value;
+            }
+        }
+
+        function relaxRightToLeft(alpha) {
+            nodesByBreadth.slice().reverse().forEach(function (nodes) {
+                nodes.forEach(function (node) {
+                    if (node.sourceLinks.length) {
+                        var y = d3.sum(node.sourceLinks, weightedTarget) / d3.sum(node.sourceLinks, value);
+                        node.y += (y - center(node)) * alpha;
+                    }
+                });
+            });
+
+            function weightedTarget(link) {
+                return center(link.target) * link.value;
+            }
+        }
+
+        function resolveCollisions() {
+            nodesByBreadth.forEach(function (nodes) {
+                var node,
+                    dy,
+                    y0 = 0,
+                    n = nodes.length,
+                    i;
+
+                // Push any overlapping nodes down.
+                nodes.sort(ascendingDepth);
+                for (i = 0; i < n; ++i) {
+                    node = nodes[i];
+                    dy = y0 - node.y;
+                    if (dy > 0) node.y += dy;
+                    y0 = node.y + node.dy + nodePadding;
+                }
+
+                // If the bottommost node goes outside the bounds, push it back up.
+                dy = y0 - nodePadding - size[1];
+                if (dy > 0) {
+                    y0 = node.y -= dy;
+
+                    // Push any overlapping nodes back up.
+                    for (i = n - 2; i >= 0; --i) {
+                        node = nodes[i];
+                        dy = node.y + node.dy + nodePadding - y0;
+                        if (dy > 0) node.y -= dy;
+                        y0 = node.y;
+                    }
+                }
+            });
+        }
+
+        function ascendingDepth(a, b) {
+            return a.y - b.y;
+        }
+    }
+
+    function computeLinkDepths() {
+        nodes.forEach(function (node) {
+            node.sourceLinks.sort(ascendingTargetDepth);
+            node.targetLinks.sort(ascendingSourceDepth);
+        });
+        nodes.forEach(function (node) {
+            var sy = 0, ty = 0;
+            node.sourceLinks.forEach(function (link) {
+                link.sy = sy;
+                sy += link.dy;
+            });
+            node.targetLinks.forEach(function (link) {
+                link.ty = ty;
+                ty += link.dy;
+            });
+        });
+
+        function ascendingSourceDepth(a, b) {
+            return a.source.y - b.source.y;
+        }
+
+        function ascendingTargetDepth(a, b) {
+            return a.target.y - b.target.y;
+        }
+    }
+
+    function center(node) {
+        return node.y + node.dy / 2;
+    }
+
+    function value(link) {
+        return link.value;
+    }
+
+    $(document).ready(function () {
+        // Add tooltips
+        $(document).uitooltip({
+            items: "path",
+            content: function () {
+                return $(this).find("tooltip-content").text();
+            },
+            track: true
+        });
+
+        // Make the entire chart draggable.
+        //$(sankey.config.parent).draggable();
     });
-    nodes.forEach(function (node) {
-      var sy = 0, ty = 0;
-      node.sourceLinks.forEach(function (link) {
-        link.sy = sy;
-        sy += link.dy;
-      });
-      node.targetLinks.forEach(function (link) {
-        link.ty = ty;
-        ty += link.dy;
-      });
-    });
 
-    function ascendingSourceDepth(a, b) {
-      return a.source.y - b.source.y;
-    }
-
-    function ascendingTargetDepth(a, b) {
-      return a.target.y - b.target.y;
-    }
-  }
-
-  function center(node) {
-    return node.y + node.dy / 2;
-  }
-
-  function value(link) {
-    return link.value;
-  }
-
-  $(document).ready(function () {
-    // Add tooltips
-    $(document).uitooltip({
-      items: "path",
-      content: function () {
-        return $(this).find("tooltip-content").text();
-      },
-      track: true
-    });
-
-    // Make the entire chart draggable.
-    //$(sankey.config.parent).draggable();
-  });
-
-  return sankey;
+    return sankey;
 };
 
 module.exports = sankey;
@@ -5421,6 +5466,10 @@ var scatterplot = function (userConfig) {
     }
   };
 
+    chart.clone = function clone(override) {
+        return scatterplot(dex.config.expandAndOverlay(override, userConfig));
+    };
+
   $(document).ready(function () {
     // Make the entire chart draggable.
     //$(chart.config.parent).draggable();
@@ -5608,6 +5657,10 @@ var sunburst = function (userConfig) {
       return (x(d.x + d.dx / 2) - Math.PI / 2) / Math.PI * 180;
     }
   };
+
+    chart.clone = function clone(override) {
+        return sunburst(dex.config.expandAndOverlay(override, userConfig));
+    };
 
   $(document).ready(function () {
     // Make the entire chart draggable.
@@ -5891,6 +5944,11 @@ var topojsonmap = function (userConfig) {
 
     initialize();
   };
+
+    chart.clone = function clone(override) {
+        return topojsonmap(dex.config.expandAndOverlay(override, userConfig));
+    };
+
   return chart;
 };
 
@@ -6254,6 +6312,10 @@ var treemap = function (userConfig) {
 
     return chart;
   };
+
+    chart.clone = function clone(override) {
+        return treemap(dex.config.expandAndOverlay(override, userConfig));
+    };
 
   $(document).ready(function () {
     // Make the entire chart draggable.
@@ -6705,6 +6767,10 @@ var treemapBarChart = function (userConfig) {
     return chart;
   };
 
+    chart.clone = function clone(override) {
+        return treemapBarChart(dex.config.expandAndOverlay(override, userConfig));
+    };
+
   $(document).ready(function () {
     // Make the entire chart draggable.
     //$(sankey.config.parent).draggable();
@@ -7067,6 +7133,10 @@ var ringnetwork = function (userConfig) {
     viz.draw();
   };
 
+    chart.clone = function clone(override) {
+        return ringnetwork(dex.config.expandAndOverlay(override, userConfig));
+    };
+
   $(document).ready(function () {
     // Make the entire chart draggable.
     //$(chart.config.parent).draggable();
@@ -7231,6 +7301,10 @@ var bubblechart = function (userConfig) {
     //d3 = dex.charts.d3.d3v3;
     internalChart.resize();
   };
+
+    chart.clone = function clone(override) {
+        return bubblechart(dex.config.expandAndOverlay(override, userConfig));
+    };
 
   $(document).ready(function () {
     // Make the entire chart draggable.
@@ -7413,6 +7487,10 @@ var scatterplot = function (userConfig) {
     //internalChart.resize();
   };
 
+    chart.clone = function clone(override) {
+        return scatterplot(dex.config.expandAndOverlay(override, userConfig));
+    };
+
   $(document).ready(function () {
     // Make the entire chart draggable.
     //$(chart.config.parent).draggable();
@@ -7432,6 +7510,137 @@ elegans.ScatterPlot = require("./ScatterPlot");
 
 module.exports = elegans;
 },{"./ScatterPlot":39}],41:[function(require,module,exports){
+var gridstermultiples = function (userConfig) {
+    var chart;
+    var gridster;
+    var cells = [];
+
+    var defaults = {
+        'parent': '#GridsterMultiplesParent',
+        'id': 'GridsterMultiplesId',
+        'class': 'GridsterMultiplesClass',
+        'resizable': true,
+        'frames': {},
+        'width': "100%",
+        'height': "100%",
+        'cell' : {
+          'width' : 6,
+          'height' : 6
+        },
+        'baseChart': dex.charts.d3.Dendrogram(),
+        'gridsterConfig': {
+            widget_base_dimensions: [50, 50],
+            widget_margins: [1, 1],
+            //helper: 'clone',
+            animate: false,
+            draggable: {
+                enabled: true,
+                start: function (e, ui) {
+                    dex.console.log("DRAG-START", e, ui);
+                },
+                handle: '.drag-handle'
+            },
+            resize: {
+                enabled: true,
+                min_size: [1, 1],
+                stop: function (event, ui, $widget) {
+                    dex.console.log("Event", event, ui, $widget);
+                    cells.forEach(function (cell, i) {
+                        cell.render();
+                    })
+                }
+            }
+        }
+    };
+
+    chart = new dex.component(userConfig, defaults);
+
+    chart.render = function render() {
+        var config = chart.config;
+        var frames = config.frames;
+
+        d3.selectAll(config.parent).selectAll("*").remove();
+
+        dex.console.log("FRAMES", frames);
+
+        var numFrames = frames.frames.length;
+
+        var gridsterContainer = d3.select(config.parent)
+            .append("div")
+            .attr("id", config["id"])
+            .attr("class", "gridster")
+            .attr("width", config.width)
+            .attr("height", config.height)
+            .append("ul");
+
+        dex.console.log("Invoking gridster constructor");
+
+        gridster = $(".gridster ul")
+            .gridster(config.gridsterConfig)
+            .data('gridster');
+
+        cells = [];
+        frames.frames.forEach(function (frame, i) {
+            /*            d3.select(".gridster ul")
+             .append("li")
+             .attr("data-row", Math.floor(i / config.numColumns + 1))
+             .attr("data-col", (i % config.numColumns + 1))
+             .attr("data-sizex", "1")
+             .attr("data-sizey", "1")
+             .append("div")
+             .attr("id", config.id + i)
+             .attr("class", config["class"] + "Cell");
+             */
+            var widget = "<li><table id='widget-table' style='word-break:break-all;'>" +
+                "<tr id='widget-header-row'><td id='widget-header' class='drag-handle'>" +
+                frames.frameIndices[i] +
+                "</td></tr>" +
+                "<tr><td id='widget-content' colspan='2'><div id='" + (config.id + i) +
+                "' height='100%' width='100%'></div></td></tr></table></li>"
+
+            gridster.add_widget(widget, config.cell.width, config.cell.height);
+
+            //         var cellChart = config.baseChart
+            //           .clone()
+            //         .attr("parent", "#" + config.id + i)
+            //       .attr("csv", frame);
+            var cellChart = config.baseChart.clone({
+                "parent": "#" + config.id + i,
+                "csv": frame
+            });
+            cellChart.render();
+            cells.push(cellChart);
+        });
+
+        return chart;
+    };
+
+    chart.update = function () {
+        cells.forEach(function (cell) {
+            cell.update();
+        })
+    };
+
+    $(document).ready(function () {
+        var config = chart.config;
+        // Make the entire chart draggable.
+        //$(chart.config.parent).draggable();
+    });
+
+    return chart;
+};
+
+module.exports = gridstermultiples;
+},{}],42:[function(require,module,exports){
+/**
+ * @module dex/charts/gridster
+ */
+var multiples = {};
+
+multiples.GridsterMultiples = require("./GridsterMultiples");
+
+module.exports = multiples;
+},{"./GridsterMultiples":41}],43:[function(require,module,exports){
 var bubblechart = function (userConfig) {
     d3 = dex.charts.d3.d3v3;
     var chart;
@@ -7577,6 +7786,10 @@ var bubblechart = function (userConfig) {
         //internalChart.load({'columns': chart.config.csv.data});
     };
 
+    chart.clone = function clone(override) {
+        return bubblechart(dex.config.expandAndOverlay(override, userConfig));
+    };
+
     $(document).ready(function () {
         // Make the entire chart draggable.
         //$(chart.config.parent).draggable();
@@ -7586,7 +7799,7 @@ var bubblechart = function (userConfig) {
 };
 
 module.exports = bubblechart;
-},{}],42:[function(require,module,exports){
+},{}],44:[function(require,module,exports){
 var stackedareachart = function (userConfig) {
     d3 = dex.charts.d3.d3v3;
     var chart;
@@ -7717,6 +7930,10 @@ var stackedareachart = function (userConfig) {
         //internalChart.load({'columns': chart.config.csv.data});
     };
 
+    chart.clone = function clone(override) {
+        return stackedareachart(dex.config.expandAndOverlay(override, userConfig));
+    };
+
     $(document).ready(function () {
         // Make the entire chart draggable.
         if (chart.config.draggable) {
@@ -7728,7 +7945,7 @@ var stackedareachart = function (userConfig) {
 };
 
 module.exports = stackedareachart;
-},{}],43:[function(require,module,exports){
+},{}],45:[function(require,module,exports){
 /**
  *
  * This module provides NVD3 based visualization components.
@@ -7742,7 +7959,7 @@ nvd3.StackedAreaChart = require("./StackedAreaChart");
 nvd3.BubbleChart = require("./BubbleChart");
 
 module.exports = nvd3;
-},{"./BubbleChart":41,"./StackedAreaChart":42}],44:[function(require,module,exports){
+},{"./BubbleChart":43,"./StackedAreaChart":44}],46:[function(require,module,exports){
 var scatterplot = function (userConfig) {
   var defaults = {
     // The parent container of this chart.
@@ -8104,11 +8321,15 @@ var scatterplot = function (userConfig) {
 
   };
 
+    chart.clone = function clone(override) {
+        return scatterplot(dex.config.expandAndOverlay(override, userConfig));
+    };
+
   return chart;
 };
 
 module.exports = scatterplot;
-},{}],45:[function(require,module,exports){
+},{}],47:[function(require,module,exports){
 /**
  *
  * This module provides ThreeJS/WebGL based visualization components.
@@ -8121,7 +8342,7 @@ var threejs = {};
 threejs.ScatterPlot = require("./ScatterPlot");
 
 module.exports = threejs;
-},{"./ScatterPlot":44}],46:[function(require,module,exports){
+},{"./ScatterPlot":46}],48:[function(require,module,exports){
 var network = function (userConfig) {
   var chart;
 
@@ -8222,6 +8443,10 @@ var network = function (userConfig) {
     var csv = config.csv;
     chart.render();
   };
+
+    chart.clone = function clone(override) {
+        return network(dex.config.expandAndOverlay(override, userConfig));
+    };
 
   chart.createData = function() {
 
@@ -8344,7 +8569,7 @@ var network = function (userConfig) {
 };
 
 module.exports = network;
-},{}],47:[function(require,module,exports){
+},{}],49:[function(require,module,exports){
 /**
  *
  * This module provides routines for dealing with arrays.
@@ -8357,7 +8582,7 @@ var vis = {};
 vis.Network = require("./Network");
 
 module.exports = vis;
-},{"./Network":46}],48:[function(require,module,exports){
+},{"./Network":48}],50:[function(require,module,exports){
 /**
  *
  * This module provides routines for dealing with colors.
@@ -8920,7 +9145,7 @@ module.exports = function color(dex) {
   };
 };
 
-},{}],49:[function(require,module,exports){
+},{}],51:[function(require,module,exports){
 module.exports = function (dex) {
 
   return function (userConfig, defaultConfig) {
@@ -8962,6 +9187,10 @@ module.exports = function (dex) {
       }
       return this;
     };
+
+    this.clone = function(userConfig) {
+      dex.console.log("No clone function defined for", this);
+    }
 
     this.subscribe = function (source, eventType, callback) {
       if (arguments.length == 3) {
@@ -9153,7 +9382,7 @@ module.exports = function (dex) {
     return this;
   };
 };
-},{}],50:[function(require,module,exports){
+},{}],52:[function(require,module,exports){
 /**
  *
  * Config module.
@@ -10345,7 +10574,7 @@ module.exports = function config(dex) {
     }
   };
 };
-},{}],51:[function(require,module,exports){
+},{}],53:[function(require,module,exports){
 /**
  *
  * This module provides console logging capabilities.
@@ -10482,7 +10711,7 @@ module.exports = function (dex) {
     }
   };
 };
-},{}],52:[function(require,module,exports){
+},{}],54:[function(require,module,exports){
 /**
  *
  * This module provides support for dealing with csv structures.  This
@@ -11007,7 +11236,6 @@ module.exports = function csv(dex) {
                 }
             }
 
-
             return guessedTypes;
         },
 
@@ -11201,7 +11429,6 @@ module.exports = function csv(dex) {
          * @returns {{frameIndices: Array, frames: Array}}
          *
          */
-
         'getPermutationFrames': function (csv, permutationSize, groupIndex) {
             var gi = dex.csv.getColumnNumber(csv, groupIndex);
 
@@ -11214,14 +11441,25 @@ module.exports = function csv(dex) {
             return dex.csv.getFrames(csv, permutations, gi);
         },
 
-        'getCombinationFrames': function (csv, comboFrames, groupIndex) {
+        /**
+         *
+         * Generate frames based upon a grouping parameter, then
+         *
+         * @param csv The csv we wish to frame.
+         * @param comboLength The length of the combinations.
+         * @param groupIndex The group index.  This column will be present in
+         * every combination.
+         * @returns {*|{frameIndices, frames}}
+         */
+        'getCombinationFrames': function (csv, comboLength, groupIndex) {
             var gi = dex.csv.getColumnNumber(csv, groupIndex);
 
-            var plist = dex.range(0, csv.header.length - 1);
+            var plist = dex.range(0, csv.header.length);
             if (gi >= 0) {
                 plist.splice(gi, 1);
             }
-            var combos = dex.array.getCombinations(plist, comboFrames);
+            dex.console.log("PLIST", plist);
+            var combos = dex.array.getCombinations(plist, comboLength);
 
             return dex.csv.getFrames(csv, combos, gi);
         },
@@ -11653,7 +11891,7 @@ module.exports = function csv(dex) {
         }
     };
 };
-},{}],53:[function(require,module,exports){
+},{}],55:[function(require,module,exports){
 /**
  *
  * This module provides support for creating various datasets.
@@ -12072,7 +12310,7 @@ module.exports = function datagen(dex) {
   };
 };
 
-},{}],54:[function(require,module,exports){
+},{}],56:[function(require,module,exports){
 // Allow user to override, but define this by default:
 
 /**
@@ -12333,7 +12571,7 @@ $.widget.bridge('uitooltip', $.ui.tooltip);
 $.widget.bridge('uibutton', $.ui.button);
 
 module.exports = dex;
-},{"../lib/pubsub":3,"./array/array":4,"./charts/charts":15,"./color/color":48,"./component/component":49,"./config/config":50,"./console/console":51,"./csv/csv":52,"./datagen/datagen":53,"./json/json":55,"./matrix/matrix":56,"./object/object":57,"./ui/ui":67,"./util/util":68}],55:[function(require,module,exports){
+},{"../lib/pubsub":3,"./array/array":4,"./charts/charts":15,"./color/color":50,"./component/component":51,"./config/config":52,"./console/console":53,"./csv/csv":54,"./datagen/datagen":55,"./json/json":57,"./matrix/matrix":58,"./object/object":59,"./ui/ui":69,"./util/util":70}],57:[function(require,module,exports){
 /**
  *
  * This module provides routines dealing with json data.
@@ -12436,7 +12674,7 @@ module.exports = function json(dex) {
   };
 };
 
-},{}],56:[function(require,module,exports){
+},{}],58:[function(require,module,exports){
 /**
  *
  * This module provides routines dealing with matrices.
@@ -12751,7 +12989,7 @@ module.exports = function matrix(dex) {
   };
 };
 
-},{}],57:[function(require,module,exports){
+},{}],59:[function(require,module,exports){
 /**
  *
  * This module provides routines dealing with javascript objects.
@@ -13073,7 +13311,7 @@ module.exports = function object(dex) {
 };
 
 
-},{}],58:[function(require,module,exports){
+},{}],60:[function(require,module,exports){
 /**
  *
  * This class creates and attaches a SqlQuery user interface onto the
@@ -13172,7 +13410,7 @@ var sqlquery = function (userConfig) {
 };
 
 module.exports = sqlquery;
-},{}],59:[function(require,module,exports){
+},{}],61:[function(require,module,exports){
 /**
  *
  * @constructor
@@ -13272,7 +13510,7 @@ var table = function (userConfig) {
 };
 
 module.exports = table;
-},{}],60:[function(require,module,exports){
+},{}],62:[function(require,module,exports){
 var typestable = function (userConfig) {
 
   var defaults =
@@ -13353,7 +13591,7 @@ var typestable = function (userConfig) {
 };
 
 module.exports = typestable;
-},{}],61:[function(require,module,exports){
+},{}],63:[function(require,module,exports){
 var configurationbox = function (userConfig) {
 
   var defaults =
@@ -13439,7 +13677,7 @@ var configurationbox = function (userConfig) {
 };
 
 module.exports = configurationbox;
-},{}],62:[function(require,module,exports){
+},{}],64:[function(require,module,exports){
 var player = function (userConfig) {
 
   var defaults = {
@@ -13637,7 +13875,7 @@ var player = function (userConfig) {
 };
 
 module.exports = player;
-},{}],63:[function(require,module,exports){
+},{}],65:[function(require,module,exports){
 var selectable = function (userConfig) {
 
   var defaults =
@@ -13734,7 +13972,7 @@ var selectable = function (userConfig) {
 };
 
 module.exports = selectable;
-},{}],64:[function(require,module,exports){
+},{}],66:[function(require,module,exports){
 var slider = function (userConfig) {
 
   var defaults = {
@@ -13826,7 +14064,7 @@ var slider = function (userConfig) {
 };
 
 module.exports = slider;
-},{}],65:[function(require,module,exports){
+},{}],67:[function(require,module,exports){
 var tabs = function (userConfig) {
   var defaults = {
     // The parent container of this chart.
@@ -13930,7 +14168,7 @@ var tabs = function (userConfig) {
 };
 
 module.exports = tabs;
-},{}],66:[function(require,module,exports){
+},{}],68:[function(require,module,exports){
 /**
  *
  * This module provides ui components based upon jquery-ui.
@@ -13948,7 +14186,7 @@ module.exports = function jqueryui(dex) {
     'Tabs': require("./Tabs")
   };
 };
-},{"./ConfigurationBox":61,"./Player":62,"./Selectable":63,"./Slider":64,"./Tabs":65}],67:[function(require,module,exports){
+},{"./ConfigurationBox":63,"./Player":64,"./Selectable":65,"./Slider":66,"./Tabs":67}],69:[function(require,module,exports){
 /**
  *
  * This module provides ui components from a variety of sources.
@@ -13974,7 +14212,7 @@ module.exports = function ui(dex) {
     'TypesTable': require("./TypesTable")
   };
 };
-},{"./SqlQuery":58,"./Table":59,"./TypesTable":60,"./jqueryui/jqueryui":66}],68:[function(require,module,exports){
+},{"./SqlQuery":60,"./Table":61,"./TypesTable":62,"./jqueryui/jqueryui":68}],70:[function(require,module,exports){
 /**
  *
  * This module provides utility routines.
@@ -14047,5 +14285,5 @@ module.exports = function util(dex) {
     }
   };
 };
-},{}]},{},[54])(54)
+},{}]},{},[56])(56)
 });
