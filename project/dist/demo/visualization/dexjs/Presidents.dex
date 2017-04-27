@@ -42,7 +42,7 @@
 &lt;/com.dexvis.simple.types.SimpleListSelectionView&gt;</columnList>
          </task>
       </task-item>
-      <task-item name="Chord" active="true">
+      <task-item name="Chord" active="false">
          <task class="com.dexvis.dex.task.vis.dexjs.Chord">
             <prop-sheet>
                <properties class="com.sun.javafx.collections.ObservableListWrapper">
@@ -468,14 +468,14 @@
             </prop-sheet>
          </task>
       </task-item>
-      <task-item name="Chord Multiples" active="true">
+      <task-item name="Chord Multiples" active="false">
          <task class="com.dexvis.dex.task.vis.dexjs.ChordMultiples">
             <prop-sheet>
                <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
             </prop-sheet>
          </task>
       </task-item>
-      <task-item name="Dendrogram" active="true">
+      <task-item name="Dendrogram" active="false">
          <task class="com.dexvis.dex.task.vis.dexjs.Dendrogram">
             <prop-sheet>
                <properties class="com.sun.javafx.collections.ObservableListWrapper">
@@ -981,7 +981,7 @@
             </prop-sheet>
          </task>
       </task-item>
-      <task-item name="Orbital Layout" active="true">
+      <task-item name="Orbital Layout" active="false">
          <task class="com.dexvis.dex.task.vis.dexjs.OrbitalLayout">
             <prop-sheet>
                <properties class="com.sun.javafx.collections.ObservableListWrapper">
@@ -1122,7 +1122,7 @@
             </prop-sheet>
          </task>
       </task-item>
-      <task-item name="Parallel Coordinates" active="true">
+      <task-item name="Parallel Coordinates" active="false">
          <task class="com.dexvis.dex.task.vis.dexjs.ParallelCoordinates">
             <prop-sheet>
                <properties class="com.sun.javafx.collections.ObservableListWrapper">
@@ -1777,28 +1777,28 @@
             </prop-sheet>
          </task>
       </task-item>
-      <task-item name="Par Coord -&gt; Chord" active="true">
+      <task-item name="Par Coord -&gt; Chord" active="false">
          <task class="com.dexvis.dex.task.vis.dexjs.ParCoor2Chord">
             <prop-sheet>
                <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
             </prop-sheet>
          </task>
       </task-item>
-      <task-item name="Par Coord -&gt; Dendrogram" active="true">
+      <task-item name="Par Coord -&gt; Dendrogram" active="false">
          <task class="com.dexvis.dex.task.vis.dexjs.ParCoor2Dendrogram">
             <prop-sheet>
                <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
             </prop-sheet>
          </task>
       </task-item>
-      <task-item name="Par Coord -&gt; Table" active="true">
+      <task-item name="Par Coord -&gt; Table" active="false">
          <task class="com.dexvis.dex.task.vis.dexjs.ParCoor2Table">
             <prop-sheet>
                <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
             </prop-sheet>
          </task>
       </task-item>
-      <task-item name="Radial Tree" active="true">
+      <task-item name="Radial Tree" active="false">
          <task class="com.dexvis.dex.task.vis.dexjs.RadialTree">
             <prop-sheet>
                <properties class="com.sun.javafx.collections.ObservableListWrapper">
@@ -1829,28 +1829,28 @@
             </prop-sheet>
          </task>
       </task-item>
-      <task-item name="Sankey Diagram" active="true">
+      <task-item name="Sankey Diagram" active="false">
          <task class="com.dexvis.dex.task.vis.dexjs.Sankey">
             <prop-sheet>
                <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
             </prop-sheet>
          </task>
       </task-item>
-      <task-item name="Sql -&gt; ParCoor" active="true">
+      <task-item name="Sql -&gt; ParCoor" active="false">
          <task class="com.dexvis.dex.task.vis.dexjs.Sql2ParCoord">
             <prop-sheet>
                <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
             </prop-sheet>
          </task>
       </task-item>
-      <task-item name="Sql -&gt; Table" active="true">
+      <task-item name="Sql -&gt; Table" active="false">
          <task class="com.dexvis.dex.task.vis.dexjs.Sql2Table">
             <prop-sheet>
                <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
             </prop-sheet>
          </task>
       </task-item>
-      <task-item name="Sunburst" active="true">
+      <task-item name="Sunburst" active="false">
          <task class="com.dexvis.dex.task.vis.dexjs.Sunburst">
             <prop-sheet>
                <properties class="com.sun.javafx.collections.ObservableListWrapper">
@@ -1881,8 +1881,36 @@
             </prop-sheet>
          </task>
       </task-item>
-      <task-item name="Treemap" active="true">
+      <task-item name="Treemap" active="false">
          <task class="com.dexvis.dex.task.vis.dexjs.Treemap">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+         </task>
+      </task-item>
+      <task-item name="Par Coord -&gt; Sankey" active="false">
+         <task class="com.dexvis.dex.task.vis.dexjs.ParCoor2Sankey">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+         </task>
+      </task-item>
+      <task-item name="Par Coord -&gt; Network" active="false">
+         <task class="com.dexvis.dex.task.vis.dexjs.ParCoor2Network">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+         </task>
+      </task-item>
+      <task-item name="Par Coord -&gt; Treemap" active="true">
+         <task class="com.dexvis.dex.task.vis.dexjs.ParCoor2Treemap">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+         </task>
+      </task-item>
+      <task-item name="Par Coord -&gt; Sunburst" active="true">
+         <task class="com.dexvis.dex.task.vis.dexjs.ParCoor2Sunburst">
             <prop-sheet>
                <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
             </prop-sheet>
