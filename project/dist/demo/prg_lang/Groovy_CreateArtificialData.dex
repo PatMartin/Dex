@@ -1,0 +1,57 @@
+<dex-project version="0.8">
+   <tasks class="java.util.ArrayList">
+      <task-item name="Groovy Script" active="true">
+         <task class="com.dexvis.dex.task.prg.GroovyScript">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+            <processbytable>&lt;map&gt;
+  &lt;entry&gt;
+    &lt;string&gt;text&lt;/string&gt;
+    &lt;string&gt;Table&lt;/string&gt;
+  &lt;/entry&gt;
+  &lt;entry&gt;
+    &lt;string&gt;selected&lt;/string&gt;
+    &lt;boolean&gt;true&lt;/boolean&gt;
+  &lt;/entry&gt;
+&lt;/map&gt;</processbytable>
+            <processbyrow>&lt;map&gt;
+  &lt;entry&gt;
+    &lt;string&gt;text&lt;/string&gt;
+    &lt;string&gt;Row&lt;/string&gt;
+  &lt;/entry&gt;
+&lt;/map&gt;</processbyrow>
+            <processbycolumn>&lt;map&gt;
+  &lt;entry&gt;
+    &lt;string&gt;text&lt;/string&gt;
+    &lt;string&gt;Column&lt;/string&gt;
+  &lt;/entry&gt;
+&lt;/map&gt;</processbycolumn>
+            <groovyCode class="javafx.beans.property.SimpleStringProperty">def rand = new java.util.Random()
+
+header = [ &quot;MONTH&quot;, &quot;SALES&quot;, &quot;OVERHEAD&quot;, &quot;REVENUE&quot;, &quot;PROFIT&quot; ]
+data = []
+[ &quot;JAN&quot;, &quot;FEB&quot;, &quot;MAR&quot;, &quot;APR&quot;, &quot;MAY&quot;, &quot;JUN&quot;,
+  &quot;JUL&quot;, &quot;AUG&quot;, &quot;SEP&quot;, &quot;OCT&quot;, &quot;NOV&quot;, &quot;DEC&quot; ].each {
+  month -&gt;
+  data &lt;&lt; [ month, rand.nextInt(1000), rand.nextInt(1000),
+               rand.nextInt(1000), rand.nextInt(1000)]
+}</groovyCode>
+         </task>
+      </task-item>
+      <task-item name="View Data" active="true">
+         <task class="com.dexvis.dex.task.utilities.ViewData">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+         </task>
+      </task-item>
+      <task-item name="C3 Stacked Bar Chart" active="true">
+         <task class="com.dexvis.dex.task.vis.c3.C3StackedBarChart">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+         </task>
+      </task-item>
+   </tasks>
+</dex-project>

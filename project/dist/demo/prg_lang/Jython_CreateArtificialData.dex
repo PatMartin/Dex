@@ -1,0 +1,36 @@
+<dex-project version="0.8">
+   <tasks class="java.util.ArrayList">
+      <task-item name="Jython Script" active="true">
+         <task class="com.dexvis.dex.task.prg.JythonScript">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+            <jythonCode class="javafx.beans.property.SimpleStringProperty">from java.util import Random
+
+rand = Random()
+
+header = [ &quot;MONTH&quot;, &quot;SALES&quot;, &quot;OVERHEAD&quot;, &quot;REVENUE&quot;, &quot;PROFIT&quot; ]
+data = []
+for month in [
+  &quot;JAN&quot;, &quot;FEB&quot;, &quot;MAR&quot;, &quot;APR&quot;, &quot;MAY&quot;, &quot;JUN&quot;,
+  &quot;JUL&quot;, &quot;AUG&quot;, &quot;SEP&quot;, &quot;OCT&quot;, &quot;NOV&quot;, &quot;DEC&quot; ]:
+  data.append([ month, rand.nextInt(1000), rand.nextInt(1000),
+               rand.nextInt(1000), rand.nextInt(1000)])</jythonCode>
+         </task>
+      </task-item>
+      <task-item name="View Data" active="true">
+         <task class="com.dexvis.dex.task.utilities.ViewData">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+         </task>
+      </task-item>
+      <task-item name="C3 Stacked Bar Chart" active="true">
+         <task class="com.dexvis.dex.task.vis.c3.C3StackedBarChart">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+         </task>
+      </task-item>
+   </tasks>
+</dex-project>

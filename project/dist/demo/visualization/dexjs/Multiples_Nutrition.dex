@@ -1,0 +1,109 @@
+<dex-project version="0.8">
+   <tasks class="java.util.ArrayList">
+      <task-item name="Read CSV" active="true">
+         <task class="com.dexvis.dex.task.input.ReadCsv">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+            <fileText>data\nutrients.csv</fileText>
+            <limitRows>false</limitRows>
+            <rowLimitText>0</rowLimitText>
+            <lastDir>C:\dex2ws\Dex\data</lastDir>
+         </task>
+      </task-item>
+      <task-item name="Trim Columns" active="true">
+         <task class="com.dexvis.dex.task.tablemanipulation.TrimColumns">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+         </task>
+      </task-item>
+      <task-item name="Select Columns" active="true">
+         <task class="com.dexvis.dex.task.tablemanipulation.SelectColumns">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+            <columnList>&lt;com.dexvis.simple.types.SimpleListSelectionView&gt;
+  &lt;sourceList&gt;
+    &lt;string&gt;calcium (g)&lt;/string&gt;
+    &lt;string&gt;sodium (g)&lt;/string&gt;
+    &lt;string&gt;vitaminc (g)&lt;/string&gt;
+    &lt;string&gt;potassium (g)&lt;/string&gt;
+    &lt;string&gt;water (g)&lt;/string&gt;
+    &lt;string&gt;id&lt;/string&gt;
+  &lt;/sourceList&gt;
+  &lt;targetList&gt;
+    &lt;string&gt;group&lt;/string&gt;
+    &lt;string&gt;name&lt;/string&gt;
+    &lt;string&gt;protein (g)&lt;/string&gt;
+    &lt;string&gt;fiber (g)&lt;/string&gt;
+    &lt;string&gt;carbohydrate (g)&lt;/string&gt;
+    &lt;string&gt;sugars (g)&lt;/string&gt;
+    &lt;string&gt;fat (g)&lt;/string&gt;
+    &lt;string&gt;calories&lt;/string&gt;
+    &lt;string&gt;monounsat (g)&lt;/string&gt;
+    &lt;string&gt;polyunsat (g)&lt;/string&gt;
+    &lt;string&gt;saturated (g)&lt;/string&gt;
+  &lt;/targetList&gt;
+&lt;/com.dexvis.simple.types.SimpleListSelectionView&gt;</columnList>
+         </task>
+      </task-item>
+      <task-item name="Replace All" active="true">
+         <task class="com.dexvis.dex.task.tablemanipulation.ReplaceAll">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+            <replace>^\s*$</replace>
+            <with>0</with>
+         </task>
+      </task-item>
+      <task-item name="View Data" active="true">
+         <task class="com.dexvis.dex.task.utilities.ViewData">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+         </task>
+      </task-item>
+      <task-item name="Low Carb Filter" active="false">
+         <task class="com.dexvis.dex.task.utilities.GroovyFilter">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+            <operationCB>&lt;map&gt;
+  &lt;entry&gt;
+    &lt;string&gt;items&lt;/string&gt;
+    &lt;list&gt;
+      &lt;string&gt;INCLUDE&lt;/string&gt;
+      &lt;string&gt;EXCLUDE&lt;/string&gt;
+    &lt;/list&gt;
+  &lt;/entry&gt;
+  &lt;entry&gt;
+    &lt;string&gt;selected&lt;/string&gt;
+    &lt;string&gt;INCLUDE&lt;/string&gt;
+  &lt;/entry&gt;
+&lt;/map&gt;</operationCB>
+            <conditionCB>&lt;map&gt;
+  &lt;entry&gt;
+    &lt;string&gt;items&lt;/string&gt;
+    &lt;list&gt;
+      &lt;string&gt;IF&lt;/string&gt;
+      &lt;string&gt;UNLESS&lt;/string&gt;
+    &lt;/list&gt;
+  &lt;/entry&gt;
+  &lt;entry&gt;
+    &lt;string&gt;selected&lt;/string&gt;
+    &lt;string&gt;IF&lt;/string&gt;
+  &lt;/entry&gt;
+&lt;/map&gt;</conditionCB>
+            <groovyExpText>(col[&quot;carbohydrate (g)&quot;] as Double) &lt; 5</groovyExpText>
+         </task>
+      </task-item>
+      <task-item name="Parallel Coordinates Multiples" active="true">
+         <task class="com.dexvis.dex.task.vis.dexjs.ParallelCoordinatesMultiples">
+            <prop-sheet>
+               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
+            </prop-sheet>
+         </task>
+      </task-item>
+   </tasks>
+</dex-project>
