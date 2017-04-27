@@ -124,7 +124,7 @@ class WebTask extends DexTask {
         .collect { configKey, configValue ->
           return "'${configKey}' : '${configValue}'";}.join(",") +
         "});}";
-    println "Configuration Script: '${configScript}'"
+    //println "Configuration Script: '${configScript}'"
     return configScript;
   }
   
