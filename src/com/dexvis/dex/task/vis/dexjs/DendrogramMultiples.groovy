@@ -10,8 +10,8 @@ class DendrogramMultiples extends WebTask {
   
   public DendrogramMultiples() {
     super('Visualization: Dex JS', 'Dendrogram Multiples',
-    "visualization/dexjs/DendrogramMultiples.html",
-    'web/dexjs/d3/DendrogramMultiples.gtmpl')
+    "visualization/dexjs/multiples/DendrogramMultiples.html",
+    'web/dexjs/multiples/DendrogramMultiples.gtmpl')
     
     setSaveDynamic(true)
   }

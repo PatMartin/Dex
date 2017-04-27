@@ -9,8 +9,8 @@ import com.dexvis.util.TaskPropertyFactory
 class ChordMultiples extends WebTask {
   public ChordMultiples() {
     super("Visualization: Dex JS", "Chord Multiples",
-      "visualization/dexjs/ChordMultiples.html",
-      "web/dexjs/d3/ChordMultiples.gtmpl")
+      "visualization/dexjs/multiples/ChordMultiples.html",
+      "web/dexjs/multiples/ChordMultiples.gtmpl")
     
     setSaveDynamic(true)
   }
