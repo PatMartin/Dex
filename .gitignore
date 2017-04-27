@@ -1,3 +1,4 @@
+lib/cachedir
 output
 .settings
 .groovy
@@ -7,7 +8,9 @@ textures
 .lock
 .project
 bin
-dist
+UnsavedProject.dex
+dist/dex*
+projects_old
 src/com/dexvis/dex/broken
 src/com/dexvis/dex/deprecated
 scripts/expect
