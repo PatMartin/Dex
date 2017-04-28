@@ -141,7 +141,7 @@ function setConfiguration(config)
     'gridsterConfig.widget_margins' : [ 1, 1 ],
     'cell.width' : 8,
     'cell.height' : 8,
-    'baseChart': dex.charts.vis.Sankey({
+    'baseChart': dex.charts.vis.Network({
       })
   });
 
