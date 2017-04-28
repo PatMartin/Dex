@@ -70,52 +70,25 @@
 </script>
 <script>
 <%
-  def header = "[" + dexData.header.collect { return "\"$it\"" }.join(',') + "]"
-  def data = []
-  dexData.data.eachWithIndex
-  {
-    row, ri ->
-    data << "[" + row.collect { return "\"$it\"" }.join(',') + "]"
-  }
-  println "var csv = { 'header' : $header,\n 'data' : [" + data.join(',\n') + "] };";
+  println dexData.toCsvString();
 %>
 
 function setConfiguration(config)
 {
-  dex.console.log("Configuration", config);
-  treemap.config = dex.config.expandAndOverlay(config, treemap.config);
-  save('#config', config);
-  treemap.update();
+  chord.configure(config);
 }
 
-function load(location) {
-  var config = {};
+var types = dex.csv.guessTypes(csv);
 
-  \$(location + " div").each(function(i) {
-    dex.console.log("Loading Setting: '" + \$(this).attr('id') + "'='" +
-      \$(this).attr('value') + "'"); 
-    config[\$(this).attr('id')] = \$(this).attr('value');
-  });
+var manualSizing = (types[csv.header.length-1] == "number");
 
-  dex.console.log("Loaded Configuration:", config);
-  return config;
-}
-
-function save(location, config) {
-  dex.console.log("Saving Configuration To: " + location, config);
-  \$(location).children().remove();
-  _.keys(config).forEach(function (key) {
-    \$(location).append("<div id='" + key + "' value='" + config[key] + "'></div>");
-  });
-}
-
-var config = dex.config.expandAndOverlay({
+var treemap = new dex.charts.d3.Treemap({
   parent : "#ChartArea",
   color : d3.scale.category20c(),
-  csv : csv }, load("#config"));
+  csv : csv
+});
 
-var treemap = new dex.charts.d3.Treemap(config);
-
+treemap.load("#config");
 treemap.render();
 
 </script>
