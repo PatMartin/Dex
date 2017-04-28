@@ -99,7 +99,7 @@
          </task>
       </task-item>
       <task-item name="Parallel Coordinates Multiples" active="true">
-         <task class="com.dexvis.dex.task.vis.dexjs.ParallelCoordinatesMultiples">
+         <task class="com.dexvis.dex.task.vis.dexjs.multiples.d3.ParallelCoordinatesMultiples">
             <prop-sheet>
                <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
             </prop-sheet>

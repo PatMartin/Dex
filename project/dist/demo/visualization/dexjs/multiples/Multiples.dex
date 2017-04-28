@@ -35,64 +35,64 @@
             </prop-sheet>
          </task>
       </task-item>
-      <task-item name="Dendrogram Multiples" active="true">
-         <task class="com.dexvis.dex.task.vis.dexjs.DendrogramMultiples">
+      <task-item name="Dendrogram Multiples" active="false">
+         <task class="com.dexvis.dex.task.vis.dexjs.multiples.d3.DendrogramMultiples">
             <prop-sheet>
                <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
             </prop-sheet>
          </task>
       </task-item>
-      <task-item name="Chord Multiples" active="true">
-         <task class="com.dexvis.dex.task.vis.dexjs.ChordMultiples">
+      <task-item name="Chord Multiples" active="false">
+         <task class="com.dexvis.dex.task.vis.dexjs.multiples.d3.ChordMultiples">
             <prop-sheet>
                <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
             </prop-sheet>
          </task>
       </task-item>
-      <task-item name="Network Multiples" active="true">
-         <task class="com.dexvis.dex.task.vis.dexjs.NetworkMultiples">
+      <task-item name="Network Multiples" active="false">
+         <task class="com.dexvis.dex.task.vis.dexjs.multiples.vis.NetworkMultiples">
             <prop-sheet>
                <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
             </prop-sheet>
          </task>
       </task-item>
-      <task-item name="Clustered Force Multiples" active="true">
-         <task class="com.dexvis.dex.task.vis.dexjs.ClusteredForceMultiples">
+      <task-item name="Clustered Force Multiples" active="false">
+         <task class="com.dexvis.dex.task.vis.dexjs.multiples.d3.ClusteredForceMultiples">
             <prop-sheet>
                <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
             </prop-sheet>
          </task>
       </task-item>
-      <task-item name="Orbital Layout Multiples" active="true">
-         <task class="com.dexvis.dex.task.vis.dexjs.OrbitalLayoutMultiples">
+      <task-item name="Orbital Layout Multiples" active="false">
+         <task class="com.dexvis.dex.task.vis.dexjs.multiples.d3.OrbitalLayoutMultiples">
             <prop-sheet>
                <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
             </prop-sheet>
          </task>
       </task-item>
-      <task-item name="Parallel Coordinates Multiples" active="true">
-         <task class="com.dexvis.dex.task.vis.dexjs.ParallelCoordinatesMultiples">
+      <task-item name="Parallel Coordinates Multiples" active="false">
+         <task class="com.dexvis.dex.task.vis.dexjs.multiples.d3.ParallelCoordinatesMultiples">
             <prop-sheet>
                <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
             </prop-sheet>
          </task>
       </task-item>
-      <task-item name="Sankey Multiples" active="true">
-         <task class="com.dexvis.dex.task.vis.dexjs.SankeyMultiples">
+      <task-item name="Sankey Multiples" active="false">
+         <task class="com.dexvis.dex.task.vis.dexjs.multiples.d3.SankeyMultiples">
             <prop-sheet>
                <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
             </prop-sheet>
          </task>
       </task-item>
-      <task-item name="Sunburst Multiples" active="true">
-         <task class="com.dexvis.dex.task.vis.dexjs.SunburstMultiples">
+      <task-item name="Sunburst Multiples" active="false">
+         <task class="com.dexvis.dex.task.vis.dexjs.multiples.d3.SunburstMultiples">
             <prop-sheet>
                <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
             </prop-sheet>
          </task>
       </task-item>
       <task-item name="Treemap Multiples" active="true">
-         <task class="com.dexvis.dex.task.vis.dexjs.TreemapMultiples">
+         <task class="com.dexvis.dex.task.vis.dexjs.multiples.d3.TreemapMultiples">
             <prop-sheet>
                <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
             </prop-sheet>
