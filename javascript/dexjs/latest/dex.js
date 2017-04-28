@@ -865,6 +865,8 @@ module.exports = stackedareachart;
  * @returns StackedBarChart
  */
 var stackedbarchart = function (userConfig) {
+  var chart;
+
   var defaults = {
     'parent': '#C3_StackedBarChart',
     'id': 'C3_StackedBarChart',
@@ -879,7 +881,9 @@ var stackedbarchart = function (userConfig) {
   };
 
   var combinedConfig = dex.config.expandAndOverlay(userConfig, defaults);
-  return dex.charts.c3.C3Chart(combinedConfig);
+  chart = dex.charts.c3.C3Chart(combinedConfig);
+
+  return chart;
 };
 
 module.exports = stackedbarchart;
