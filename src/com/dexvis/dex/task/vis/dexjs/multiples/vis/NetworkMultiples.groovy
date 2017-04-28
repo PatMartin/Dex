@@ -1,4 +1,4 @@
-package com.dexvis.dex.task.vis.dexjs
+package com.dexvis.dex.task.vis.dexjs.multiples.vis
 
 import org.simpleframework.xml.Root
 
@@ -10,8 +10,8 @@ class NetworkMultiples extends WebTask {
   
   public NetworkMultiples() {
     super('Visualization: Dex JS', 'Network Multiples',
-    "visualization/dexjs/multiples/NetworkMultiples.html",
-    'web/dexjs/multiples/NetworkMultiples.gtmpl')
+    "visualization/dexjs/multiples/vis/NetworkMultiples.html",
+    'web/dexjs/multiples/vis/NetworkMultiples.gtmpl')
     
     setSaveDynamic(true)
   }

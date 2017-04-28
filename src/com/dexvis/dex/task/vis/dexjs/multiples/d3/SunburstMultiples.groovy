@@ -1,4 +1,4 @@
-package com.dexvis.dex.task.vis.dexjs
+package com.dexvis.dex.task.vis.dexjs.multiples.d3
 
 import org.simpleframework.xml.Root
 
@@ -8,8 +8,8 @@ import com.dexvis.dex.task.base.WebTask
 class SunburstMultiples extends WebTask {
   public SunburstMultiples() {
     super("Visualization: Dex JS", "Sunburst Multiples",
-    "visualization/dexjs/multiples/SunburstMultiples.html",
-    "web/dexjs/multiples/SunburstMultiples.gtmpl")
+    "visualization/dexjs/multiples/d3/SunburstMultiples.html",
+    "web/dexjs/multiples/d3/SunburstMultiples.gtmpl")
     
     setSaveDynamic(true)
   }

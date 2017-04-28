@@ -1,4 +1,4 @@
-package com.dexvis.dex.task.vis.dexjs
+package com.dexvis.dex.task.vis.dexjs.multiples.d3
 
 import javafx.scene.Node;
 
@@ -12,8 +12,8 @@ class ClusteredForceMultiples extends WebTask
   public ClusteredForceMultiples()
   {
     super("Visualization: Dex JS", "Clustered Force Multiples",
-      "visualization/dexjs/multiples/ClusteredForceMultiples.html",
-      "web/dexjs/multiples/ClusteredForceMultiples.gtmpl")
+      "visualization/dexjs/multiples/d3/ClusteredForceMultiples.html",
+      "web/dexjs/multiples/d3/ClusteredForceMultiples.gtmpl")
     setSaveDynamic(true)
   }
 }

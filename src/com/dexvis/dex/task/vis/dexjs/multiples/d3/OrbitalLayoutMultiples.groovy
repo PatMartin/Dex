@@ -1,4 +1,4 @@
-package com.dexvis.dex.task.vis.dexjs
+package com.dexvis.dex.task.vis.dexjs.multiples.d3
 
 import org.simpleframework.xml.Root
 
@@ -9,8 +9,8 @@ import com.dexvis.util.TaskPropertyFactory
 class OrbitalLayoutMultiples extends WebTask {
   public OrbitalLayoutMultiples() {
     super("Visualization: Dex JS", "Orbital Layout Multiples",
-      "visualization/dexjs/multiples/OrbitalLayoutMultiples.html",
-      "web/dexjs/multiples/OrbitalLayoutMultiples.gtmpl")
+      "visualization/dexjs/multiples/d3/OrbitalLayoutMultiples.html",
+      "web/dexjs/multiples/d3/OrbitalLayoutMultiples.gtmpl")
     
     setSaveDynamic(true)
   }

@@ -1,4 +1,4 @@
-package com.dexvis.dex.task.vis.dexjs
+package com.dexvis.dex.task.vis.dexjs.multiples.d3
 
 import javafx.scene.Node;
 
@@ -12,8 +12,8 @@ class TreemapMultiples extends WebTask
   public TreemapMultiples()
   {
     super("Visualization: Dex JS", "Treemap Multiples",
-      "visualization/dexjs/multiples/TreemapMultiples.html",
-      "web/dexjs/multiples/TreemapMultiples.gtmpl")
+      "visualization/dexjs/multiples/d3/TreemapMultiples.html",
+      "web/dexjs/multiples/d3/TreemapMultiples.gtmpl")
     setSaveDynamic(true)
   }
 }

@@ -1,4 +1,4 @@
-package com.dexvis.dex.task.vis.dexjs
+package com.dexvis.dex.task.vis.dexjs.multiples.d3
 
 import org.simpleframework.xml.Root
 
@@ -9,8 +9,8 @@ import com.dexvis.util.TaskPropertyFactory
 class SankeyMultiples extends WebTask {
   public SankeyMultiples() {
     super("Visualization: Dex JS", "Sankey Multiples",
-      "visualization/dexjs/multiples/SankeyMultiples.html",
-      "web/dexjs/multiples/SankeyMultiples.gtmpl")
+      "visualization/dexjs/multiples/d3/SankeyMultiples.html",
+      "web/dexjs/multiples/d3/SankeyMultiples.gtmpl")
 
     setSaveDynamic(true)
   }
