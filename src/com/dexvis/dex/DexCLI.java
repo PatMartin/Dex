@@ -128,10 +128,26 @@ public class DexCLI extends Application
     System.exit(0);
   }
   
+  private static void setDefault(String propertyName, String propertyValue)
+  {
+    if (!System.getProperties().containsKey(propertyName))
+    {
+      System.setProperty(propertyName, propertyValue);
+    }
+  }
+  
   public static void main(String[] args)
   {
     arguments = args;
     Platform.setImplicitExit(false);
+    
+    // Headless params, overridable from command line.
+    setDefault("glass.platform", "Monocle");
+    setDefault("monocle.platform", "Headless");
+    setDefault("prism.order", "sw");
+    setDefault("prism.text", "t2k");
+    setDefault("headless.geometry", "1600x1200-32");
+    
     launch(args);
   }
 }
