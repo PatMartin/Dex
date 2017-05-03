@@ -37,6 +37,11 @@
 
   function drawChart() {
     var container = document.getElementById('TimelineParent');
+    
+    /*
+    while (container.firstChild) {
+      container.removeChild(container.firstChild);
+    }*/
     var chart = new google.visualization.Timeline(container);
     var dataTable = new google.visualization.DataTable();
 

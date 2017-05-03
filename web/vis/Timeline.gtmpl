@@ -32,18 +32,15 @@
 
 // Load dex data.  
 <%
-  def header = "[" + dexData.header.collect { return "\"$it\"" }.join(',') + "]"
-  def data = []
-  dexData.data.eachWithIndex
-  {
-    row, ri ->
-    data << "[" + row.collect { return "\"$it\"" }.join(',') + "]"
-  }
-  println "var csv = { 'header' : $header,\n 'data' : [" + data.join(',\n') + "] };";
+  println dexData.toCsvString();
 %>
 
   var container = document.getElementById('timeline');
 
+  while (container.firstChild) {
+    container.removeChild(container.firstChild);
+  }
+  
   var types = dex.csv.guessTypes(csv);
   dex.console.log("TYPES", types);
   var firstDateIndex = types.indexOf("date");
