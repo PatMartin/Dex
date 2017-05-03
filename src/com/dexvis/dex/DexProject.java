@@ -21,23 +21,23 @@ public class DexProject implements Serializable
 {
   @XStreamOmitField
   private static final long serialVersionUID = 6741812628232068933L;
-
-  @Attribute(name="version", required=false)
-  private String            version          = "0.8";
-
-  @ElementList(name="tasks")
-  private List<DexTaskItem> taskItems        = new ArrayList<DexTaskItem>();
-
+  
+  @Attribute(name = "version", required = false)
+  private String version = "0.8";
+  
+  @ElementList(name = "tasks")
+  private List<DexTaskItem> taskItems = new ArrayList<DexTaskItem>();
+  
   public List<DexTaskItem> getTaskItems()
   {
     return taskItems;
   }
-
+  
   public void setTaskItems(List<DexTaskItem> taskItems)
   {
     this.taskItems = taskItems;
   }
-
+  
   public void addDataFilter(DexTaskItem task)
   {
     if (task != null)
@@ -45,13 +45,11 @@ public class DexProject implements Serializable
       taskItems.add(task);
     }
   }
-
+  
   public static DexProject readProject(Stage stage, File projectFile)
       throws Exception
   {
-    Serializer serializer = new Persister(new DexMatcher());
-
-    DexProject project = serializer.read(DexProject.class, projectFile);
+    DexProject project = readProject(projectFile);
     
     for (DexTaskItem item : project.getTaskItems())
     {
@@ -60,18 +58,25 @@ public class DexProject implements Serializable
     
     return project;
   }
-
+  
+  public static DexProject readProject(File projectFile) throws Exception
+  {
+    Serializer serializer = new Persister(new DexMatcher());
+    
+    return serializer.read(DexProject.class, projectFile);
+  }
+  
   public void writeProject(File projectFile) throws Exception
   {
     Serializer serializer = new Persister(new DexMatcher());
     serializer.write(this, projectFile);
   }
-
+  
   public String getVersion()
   {
     return version;
   }
-
+  
   public void setVersion(String version)
   {
     this.version = version;
