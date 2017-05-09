@@ -12,8 +12,8 @@ class Chord extends WebTask {
       "visualization/dexjs/ChordDiagram.html",
       "web/dexjs/d3/Chord.gtmpl")
 
-    setProperty('Dimensions', 'Height', 'height', 600)
-    setProperty('Dimensions', 'Width', 'width', 800)
+    setProperty('Dimensions', 'Height', 'height', '100%')
+    setProperty('Dimensions', 'Width', 'width', '100%')
     setProperty('Dimensions', 'Transform', 'transform', '')
     setProperty('Dimensions', 'Resizable', 'resizable', true)
     setProperty('Dimensions', 'Padding', 'padding', '')
