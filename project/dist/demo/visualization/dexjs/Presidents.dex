@@ -469,7 +469,7 @@
          </task>
       </task-item>
       <task-item name="Chord Multiples" active="false">
-         <task class="com.dexvis.dex.task.vis.dexjs.ChordMultiples">
+         <task class="com.dexvis.dex.task.vis.dexjs.multiples.d3.ChordMultiples">
             <prop-sheet>
                <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
             </prop-sheet>
