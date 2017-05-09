@@ -41,6 +41,7 @@
 			<attribute name="javadoc_location" value="jar:platform:/resource/Dex/lib/commons-cli-1.4-javadoc.jar!/"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="lib/javax.json-1.0.4.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/jdk1.8.0_121"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
