@@ -20,14 +20,16 @@ public class ChoiceBoxTransform implements Transform<ChoiceBox>
     XStream xstream = new XStream(new DomDriver());
     Map<String, Object> cbMap = (Map<String, Object>) xstream.fromXML(value);
     ChoiceBox cb = new ChoiceBox();
-    cb.setItems(FXCollections.observableArrayList((List<Object>) cbMap.get("items")));
+    cb.setItems(FXCollections.observableArrayList((List<Object>) cbMap
+        .get("items")));
+    
     if (cbMap.containsKey("selected"))
     {
       cb.setValue((String) cbMap.get("selected"));
     }
     return cb;
   }
-
+  
   @Override
   public String write(ChoiceBox value) throws Exception
   {
@@ -50,7 +52,7 @@ public class ChoiceBoxTransform implements Transform<ChoiceBox>
       cbMap.put("selected", selected);
     }
     cbMap.put("items", newItems);
-
+    
     XStream xstream = new XStream(new DomDriver());
     return xstream.toXML(cbMap);
   }
