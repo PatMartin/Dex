@@ -84,7 +84,6 @@ class ReadCsv extends DexTask {
       state.dexData.data << row.collect() { it }
       rowNum++;
     }
-    
     return state
   }
   
