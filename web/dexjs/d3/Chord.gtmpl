@@ -37,6 +37,7 @@
 function setConfiguration(config)
 {
   chord.configure(config);
+  chord.update();
 }
 
 var chord = new dex.charts.d3.Chord({
