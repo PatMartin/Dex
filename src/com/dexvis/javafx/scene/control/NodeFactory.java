@@ -27,10 +27,10 @@ public class NodeFactory
     t.setY(270.0f);
     t.setFill(Color.DARKBLUE);
     t.setText(title);
-    t.setFont(Font.font(null, FontWeight.BOLD, 18));
+    t.setFont(Font.font(null, FontWeight.BOLD, 22));
 
     Separator sep = new Separator();
-    sep.setStyle("-fx-background-color: grey;-fx-background-radius: 2;");
+    sep.setStyle("-fx-background-color: grey;-fx-background-radius: 1;");
     pane.add(t, "span, growx, aligny top");
     pane.add(sep, "span, grow");
     
