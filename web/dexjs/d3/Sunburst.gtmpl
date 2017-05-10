@@ -54,6 +54,16 @@ var sunburst = dex.charts.d3.Sunburst({
 sunburst.load('#config');
 sunburst.render();
 
+function setValue(key, value)
+{
+  sunburst.attr(key, value).update();
+}
+
+function getGuiDefinition()
+{
+  return JSON.stringify(sunburst.getGuiDefinition());
+}
+
 </script>
 </body>
 </html>

@@ -81,6 +81,16 @@ var orbital = new dex.charts.d3.OrbitalLayout(config);
 
 orbital.render();
 
+function setValue(key, value)
+{
+  orbital.attr(key, value).update();
+}
+
+function getGuiDefinition()
+{
+  return JSON.stringify(orbital.getGuiDefinition());
+}
+
 </script>
 </body>
 </html>

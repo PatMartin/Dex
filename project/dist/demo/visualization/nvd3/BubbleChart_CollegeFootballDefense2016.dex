@@ -2,9 +2,7 @@
    <tasks class="java.util.ArrayList">
       <task-item name="Read CSV" active="true">
          <task class="com.dexvis.dex.task.input.ReadCsv">
-            <prop-sheet>
-               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
-            </prop-sheet>
+            
             <fileText>data\college_football\2016\total_defense_fbs.csv</fileText>
             <limitRows>false</limitRows>
             <rowLimitText>0</rowLimitText>
@@ -13,16 +11,12 @@
       </task-item>
       <task-item name="View Data" active="true">
          <task class="com.dexvis.dex.task.utilities.ViewData">
-            <prop-sheet>
-               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
-            </prop-sheet>
+            
          </task>
       </task-item>
       <task-item name="Select Columns" active="true">
          <task class="com.dexvis.dex.task.tablemanipulation.SelectColumns">
-            <prop-sheet>
-               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
-            </prop-sheet>
+            
             <columnList>&lt;com.dexvis.simple.types.SimpleListSelectionView&gt;
   &lt;sourceList&gt;
     &lt;string&gt;Team&lt;/string&gt;
@@ -40,16 +34,12 @@
       </task-item>
       <task-item name="View Data" active="false">
          <task class="com.dexvis.dex.task.utilities.ViewData">
-            <prop-sheet>
-               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
-            </prop-sheet>
+            
          </task>
       </task-item>
       <task-item name="Group Columns" active="true">
          <task class="com.dexvis.dex.task.tablemanipulation.GroupColumns">
-            <prop-sheet>
-               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
-            </prop-sheet>
+            
             <groupName>STAT</groupName>
             <columnList>&lt;com.dexvis.simple.types.SimpleListSelectionView&gt;
   &lt;sourceList&gt;
@@ -69,9 +59,7 @@
       </task-item>
       <task-item name="Select Columns" active="true">
          <task class="com.dexvis.dex.task.tablemanipulation.SelectColumns">
-            <prop-sheet>
-               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
-            </prop-sheet>
+            
             <columnList>&lt;com.dexvis.simple.types.SimpleListSelectionView&gt;
   &lt;sourceList/&gt;
   &lt;targetList&gt;
@@ -84,16 +72,12 @@
       </task-item>
       <task-item name="NVD3 Stacked Area Chart" active="true">
          <task class="com.dexvis.dex.task.vis.nvd3.StackedAreaChart">
-            <prop-sheet>
-               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
-            </prop-sheet>
+            
          </task>
       </task-item>
       <task-item name="Select Columns" active="true">
          <task class="com.dexvis.dex.task.tablemanipulation.SelectColumns">
-            <prop-sheet>
-               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
-            </prop-sheet>
+            
             <columnList>&lt;com.dexvis.simple.types.SimpleListSelectionView&gt;
   &lt;sourceList/&gt;
   &lt;targetList&gt;
@@ -106,9 +90,7 @@
       </task-item>
       <task-item name="NVD3 Bubble Chart" active="true">
          <task class="com.dexvis.dex.task.vis.nvd3.BubbleChart">
-            <prop-sheet>
-               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
-            </prop-sheet>
+            
          </task>
       </task-item>
    </tasks>

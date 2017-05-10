@@ -25,11 +25,8 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 
-import org.tbee.javafx.scene.layout.MigPane;
-
 import com.dexvis.dex.DexConstants;
 import com.dexvis.dex.wf.DexTask;
-import com.dexvis.util.DexUtil;
 import com.thoughtworks.xstream.annotations.XStreamOmitField;
 
 public class DexTaskList extends ListView<DexTaskItem> implements DexConstants
@@ -181,20 +178,11 @@ public class DexTaskList extends ListView<DexTaskItem> implements DexConstants
     try
     {
       Stage configStage = new Stage();
-      MigPane rootLayout = new MigPane("", "[grow]", "[grow]");
       
       DexTask task = getSelectionModel().getSelectedItem().getTask().getValue();
-      
-      DexPropertySheet dps = task.getPropertySheet();
-      
-      System.out.println("Dex Property Sheet: " + dps);
-      
-      dps.setOnKeyPressed((event) -> {
-        System.out.println("DEX Prop Sheet Event: '" + event + "'");
-      });
-      rootLayout.add(dps, "grow");
+      JsonGuiPane configGui = task.getConfigurationGui();
 
-      Scene configScene = new Scene(rootLayout, 800, 600);
+      Scene configScene = new Scene(configGui, 800, 600);
       configStage.setScene(configScene);
       configStage.show();
     }

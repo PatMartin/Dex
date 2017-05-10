@@ -48,6 +48,16 @@ var dendrogram = dex.charts.d3.Dendrogram({
 dendrogram.load('#config');
 dendrogram.render();
 
+function setValue(key, value)
+{
+  dendrogram.attr(key, value).update();
+}
+
+function getGuiDefinition()
+{
+  return "[" + JSON.stringify(dendrogram.getGuiDefinition()) + "]";
+}
+
 </script>
 </body>
 </html>

@@ -50,6 +50,16 @@ var motionBarChart = dex.charts.d3.MotionBarChart({
 motionBarChart.load('#config');
 motionBarChart.render();
 
+function setValue(key, value)
+{
+  motionBarChart.attr(key, value).update();
+}
+
+function getGuiDefinition()
+{
+  return JSON.stringify(motionBarChart.getGuiDefinition());
+}
+
 </script>
 </body>
 </html>

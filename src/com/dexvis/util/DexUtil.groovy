@@ -9,7 +9,6 @@ import org.simpleframework.xml.core.Persister;
 import com.dexvis.dex.DexData;
 import com.dexvis.dex.DexMatcher;
 import com.dexvis.dex.wf.DexTask;
-import com.dexvis.javafx.scene.control.DexPropertySheet;
 
 
 /**
@@ -55,7 +54,7 @@ public class DexUtil {
       copy.setActive(task.getActive())
       try
       {
-        copy.setPropertySheet((DexPropertySheet) task.getPropertySheet().clone());
+        // REM: Copy the configuration of the task here too.
       }
       catch (Exception iex1)
       {

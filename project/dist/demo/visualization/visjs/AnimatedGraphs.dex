@@ -2,9 +2,7 @@
    <tasks class="java.util.ArrayList">
       <task-item name="Equation1" active="false">
          <task class="com.dexvis.dex.task.prg.GroovyScript">
-            <prop-sheet>
-               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
-            </prop-sheet>
+            
             <processbytable>&lt;map&gt;
   &lt;entry&gt;
     &lt;string&gt;text&lt;/string&gt;
@@ -45,9 +43,7 @@ data = []
       </task-item>
       <task-item name="Equation2" active="true">
          <task class="com.dexvis.dex.task.prg.GroovyScript">
-            <prop-sheet>
-               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
-            </prop-sheet>
+            
             <processbytable>&lt;map&gt;
   &lt;entry&gt;
     &lt;string&gt;text&lt;/string&gt;
@@ -87,9 +83,7 @@ data = []
       </task-item>
       <task-item name="Elastic Plane" active="false">
          <task class="com.dexvis.dex.task.prg.GroovyScript">
-            <prop-sheet>
-               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
-            </prop-sheet>
+            
             <processbytable>&lt;map&gt;
   &lt;entry&gt;
     &lt;string&gt;text&lt;/string&gt;
@@ -129,9 +123,7 @@ data = []
       </task-item>
       <task-item name="Elliptic Paraboloid" active="false">
          <task class="com.dexvis.dex.task.prg.GroovyScript">
-            <prop-sheet>
-               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
-            </prop-sheet>
+            
             <processbytable>&lt;map&gt;
   &lt;entry&gt;
     &lt;string&gt;text&lt;/string&gt;
@@ -170,9 +162,7 @@ data = []
       </task-item>
       <task-item name="Hyperbolic Paraboloid" active="false">
          <task class="com.dexvis.dex.task.prg.GroovyScript">
-            <prop-sheet>
-               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
-            </prop-sheet>
+            
             <processbytable>&lt;map&gt;
   &lt;entry&gt;
     &lt;string&gt;text&lt;/string&gt;
@@ -211,9 +201,7 @@ data = []
       </task-item>
       <task-item name="Cone" active="false">
          <task class="com.dexvis.dex.task.prg.GroovyScript">
-            <prop-sheet>
-               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
-            </prop-sheet>
+            
             <processbytable>&lt;map&gt;
   &lt;entry&gt;
     &lt;string&gt;text&lt;/string&gt;
@@ -253,33 +241,7 @@ data = []
       </task-item>
       <task-item name="Animated 3D Graph" active="true">
          <task class="com.dexvis.dex.task.vis.visjs.AnimatedGraph3D">
-            <prop-sheet>
-               <properties class="com.sun.javafx.collections.ObservableListWrapper">
-                  <property>
-                     <name>Height</name>
-                     <target>height</target>
-                     <category>Dimensions</category>
-                     <value class="java.lang.Integer">600</value>
-                  </property>
-                  <property>
-                     <name>Width</name>
-                     <target>width</target>
-                     <category>Dimensions</category>
-                     <value class="java.lang.Integer">800</value>
-                  </property>
-                  <property>
-                     <name>Transform</name>
-                     <target>transform</target>
-                     <category>Dimensions</category>
-                  </property>
-                  <property>
-                     <name>Resizable</name>
-                     <target>resizable</target>
-                     <category>Dimensions</category>
-                     <value class="java.lang.Boolean">true</value>
-                  </property>
-               </properties>
-            </prop-sheet>
+            
          </task>
       </task-item>
    </tasks>

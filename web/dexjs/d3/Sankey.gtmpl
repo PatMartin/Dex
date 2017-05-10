@@ -36,6 +36,16 @@
 
   sankey.render();
 
+function setValue(key, value)
+{
+  sankey.attr(key, value).update();
+}
+
+function getGuiDefinition()
+{
+  return JSON.stringify(sankey.getGuiDefinition());
+}
+
 </script>
 </body>
 </html>

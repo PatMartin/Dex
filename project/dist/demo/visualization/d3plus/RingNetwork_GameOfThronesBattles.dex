@@ -2,9 +2,7 @@
    <tasks class="java.util.ArrayList">
       <task-item name="Read CSV" active="true">
          <task class="com.dexvis.dex.task.input.ReadCsv">
-            <prop-sheet>
-               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
-            </prop-sheet>
+            
             <fileText>data\thrones.csv</fileText>
             <limitRows>false</limitRows>
             <rowLimitText>0</rowLimitText>
@@ -13,23 +11,17 @@
       </task-item>
       <task-item name="Trim Columns" active="true">
          <task class="com.dexvis.dex.task.tablemanipulation.TrimColumns">
-            <prop-sheet>
-               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
-            </prop-sheet>
+            
          </task>
       </task-item>
       <task-item name="View Data" active="true">
          <task class="com.dexvis.dex.task.utilities.ViewData">
-            <prop-sheet>
-               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
-            </prop-sheet>
+            
          </task>
       </task-item>
       <task-item name="Select Columns" active="true">
          <task class="com.dexvis.dex.task.tablemanipulation.SelectColumns">
-            <prop-sheet>
-               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
-            </prop-sheet>
+            
             <columnList>&lt;com.dexvis.simple.types.SimpleListSelectionView&gt;
   &lt;sourceList&gt;
     &lt;string&gt;year&lt;/string&gt;
@@ -65,9 +57,7 @@
       </task-item>
       <task-item name="Groovy Filter" active="true">
          <task class="com.dexvis.dex.task.utilities.GroovyFilter">
-            <prop-sheet>
-               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
-            </prop-sheet>
+            
             <operationCB>&lt;map&gt;
   &lt;entry&gt;
     &lt;string&gt;items&lt;/string&gt;
@@ -99,33 +89,7 @@
       </task-item>
       <task-item name="Ring Network" active="true">
          <task class="com.dexvis.dex.task.vis.dexjs.RingNetwork">
-            <prop-sheet>
-               <properties class="com.sun.javafx.collections.ObservableListWrapper">
-                  <property>
-                     <name>Height</name>
-                     <target>height</target>
-                     <category>Dimensions</category>
-                     <value class="java.lang.Integer">600</value>
-                  </property>
-                  <property>
-                     <name>Width</name>
-                     <target>width</target>
-                     <category>Dimensions</category>
-                     <value class="java.lang.Integer">800</value>
-                  </property>
-                  <property>
-                     <name>Transform</name>
-                     <target>transform</target>
-                     <category>Dimensions</category>
-                  </property>
-                  <property>
-                     <name>Resizable</name>
-                     <target>resizable</target>
-                     <category>Dimensions</category>
-                     <value class="java.lang.Boolean">true</value>
-                  </property>
-               </properties>
-            </prop-sheet>
+            
          </task>
       </task-item>
    </tasks>

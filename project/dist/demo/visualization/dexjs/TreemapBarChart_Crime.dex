@@ -2,9 +2,7 @@
    <tasks class="java.util.ArrayList">
       <task-item name="Read CSV" active="true">
          <task class="com.dexvis.dex.task.input.ReadCsv">
-            <prop-sheet>
-               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
-            </prop-sheet>
+            
             <fileText>data\CrimeStatebyState.csv</fileText>
             <limitRows>false</limitRows>
             <rowLimitText>0</rowLimitText>
@@ -13,16 +11,12 @@
       </task-item>
       <task-item name="View Data" active="true">
          <task class="com.dexvis.dex.task.utilities.ViewData">
-            <prop-sheet>
-               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
-            </prop-sheet>
+            
          </task>
       </task-item>
       <task-item name="Select Columns" active="true">
          <task class="com.dexvis.dex.task.tablemanipulation.SelectColumns">
-            <prop-sheet>
-               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
-            </prop-sheet>
+            
             <columnList>&lt;com.dexvis.simple.types.SimpleListSelectionView&gt;
   &lt;sourceList/&gt;
   &lt;targetList&gt;
@@ -37,9 +31,7 @@
       </task-item>
       <task-item name="Groovy Filter" active="true">
          <task class="com.dexvis.dex.task.utilities.GroovyFilter">
-            <prop-sheet>
-               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
-            </prop-sheet>
+            
             <operationCB>&lt;map&gt;
   &lt;entry&gt;
     &lt;string&gt;items&lt;/string&gt;
@@ -71,9 +63,7 @@
       </task-item>
       <task-item name="Treemap Bar Chart" active="true">
          <task class="com.dexvis.dex.task.vis.dexjs.TreemapBarChart">
-            <prop-sheet>
-               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
-            </prop-sheet>
+            
          </task>
       </task-item>
    </tasks>

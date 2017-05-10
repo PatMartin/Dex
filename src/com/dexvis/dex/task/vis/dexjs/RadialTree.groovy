@@ -11,11 +11,6 @@ class RadialTree extends WebTask {
     "visualization/dexjs/RadialTree.html",
     "web/dexjs/d3/RadialTree.gtmpl")
     
-    setProperty('Dimensions', 'Height', 'height', 600)
-    setProperty('Dimensions', 'Width', 'width', 800)
-    setProperty('Dimensions', 'Transform', 'transform', '')
-    setProperty('Dimensions', 'Resizable', 'resizable', true)
-    
     setSaveDynamic(true)
   }
 }

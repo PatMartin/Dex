@@ -46,6 +46,16 @@ var chart = dex.charts.d3.ParallelCoordinates({
   csv : csv
 }).render();
 
+function setValue(key, value)
+{
+  chart.attr(key, value).update();
+}
+
+function getGuiDefinition()
+{
+  return JSON.stringify(chart.getGuiDefinition());
+}
+
 </script>
 </body>
 </html>

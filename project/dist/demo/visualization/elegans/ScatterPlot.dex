@@ -2,9 +2,7 @@
    <tasks class="java.util.ArrayList">
       <task-item name="Read CSV" active="true">
          <task class="com.dexvis.dex.task.input.ReadCsv">
-            <prop-sheet>
-               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
-            </prop-sheet>
+            
             <fileText>data\iris.csv</fileText>
             <limitRows>false</limitRows>
             <rowLimitText>0</rowLimitText>
@@ -13,9 +11,7 @@
       </task-item>
       <task-item name="Select Columns" active="true">
          <task class="com.dexvis.dex.task.tablemanipulation.SelectColumns">
-            <prop-sheet>
-               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
-            </prop-sheet>
+            
             <columnList>&lt;com.dexvis.simple.types.SimpleListSelectionView&gt;
   &lt;sourceList/&gt;
   &lt;targetList&gt;
@@ -30,9 +26,7 @@
       </task-item>
       <task-item name="Elegans Scatter Plot" active="true">
          <task class="com.dexvis.dex.task.vis.elegans.ElegansScatterPlot">
-            <prop-sheet>
-               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
-            </prop-sheet>
+            
          </task>
       </task-item>
    </tasks>

@@ -44,6 +44,16 @@ var tree = dex.charts.d3.RadialTree({
 //tree.load('#config');
 tree.render();
 
+function setValue(key, value)
+{
+  tree.attr(key, value).update();
+}
+
+function getGuiDefinition()
+{
+  return JSON.stringify(tree.getGuiDefinition());
+}
+
 </script>
 </body>
 </html>

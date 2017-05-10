@@ -91,6 +91,16 @@ var treemap = new dex.charts.d3.Treemap({
 treemap.load("#config");
 treemap.render();
 
+function setValue(key, value)
+{
+  treemap.attr(key, value).update();
+}
+
+function getGuiDefinition()
+{
+  return JSON.stringify(treemap.getGuiDefinition());
+}
+
 </script>
 </body>
 </html>

@@ -2,18 +2,12 @@
    <tasks class="java.util.ArrayList">
       <task-item name="Documentation" active="true">
          <task class="com.dexvis.dex.task.utilities.Documentation">
-            <prop-sheet>
-               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
-            </prop-sheet>
             <editor>&lt;html dir=&quot;ltr&quot;&gt;&lt;head&gt;&lt;/head&gt;&lt;body contenteditable=&quot;true&quot;&gt;&lt;h1&gt;&lt;font face=&quot;Segoe UI&quot; size=&quot;6&quot;&gt;ETL : In Memory Database Demo&lt;/font&gt;&lt;/h1&gt;&lt;p&gt;&lt;font face=&quot;Segoe UI&quot;&gt;&lt;b&gt;This example illustrates a few of Dex&apos;s ETL capabilities. &amp;nbsp;In this example, we read a somewhat messy dataset and perform some transformations upon the data, store it in an in memory database, then select out the parts we wish to visualize in the order we wish to see them.&lt;/b&gt;&lt;/font&gt;&lt;/p&gt;&lt;h2&gt;&lt;font face=&quot;Segoe UI&quot; size=&quot;5&quot;&gt;TASK BREAKDOWN&lt;/font&gt;&lt;/h2&gt;&lt;p&gt;&lt;ol&gt;&lt;li&gt;&lt;font face=&quot;Segoe UI&quot;&gt;&lt;b&gt;Documentation - This document.&lt;/b&gt;&lt;/font&gt;&lt;/li&gt;&lt;li&gt;&lt;font face=&quot;Segoe UI&quot;&gt;&lt;b&gt;Read CSV - We read in our defense budget dataset.&lt;/b&gt;&lt;/font&gt;&lt;/li&gt;&lt;li&gt;&lt;font face=&quot;Segoe UI&quot;&gt;&lt;b&gt;Trim Columns - Whitespace is removed from the beginning and end of each table cell.&lt;/b&gt;&lt;/font&gt;&lt;/li&gt;&lt;li&gt;&lt;font face=&quot;Segoe UI&quot;&gt;&lt;b&gt;View Data - A checkpoint so we can observe our results so far.&lt;/b&gt;&lt;/font&gt;&lt;/li&gt;&lt;li&gt;&lt;font face=&quot;Segoe UI&quot;&gt;&lt;b&gt;Rename Column - A small groovy script which renames a column name which is incompatible with SQL standards.&lt;/b&gt;&lt;/font&gt;&lt;/li&gt;&lt;li&gt;&lt;font face=&quot;Segoe UI&quot;&gt;&lt;b&gt;Remove Commas - Removing commas from the datset so that numbers like 1,000 becomes 1000 and is treated as a legal number.&lt;/b&gt;&lt;/font&gt;&lt;/li&gt;&lt;li&gt;&lt;font face=&quot;Segoe UI&quot;&gt;&lt;b&gt;Remove Percentages - Removing instances of &apos;%&apos; from the data.&lt;/b&gt;&lt;/font&gt;&lt;/li&gt;&lt;li&gt;&lt;font face=&quot;Segoe UI&quot;&gt;&lt;b&gt;Replace Empties with Zero - &amp;nbsp;Replaces empty cells with a numeric 0.&lt;/b&gt;&lt;/font&gt;&lt;/li&gt;&lt;li&gt;&lt;font face=&quot;Segoe UI&quot;&gt;&lt;b&gt;View Data - Another visual checkpoint.&lt;/b&gt;&lt;/font&gt;&lt;/li&gt;&lt;li&gt;&lt;font face=&quot;Segoe UI&quot;&gt;&lt;b&gt;Select Columns - We pick the columns we wish to work with.&lt;/b&gt;&lt;/font&gt;&lt;/li&gt;&lt;li&gt;&lt;font face=&quot;Segoe UI&quot;&gt;&lt;b&gt;Create Jdbc Table - Here we create an in-memory HSQL database out of the data, using strict types so that the numeric fields can be treated as numerics. &amp;nbsp;We store it into an in-memory table called DEFENSE.&lt;/b&gt;&lt;/font&gt;&lt;/li&gt;&lt;li&gt;&lt;font face=&quot;Segoe UI&quot;&gt;&lt;b&gt;View Data - Another visual checkpoint&lt;/b&gt;&lt;/font&gt;&lt;/li&gt;&lt;li&gt;&lt;font face=&quot;Segoe UI&quot;&gt;&lt;b&gt;Query Jdbc - Here we query our defense table, only looking for countries with defense budgets of 10,000 million or 10 Billion or more. &amp;nbsp;We order them in descending order so that the charts will likewise be sorted in this order.&lt;/b&gt;&lt;/font&gt;&lt;/li&gt;&lt;li&gt;&lt;font face=&quot;Segoe UI&quot;&gt;&lt;b&gt;View Data - Checkpoint&lt;/b&gt;&lt;/font&gt;&lt;/li&gt;&lt;li&gt;&lt;font face=&quot;Segoe UI&quot;&gt;&lt;b&gt;C3 Stacked Area Chart - Visualize the data&lt;/b&gt;&lt;/font&gt;&lt;/li&gt;&lt;li&gt;&lt;font face=&quot;Segoe UI&quot;&gt;&lt;b&gt;C3 Stacked Bar Chart - Another visualization&lt;/b&gt;&lt;/font&gt;&lt;/li&gt;&lt;/ol&gt;&lt;p&gt;&lt;font face=&quot;Segoe UI&quot;&gt;&lt;b&gt;Using an in-memory database is a powerful way to store and access your data. &amp;nbsp;It is possible to read in multiple datasets and store them to different tables, then creating queries across them.&lt;/b&gt;&lt;/font&gt;&lt;/p&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</editor>
             <docFileText></docFileText>
          </task>
       </task-item>
       <task-item name="Read CSV" active="true">
          <task class="com.dexvis.dex.task.input.ReadCsv">
-            <prop-sheet>
-               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
-            </prop-sheet>
             <fileText>data\DefenseBudgets.csv</fileText>
             <limitRows>false</limitRows>
             <rowLimitText>0</rowLimitText>
@@ -22,23 +16,14 @@
       </task-item>
       <task-item name="Trim Columns" active="true">
          <task class="com.dexvis.dex.task.tablemanipulation.TrimColumns">
-            <prop-sheet>
-               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
-            </prop-sheet>
          </task>
       </task-item>
       <task-item name="View Data" active="true">
          <task class="com.dexvis.dex.task.utilities.ViewData">
-            <prop-sheet>
-               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
-            </prop-sheet>
          </task>
       </task-item>
       <task-item name="Rename Column" active="true">
          <task class="com.dexvis.dex.task.prg.GroovyScript">
-            <prop-sheet>
-               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
-            </prop-sheet>
             <processbytable>&lt;map&gt;
   &lt;entry&gt;
     &lt;string&gt;text&lt;/string&gt;
@@ -67,43 +52,28 @@ header[hdrIndex] = &quot;GDP_IN_MILLIONS&quot;</groovyCode>
       </task-item>
       <task-item name="Remove Commas" active="true">
          <task class="com.dexvis.dex.task.tablemanipulation.ReplaceAll">
-            <prop-sheet>
-               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
-            </prop-sheet>
             <replace>,</replace>
             <with></with>
          </task>
       </task-item>
       <task-item name="Remove Percentages" active="true">
          <task class="com.dexvis.dex.task.tablemanipulation.ReplaceAll">
-            <prop-sheet>
-               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
-            </prop-sheet>
             <replace>%</replace>
             <with></with>
          </task>
       </task-item>
       <task-item name="Replace Empties With Zero" active="true">
          <task class="com.dexvis.dex.task.tablemanipulation.ReplaceAll">
-            <prop-sheet>
-               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
-            </prop-sheet>
             <replace>^\s*$</replace>
             <with>0</with>
          </task>
       </task-item>
       <task-item name="View Data" active="true">
          <task class="com.dexvis.dex.task.utilities.ViewData">
-            <prop-sheet>
-               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
-            </prop-sheet>
          </task>
       </task-item>
       <task-item name="Select Columns" active="true">
          <task class="com.dexvis.dex.task.tablemanipulation.SelectColumns">
-            <prop-sheet>
-               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
-            </prop-sheet>
             <columnList>&lt;com.dexvis.simple.types.SimpleListSelectionView&gt;
   &lt;sourceList&gt;
     &lt;string&gt;ISO country code&lt;/string&gt;
@@ -125,9 +95,6 @@ header[hdrIndex] = &quot;GDP_IN_MILLIONS&quot;</groovyCode>
       </task-item>
       <task-item name="Create Jdbc Table" active="true">
          <task class="com.dexvis.dex.task.database.CreateJdbcTable">
-            <prop-sheet>
-               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
-            </prop-sheet>
             <dbtype>&lt;map&gt;
   &lt;entry&gt;
     &lt;string&gt;items&lt;/string&gt;
@@ -159,16 +126,10 @@ header[hdrIndex] = &quot;GDP_IN_MILLIONS&quot;</groovyCode>
       </task-item>
       <task-item name="View Data" active="true">
          <task class="com.dexvis.dex.task.utilities.ViewData">
-            <prop-sheet>
-               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
-            </prop-sheet>
          </task>
       </task-item>
       <task-item name="Query Jdbc" active="true">
          <task class="com.dexvis.dex.task.database.QueryJdbc">
-            <prop-sheet>
-               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
-            </prop-sheet>
             <sqlScript class="javafx.beans.property.SimpleStringProperty">SELECT * FROM DEFENSE WHERE DEFENSEBUDGET2008INMILLIONS &gt; 10000
 ORDER BY GDP_IN_MILLIONS DESC;</sqlScript>
             <dbtype>&lt;map&gt;
@@ -194,23 +155,14 @@ ORDER BY GDP_IN_MILLIONS DESC;</sqlScript>
       </task-item>
       <task-item name="View Data" active="true">
          <task class="com.dexvis.dex.task.utilities.ViewData">
-            <prop-sheet>
-               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
-            </prop-sheet>
          </task>
       </task-item>
       <task-item name="C3 Stacked Area Chart" active="true">
          <task class="com.dexvis.dex.task.vis.c3.C3StackedAreaChart">
-            <prop-sheet>
-               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
-            </prop-sheet>
          </task>
       </task-item>
       <task-item name="C3 Stacked Bar Chart" active="true">
          <task class="com.dexvis.dex.task.vis.c3.C3StackedBarChart">
-            <prop-sheet>
-               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
-            </prop-sheet>
          </task>
       </task-item>
    </tasks>

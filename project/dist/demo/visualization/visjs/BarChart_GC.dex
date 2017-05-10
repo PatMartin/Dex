@@ -2,9 +2,7 @@
    <tasks class="java.util.ArrayList">
       <task-item name="Read CSV" active="true">
          <task class="com.dexvis.dex.task.input.ReadCsv">
-            <prop-sheet>
-               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
-            </prop-sheet>
+            
             <fileText>C:\dex2ws\Dex\data\gc.csv</fileText>
             <limitRows>false</limitRows>
             <rowLimitText>0</rowLimitText>
@@ -13,16 +11,12 @@
       </task-item>
       <task-item name="View Data" active="true">
          <task class="com.dexvis.dex.task.utilities.ViewData">
-            <prop-sheet>
-               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
-            </prop-sheet>
+            
          </task>
       </task-item>
       <task-item name="Groovy Script" active="true">
          <task class="com.dexvis.dex.task.prg.GroovyScript">
-            <prop-sheet>
-               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
-            </prop-sheet>
+            
             <processbytable>&lt;map&gt;
   &lt;entry&gt;
     &lt;string&gt;text&lt;/string&gt;
@@ -61,33 +55,7 @@ data.eachWithIndex {
       </task-item>
       <task-item name="Bar Chart" active="true">
          <task class="com.dexvis.dex.task.vis.visjs.BarChart">
-            <prop-sheet>
-               <properties class="com.sun.javafx.collections.ObservableListWrapper">
-                  <property>
-                     <name>Height</name>
-                     <target>height</target>
-                     <category>Dimensions</category>
-                     <value class="java.lang.Integer">600</value>
-                  </property>
-                  <property>
-                     <name>Width</name>
-                     <target>width</target>
-                     <category>Dimensions</category>
-                     <value class="java.lang.Integer">800</value>
-                  </property>
-                  <property>
-                     <name>Transform</name>
-                     <target>transform</target>
-                     <category>Dimensions</category>
-                  </property>
-                  <property>
-                     <name>Resizable</name>
-                     <target>resizable</target>
-                     <category>Dimensions</category>
-                     <value class="java.lang.Boolean">true</value>
-                  </property>
-               </properties>
-            </prop-sheet>
+            
          </task>
       </task-item>
    </tasks>

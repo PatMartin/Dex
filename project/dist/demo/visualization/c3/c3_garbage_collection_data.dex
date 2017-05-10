@@ -2,9 +2,7 @@
    <tasks class="java.util.ArrayList">
       <task-item name="Read CSV" active="true">
          <task class="com.dexvis.dex.task.input.ReadCsv">
-            <prop-sheet>
-               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
-            </prop-sheet>
+            
             <fileText>data\gc.csv</fileText>
             <limitRows>false</limitRows>
             <rowLimitText>0</rowLimitText>
@@ -13,16 +11,12 @@
       </task-item>
       <task-item name="View Data" active="true">
          <task class="com.dexvis.dex.task.utilities.ViewData">
-            <prop-sheet>
-               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
-            </prop-sheet>
+            
          </task>
       </task-item>
       <task-item name="Column Filter" active="true">
          <task class="com.dexvis.dex.task.tablemanipulation.ColumnFilter">
-            <prop-sheet>
-               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
-            </prop-sheet>
+            
             <filterTypeCB>&lt;map&gt;
   &lt;entry&gt;
     &lt;string&gt;items&lt;/string&gt;
@@ -76,44 +70,32 @@
       </task-item>
       <task-item name="C3 Area Chart" active="true">
          <task class="com.dexvis.dex.task.vis.c3.C3AreaChart">
-            <prop-sheet>
-               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
-            </prop-sheet>
+            
          </task>
       </task-item>
       <task-item name="C3 Bar Chart" active="true">
          <task class="com.dexvis.dex.task.vis.c3.C3BarChart">
-            <prop-sheet>
-               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
-            </prop-sheet>
+            
          </task>
       </task-item>
       <task-item name="C3 Line Chart" active="true">
          <task class="com.dexvis.dex.task.vis.c3.C3LineChart">
-            <prop-sheet>
-               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
-            </prop-sheet>
+            
          </task>
       </task-item>
       <task-item name="C3 Scatter Plot" active="true">
          <task class="com.dexvis.dex.task.vis.c3.C3ScatterPlot">
-            <prop-sheet>
-               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
-            </prop-sheet>
+            
          </task>
       </task-item>
       <task-item name="C3 Stacked Area Chart" active="true">
          <task class="com.dexvis.dex.task.vis.c3.C3StackedAreaChart">
-            <prop-sheet>
-               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
-            </prop-sheet>
+            
          </task>
       </task-item>
       <task-item name="C3 Stacked Bar Chart" active="true">
          <task class="com.dexvis.dex.task.vis.c3.C3StackedBarChart">
-            <prop-sheet>
-               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
-            </prop-sheet>
+            
          </task>
       </task-item>
    </tasks>

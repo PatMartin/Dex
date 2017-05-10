@@ -52,6 +52,16 @@ var radar = new dex.charts.d3.RadarChart({
 radar.load('#config');
 radar.render();
 
+function setValue(key, value)
+{
+  radar.attr(key, value).update();
+}
+
+function getGuiDefinition()
+{
+  return JSON.stringify(radar.getGuiDefinition());
+}
+
 </script>
 </body>
 </html>

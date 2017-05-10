@@ -2,8 +2,6 @@ package com.dexvis.dex.wf;
 
 import java.io.InputStream;
 import java.io.Serializable;
-import java.util.List;
-import java.util.Map;
 
 import javafx.concurrent.Task;
 import javafx.scene.Node;
@@ -19,8 +17,7 @@ import org.tbee.javafx.scene.layout.MigPane;
 
 import com.dexvis.dex.DexConstants;
 import com.dexvis.dex.exception.DexException;
-import com.dexvis.javafx.scene.control.DexPropertySheet;
-import com.dexvis.javafx.scene.control.DexTaskProperty;
+import com.dexvis.javafx.scene.control.JsonGuiPane;
 import com.dexvis.util.DexUtil;
 import com.thoughtworks.xstream.annotations.XStreamOmitField;
 
@@ -47,7 +44,7 @@ public class DexTask extends Task<DexTask> implements Comparable<DexTask>,
   private String name = "NONE";
   // Default helpfile, NONE
   private String helpFile = "NONE";
-
+  
   private String ICONDIR = "/icons/";
   private String missingIconResource = "missing_icon.png";
   private String iconResource = missingIconResource;
@@ -58,12 +55,8 @@ public class DexTask extends Task<DexTask> implements Comparable<DexTask>,
   // Defaults to an active component.
   private boolean active = true;
   
-  @Element(name = "prop-sheet", required = false)
-  private DexPropertySheet properties = new DexPropertySheet();
-  
-  // @ElementMap(entry = "property", key = "name", required = false)
-  // private Map<String, DexTaskProperty> properties = new HashMap<String,
-  // DexTaskProperty>();
+  @Element(name= "config-def", required = false)
+  private String configDefinition = ""; 
   
   public DexTask()
   {
@@ -216,6 +209,13 @@ public class DexTask extends Task<DexTask> implements Comparable<DexTask>,
     }
   }
   
+  public JsonGuiPane getConfigurationGui()
+  {
+    JsonGuiPane configGui = new JsonGuiPane("", "[grow]", "[grow]");
+    configGui.setGuiDefinition(getConfigDefinition());
+    return configGui;
+  }
+  
   /**
    * 
    * Get the name of this task.
@@ -241,8 +241,7 @@ public class DexTask extends Task<DexTask> implements Comparable<DexTask>,
     this.name = name;
     setIconResource(ICONDIR
         + name.replaceAll("\\s*\\-\\>\\s*", "2").replaceAll("\\s+", "_")
-        .replaceAll("-+",  "_")
-            .toLowerCase() + ".png");
+            .replaceAll("-+", "_").toLowerCase() + ".png");
   }
   
   /**
@@ -485,28 +484,14 @@ public class DexTask extends Task<DexTask> implements Comparable<DexTask>,
     return DexUtil.copyTask(this);
   }
   
-  public void setPropertySheet(DexPropertySheet properties)
+  public void setConfigDefinition(String configDefinition)
   {
-    this.properties = properties;
+    this.configDefinition = configDefinition;
   }
   
-  public DexPropertySheet getPropertySheet()
+  public String getConfigDefinition()
   {
-    // List<DexTaskProperty> propList = new ArrayList<DexTaskProperty>();
-    // for (String propName : properties.keySet())
-    // {
-    // propList.add(properties.get(propName));
-    // }
-    //
-    // ObservableList<DexTaskProperty> oPropList = FXCollections
-    // .observableList(propList);
-    //
-    // DexPropertySheet propertySheet = new DexPropertySheet(oPropList);
-    return properties;
-  }
-  
-  public void update() throws DexException
-  {
+    return this.configDefinition;
   }
   
   public void updateTitle(String title)
@@ -566,44 +551,11 @@ public class DexTask extends Task<DexTask> implements Comparable<DexTask>,
     super.cancelled();
   }
   
-  // public Map<String, DexTaskProperty> getProperties()
-  // {
-  // return properties;
-  // }
-  
   @Commit
   public void build()
   {
-    properties.setTask(this);
-  }
-  
-  public void setProperties(Map<String, DexTaskProperty> properties)
-  {
-    this.properties = new DexPropertySheet(properties);
-    this.properties.setTask(this);
-  }
-  
-  public void setProperty(String category, String name, String target,
-      Object value)
-  {
-    properties.setProperty(new DexTaskProperty(this, category, name, target,
-        value, ""));
-  }
-  
-  public void setProperty(String category, String name, String target,
-      Object value, String description)
-  {
-    properties.setProperty(new DexTaskProperty(this, category, name, target,
-        value, description));
-  }
-  
-  public void addProperties(List<DexTaskProperty> props)
-  {
-    for (DexTaskProperty prop : props)
-    {
-      prop.setTask(this);
-      properties.setProperty(prop);
-    }
+    // Need to load configDefinition with setters here for
+    // serializing configuration state.
   }
   
   @Override

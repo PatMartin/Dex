@@ -135,4 +135,14 @@ var sankey = new Sankey(
 dex.console.log("CONFIG", sankey.attr());
 sankey.render();
 
+function setValue(key, value)
+{
+  sankey.attr(key, value).update();
+}
+
+function getGuiDefinition()
+{
+  return JSON.stringify(sankey.getGuiDefinition());
+}
+
 </script>

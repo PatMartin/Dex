@@ -63,6 +63,7 @@ public class JsonGuiPane extends MigPane
    */
   public void setGuiDefinition(String guiDef)
   {
+    System.out.println("SetGuiDef: '" + guiDef + "'");
     // Clear out any old contents.
     getChildren().clear();
     

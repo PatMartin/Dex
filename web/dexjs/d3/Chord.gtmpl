@@ -18,8 +18,7 @@
     <title>DexCharts : Chord Diagram</title>
   </head>
   <body>
-  <div id="config" style="visibility: hidden">
-  </div>
+  <div id="config" style="visibility: hidden"></div>
   <div id="ChartArea"></div>
 <script>
 <%
@@ -47,8 +46,19 @@ var chord = new dex.charts.d3.Chord({
   csv : csv
 });
 
-chord.load('#config');
+chord.load();
 chord.render();
+
+function setValue(key, value)
+{
+  chord.attr(key, value).update();
+  chord.save();
+}
+
+function getGuiDefinition()
+{
+  return "[" + JSON.stringify(chord.getGuiDefinition()) + "]";
+}
 
 </script>
 </body>

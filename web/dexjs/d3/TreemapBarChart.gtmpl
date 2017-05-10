@@ -74,6 +74,16 @@ var treemapBarChart = new dex.charts.d3.TreemapBarChart({
 treemapBarChart.load('#config');
 treemapBarChart.render();
 
+function setValue(key, value)
+{
+  treemapBarChart.attr(key, value).update();
+}
+
+function getGuiDefinition()
+{
+  return JSON.stringify(treemapBarChart.getGuiDefinition());
+}
+
 </script>
 </body>
 </html>

@@ -2,9 +2,7 @@
    <tasks class="java.util.ArrayList">
       <task-item name="Read CSV" active="true">
          <task class="com.dexvis.dex.task.input.ReadCsv">
-            <prop-sheet>
-               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
-            </prop-sheet>
+            
             <fileText>data\crime.csv</fileText>
             <limitRows>false</limitRows>
             <rowLimitText>0</rowLimitText>
@@ -13,16 +11,12 @@
       </task-item>
       <task-item name="View Data" active="true">
          <task class="com.dexvis.dex.task.utilities.ViewData">
-            <prop-sheet>
-               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
-            </prop-sheet>
+            
          </task>
       </task-item>
       <task-item name="Select Columns" active="true">
          <task class="com.dexvis.dex.task.tablemanipulation.SelectColumns">
-            <prop-sheet>
-               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
-            </prop-sheet>
+            
             <columnList>&lt;com.dexvis.simple.types.SimpleListSelectionView&gt;
   &lt;sourceList&gt;
     &lt;string&gt;SHIFT&lt;/string&gt;
@@ -47,39 +41,29 @@
       </task-item>
       <task-item name="Add Column" active="true">
          <task class="com.dexvis.dex.task.tablemanipulation.AddColumn">
-            <prop-sheet>
-               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
-            </prop-sheet>
+            
             <colName>NUM_OFFENSES</colName>
             <colValue>1</colValue>
          </task>
       </task-item>
       <task-item name="View Data" active="true">
          <task class="com.dexvis.dex.task.utilities.ViewData">
-            <prop-sheet>
-               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
-            </prop-sheet>
+            
          </task>
       </task-item>
       <task-item name="Trim Columns" active="true">
          <task class="com.dexvis.dex.task.tablemanipulation.TrimColumns">
-            <prop-sheet>
-               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
-            </prop-sheet>
+            
          </task>
       </task-item>
       <task-item name="Describe Data" active="true">
          <task class="com.dexvis.dex.task.info.DescribeData">
-            <prop-sheet>
-               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
-            </prop-sheet>
+            
          </task>
       </task-item>
       <task-item name="Create Jdbc Table" active="true">
          <task class="com.dexvis.dex.task.database.CreateJdbcTable">
-            <prop-sheet>
-               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
-            </prop-sheet>
+            
             <dbtype>&lt;map&gt;
   &lt;entry&gt;
     &lt;string&gt;items&lt;/string&gt;
@@ -111,9 +95,7 @@
       </task-item>
       <task-item name="Query Jdbc" active="false">
          <task class="com.dexvis.dex.task.database.QueryJdbc">
-            <prop-sheet>
-               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
-            </prop-sheet>
+            
             <sqlScript class="javafx.beans.property.SimpleStringProperty">SELECT
   DISTRICT,
   OFFENSE,
@@ -145,9 +127,7 @@ GROUP BY DISTRICT, OFFENSE, SHIFT, METHOD;</sqlScript>
       </task-item>
       <task-item name="Query Jdbc" active="true">
          <task class="com.dexvis.dex.task.database.QueryJdbc">
-            <prop-sheet>
-               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
-            </prop-sheet>
+            
             <sqlScript class="javafx.beans.property.SimpleStringProperty">SELECT
   DISTRICT,
   WARD,
@@ -179,30 +159,22 @@ FROM CSV;</sqlScript>
       </task-item>
       <task-item name="View Data" active="true">
          <task class="com.dexvis.dex.task.utilities.ViewData">
-            <prop-sheet>
-               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
-            </prop-sheet>
+            
          </task>
       </task-item>
       <task-item name="C3 Area Chart Multiples" active="false">
          <task class="com.dexvis.dex.task.vis.dexjs.multiples.c3.C3AreaChartMultiples">
-            <prop-sheet>
-               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
-            </prop-sheet>
+            
          </task>
       </task-item>
       <task-item name="Treemap Multiples" active="false">
          <task class="com.dexvis.dex.task.vis.dexjs.multiples.d3.TreemapMultiples">
-            <prop-sheet>
-               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
-            </prop-sheet>
+            
          </task>
       </task-item>
       <task-item name="Treemap Bar Chart Multiples" active="true">
          <task class="com.dexvis.dex.task.vis.dexjs.multiples.d3.TreemapBarChartMultiples">
-            <prop-sheet>
-               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
-            </prop-sheet>
+            
          </task>
       </task-item>
    </tasks>

@@ -2,9 +2,7 @@
    <tasks class="java.util.ArrayList">
       <task-item name="Text Input" active="true">
          <task class="com.dexvis.dex.task.input.TextInput">
-            <prop-sheet>
-               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
-            </prop-sheet>
+            
             <inputText>It was many and many a year ago,
 ﻿In a kingdom by the sea,
 That a maiden there lived whom you may know
@@ -50,9 +48,7 @@ Of my darling—my darling—my life and my bride,
       </task-item>
       <task-item name="Groovy Filter" active="true">
          <task class="com.dexvis.dex.task.utilities.GroovyFilter">
-            <prop-sheet>
-               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
-            </prop-sheet>
+            
             <operationCB>&lt;map&gt;
   &lt;entry&gt;
     &lt;string&gt;items&lt;/string&gt;
@@ -84,45 +80,35 @@ Of my darling—my darling—my life and my bride,
       </task-item>
       <task-item name="Replace All" active="true">
          <task class="com.dexvis.dex.task.tablemanipulation.ReplaceAll">
-            <prop-sheet>
-               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
-            </prop-sheet>
+            
             <replace>^\s+</replace>
             <with></with>
          </task>
       </task-item>
       <task-item name="Replace All" active="true">
          <task class="com.dexvis.dex.task.tablemanipulation.ReplaceAll">
-            <prop-sheet>
-               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
-            </prop-sheet>
+            
             <replace>&quot;</replace>
             <with></with>
          </task>
       </task-item>
       <task-item name="Replace All" active="true">
          <task class="com.dexvis.dex.task.tablemanipulation.ReplaceAll">
-            <prop-sheet>
-               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
-            </prop-sheet>
+            
             <replace>—</replace>
             <with> </with>
          </task>
       </task-item>
       <task-item name="Replace All" active="true">
          <task class="com.dexvis.dex.task.tablemanipulation.ReplaceAll">
-            <prop-sheet>
-               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
-            </prop-sheet>
+            
             <replace>�</replace>
             <with> </with>
          </task>
       </task-item>
       <task-item name="Select Columns" active="true">
          <task class="com.dexvis.dex.task.tablemanipulation.SelectColumns">
-            <prop-sheet>
-               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
-            </prop-sheet>
+            
             <columnList>&lt;com.dexvis.simple.types.SimpleListSelectionView&gt;
   &lt;sourceList&gt;
     &lt;string&gt;NUM&lt;/string&gt;
@@ -135,9 +121,7 @@ Of my darling—my darling—my life and my bride,
       </task-item>
       <task-item name="Word Tree" active="true">
          <task class="com.dexvis.dex.task.vis.google.WordTree">
-            <prop-sheet>
-               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
-            </prop-sheet>
+            
          </task>
       </task-item>
    </tasks>

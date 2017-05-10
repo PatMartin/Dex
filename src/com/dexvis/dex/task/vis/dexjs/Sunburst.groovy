@@ -11,11 +11,6 @@ class Sunburst extends WebTask {
     "visualization/dexjs/Sunburst.html",
     "web/dexjs/d3/Sunburst.gtmpl")
     
-    setProperty('Dimensions', 'Height', 'height', 600)
-    setProperty('Dimensions', 'Width', 'width', 800)
-    setProperty('Dimensions', 'Transform', 'transform', '')
-    setProperty('Dimensions', 'Resizable', 'resizable', true)
-    
     setSaveDynamic(true)
   }
 }

@@ -2,9 +2,6 @@
    <tasks class="java.util.ArrayList">
       <task-item name="Groovy Script" active="true">
          <task class="com.dexvis.dex.task.prg.GroovyScript">
-            <prop-sheet>
-               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
-            </prop-sheet>
             <processbytable>&lt;map&gt;
   &lt;entry&gt;
     &lt;string&gt;text&lt;/string&gt;
@@ -41,16 +38,10 @@ data = []
       </task-item>
       <task-item name="View Data" active="true">
          <task class="com.dexvis.dex.task.utilities.ViewData">
-            <prop-sheet>
-               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
-            </prop-sheet>
          </task>
       </task-item>
       <task-item name="C3 Stacked Bar Chart" active="true">
          <task class="com.dexvis.dex.task.vis.c3.C3StackedBarChart">
-            <prop-sheet>
-               <properties class="com.sun.javafx.collections.ObservableListWrapper"/>
-            </prop-sheet>
          </task>
       </task-item>
    </tasks>

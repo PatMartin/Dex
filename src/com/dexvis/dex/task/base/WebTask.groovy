@@ -30,7 +30,8 @@ import com.dexvis.dex.wf.DexTask
 import com.dexvis.dex.wf.DexTaskState
 import com.dexvis.javafx.event.ReflectiveKeyEventHandler
 import com.dexvis.javafx.scene.control.DexFileChooser
-import com.dexvis.javafx.scene.control.DexPropertySheet
+import com.dexvis.javafx.scene.control.JsonGuiEvent
+import com.dexvis.javafx.scene.control.JsonGuiPane
 import com.thoughtworks.xstream.annotations.XStreamOmitField
 
 /**
@@ -65,7 +66,7 @@ class WebTask extends DexTask {
   
   private static boolean debug = true;
   private String previousConfig = null;
-    
+  
   /**
    * 
    * Override the default constructor to provide this component's name, category and help file.
@@ -91,47 +92,9 @@ class WebTask extends DexTask {
         });
   }
   
-  public String getConfigScript()
-  {
-    DexPropertySheet dps = getPropertySheet()
-    
-    def config = [:]
-    def target;
-    def value;
-    
-    dps.getItems().eachWithIndex { item, i ->
-      target = item.getTarget()
-      value = item.getValue()
-      
-      if (value)
-      {
-        if (value instanceof String)
-        {
-          if (value.toString().length() > 0)
-          {
-            config[target] = value.toString()
-          }
-        }
-        else
-        {
-          config[target] = "" + value
-        }
-      }
-    }
-    
-    String configScript = "if (typeof setConfiguration == 'function') { setConfiguration({" +
-        config.findAll { configKey, configValue -> return (configKey && configValue); }
-        .collect { configKey, configValue ->
-          return "'${configKey}' : '${configValue}'";}.join(",") +
-        "});}";
-    //println "Configuration Script: '${configScript}'"
-    return configScript;
-  }
-  
   public DexTaskState execute(DexTaskState state) throws DexException
   {
     println "Running: $name"
-    println "Property Sheet Configuration: ${getPropertySheet()}"
     println "Config  : ${config}"
     println "Template: ${templatePath}"
     long start = System.currentTimeMillis()
@@ -160,12 +123,14 @@ class WebTask extends DexTask {
       def engine = new SimpleTemplateEngine()
       def template = engine.createTemplate(templateCode).make(binding)
       output = template.toString()
-
+      
       we.getLoadWorker().stateProperty().addListener(
           new ChangeListener<State>() {
             public void changed(ObservableValue ov, State oldState, State newState) {
               if (newState == Worker.State.SUCCEEDED) {
-                update();
+                String guiDefinition = (String) we
+                    .executeScript("getGuiDefinition();");
+                    setConfigDefinition(guiDefinition);
               }
             }
           });
@@ -203,22 +168,28 @@ class WebTask extends DexTask {
     ]
   }
   
-  public void update()
-  {
-    String config = getConfigScript();
-    if (!config.equals(previousConfig))
-    {
-      previousConfig = config
-      we.executeScript(config);
-    }
-  }
-  
   /**
    * Enables Firebug Lite for debugging a webEngine.
    * @param engine the webEngine for which debugging is to be enabled.
    */
   private void enableFirebug(final WebEngine we) {
     we.executeScript("if (!document.getElementById('FirebugLite')){E = document['createElement' + 'NS'] && document.documentElement.namespaceURI;E = E ? document['createElement' + 'NS'](E, 'script') : document['createElement']('script');E['setAttribute']('id', 'FirebugLite');E['setAttribute']('src', '../javascript/firebug/latest/firebug-lite.min.js#startOpened');E['setAttribute']('FirebugLite', '4');(document['getElementsByTagName']('head')[0] || document['getElementsByTagName']('body')[0]).appendChild(E);E = new Image;E['setAttribute']('src', '../javascript/firebug/latest/firebug-lite.min.js#startOpened');}");
+  }
+  
+  public JsonGuiPane getConfigurationGui()
+  {
+    JsonGuiPane configGui = new JsonGuiPane("", "[grow]", "[grow]");
+    configGui.setGuiDefinition(getConfigDefinition());
+    
+    configGui.addEventHandler(
+        JsonGuiEvent.CHANGE_EVENT,
+        { event ->
+          println "setValue('${event.getPayload().getTarget()}', '${event.getPayload().getValue()}')"
+          we.executeScript("setValue(\"" + event.getPayload().getTarget()
+              + "\",\"" + event.getPayload().getValue() + "\");");
+        });
+    
+    return configGui;
   }
   
   public Node getConfig()
