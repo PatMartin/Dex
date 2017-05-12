@@ -54,12 +54,12 @@
             <config-def>[ { &quot;type&quot; : &quot;label&quot;, &quot;initialValue&quot;: &quot;No configuration is available&quot; } ]</config-def>
          </task>
       </task-item>
-      <task-item name="Parallel Coordinates" active="true">
+      <task-item name="Parallel Coordinates" active="false">
          <task class="com.dexvis.dex.task.vis.dexjs.ParallelCoordinates">
             <config-def>[ { &quot;type&quot; : &quot;label&quot;, &quot;initialValue&quot;: &quot;No configuration is available&quot; } ]</config-def>
          </task>
       </task-item>
-      <task-item name="Par Coord -&gt; Chord" active="false">
+      <task-item name="Par Coord -&gt; Chord" active="true">
          <task class="com.dexvis.dex.task.vis.dexjs.ParCoor2Chord">
             <config-def>[ { &quot;type&quot; : &quot;label&quot;, &quot;initialValue&quot;: &quot;No configuration is available&quot; } ]</config-def>
          </task>

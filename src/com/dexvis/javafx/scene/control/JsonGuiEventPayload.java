@@ -9,13 +9,27 @@ package com.dexvis.javafx.scene.control;
  */
 public class JsonGuiEventPayload
 {
+  private String component = null;
   private String target = null;
   private String value = null;
   
-  JsonGuiEventPayload(String target, String value)
+  JsonGuiEventPayload(String component, String target, String value)
   {
+    this.component = component;
     this.target = target;
     this.value = value;
+  }
+  
+  /**
+   * 
+   * Get the JSON component.
+   * 
+   * @return The component.
+   * 
+   */
+  public String getComponent()
+  {
+    return component;
   }
   
   /**

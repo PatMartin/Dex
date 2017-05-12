@@ -71,7 +71,22 @@ public class JsonGuiPane extends MigPane
     Object jsonSpec = JsonUtil.parseJsonString(guiDef);
     
     // Add the controls to the guiPane.
-    addControls(this, jsonSpec);
+    addChartControls(this, jsonSpec);
+  }
+  
+  private void addChartControls(MigPane pane, Object jsonSpec)
+  {
+    // We expect a list of controls or groups of controls.
+    if (jsonSpec instanceof Map<?, ?>)
+    {
+      // The spec consists of a list of 0 or more control specs.
+      Map<String, Map<String, Object>> specs = (Map<String, Map<String, Object>>) jsonSpec;
+      
+      for (String chartName : specs.keySet())
+      {
+        addControl(pane, chartName, specs.get(chartName));
+      }
+    }
   }
   
   /**
@@ -84,7 +99,7 @@ public class JsonGuiPane extends MigPane
    *          The JSON specification converted to java objects.
    * 
    */
-  private void addControls(MigPane pane, Object jsonSpec)
+  private void addControls(MigPane pane, String chartName, Object jsonSpec)
   {
     // We expect a list of controls or groups of controls.
     if (jsonSpec instanceof List<?>)
@@ -97,31 +112,32 @@ public class JsonGuiPane extends MigPane
       {
         for (Map<String, Object> spec : specs)
         {
-          String specType = spec.get("type").toString();
-          addControl(pane, specType, spec);
+          addControl(pane, chartName, spec);
         }
       }
     }
   }
   
-  private void addControl(MigPane pane, String type, Map<String, Object> spec)
+  private void addControl(MigPane pane, String chartName,
+      Map<String, Object> spec)
   {
+    String type = spec.get("type").toString();
     switch (type)
     {
       case "group":
       {
-        addGroupControl(pane, type, spec);
+        addGroupControl(pane, chartName, type, spec);
         break;
       }
       default:
       {
-        addSingleControl(pane, type, spec);
+        addSingleControl(pane, chartName, type, spec);
         break;
       }
     }
   }
   
-  private void addGroupControl(MigPane pane, String type,
+  private void addGroupControl(MigPane pane, String chartName, String type,
       Map<String, Object> spec)
   {
     Accordion accordion = new Accordion();
@@ -129,14 +145,14 @@ public class JsonGuiPane extends MigPane
     tp.setText(getValue(spec, "name", "Unnamed"));
     accordion.getPanes().add(tp);
     MigPane contentPane = new MigPane("", "[][grow][]", "[]");
-    addControls(contentPane, spec.get("contents"));
+    addControls(contentPane, chartName, spec.get("contents"));
     tp.setContent(contentPane);
     
     // Adding grouped specifications.
     pane.add(accordion, "grow,span");
   }
   
-  private void addSingleControl(MigPane pane, String type,
+  private void addSingleControl(MigPane pane, String chartName, String type,
       Map<String, Object> spec)
   {
     Label label = new Label(getValue(spec, "name", "Unnamed"));
@@ -147,43 +163,44 @@ public class JsonGuiPane extends MigPane
     // Express ints as a slider.
       case "int":
       {
-        addIntControl(pane, spec);
+        addIntControl(pane, chartName, spec);
         break;
       }
       // Express floats as a slider as well.
       case "float":
       {
-        addFloatControl(pane, spec);
+        addFloatControl(pane, chartName, spec);
         break;
       }
       // Expressed string input in a text field.
       case "string":
       {
-        addStringControl(pane, spec);
+        addStringControl(pane, chartName, spec);
         break;
       }
       // Express a choice as a ChoiceBox.
       case "choice":
       {
-        addChoiceControl(pane, spec);
+        addChoiceControl(pane, chartName, spec);
         break;
       }
       // Express booleans as a checkbox.
       case "boolean":
       {
-        addBooleanControl(pane, spec);
+        addBooleanControl(pane, chartName, spec);
         break;
       }
       // Express color as a color-picker.
       case "color":
       {
-        addColorControl(pane, spec);
+        addColorControl(pane, chartName, spec);
         break;
       }
     }
   }
   
-  private void addIntControl(MigPane pane, Map<String, Object> spec)
+  private void addIntControl(MigPane pane, String chartName,
+      Map<String, Object> spec)
   {
     Slider slider = new Slider();
     slider.setMin(getIntValue(spec, "minValue", 0));
@@ -195,13 +212,14 @@ public class JsonGuiPane extends MigPane
     slider.valueProperty().addListener((observable, oldVal, newVal) -> {
       int val = newVal.intValue();
       valueLabel.setText("" + val);
-      fireEvent(spec.get("target").toString(), "" + val);
+      fireEvent(chartName, spec.get("target").toString(), "" + val);
     });
     pane.add(slider, "growx");
     pane.add(valueLabel, "span");
   }
   
-  private void addFloatControl(MigPane pane, Map<String, Object> spec)
+  private void addFloatControl(MigPane pane, String chartName,
+      Map<String, Object> spec)
   {
     Slider slider = new Slider();
     slider.setMin(getDoubleValue(spec, "minValue", 0.0));
@@ -213,48 +231,49 @@ public class JsonGuiPane extends MigPane
     slider.valueProperty().addListener((observable, oldVal, newVal) -> {
       double val = newVal.doubleValue();
       valueLabel.setText("" + val);
-      fireEvent(spec.get("target").toString(), "" + val);
+      fireEvent(chartName, spec.get("target").toString(), "" + val);
     });
     pane.add(slider, "growx");
     pane.add(valueLabel, "span");
   }
   
-  private void addStringControl(MigPane pane, Map<String, Object> spec)
+  private void addStringControl(MigPane pane, String chartName,
+      Map<String, Object> spec)
   {
     TextField textField = new TextField(getValue(spec, "initialValue", ""));
-    textField.textProperty().addListener(
-        (observable, oldVal, newVal) -> {
-          String val = newVal.toString();
-          fireEvent(new JsonGuiEvent(new JsonGuiEventPayload(spec.get("target")
-              .toString(), "" + val), null, JsonGuiEvent.CHANGE_EVENT));
-        });
+    textField.textProperty().addListener((observable, oldVal, newVal) -> {
+      fireEvent(chartName, spec.get("target").toString(), newVal.toString());
+    });
     pane.add(textField, "grow,span");
   }
   
-  private void addChoiceControl(MigPane pane, Map<String, Object> spec)
+  private void addChoiceControl(MigPane pane, String chartName,
+      Map<String, Object> spec)
   {
     ChoiceBox cb = new ChoiceBox(
         FXCollections.observableArrayList((ArrayList) spec.get("choices")));
     cb.getSelectionModel().select(getValue(spec, "initialValue", ""));
     pane.add(cb, "grow,span");
     cb.setOnAction(action -> {
-      fireEvent(spec.get("target").toString(), cb.getSelectionModel()
-          .selectedItemProperty().getValue().toString());
+      fireEvent(chartName, spec.get("target").toString(), cb
+          .getSelectionModel().selectedItemProperty().getValue().toString());
     });
   }
   
-  private void addBooleanControl(MigPane pane, Map<String, Object> spec)
+  private void addBooleanControl(MigPane pane, String chartName,
+      Map<String, Object> spec)
   {
     CheckBox cb = new CheckBox();
     cb.setSelected(getBooleanValue(spec, "initialValue", false));
     
     cb.setOnAction(action -> {
-      fireEvent(spec.get("target").toString(), "" + cb.isSelected());
+      fireEvent(chartName, spec.get("target").toString(), "" + cb.isSelected());
     });
     pane.add(cb, "grow,span");
   }
   
-  private void addColorControl(MigPane pane, Map<String, Object> spec)
+  private void addColorControl(MigPane pane, String chartName,
+      Map<String, Object> spec)
   {
     ColorPicker colorPicker = new ColorPicker();
     pane.add(colorPicker, "grow,span");
@@ -266,16 +285,16 @@ public class JsonGuiPane extends MigPane
         String webColor = String.format("#%02X%02X%02X",
             (int) (color.getRed() * 255), (int) (color.getGreen() * 255),
             (int) (color.getBlue() * 255));
-        fireEvent(new JsonGuiEvent(new JsonGuiEventPayload(spec.get("target")
-            .toString(), webColor), null, JsonGuiEvent.CHANGE_EVENT));
+        fireEvent(chartName, spec.get("target").toString(), webColor);
       }
     });
   }
   
   // Convenience function to fire a JsonGuiEvent
-  private void fireEvent(String target, String value)
+  private void fireEvent(String chartName, String target, String value)
   {
-    fireEvent(new JsonGuiEvent(new JsonGuiEventPayload(target, value), null,
+    fireEvent(new JsonGuiEvent(
+        new JsonGuiEventPayload(chartName, target, value), null,
         JsonGuiEvent.CHANGE_EVENT));
   }
   

@@ -18,7 +18,6 @@
     <title>DexCharts : Chord Diagram</title>
   </head>
   <body>
-  <div id="config" style="visibility: hidden"></div>
   <div id="ChartArea"></div>
 <script>
 <%
@@ -26,18 +25,9 @@
   println new File("javascript/jqueryui/latest/jquery-ui.min.js").text
   println new File("javascript/underscore/latest/underscore-min.js").text
   println new File("javascript/dexjs/latest/dex.min.js").text
-%>
-</script>
-<script>
-<%
+
   println dexData.toCsvString();
 %>
-
-function setConfiguration(config)
-{
-  chord.configure(config);
-  chord.update();
-}
 
 var chord = new dex.charts.d3.Chord({
   parent : "#ChartArea",
@@ -49,17 +39,26 @@ var chord = new dex.charts.d3.Chord({
 chord.load();
 chord.render();
 
-function setValue(key, value)
+function setValue(chartName, key, value)
 {
-  chord.attr(key, value).update();
-  chord.save();
+  switch (chartName) {
+    case "chord":
+    {
+      chord.attr(key, value).update();
+      chord.save();
+      break;
+    }
+  }
 }
 
 function getGuiDefinition()
 {
-  return "[" + JSON.stringify(chord.getGuiDefinition()) + "]";
-}
+  var guiDef = {
+    'chord': chord.getGuiDefinition()
+  };
 
+  return JSON.stringify(guiDef);
+}
 </script>
 </body>
 </html>

@@ -29,7 +29,7 @@
   </head>
   <body>
   <div id="config" style="visibility: hidden"></div>
-  <svg id="ChartArea"></svg>
+  <div id="ChartArea"></div>
 <script>
 
 <%
@@ -44,15 +44,25 @@ var chart = dex.charts.d3.ParallelCoordinates({
 chart.load();
 chart.render();
 
-function setValue(key, value)
+function setValue(chartName, key, value)
 {
-  chart.attr(key, value).update();
-  chart.save();
+  switch (chartName) {
+    case "pc":
+    {
+      chart.attr(key, value).update();
+      chart.save();
+      break;
+    }
+  }
 }
 
 function getGuiDefinition()
 {
-  return "[" + JSON.stringify(chart.getGuiDefinition()) + "]";
+  var guiDef = {
+    'pc': chart.getGuiDefinition()
+  };
+
+  return JSON.stringify(guiDef);
 }
 
 </script>

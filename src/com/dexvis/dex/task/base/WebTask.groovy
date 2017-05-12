@@ -192,14 +192,16 @@ class WebTask extends DexTask {
   
   public JsonGuiPane getConfigurationGui()
   {
-    JsonGuiPane configGui = new JsonGuiPane("", "[grow]", "[grow]");
+    JsonGuiPane configGui = new JsonGuiPane("", "[grow]", "[]");
     configGui.setGuiDefinition(getConfigDefinition());
     
     configGui.addEventHandler(
         JsonGuiEvent.CHANGE_EVENT,
         { event ->
-          //println "setValue('${event.getPayload().getTarget()}', '${event.getPayload().getValue()}')"
-          we.executeScript("setValue(\"" + event.getPayload().getTarget()
+          println "setValue('${event.getPayload().getComponent()}, '${event.getPayload().getTarget()}', '${event.getPayload().getValue()}')"
+          we.executeScript("setValue(\"" +
+            event.getPayload().getComponent() + "\",\"" +
+            event.getPayload().getTarget()
               + "\",\"" + event.getPayload().getValue() + "\");");
         });
     

@@ -1446,7 +1446,7 @@ var chord = function (userConfig) {
               "target": "innerRadius",
               "type": "int",
               "minValue": 0,
-              "maxValue": 2000,
+              "maxValue": 1000,
               "initialValue": 350
             },
             {
@@ -1455,7 +1455,7 @@ var chord = function (userConfig) {
               "target": "outerRadius",
               "type": "int",
               "minValue": 0,
-              "maxValue": 2000,
+              "maxValue": 1000,
               "initialValue": 400
             },
             {
@@ -3386,13 +3386,12 @@ var parallelcoordinates = function (userConfig) {
         [4, 16]
       ]
     },
-    'rows': 0,
     'normalize': false,
     'transform': '',
     'margin': {
-      'left': 20,
-      'right': 20,
-      'top': 20,
+      'left': 50,
+      'right': 50,
+      'top': 50,
       'bottom': 20
     },
     'axis': {
@@ -3445,7 +3444,7 @@ var parallelcoordinates = function (userConfig) {
         }
       },
       'dx': function (d, i) {
-        return -1 * Math.max(chart.config.axis.label.font.size(d, i) / 2, 8);
+        return "-.5em"
       },
       'dy': ".35em",
       'fill.fillColor': 'black',
@@ -3540,6 +3539,56 @@ var parallelcoordinates = function (userConfig) {
   };
 
   chart = new dex.component(userConfig, defaults);
+
+  chart.getGuiDefinition = function getGuiDefinition(userConfig) {
+    var defaults = {
+      "type": "group",
+      "name": "Parallel Coordinates",
+      "contents": [
+        dex.config.gui.dimensions(),
+        dex.config.gui.general(),
+        {
+          "type": "group",
+          "name": "Miscellaneous",
+          "contents": [
+            {
+              "name": "Normalize",
+              "description": "Will normalize the scale of each column consistently, when true.",
+              "target": "normalize",
+              "type": "boolean",
+              "initialValue": false
+            },
+            {
+              "name": "Title",
+              "description": "The title.",
+              "target": "title",
+              "type": "string",
+              "initialValue": ""
+            },
+            {
+              "name": "Axis Orientation",
+              "description": "Axis orientation",
+              "target": "axis.orient",
+              "type": "choice",
+              "choices": ["left", "right", "top", "bottom"],
+              "initialValue": "left"
+            }
+          ]
+        },
+        dex.config.gui.brush({}, "brush"),
+        dex.config.gui.text({name: "Tick Label"}, "axis.label"),
+        dex.config.gui.path({name: "Axis Line"}, "axis.line"),
+        dex.config.gui.text({name: "Axis Label"}, "verticalLabel"),
+        dex.config.gui.link({name: "Selected Links"}, "selected.link"),
+        dex.config.gui.link({name: "Unselected Links"}, "unselected.link")
+      ]
+    };
+    var guiDef = dex.config.expandAndOverlay(userConfig, defaults);
+    //guiDef = dex.config.gui.disable(guiDef, "axis.label.font.size");
+    dex.console.log("GUI-DEF", guiDef);
+    dex.config.gui.sync(chart, guiDef);
+    return guiDef;
+  };
 
   chart.render = function render() {
     d3 = dex.charts.d3.d3v3;
@@ -3696,7 +3745,7 @@ var parallelcoordinates = function (userConfig) {
         if (i == config.csv.header.length - 1) {
           myConfig.orient = 'right';
           myConfig.label.dx = function (d, i) {
-            return Math.max(chart.config.axis.label.font.size(d, i) / 2, 8);
+            return ".5em";
           }
         }
         // Configure and apply the axis.
@@ -3791,9 +3840,9 @@ var parallelcoordinates = function (userConfig) {
     return chart;
   };
 
-    chart.clone = function clone(override) {
-        return parallelcoordinates(dex.config.expandAndOverlay(override, userConfig));
-    };
+  chart.clone = function clone(override) {
+    return parallelcoordinates(dex.config.expandAndOverlay(override, userConfig));
+  };
 
   $(document).ready(function () {
     $(document).uitooltip({
@@ -9360,7 +9409,9 @@ module.exports = function (dex) {
       }
       else if (arguments.length == 1) {
         // REM: Need to getHierarchical
-        return this.config[name];
+        //dex.console.log("HIERARCHY=" + dex.object.getHierarchical(this.config, name));
+        return dex.object.getHierarchical(this.config, name);
+        //return this.config[name];
       }
       else if (arguments.length == 2) {
         //console.log("Setting Hieararchical: " + name + "=" + value);
@@ -9530,10 +9581,11 @@ module.exports = function (dex) {
     };
 
     // Used to load chart state from the DOM.
-    this.load = function () {
+    this.load = function (location) {
+      var loadLocation = location || "dexjs-config";
       var config = {};
 
-      $("#dexjs-config > div").each(function (i) {
+      $("#" + loadLocation + " > div").each(function (i) {
         dex.console.log("Loading Setting: '" + $(this).attr('id') + "'='" +
           $(this).attr('value') + "'");
         config[$(this).attr('id')] = $(this).attr('value');
@@ -9541,47 +9593,6 @@ module.exports = function (dex) {
 
       dex.console.debug("Loaded Configuration:", config);
       return this.configure(config);
-    };
-
-    // Used to print save log.
-    this.logSave = function logSave(saveConfig, prefix) {
-      var config = saveConfig || this.attr() || {};
-      var ns = (prefix) ? prefix + "." : "";
-      _.keys(config).forEach(function (key) {
-        var obj = config[key];
-        //dex.console.log(typeof obj);
-        // Don't serialize the CSV.
-        switch (key) {
-          case "csv":
-          case "channel": {
-            return;
-          }
-        }
-        if (config[key] == "") {
-          return;
-        }
-
-        // Arrays are not handled.
-        if (Array.isArray(obj)) {
-          return;
-        }
-        switch (typeof obj) {
-          case "object" : {
-            logSave(config[key], ns + key);
-            break;
-          }
-          // Don't serialize functions or things which are undefined.
-          case "function" :
-          case "undefined" : {
-            break;
-          }
-          default: {
-            dex.console.log("<div id='" + ns + key + "' value='" + config[key] + "'></div>");
-          }
-        }
-
-      });
-      return this;
     };
 
     this.saveRelative = function saveRelative(location, saveConfig, prefix) {
@@ -9616,7 +9627,7 @@ module.exports = function (dex) {
             break;
           }
           default: {
-            $(location).append("<div id='" + ns + key + "' value='" +
+            $("#" + location).append("<div id='" + ns + key + "' value='" +
               config[key] + "'></div>");
           }
         }
@@ -9625,11 +9636,12 @@ module.exports = function (dex) {
     };
 
     // Used to save chart state within the DOM.
-    this.save = function (config) {
-      $("#dexjs-config").remove();
-      $("body").prepend("<div id='dexjs-config' style='visibility: hidden;'></div>")
-      var saveConfig = config || this.attr() || {};
-      this.saveRelative("#dexjs-config", saveConfig);
+    this.save = function (location) {
+      var saveLocation = location || "dexjs-config";
+      $("#" + saveLocation).remove();
+      $("body").prepend("<div id='" + saveLocation + "' style='visibility: hidden;'></div>")
+      var saveConfig = this.attr();
+      this.saveRelative(saveLocation, saveConfig);
       return this;
     };
 
@@ -9867,7 +9879,10 @@ module.exports = function config(dex) {
           'dy': 0,
           'writingMode': undefined,
           'anchor': 'start',
-          'fill': 'fill',
+          'fill': dex.config.fill(),
+          'stroke': dex.config.stroke({
+            'width' : 0
+          }),
           'format': undefined,
           'events': dex.config.events()
         };
@@ -9894,9 +9909,10 @@ module.exports = function config(dex) {
         dex.config.setAttr(node, "y", textSpec.y, i);
         dex.config.setAttr(node, "dx", textSpec.dx, i);
         dex.config.setAttr(node, "dy", textSpec.dy, i);
-        dex.config.setAttr(node, "fill", textSpec.fill, i);
         dex.config.setStyle(node, "text-anchor", textSpec.anchor, i);
         dex.config.configureFont(node, textSpec.font, i);
+        dex.config.configureFill(node, textSpec.fill, i);
+        dex.config.configureStroke(node, textSpec.stroke, i);
         dex.config.setAttr(node, 'textLength', textSpec.textLength, i);
         dex.config.setAttr(node, 'lengthAdjust', textSpec.lengthAdjust, i);
         dex.config.setAttr(node, 'transform', textSpec.transform, i);
@@ -10991,13 +11007,6 @@ module.exports = function gui(dex) {
                 "initialValue": ""
               },
               {
-                "name": "Text Color",
-                "description": "The text color.",
-                "target": ns + "fill",
-                "type" : "color",
-                "initialValue": "black"
-              },
-              {
                 "name": "Anchor",
                 "description": "The text anchor.",
                 "target": ns + "anchor",
@@ -11059,7 +11068,8 @@ module.exports = function gui(dex) {
             ]
           },
           dex.config.gui.font(config.font || {}, ns + "font"),
-          dex.config.gui.fill(config.fill || {}, ns + "fill")
+          dex.config.gui.fill(config.fill || {}, ns + "fill"),
+          dex.config.gui.stroke(config.stroke || {}, ns + "stroke")
         ]
       };
       return dex.config.expandAndOverlay(userConfig, defaults);
@@ -11088,22 +11098,16 @@ module.exports = function gui(dex) {
           {
             "name": "Fill",
             "description": "The fill color or none.",
-            "target": ns + "fill",
+            "target": ns + "fillColor",
             "type": "choice",
             "choices": ["none", "red", "green", "blue", "black", "white", "yellow",
               "purple", "orange", "pink", "cyan", "steelblue", "grey",],
             "initialValue": "none"
           },
           {
-            "name": "Fill",
-            "description": "The text anchor.",
-            "target": ns + "fill",
-            "type": "color"
-          },
-          {
             "name": "Fill Opacity",
             "description": "The text anchor.",
-            "target": ns + "opacity",
+            "target": ns + "fillOpacity",
             "type": "float",
             "minValue": 0.0,
             "maxValue": 1.0,
@@ -11278,8 +11282,8 @@ module.exports = function gui(dex) {
               }
             ]
           },
-          dex.config.gui.fill(config.fill || {}, ns + prefix),
-          dex.config.gui.stroke(config.stroke || {}, ns + prefix)
+          dex.config.gui.fill(config.fill || {}, ns + "fill"),
+          dex.config.gui.stroke(config.stroke || {}, ns + "stroke")
         ]
       };
       dex.config.gui.fill(config, ns + "fill");
@@ -11292,8 +11296,60 @@ module.exports = function gui(dex) {
         "type": "group",
         "name": "Path",
         "contents": [
-          dex.config.gui.fill(config.fill || {}, ns + prefix),
-          dex.config.gui.stroke(config.stroke || {}, ns + prefix)
+          dex.config.gui.fill(config.fill || {}, ns + "fill"),
+          dex.config.gui.stroke(config.stroke || {}, ns + "stroke")
+        ]
+      };
+      return dex.config.expandAndOverlay(userConfig, defaults);
+    },
+    'brush': function path(config, prefix) {
+      var ns = (typeof prefix !== 'undefined') ? (prefix + ".") : "";
+      var userConfig = config || {};
+      var defaults = {
+        "type": "group",
+        "name": "Brush",
+        "contents": [
+          {
+            "type": "group",
+            "name": "Dimensions and Color",
+            "contents": [
+              {
+                "name": "Brush Color",
+                "type": "color",
+                "target": ns + "color",
+                "description": "Brush color",
+                "intialValue": "steelblue"
+              },
+              {
+                "name": "Brush Opacity",
+                "type": "float",
+                "target": ns + "opacity",
+                "minValue": 0,
+                "maxValue": 1,
+                "description": "Brush color",
+                "intialValue": .8
+              },
+              {
+                "name": "Brush Width",
+                "type": "int",
+                "description": "Brush Width",
+                "target": ns + "width",
+                "minValue": 0,
+                "maxValue": 30,
+                "intialValue": 12
+              },
+              {
+                "name": "Brush X Offset",
+                "type": "int",
+                "description": "Brush X Offset",
+                "target": ns + "x",
+                "minValue": -30,
+                "maxValue": 30,
+                "intialValue": -6
+              }
+            ]
+          },
+          dex.config.gui.stroke(config.stroke || {}, ns + "stroke")
         ]
       };
       return dex.config.expandAndOverlay(userConfig, defaults);
@@ -11354,13 +11410,45 @@ module.exports = function gui(dex) {
               }
             ]
           },
-          dex.config.gui.fill(config.fill || {}, ns + prefix),
-          dex.config.gui.stroke(config.stroke || {}, ns + prefix)
+          dex.config.gui.fill(config.fill || {}, ns + "fill"),
+          dex.config.gui.stroke(config.stroke || {}, ns + "stroke")
         ]
       };
       dex.config.gui.fill(config, ns + "fill");
       return dex.config.expandAndOverlay(userConfig, defaults);
     },
+    'disable': function disable(config, field) {
+      if (config.type == "group") {
+        config.contents.forEach(function (elt, i) {
+          if (elt.hasOwnProperty("target") && elt.target == field)
+          {
+            delete config.contents[i];
+          }
+          else {
+            disable(elt, field);
+          }
+        })
+      }
+
+      return config;
+    },
+    'sync': function sync(chart, guiDef) {
+      if (guiDef.type == "group") {
+        guiDef.contents.forEach(function (elt, i) {
+            sync(chart, elt);
+        })
+      }
+      else {
+        var value = chart.attr(guiDef.target);
+        var valueType = typeof value;
+        if (valueType != "undefined" && valueType != "function") {
+          guiDef.initialValue = value;
+          //dex.console.log(guiDef.target + "=" + chart.attr(guiDef.target));
+        }
+      }
+
+      return guiDef;
+    }
   };
 };
 },{}],54:[function(require,module,exports){
@@ -13864,14 +13952,6 @@ module.exports = function object(dex) {
       throw new Error("Unable to copy obj! Its type isn't supported.");
     },
 
-    /*
-     This version causes expand to continue forever.
-
-     'isEmpty' : function isEmpty(obj) {
-     return _.isEmpty(obj);
-     };
-     */
-
     /**
      *
      * Kind of misleading.  This really signals when expand should quit
@@ -13948,7 +14028,7 @@ module.exports = function object(dex) {
     'isNode': function isNode(obj) {
       return (
         typeof Node === "object" ? obj instanceof Node :
-        obj && typeof obj === "object" && typeof obj.nodeType === "number" && typeof obj.nodeName === "string"
+          obj && typeof obj === "object" && typeof obj.nodeType === "number" && typeof obj.nodeName === "string"
       );
     },
 
@@ -13965,7 +14045,7 @@ module.exports = function object(dex) {
     'isElement': function isElement(obj) {
       return (
         typeof HTMLElement === "object" ? obj instanceof HTMLElement : //DOM2
-        obj && typeof obj === "object" && obj.nodeType === 1 && typeof obj.nodeName === "string"
+          obj && typeof obj === "object" && obj.nodeType === 1 && typeof obj.nodeName === "string"
       );
     },
 
@@ -14001,27 +14081,6 @@ module.exports = function object(dex) {
       //return typeof obj === 'function';
       return (typeof obj === "function");
     },
-
-    /**
-     *
-     * Visit each local property within.
-     *
-     * @param obj
-     * @param func
-     */
-    /*
-     'visit' : function (obj, func) {
-     var prop;
-     func(obj);
-     for (prop in obj) {
-     if (obj.hasOwnProperty(prop)) {
-     if (typeof obj[prop] === 'object') {
-     dex.object.visit(obj[prop], func);
-     }
-     }
-     }
-     }
-     */
 
     /**
      *
@@ -14095,7 +14154,27 @@ module.exports = function object(dex) {
       }
 
       return hierarchy;
+    },
+
+    'getHierarchical': function (hierarchy, name) {
+      //dex.console.log("getHierarchical", hierarchy, name);
+      if ((typeof hierarchy) == "undefined" ||
+        (typeof name == "undefined")) {
+        return undefined;
+      }
+      var nsIndex = name.indexOf(".");
+      if (nsIndex >= 0) {
+        var key = name.substring(0, nsIndex);
+        var remainingKey = name.substring(nsIndex+1);
+        //dex.console.log("NAME: ", key, remainingKey);
+        return dex.object.getHierarchical(hierarchy[key], remainingKey);
+      }
+      else
+      {
+        return hierarchy[name];
+      }
     }
+
   };
 };
 

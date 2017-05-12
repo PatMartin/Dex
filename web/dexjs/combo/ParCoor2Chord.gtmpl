@@ -32,8 +32,8 @@
     <title>DexCharts : Parallel Coordinates To Chord</title>
   </head>
   <body>
-<svg id="ChartArea1"></svg>
-<svg id="ChartArea2"></svg>
+<div id="ChartArea1"></div>
+<div id="ChartArea2"></div>
 <script>
 <%
   println new File("javascript/jquery/latest/jquery-2.1.3.min.js").text
@@ -60,9 +60,39 @@ chord.subscribe(pcChart, "select", function(msg) {
   chord.attr('csv', msg.selected).update();
 });
 
+pcChart.load("dexjs-config-pc");
 pcChart.render();
+
+chord.load("dexjs-config-chord");
 chord.render();
 
+function getGuiDefinition()
+{
+  var guiDef = {
+    'pc'   : pcChart.getGuiDefinition(),
+    'chord': chord.getGuiDefinition()
+  };
+
+  return JSON.stringify(guiDef);
+}
+
+function setValue(chartName, key, value)
+{
+  switch (chartName) {
+    case "pc":
+    {
+      pcChart.attr(key, value).update();
+      pcChart.save("dexjs-config-pc");
+      break;
+    }
+    case "chord":
+    {
+      chord.attr(key, value).update();
+      chord.save("dexjs-config-chord");
+      break;
+    }
+  }
+}
 </script>
 </body>
 </html>
