@@ -48,7 +48,7 @@ class WebTask extends DexTask {
   private MigPane configPane = null
   
   @XStreamOmitField
-  private String templatePath = ""
+  protected String templatePath = ""
   @XStreamOmitField
   private String templateCode = "Insert template code here..."
   @XStreamOmitField
@@ -81,6 +81,11 @@ class WebTask extends DexTask {
       htmlChooser = new DexFileChooser("output",
           "Load HTML", "Save HTML", "HTML", "html")
     }
+    
+    wv.minWidth(800);
+    wv.prefWidth(800);
+    wv.minHeight(600);
+    wv.prefHeight(600);
     
     this.templatePath = templatePath
     we.setOnAlert(new EventHandler<WebEvent<String>>()
@@ -128,9 +133,18 @@ class WebTask extends DexTask {
           new ChangeListener<State>() {
             public void changed(ObservableValue ov, State oldState, State newState) {
               if (newState == Worker.State.SUCCEEDED) {
-                String guiDefinition = (String) we
-                    .executeScript("getGuiDefinition();");
-                    setConfigDefinition(guiDefinition);
+                try
+                {
+                  String guiDefinition = (String) we
+                      .executeScript("getGuiDefinition();");
+                  setConfigDefinition(guiDefinition);
+                }
+                catch (Exception ex)
+                {
+                  System.err.println("No GUI Definition for: '" + getName() +
+                      "': Add getGuiDefinition() function to '" +
+                      templatePath + "'");
+                }
               }
             }
           });
@@ -184,7 +198,7 @@ class WebTask extends DexTask {
     configGui.addEventHandler(
         JsonGuiEvent.CHANGE_EVENT,
         { event ->
-          println "setValue('${event.getPayload().getTarget()}', '${event.getPayload().getValue()}')"
+          //println "setValue('${event.getPayload().getTarget()}', '${event.getPayload().getValue()}')"
           we.executeScript("setValue(\"" + event.getPayload().getTarget()
               + "\",\"" + event.getPayload().getValue() + "\");");
         });
@@ -206,7 +220,7 @@ class WebTask extends DexTask {
   
   public void keyPress(KeyEvent evt)
   {
-    System.out.println("*** keypress: " + evt);
+    //System.out.println("*** keypress: " + evt);
     
     if (evt.getCode().equals(KeyCode.S) && evt.isControlDown())
     {

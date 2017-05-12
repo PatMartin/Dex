@@ -285,7 +285,7 @@ class WebDriverTask extends DexTask
 
   public void keyPress(KeyEvent evt)
   {
-    System.out.println("*** keypress: " + evt);
+    //System.out.println("*** keypress: " + evt);
 
     if (evt.getCode().equals(KeyCode.S) && evt.isControlDown())
     {

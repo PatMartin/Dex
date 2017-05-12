@@ -32,11 +32,6 @@
   <svg id="ChartArea"></svg>
 <script>
 
-function setConfiguration(config)
-{
-  chart.configure(config).update();
-}
-
 <%
   println dexData.toCsvString()
 %>
@@ -44,16 +39,20 @@ function setConfiguration(config)
 var chart = dex.charts.d3.ParallelCoordinates({
   parent : "#ChartArea",
   csv : csv
-}).render();
+});
+
+chart.load();
+chart.render();
 
 function setValue(key, value)
 {
   chart.attr(key, value).update();
+  chart.save();
 }
 
 function getGuiDefinition()
 {
-  return JSON.stringify(chart.getGuiDefinition());
+  return "[" + JSON.stringify(chart.getGuiDefinition()) + "]";
 }
 
 </script>

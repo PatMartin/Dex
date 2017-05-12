@@ -93,146 +93,183 @@ public class JsonGuiPane extends MigPane
       List<Map<String, Object>> specs = (List<Map<String, Object>>) jsonSpec;
       
       // If we have at least one spec then...
-      if (specs.size() > 0)
+      if (specs != null && specs.size() > 0)
       {
-        // If we are dealing with a group definition, create an accordion
-        // control and add each under a titled pane.
-        String specType = (String) specs.get(0).get("type");
-        if (specType.equalsIgnoreCase("group"))
+        for (Map<String, Object> spec : specs)
         {
-          Accordion accordion = new Accordion();
-          for (Map<String, Object> spec : specs)
-          {
-            TitledPane tp = new TitledPane();
-            tp.setText(getValue(spec, "name", "Unnamed"));
-            accordion.getPanes().add(tp);
-            MigPane contentPane = new MigPane("", "[][grow][]", "[]");
-            addControls(contentPane, spec.get("contents"));
-            tp.setContent(contentPane);
-          }
-          // Adding grouped specifications.
-          pane.add(accordion, "grow,span");
-        }
-        else
-        {
-          // Adding single components.
-          for (Map<String, Object> spec : specs)
-          {
-            Label label = new Label(getValue(spec, "name", "Unnamed"));
-            pane.add(label);
-            switch (spec.get("type").toString())
-            {
-            // Express ints as a slider.
-              case "int":
-              {
-                Slider slider = new Slider();
-                slider.setMin(getIntValue(spec, "minValue", 0));
-                slider.setMax(getIntValue(spec, "maxValue", 100));
-                slider.setValue(getIntValue(spec, "initialValue", 0));
-                
-                Label valueLabel = new Label(
-                    getValue(spec, "initialValue", "0"));
-                
-                slider.valueProperty().addListener(
-                    (observable, oldVal, newVal) -> {
-                      int val = newVal.intValue();
-                      valueLabel.setText("" + val);
-                      fireEvent(spec.get("target").toString(), "" + val);
-                    });
-                pane.add(slider, "growx");
-                pane.add(valueLabel, "span");
-                break;
-              }
-              // Express floats as a slider as well.
-              case "float":
-              {
-                Slider slider = new Slider();
-                slider.setMin(getDoubleValue(spec, "minValue", 0.0));
-                slider.setMax(getDoubleValue(spec, "maxValue", 100.0));
-                slider.setValue(getDoubleValue(spec, "initialValue", 0.0));
-                
-                Label valueLabel = new Label(
-                    getValue(spec, "initialValue", "0"));
-                
-                slider.valueProperty().addListener(
-                    (observable, oldVal, newVal) -> {
-                      double val = newVal.doubleValue();
-                      valueLabel.setText("" + val);
-                      fireEvent(spec.get("target").toString(), "" + val);
-                    });
-                pane.add(slider, "growx");
-                pane.add(valueLabel, "span");
-                break;
-              }
-              // Expressed string input in a text field.
-              case "string":
-              {
-                TextField textField = new TextField(getValue(spec,
-                    "initialValue", ""));
-                textField.textProperty().addListener(
-                    (observable, oldVal, newVal) -> {
-                      String val = newVal.toString();
-                      fireEvent(new JsonGuiEvent(new JsonGuiEventPayload(spec
-                          .get("target").toString(), "" + val), null,
-                          JsonGuiEvent.CHANGE_EVENT));
-                    });
-                pane.add(textField, "grow,span");
-                break;
-              }
-              // Express a choice as a ChoiceBox.
-              case "choice":
-              {
-                ChoiceBox cb = new ChoiceBox(
-                    FXCollections.observableArrayList((ArrayList) spec
-                        .get("choices")));
-                cb.getSelectionModel().select(
-                    getValue(spec, "initialValue", ""));
-                pane.add(cb, "grow,span");
-                cb.setOnAction(action -> {
-                  fireEvent(spec.get("target").toString(), cb
-                      .getSelectionModel().selectedItemProperty().getValue()
-                      .toString());
-                });
-                break;
-              }
-              // Express booleans as a checkbox.
-              case "boolean":
-              {
-                CheckBox cb = new CheckBox();
-                cb.setSelected(getBooleanValue(spec, "initialValue", false));
-                
-                cb.setOnAction(action -> {
-                  fireEvent(spec.get("target").toString(), "" + cb.isSelected());
-                });
-                pane.add(cb, "grow,span");
-                break;
-              }
-              // Express color as a color-picker.
-              case "color":
-              {
-                ColorPicker colorPicker = new ColorPicker();
-                pane.add(colorPicker, "grow,span");
-                colorPicker.setOnAction(new EventHandler()
-                {
-                  public void handle(Event t)
-                  {
-                    Color color = colorPicker.getValue();
-                    String webColor = String.format("#%02X%02X%02X",
-                        (int) (color.getRed() * 255),
-                        (int) (color.getGreen() * 255),
-                        (int) (color.getBlue() * 255));
-                    fireEvent(new JsonGuiEvent(new JsonGuiEventPayload(spec
-                        .get("target").toString(), webColor), null,
-                        JsonGuiEvent.CHANGE_EVENT));
-                  }
-                });
-                break;
-              }
-            }
-          }
+          String specType = spec.get("type").toString();
+          addControl(pane, specType, spec);
         }
       }
     }
+  }
+  
+  private void addControl(MigPane pane, String type, Map<String, Object> spec)
+  {
+    switch (type)
+    {
+      case "group":
+      {
+        addGroupControl(pane, type, spec);
+        break;
+      }
+      default:
+      {
+        addSingleControl(pane, type, spec);
+        break;
+      }
+    }
+  }
+  
+  private void addGroupControl(MigPane pane, String type,
+      Map<String, Object> spec)
+  {
+    Accordion accordion = new Accordion();
+    TitledPane tp = new TitledPane();
+    tp.setText(getValue(spec, "name", "Unnamed"));
+    accordion.getPanes().add(tp);
+    MigPane contentPane = new MigPane("", "[][grow][]", "[]");
+    addControls(contentPane, spec.get("contents"));
+    tp.setContent(contentPane);
+    
+    // Adding grouped specifications.
+    pane.add(accordion, "grow,span");
+  }
+  
+  private void addSingleControl(MigPane pane, String type,
+      Map<String, Object> spec)
+  {
+    Label label = new Label(getValue(spec, "name", "Unnamed"));
+    pane.add(label);
+    
+    switch (type)
+    {
+    // Express ints as a slider.
+      case "int":
+      {
+        addIntControl(pane, spec);
+        break;
+      }
+      // Express floats as a slider as well.
+      case "float":
+      {
+        addFloatControl(pane, spec);
+        break;
+      }
+      // Expressed string input in a text field.
+      case "string":
+      {
+        addStringControl(pane, spec);
+        break;
+      }
+      // Express a choice as a ChoiceBox.
+      case "choice":
+      {
+        addChoiceControl(pane, spec);
+        break;
+      }
+      // Express booleans as a checkbox.
+      case "boolean":
+      {
+        addBooleanControl(pane, spec);
+        break;
+      }
+      // Express color as a color-picker.
+      case "color":
+      {
+        addColorControl(pane, spec);
+        break;
+      }
+    }
+  }
+  
+  private void addIntControl(MigPane pane, Map<String, Object> spec)
+  {
+    Slider slider = new Slider();
+    slider.setMin(getIntValue(spec, "minValue", 0));
+    slider.setMax(getIntValue(spec, "maxValue", 100));
+    slider.setValue(getIntValue(spec, "initialValue", 0));
+    
+    Label valueLabel = new Label(getValue(spec, "initialValue", "0"));
+    
+    slider.valueProperty().addListener((observable, oldVal, newVal) -> {
+      int val = newVal.intValue();
+      valueLabel.setText("" + val);
+      fireEvent(spec.get("target").toString(), "" + val);
+    });
+    pane.add(slider, "growx");
+    pane.add(valueLabel, "span");
+  }
+  
+  private void addFloatControl(MigPane pane, Map<String, Object> spec)
+  {
+    Slider slider = new Slider();
+    slider.setMin(getDoubleValue(spec, "minValue", 0.0));
+    slider.setMax(getDoubleValue(spec, "maxValue", 100.0));
+    slider.setValue(getDoubleValue(spec, "initialValue", 0.0));
+    
+    Label valueLabel = new Label(getValue(spec, "initialValue", "0"));
+    
+    slider.valueProperty().addListener((observable, oldVal, newVal) -> {
+      double val = newVal.doubleValue();
+      valueLabel.setText("" + val);
+      fireEvent(spec.get("target").toString(), "" + val);
+    });
+    pane.add(slider, "growx");
+    pane.add(valueLabel, "span");
+  }
+  
+  private void addStringControl(MigPane pane, Map<String, Object> spec)
+  {
+    TextField textField = new TextField(getValue(spec, "initialValue", ""));
+    textField.textProperty().addListener(
+        (observable, oldVal, newVal) -> {
+          String val = newVal.toString();
+          fireEvent(new JsonGuiEvent(new JsonGuiEventPayload(spec.get("target")
+              .toString(), "" + val), null, JsonGuiEvent.CHANGE_EVENT));
+        });
+    pane.add(textField, "grow,span");
+  }
+  
+  private void addChoiceControl(MigPane pane, Map<String, Object> spec)
+  {
+    ChoiceBox cb = new ChoiceBox(
+        FXCollections.observableArrayList((ArrayList) spec.get("choices")));
+    cb.getSelectionModel().select(getValue(spec, "initialValue", ""));
+    pane.add(cb, "grow,span");
+    cb.setOnAction(action -> {
+      fireEvent(spec.get("target").toString(), cb.getSelectionModel()
+          .selectedItemProperty().getValue().toString());
+    });
+  }
+  
+  private void addBooleanControl(MigPane pane, Map<String, Object> spec)
+  {
+    CheckBox cb = new CheckBox();
+    cb.setSelected(getBooleanValue(spec, "initialValue", false));
+    
+    cb.setOnAction(action -> {
+      fireEvent(spec.get("target").toString(), "" + cb.isSelected());
+    });
+    pane.add(cb, "grow,span");
+  }
+  
+  private void addColorControl(MigPane pane, Map<String, Object> spec)
+  {
+    ColorPicker colorPicker = new ColorPicker();
+    pane.add(colorPicker, "grow,span");
+    colorPicker.setOnAction(new EventHandler()
+    {
+      public void handle(Event t)
+      {
+        Color color = colorPicker.getValue();
+        String webColor = String.format("#%02X%02X%02X",
+            (int) (color.getRed() * 255), (int) (color.getGreen() * 255),
+            (int) (color.getBlue() * 255));
+        fireEvent(new JsonGuiEvent(new JsonGuiEventPayload(spec.get("target")
+            .toString(), webColor), null, JsonGuiEvent.CHANGE_EVENT));
+      }
+    });
   }
   
   // Convenience function to fire a JsonGuiEvent

@@ -2,7 +2,7 @@
    <tasks class="java.util.ArrayList">
       <task-item name="Read CSV" active="true">
          <task class="com.dexvis.dex.task.input.ReadCsv">
-            
+            <config-def>[ { &quot;type&quot; : &quot;label&quot;, &quot;initialValue&quot;: &quot;No configuration is available&quot; } ]</config-def>
             <fileText>data\presidents.csv</fileText>
             <limitRows>false</limitRows>
             <rowLimitText>0</rowLimitText>
@@ -11,17 +11,17 @@
       </task-item>
       <task-item name="Trim Columns" active="true">
          <task class="com.dexvis.dex.task.tablemanipulation.TrimColumns">
-            
+            <config-def>[ { &quot;type&quot; : &quot;label&quot;, &quot;initialValue&quot;: &quot;No configuration is available&quot; } ]</config-def>
          </task>
       </task-item>
       <task-item name="View Data" active="true">
          <task class="com.dexvis.dex.task.utilities.ViewData">
-            
+            <config-def>[ { &quot;type&quot; : &quot;label&quot;, &quot;initialValue&quot;: &quot;No configuration is available&quot; } ]</config-def>
          </task>
       </task-item>
       <task-item name="Select Columns" active="true">
          <task class="com.dexvis.dex.task.tablemanipulation.SelectColumns">
-            
+            <config-def>[ { &quot;type&quot; : &quot;label&quot;, &quot;initialValue&quot;: &quot;No configuration is available&quot; } ]</config-def>
             <columnList>&lt;com.dexvis.simple.types.SimpleListSelectionView&gt;
   &lt;sourceList&gt;
     &lt;string&gt;Presidency&lt;/string&gt;
@@ -36,88 +36,92 @@
       </task-item>
       <task-item name="Chord" active="false">
          <task class="com.dexvis.dex.task.vis.dexjs.Chord">
+            <config-def>[ { &quot;type&quot; : &quot;label&quot;, &quot;initialValue&quot;: &quot;No configuration is available&quot; } ]</config-def>
          </task>
       </task-item>
       <task-item name="Chord Multiples" active="false">
          <task class="com.dexvis.dex.task.vis.dexjs.multiples.d3.ChordMultiples">
-            
+            <config-def>[ { &quot;type&quot; : &quot;label&quot;, &quot;initialValue&quot;: &quot;No configuration is available&quot; } ]</config-def>
          </task>
       </task-item>
       <task-item name="Dendrogram" active="false">
          <task class="com.dexvis.dex.task.vis.dexjs.Dendrogram">
+            <config-def>[ { &quot;type&quot; : &quot;label&quot;, &quot;initialValue&quot;: &quot;No configuration is available&quot; } ]</config-def>
          </task>
       </task-item>
       <task-item name="Orbital Layout" active="false">
          <task class="com.dexvis.dex.task.vis.dexjs.OrbitalLayout">
+            <config-def>[ { &quot;type&quot; : &quot;label&quot;, &quot;initialValue&quot;: &quot;No configuration is available&quot; } ]</config-def>
          </task>
       </task-item>
-      <task-item name="Parallel Coordinates" active="false">
+      <task-item name="Parallel Coordinates" active="true">
          <task class="com.dexvis.dex.task.vis.dexjs.ParallelCoordinates">
+            <config-def>[ { &quot;type&quot; : &quot;label&quot;, &quot;initialValue&quot;: &quot;No configuration is available&quot; } ]</config-def>
          </task>
       </task-item>
       <task-item name="Par Coord -&gt; Chord" active="false">
          <task class="com.dexvis.dex.task.vis.dexjs.ParCoor2Chord">
-            
+            <config-def>[ { &quot;type&quot; : &quot;label&quot;, &quot;initialValue&quot;: &quot;No configuration is available&quot; } ]</config-def>
          </task>
       </task-item>
       <task-item name="Par Coord -&gt; Dendrogram" active="false">
          <task class="com.dexvis.dex.task.vis.dexjs.ParCoor2Dendrogram">
-            
+            <config-def>[ { &quot;type&quot; : &quot;label&quot;, &quot;initialValue&quot;: &quot;No configuration is available&quot; } ]</config-def>
          </task>
       </task-item>
       <task-item name="Par Coord -&gt; Table" active="false">
          <task class="com.dexvis.dex.task.vis.dexjs.ParCoor2Table">
-            
+            <config-def>[ { &quot;type&quot; : &quot;label&quot;, &quot;initialValue&quot;: &quot;No configuration is available&quot; } ]</config-def>
          </task>
       </task-item>
       <task-item name="Radial Tree" active="false">
          <task class="com.dexvis.dex.task.vis.dexjs.RadialTree">
-            
+            <config-def>[ { &quot;type&quot; : &quot;label&quot;, &quot;initialValue&quot;: &quot;No configuration is available&quot; } ]</config-def>
          </task>
       </task-item>
       <task-item name="Sankey Diagram" active="false">
          <task class="com.dexvis.dex.task.vis.dexjs.Sankey">
-            
+            <config-def>[ { &quot;type&quot; : &quot;label&quot;, &quot;initialValue&quot;: &quot;No configuration is available&quot; } ]</config-def>
          </task>
       </task-item>
       <task-item name="Sql -&gt; ParCoor" active="false">
          <task class="com.dexvis.dex.task.vis.dexjs.Sql2ParCoord">
-            
+            <config-def>[ { &quot;type&quot; : &quot;label&quot;, &quot;initialValue&quot;: &quot;No configuration is available&quot; } ]</config-def>
          </task>
       </task-item>
       <task-item name="Sql -&gt; Table" active="false">
          <task class="com.dexvis.dex.task.vis.dexjs.Sql2Table">
-            
+            <config-def>[ { &quot;type&quot; : &quot;label&quot;, &quot;initialValue&quot;: &quot;No configuration is available&quot; } ]</config-def>
          </task>
       </task-item>
       <task-item name="Sunburst" active="false">
          <task class="com.dexvis.dex.task.vis.dexjs.Sunburst">
-            
+            <config-def>[ { &quot;type&quot; : &quot;label&quot;, &quot;initialValue&quot;: &quot;No configuration is available&quot; } ]</config-def>
          </task>
       </task-item>
       <task-item name="Treemap" active="false">
          <task class="com.dexvis.dex.task.vis.dexjs.Treemap">
-            
+            <config-def>[ { &quot;type&quot; : &quot;label&quot;, &quot;initialValue&quot;: &quot;No configuration is available&quot; } ]</config-def>
          </task>
       </task-item>
       <task-item name="Par Coord -&gt; Sankey" active="false">
          <task class="com.dexvis.dex.task.vis.dexjs.ParCoor2Sankey">
-            
+            <config-def>[ { &quot;type&quot; : &quot;label&quot;, &quot;initialValue&quot;: &quot;No configuration is available&quot; } ]</config-def>
          </task>
       </task-item>
       <task-item name="Par Coord -&gt; Network" active="false">
          <task class="com.dexvis.dex.task.vis.dexjs.ParCoor2Network">
-            
+            <config-def>[ { &quot;type&quot; : &quot;label&quot;, &quot;initialValue&quot;: &quot;No configuration is available&quot; } ]</config-def>
          </task>
       </task-item>
-      <task-item name="Par Coord -&gt; Treemap" active="true">
+      <task-item name="Par Coord -&gt; Treemap" active="false">
          <task class="com.dexvis.dex.task.vis.dexjs.ParCoor2Treemap">
-            
+            <config-def>[ { &quot;type&quot; : &quot;label&quot;, &quot;initialValue&quot;: &quot;No configuration is available&quot; } ]</config-def>
          </task>
       </task-item>
-      <task-item name="Par Coord -&gt; Sunburst" active="true">
+      <task-item name="Par Coord -&gt; Sunburst" active="false">
          <task class="com.dexvis.dex.task.vis.dexjs.ParCoor2Sunburst">
-            
+            <config-def>[ { &quot;type&quot; : &quot;label&quot;, &quot;initialValue&quot;: &quot;No configuration is available&quot; } ]</config-def>
          </task>
       </task-item>
    </tasks>

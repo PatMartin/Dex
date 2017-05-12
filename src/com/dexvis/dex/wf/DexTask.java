@@ -56,7 +56,7 @@ public class DexTask extends Task<DexTask> implements Comparable<DexTask>,
   private boolean active = true;
   
   @Element(name= "config-def", required = false)
-  private String configDefinition = ""; 
+  private String configDefinition = "[ { \"type\" : \"label\", \"initialValue\": \"No configuration is available\" } ]";
   
   public DexTask()
   {
