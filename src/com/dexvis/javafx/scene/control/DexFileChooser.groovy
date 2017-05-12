@@ -128,11 +128,13 @@ class DexFileChooser {
       
       File saveFile = fc.showSaveDialog(null)
       
-      if (!saveFile.getCanonicalPath().endsWith("." + ext)) {
-        saveFile = new File(saveFile.getCanonicalPath() + "." + ext)
+      if (saveFile != null) {
+        if (!saveFile.getCanonicalPath().endsWith("." + ext)) {
+          saveFile = new File(saveFile.getCanonicalPath() + "." + ext)
+        }
+        
+        startDir = saveFile.getParent()
       }
-      
-      startDir = saveFile.getParent()
       return saveFile
     }
     catch(Exception ex) {
