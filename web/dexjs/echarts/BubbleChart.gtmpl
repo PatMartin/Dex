@@ -72,7 +72,7 @@ var bubblechart = new dex.charts.echarts.BubbleChart({
   csv : csv
 });
 
-bubblechart.load('#config');
+bubblechart.load();
 bubblechart.render();
 
 </script>

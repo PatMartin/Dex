@@ -44,7 +44,7 @@ var network = new dex.charts.d3plus.RingNetwork({
   'edges' : {'arrows' : true},
   'csv': csv });
 
-network.load('#config').render();
+network.load().render();
 
 </script>
 </body>

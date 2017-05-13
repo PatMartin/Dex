@@ -47,7 +47,7 @@ var pieChart = dex.charts.c3.PieChart({
   csv : csv
 });
 
-pieChart.load('#config');
+pieChart.load();
 pieChart.render();
 
 </script>

@@ -42,7 +42,7 @@ var network = dex.charts.vis.Network({
   'csv'    : csv
 });
 
-network.load('#config');
+network.load();
 network.render();
 
 </script>

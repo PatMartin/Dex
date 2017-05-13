@@ -71,7 +71,7 @@ var treemapBarChart = new dex.charts.d3.TreemapBarChart({
   csv : csv
 });
 
-treemapBarChart.load('#config');
+treemapBarChart.load();
 treemapBarChart.render();
 
 function setValue(key, value)

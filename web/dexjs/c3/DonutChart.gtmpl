@@ -47,7 +47,7 @@ var donutChart = dex.charts.c3.DonutChart({
   csv : csv
 });
 
-donutChart.load('#config');
+donutChart.load();
 donutChart.render();
 
 </script>

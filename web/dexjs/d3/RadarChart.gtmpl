@@ -49,7 +49,7 @@ var radar = new dex.charts.d3.RadarChart({
   csv : csv
 });
 
-radar.load('#config');
+radar.load();
 radar.render();
 
 function setValue(key, value)

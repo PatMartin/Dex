@@ -46,7 +46,7 @@ var bubbleChart = new dex.charts.nvd3.BubbleChart({
   csv : csv
 });
 
-bubbleChart.load('#config');
+bubbleChart.load();
 bubbleChart.render();
 
 </script>

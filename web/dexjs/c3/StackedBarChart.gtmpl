@@ -48,7 +48,7 @@ var stackedBarChart = dex.charts.c3.StackedBarChart({
   csv : csv
 });
 
-stackedBarChart.load('#config');
+stackedBarChart.load();
 stackedBarChart.render();
 
 </script>

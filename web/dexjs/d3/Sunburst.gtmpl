@@ -51,7 +51,7 @@ var sunburst = dex.charts.d3.Sunburst({
   parent : "#ChartArea",
   csv : csv });
 
-sunburst.load('#config');
+sunburst.load();
 sunburst.render();
 
 function setValue(key, value)

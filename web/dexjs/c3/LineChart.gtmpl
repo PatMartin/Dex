@@ -48,7 +48,7 @@ var lineChart = dex.charts.c3.LineChart({
   csv : csv
 });
 
-lineChart.load('#config');
+lineChart.load();
 lineChart.render();
 
 </script>

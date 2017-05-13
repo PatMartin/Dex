@@ -142,7 +142,7 @@ function setConfiguration(config)
     'baseChart': dex.charts.d3.Chord({'margin' : { 'left':30, 'right':30, 'left':30, 'right':30 }})
   });
 
-  multiples.load('#config');
+  multiples.load();
   multiples.render();
 
 </script>

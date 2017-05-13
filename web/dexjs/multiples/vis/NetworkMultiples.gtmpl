@@ -145,7 +145,7 @@ function setConfiguration(config)
       })
   });
 
-  multiples.load('#config');
+  multiples.load();
   multiples.render();
 
 </script>

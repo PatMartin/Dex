@@ -41,7 +41,7 @@ var tree = dex.charts.d3.RadialTree({
   'csv' : csv
 });
 
-//tree.load('#config');
+//tree.load();
 tree.render();
 
 function setValue(key, value)

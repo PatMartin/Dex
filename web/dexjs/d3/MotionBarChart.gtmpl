@@ -47,7 +47,7 @@ var motionBarChart = dex.charts.d3.MotionBarChart({
     'csv' : csv });
 
 // Configure the chart.
-motionBarChart.load('#config');
+motionBarChart.load();
 motionBarChart.render();
 
 function setValue(key, value)

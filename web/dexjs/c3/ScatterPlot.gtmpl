@@ -47,7 +47,7 @@ var scatterplot = dex.charts.c3.ScatterPlot({
   csv : csv
 });
 
-scatterplot.load('#config');
+scatterplot.load();
 scatterplot.render();
 
 </script>

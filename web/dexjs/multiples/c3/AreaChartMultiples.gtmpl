@@ -144,7 +144,7 @@ function setConfiguration(config)
     'baseChart': dex.charts.c3.AreaChart()
   });
 
-  multiples.load('#config');
+  multiples.load();
   multiples.render();
 
 </script>

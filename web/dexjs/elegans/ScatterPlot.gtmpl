@@ -47,7 +47,7 @@ var scatterplot = new dex.charts.elegans.ScatterPlot({
   csv : csv
 });
 
-scatterplot.load('#config');
+scatterplot.load();
 scatterplot.render();
 
 </script>

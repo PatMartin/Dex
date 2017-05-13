@@ -51,7 +51,7 @@ var stackedArea = new dex.charts.nvd3.StackedAreaChart({
   csv : csv
 });
 
-stackedArea.load('#config');
+stackedArea.load();
 stackedArea.render();
 
 </script>

@@ -47,7 +47,7 @@ var clusteredForce = dex.charts.d3.ClusteredForce({
   csv : csv
 });
 
-clusteredForce.load('#config');
+clusteredForce.load();
 clusteredForce.render();
 
 function setValue(key, value)

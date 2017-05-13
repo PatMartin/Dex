@@ -48,7 +48,7 @@ var barChart = dex.charts.c3.BarChart({
   csv : csv
 });
 
-barChart.load('#config');
+barChart.load();
 barChart.render();
 
 </script>
