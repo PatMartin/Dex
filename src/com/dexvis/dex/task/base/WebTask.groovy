@@ -279,14 +279,14 @@ class WebTask extends DexTask {
     try
     {
       File saveFile = htmlChooser.save(evt)
-      
+            
       if (saveFile != null)
       {
         if (saveDynamic)
         {
           //FileUtils.writeStringToFile(saveFile, toString(we.getDocument()))
           String html = (String) we.executeScript("document.documentElement.outerHTML");
-          println html
+          //println html
           FileUtils.writeStringToFile(saveFile, html)
         }
         else
