@@ -19,10 +19,8 @@
 		<mkdir dir="${dist}/project" />
 		<mkdir dir="${dist}/scripts" />
 		<mkdir dir="${dist}/template" />
-
-		<!--copy file="startDex.sh" todir="${dist}" />
-		<chmod perm="a+rx" file="startDex.sh" /-->
-
+		<mkdir dir="${dist}/output" />
+		
 		<copy file="resources/Dex.css" todir="${dist}" />
 		
 		<copy file="Dex.jar" todir="${dist}" />
@@ -79,6 +77,7 @@
 		<copy file="data/cars2013.csv" todir="${dist}/data" />
 		<copy file="data/CircularHeat.csv" todir="${dist}/data" />
 		<copy file="data/president_timeline.csv" todir="${dist}/data" />
+		<copy file="data/DefenseBudgets.csv" todir="${dist}/data" />
 		
 		<copy todir="${dist}/web">
 			<fileset dir="web" />
@@ -152,6 +151,13 @@
 		<copy todir="${dist}/javascript/jqGrid/latest">
 			<fileset dir="javascript/jqGrid/latest" />
 		</copy>
+		
+		<!-- Permissions -->
+		<chmod perm="a+rx" file="${dist}/output" />
+		<chmod perm="a+rx" file="${dist}/project" />
+		<chmod perm="a+rx" file="${dist}/data" />
+		<chmod perm="a+rx" file="${dist}/util" />
+		<chmod perm="a+rx" file="${dist}/util/*" />
 	</target>
 
 	<path id="libraries.path">
