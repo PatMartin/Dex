@@ -100,12 +100,13 @@ public class DexCLI extends Application
       taskStartTime = System.currentTimeMillis();
       System.out.println("  TASK[" + taskNum + "]: '"
           + task.getName().getValue() + "'");
-      //long startTime = System.currentTimeMillis();
+      // long startTime = System.currentTimeMillis();
       if (task.getActive().getValue())
       {
         state = task.getTask().getValue().execute(state);
       }
-      System.out.println("    " + (System.currentTimeMillis() - taskStartTime) + " ms");
+      System.out.println("    " + (System.currentTimeMillis() - taskStartTime)
+          + " ms");
       taskNum++;
     }
     serialExecutor.shutdown();
@@ -118,8 +119,9 @@ public class DexCLI extends Application
     {
       concurrentExecutor.shutdownNow();
     }
-    System.out.println("Excecution Completed In: " + (System.currentTimeMillis() - projectStartTime) + " ms");
-
+    System.out.println("Execution Completed In: "
+        + (System.currentTimeMillis() - projectStartTime) + " ms");
+    
     Platform.exit();
   }
   
@@ -134,6 +136,9 @@ public class DexCLI extends Application
     {
       System.setProperty(propertyName, propertyValue);
     }
+    
+    System.out.println(propertyName + "='" + System.getProperty(propertyName)
+        + "'");
   }
   
   public static void main(String[] args)
