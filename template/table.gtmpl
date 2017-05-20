@@ -1,0 +1,10 @@
+<table>
+<%
+  header.each { println "  <th>" + it + "</th>" }
+  data.each { row ->
+    println "<tr>"
+    row.each { cell -> println "<td>" + cell + "</td>" }
+    println "</tr>"
+  }
+%>
+</table>
