@@ -24,31 +24,22 @@ public class ClassPathUtil
   // 2) Are assignment compatible with the DexTask interface.
   // 3) Are not abstract or an interface.
   final static Predicate<ClassInfo> isDexTask = (final ClassInfo ci) -> {
-                                                if (ci == null
-                                                    || ci.getName().indexOf(
-                                                        "task") <= 0
-                                                    || ci.getName().indexOf(
-                                                        "dex") <= 0)
-                                                {
-                                                  return false;
-                                                }
-                                                Class<?> clzz = ci.load();
-                                                return clzz != null
-                                                    && DexTask.class
-                                                        .isAssignableFrom(clzz)
-                                                    && !Modifier
-                                                        .isAbstract(clzz
-                                                            .getModifiers())
-                                                    && !Modifier
-                                                        .isInterface(clzz
-                                                            .getModifiers());
-                                              };
-
+    if (ci == null || ci.getName().indexOf("task") <= 0
+        || ci.getName().indexOf("dex") <= 0)
+    {
+      return false;
+    }
+    Class<?> clzz = ci.load();
+    return clzz != null && DexTask.class.isAssignableFrom(clzz)
+        && !Modifier.isAbstract(clzz.getModifiers())
+        && !Modifier.isInterface(clzz.getModifiers());
+  };
+  
   public static List<String> getClasses()
   {
     return getClasses(ClassLoader.getSystemClassLoader());
   }
-
+  
   public static List<String> getClasses(ClassLoader cl)
   {
     List<String> classList = new ArrayList<String>();
@@ -58,12 +49,12 @@ public class ClassPathUtil
       if (classpathEntry.endsWith(".jar"))
       {
         File jar = new File(classpathEntry);
-
+        
         JarInputStream is;
         try
         {
           is = new JarInputStream(new FileInputStream(jar));
-
+          
           JarEntry entry;
           while ((entry = is.getNextJarEntry()) != null)
           {
@@ -104,7 +95,7 @@ public class ClassPathUtil
     }
     return classList;
   }
-
+  
   static Stream<Path> listFiles(Path path)
   {
     if (Files.isDirectory(path))
@@ -123,7 +114,7 @@ public class ClassPathUtil
       return Stream.of(path);
     }
   }
-
+  
   public static void main(String args[])
   {
     getClasses().stream().filter(name -> name.indexOf("task") >= 0)
