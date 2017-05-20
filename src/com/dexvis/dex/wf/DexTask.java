@@ -30,8 +30,7 @@ public class DexTask extends Task<DexTask> implements Comparable<DexTask>,
    */
   private static final long serialVersionUID = -3296675819537504912L;
   // Base directory for all task help files.
-  @XStreamOmitField
-  public final String HELPDIR = "http://patmartin.gitbooks.io/dex-docs/content/tasks/";
+
   // State of this task, initialize to start.
   @XStreamOmitField
   private DexTaskState dexTaskState = new DexTaskState();
@@ -443,7 +442,7 @@ public class DexTask extends Task<DexTask> implements Comparable<DexTask>,
     WebEngine we = wv.getEngine();
     try
     {
-      String helpStr = HELPDIR + getHelpFile();
+      String helpStr = TASK_HELP_DIR + getHelpFile();
       
       // int anchorLoc = helpStr.indexOf("#");
       //
