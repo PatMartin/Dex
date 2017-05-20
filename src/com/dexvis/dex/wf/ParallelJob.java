@@ -13,7 +13,7 @@ public class ParallelJob implements DexJob
   private Stage stage = null;
   private List<DexTask> taskList = new ArrayList<DexTask>();
   private boolean terminated = false;
-  
+
   public ParallelJob(List<DexTaskItem> itemList)
   {
     for (DexTaskItem item : itemList)
