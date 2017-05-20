@@ -42,6 +42,7 @@ import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 import org.tbee.javafx.scene.layout.MigPane;
 
 import com.dexvis.dex.collections.HierarchicalMap;
+import com.dexvis.dex.exception.DexException;
 import com.dexvis.dex.wf.DexJob;
 import com.dexvis.dex.wf.DexJobScheduler;
 import com.dexvis.dex.wf.DexTask;
@@ -54,6 +55,7 @@ import com.dexvis.javafx.scene.control.DexTaskTree;
 import com.dexvis.javafx.scene.control.ModalDialog;
 import com.dexvis.util.ClassPathUtil;
 import com.dexvis.util.SortedList;
+import com.dexvis.util.ThreadUtil;
 
 /**
  * 
@@ -126,8 +128,6 @@ public class Dex extends Application
   // Handles task selection within the palette by displaying the help screen for
   // that task within the workflow pane.
   ChangeListener<Object> taskChange = (ov, objOld, objNew) -> {
-    // System.out.println("*** Task Change: ov='" + ov + "', old='" + objOld
-    // + "', new='" + objNew + "'");
     if (objNew == null)
     {
       return;
@@ -457,6 +457,22 @@ public class Dex extends Application
     }
   }
   
+  public static void reportException(Stage stage, Exception ex)
+  {
+    ThreadUtil.runAndWait(() -> {
+      System.err.println("=========================");
+      ex.printStackTrace();
+      
+      if (ex != null)
+      {
+        StringWriter sw = new StringWriter();
+        ex.printStackTrace(new PrintWriter(sw));
+        ModalDialog dialog = new ModalDialog(stage, "Execution Status", sw
+            .toString(), "Ok");
+      }
+    });
+  }
+  
   public void executeWorkflow(ActionEvent evt)
   {
     System.out.println("Execute Workflow: ");
@@ -476,17 +492,13 @@ public class Dex extends Application
     }
     catch(Exception ex)
     {
-      StringWriter sw = new StringWriter();
-      ex.printStackTrace(new PrintWriter(sw));
-      ModalDialog dialog = new ModalDialog(stage, "Execution Status",
-          sw.toString(), "Ok");
-      ex.printStackTrace();
+      reportException(stage, ex);
     }
   }
   
   public void onMouseClick(MouseEvent evt)
   {
-    System.out.println("Mouse Click Detected: " + evt.getClickCount());
+    // System.out.println("Mouse Click Detected: " + evt.getClickCount());
     if (evt.getClickCount() > 1)
     {
       DexTaskTree source = (DexTaskTree) evt.getSource();
