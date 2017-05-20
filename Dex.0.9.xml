@@ -53,6 +53,7 @@
     <cp>lib/sqlite-jdbc-3.8.11.2.jar</cp>
     <cp>lib/xdb.jar</cp>
     <cp>lib/xstream-1.4.7.jar</cp>
+    <cp>ext/*</cp>
   </classPath>
   <jre>
     <path></path>
