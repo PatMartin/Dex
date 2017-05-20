@@ -53,7 +53,7 @@ class DexFileChooser {
       }
       catch (Exception iex) {
         startDir = System.getProperty("user.dir")
-        println "Opening: $startDir"
+        //println "Opening: $startDir"
         fc.setInitialDirectory(new File(startDir))
         loadFile = fc.showOpenDialog(null)
       }
