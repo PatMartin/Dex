@@ -9,7 +9,6 @@ import javafx.scene.control.CheckBox
 import javafx.scene.control.ChoiceBox
 import javafx.scene.control.Label
 import javafx.scene.control.ScrollPane
-import javafx.scene.image.Image
 import javafx.scene.layout.HBox
 
 import org.simpleframework.xml.Element
@@ -20,9 +19,8 @@ import org.tbee.javafx.scene.layout.MigPane
 import com.dexvis.dex.exception.DexException
 import com.dexvis.dex.wf.DexTask
 import com.dexvis.dex.wf.DexTaskState
-import com.dexvis.javafx.event.ReflectiveActionEventHandler
 import com.dexvis.javafx.scene.control.NodeFactory
-import com.thoughtworks.xstream.annotations.XStreamOmitField;
+import com.thoughtworks.xstream.annotations.XStreamOmitField
 
 /**
  * 
@@ -35,28 +33,28 @@ import com.thoughtworks.xstream.annotations.XStreamOmitField;
 class ColumnFilter extends DexTask {
   @XStreamOmitField
   private MigPane configPane = null
-
+  
   @XStreamOmitField
   private Label filterTypeLabel = new Label("Filter Type:")
-
+  
   @XStreamOmitField
   ScrollPane scrollPane = new ScrollPane()
-
+  
   @Element(required=false)
   @XStreamOmitField
   private ChoiceBox filterTypeCB = new ChoiceBox(FXCollections.observableArrayList(
   "Exclude", "Include"))
-
+  
   @ElementList(required=false)
   @XStreamOmitField
   private List<CheckBox> colCbList = new ArrayList<CheckBox>()
   @ElementList(required=false)
   @XStreamOmitField
   private List<Label> colLabelList = new ArrayList<Label>()
-
+  
   @XStreamOmitField
   private MigPane flowPane = new MigPane("wrap 10")
-
+  
   /**
    * 
    * Override the default constructor to provide this component's name, category and help file.
@@ -65,38 +63,38 @@ class ColumnFilter extends DexTask {
    */
   public ColumnFilter() {
     super("Table Manipulation", "Column Filter",
-      "table_manipulation/ColumnFilter.html")
+    "table_manipulation/ColumnFilter.html")
   }
-
+  
   public DexTaskState initialize(DexTaskState state) throws DexException {
     colCbList.clear()
     colLabelList.clear()
-
+    
     state.dexData.header.each { h ->
       colCbList
       colLabelList.add(new Label("$h:"))
       colCbList.add(new CheckBox())
     }
-
+    
     layoutColumns()
     return state
   }
-
+  
   public DexTaskState execute(DexTaskState state) throws DexException {
     boolean exclude = (filterTypeCB.getValue() == "Exclude")
-
+    
     if (colCbList.size() == 0) {
       state.dexData.header.each { h ->
         colCbList
         colLabelList.add(new Label("$h:"))
         colCbList.add(new CheckBox())
       }
-
+      
       layoutColumns()
     }
-
+    
     def selectedCols = [:]
-
+    
     // Create list of columns to include or exclude
     colCbList.eachWithIndex
     { cb, i ->
@@ -107,11 +105,11 @@ class ColumnFilter extends DexTask {
         selectedCols[colName] = 1
       }
     }
-
+    
     def headerMap = [:]
-
+    
     def newHeader = []
-
+    
     state.dexData.header.each
     { h ->
       println "******* $h ${h.getClass()}"
@@ -132,11 +130,11 @@ class ColumnFilter extends DexTask {
         }
       }
     }
-
+    
     println "NEW HEADER: $newHeader"
-
+    
     def newData = []
-
+    
     state.dexData.data.eachWithIndex
     { row, ri ->
       def newRow = []
@@ -149,13 +147,13 @@ class ColumnFilter extends DexTask {
       }
       newData << newRow
     }
-
+    
     state.dexData.header = newHeader
     state.dexData.data = newData
-
+    
     return state
   }
-
+  
   public Node getConfig()
   {
     if (configPane == null)
@@ -163,49 +161,49 @@ class ColumnFilter extends DexTask {
       configPane = new MigPane("", "[][grow]", "[][][grow]")
       configPane.setStyle("-fx-background-color: white;")
       configPane.add(NodeFactory.createTitle("Column Filter"), "grow,span")
-
+      
       HBox hbox = new HBox()
       hbox.setPadding(new Insets(15, 12, 15, 12))
       hbox.setSpacing(10)
-
+      
       Button selectAllButton = new Button("Select All")
       Button deselectAllButton = new Button("Deselect All")
       Button clearButton = new Button("Clear Columns")
-
-      selectAllButton.setOnAction(new ReflectiveActionEventHandler(this, "selectAll"))
-      deselectAllButton.setOnAction(new ReflectiveActionEventHandler(this, "deselectAll"))
-      clearButton.setOnAction(new ReflectiveActionEventHandler(this, "clear"))
-
+      
+      selectAllButton.setOnAction({ event -> selectAll(event) })
+      deselectAllButton.setOnAction({ event -> deselectAll(event)})
+      clearButton.setOnAction({ event -> clear(event) })
+      
       hbox.getChildren().addAll(filterTypeLabel, filterTypeCB, selectAllButton, deselectAllButton, clearButton)
       configPane.add(hbox, "grow, span")
-
+      
       scrollPane.setContent(flowPane)
       configPane.add(scrollPane, "grow, span")
-
+      
       if (filterTypeCB.getValue() == null)
       {
         filterTypeCB.setValue(filterTypeCB.getItems().get(0))
       }
-
+      
       layoutColumns()
     }
-
+    
     return configPane
   }
-
+  
   private void layoutColumns()
   {
     flowPane.getChildren().clear()
-
+    
     //scrollPane.setPrefHeight(500)
-
+    
     for (int i; i < colCbList.size() && i < colLabelList.size(); i++)
     {
       flowPane.add(colLabelList.get(i), "align right")
       flowPane.add(colCbList.get(i))
     }
   }
-
+  
   public clear(ActionEvent evt)
   {
     try
@@ -219,7 +217,7 @@ class ColumnFilter extends DexTask {
       ex.printStackTrace()
     }
   }
-
+  
   public selectAll(ActionEvent evt)
   {
     try
@@ -231,7 +229,7 @@ class ColumnFilter extends DexTask {
       ex.printStackTrace()
     }
   }
-
+  
   public deselectAll(ActionEvent evt)
   {
     try

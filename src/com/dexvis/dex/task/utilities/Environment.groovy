@@ -11,7 +11,6 @@ import javafx.scene.control.TableColumn
 import javafx.scene.control.TableView
 import javafx.scene.control.TableColumn.CellEditEvent
 import javafx.scene.control.cell.PropertyValueFactory
-import javafx.scene.image.Image
 import javafx.util.Callback
 
 import org.simpleframework.xml.ElementList
@@ -22,7 +21,6 @@ import com.dexvis.dex.exception.DexException
 import com.dexvis.dex.wf.DexEnvironment
 import com.dexvis.dex.wf.DexTask
 import com.dexvis.dex.wf.DexTaskState
-import com.dexvis.javafx.event.ReflectiveActionEventHandler
 import com.dexvis.javafx.observable.NameValuePair
 import com.dexvis.javafx.scene.control.EnvironmentEditingCell
 import com.dexvis.javafx.scene.control.ModalDialog
@@ -141,10 +139,10 @@ class Environment extends DexTask {
           })
 
       Button addButton = new Button("Add")
-      addButton.setOnAction(new ReflectiveActionEventHandler(this, "add"))
+      addButton.setOnAction({ event -> add(event) })
 
       Button removeButton = new Button("Remove")
-      removeButton.setOnAction(new ReflectiveActionEventHandler(this, "remove"))
+      removeButton.setOnAction({ event -> remove(event) })
       
       configPane.add(envTable, "span, grow")
       configPane.add(addButton, "grow")

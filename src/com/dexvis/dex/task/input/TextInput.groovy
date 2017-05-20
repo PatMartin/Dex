@@ -4,7 +4,6 @@ import javafx.event.ActionEvent
 import javafx.scene.Node
 import javafx.scene.control.Button
 import javafx.scene.control.TextArea
-import javafx.scene.image.Image
 import javafx.stage.FileChooser
 
 import org.apache.commons.io.FileUtils
@@ -15,12 +14,13 @@ import org.tbee.javafx.scene.layout.MigPane
 import com.dexvis.dex.exception.DexException
 import com.dexvis.dex.wf.DexTask
 import com.dexvis.dex.wf.DexTaskState
-import com.dexvis.javafx.event.ReflectiveActionEventHandler
 import com.dexvis.javafx.scene.control.NodeFactory
 
 @Root(name="text-input")
 class TextInput extends DexTask
 {
+  private String startDif = "data"
+  
   public TextInput()
   {
     super("Input", "Text Input", "input/TextInput.html")
@@ -61,10 +61,10 @@ class TextInput extends DexTask
       configPane.setStyle("-fx-background-color: white;")
 
       Button loadButton = new Button("Load Text")
-      loadButton.setOnAction(new ReflectiveActionEventHandler(this, "load"))
+      loadButton.setOnAction({ event -> load(event)})
 
       Button saveButton = new Button("Save Text")
-      saveButton.setOnAction(new ReflectiveActionEventHandler(this, "save"))
+      saveButton.setOnAction({ event -> save(event)})
 
       configPane.add(NodeFactory.createTitle("Text Input Configuration"), "grow,span")
       configPane.add(inputText, "span, grow")
@@ -106,8 +106,8 @@ class TextInput extends DexTask
       FileChooser fc = new FileChooser()
       fc.setTitle("Save Text File")
 
-      File startDir = new File(new File(".").getCanonicalPath())
-      fc.setInitialDirectory(startDir)
+      File startDirFile = new File(startDir)
+      fc.setInitialDirectory(startDirFile)
 
       File loadFile = fc.showSaveDialog(null)
 

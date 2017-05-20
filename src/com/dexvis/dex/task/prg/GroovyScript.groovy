@@ -8,7 +8,6 @@ import javafx.scene.control.Button
 import javafx.scene.control.Label
 import javafx.scene.control.RadioButton
 import javafx.scene.control.ToggleGroup
-import javafx.scene.image.Image
 import javafx.scene.web.WebEngine
 import javafx.scene.web.WebView
 
@@ -21,7 +20,6 @@ import com.dexvis.dex.exception.DexException
 import com.dexvis.dex.wf.DexEnvironment
 import com.dexvis.dex.wf.DexTask
 import com.dexvis.dex.wf.DexTaskState
-import com.dexvis.javafx.event.ReflectiveActionEventHandler
 import com.dexvis.javafx.scene.control.DexFileChooser
 import com.dexvis.javafx.scene.control.NodeFactory
 import com.dexvis.javafx.scene.control.editor.CodeMirrorEditor
@@ -162,10 +160,10 @@ class GroovyScript extends DexTask {
       configPane.setStyle("-fx-background-color: white;")
 
       Button loadButton = new Button("Load")
-      loadButton.setOnAction(new ReflectiveActionEventHandler(this, "load"))
+      loadButton.setOnAction({ event -> load(event)})
 
       Button saveButton = new Button("Save")
-      saveButton.setOnAction(new ReflectiveActionEventHandler(this, "save"))
+      saveButton.setOnAction({ event -> save(event) })
 
       configPane.add(NodeFactory.createTitle("Groovy Script"), "grow,span")
       configPane.add(wv, "align left,span,grow")

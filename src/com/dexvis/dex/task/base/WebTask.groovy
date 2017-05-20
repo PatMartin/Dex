@@ -28,7 +28,6 @@ import org.w3c.dom.Document
 import com.dexvis.dex.exception.DexException
 import com.dexvis.dex.wf.DexTask
 import com.dexvis.dex.wf.DexTaskState
-import com.dexvis.javafx.event.ReflectiveKeyEventHandler
 import com.dexvis.javafx.scene.control.DexFileChooser
 import com.dexvis.javafx.scene.control.JsonGuiEvent
 import com.dexvis.javafx.scene.control.JsonGuiPane
@@ -200,8 +199,8 @@ class WebTask extends DexTask {
         { event ->
           println "setValue('${event.getPayload().getComponent()}, '${event.getPayload().getTarget()}', '${event.getPayload().getValue()}')"
           we.executeScript("setValue(\"" +
-            event.getPayload().getComponent() + "\",\"" +
-            event.getPayload().getTarget()
+              event.getPayload().getComponent() + "\",\"" +
+              event.getPayload().getTarget()
               + "\",\"" + event.getPayload().getValue() + "\");");
         });
     
@@ -214,7 +213,7 @@ class WebTask extends DexTask {
     {
       configPane = new MigPane("", "[grow]", "[grow]")
       configPane.add(wv, "grow")
-      configPane.setOnKeyPressed(new ReflectiveKeyEventHandler(this, "keyPress"));
+      configPane.setOnKeyPressed({ event -> keyPress(event) });
     }
     
     return configPane
@@ -279,7 +278,7 @@ class WebTask extends DexTask {
     try
     {
       File saveFile = htmlChooser.save(evt)
-            
+      
       if (saveFile != null)
       {
         if (saveDynamic)

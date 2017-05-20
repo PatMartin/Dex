@@ -27,8 +27,6 @@ import org.tbee.javafx.scene.layout.MigPane
 import com.dexvis.dex.exception.DexException
 import com.dexvis.dex.wf.DexTask
 import com.dexvis.dex.wf.DexTaskState
-import com.dexvis.javafx.event.ReflectiveActionEventHandler
-import com.dexvis.javafx.event.ReflectiveEventHandler
 
 /**
  * 
@@ -97,7 +95,7 @@ class Documentation extends DexTask
       configTabPane.add(docFileText, "grow")
 
       Button loadDocButton = new Button("Load Documentation")
-      loadDocButton.setOnAction(new ReflectiveActionEventHandler(this, "loadDoc"))
+      loadDocButton.setOnAction({ event -> loadDoc(event) })
 
       configTabPane.add(loadDocButton, "span")
 
@@ -108,7 +106,7 @@ class Documentation extends DexTask
       outputTabPane.add(editor, "span, grow")
 
       Button saveOutputButton = new Button("Save Documentation")
-      saveOutputButton.setOnAction(new ReflectiveActionEventHandler(this, "saveDoc"))
+      saveOutputButton.setOnAction({ event -> saveDoc(event) })
 
       outputTabPane.add(saveOutputButton)
       outputTab.setContent(outputTabPane)
@@ -119,7 +117,7 @@ class Documentation extends DexTask
 
       htmlTab.setContent(htmlTabPane)
 
-      htmlTab.setOnSelectionChanged(new ReflectiveEventHandler(this, "tabChange"))
+      htmlTab.setOnSelectionChanged({ event -> tabChange(event) })
 
       htmlTab.setClosable(false)
       configTab.setClosable(false)

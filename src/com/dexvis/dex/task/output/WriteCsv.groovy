@@ -1,23 +1,20 @@
 package com.dexvis.dex.task.output
 
-import javafx.event.ActionEvent
+import javafx.beans.value.ChangeListener
 import javafx.scene.Node
 import javafx.scene.control.Button
 import javafx.scene.control.Label
 import javafx.scene.control.TextField
-import javafx.scene.image.Image
-import javafx.stage.FileChooser
-import javafx.stage.FileChooser.ExtensionFilter
 
 import org.simpleframework.xml.Element
 import org.simpleframework.xml.Root
 import org.tbee.javafx.scene.layout.MigPane
 
 import com.dexvis.dex.exception.DexException
-import com.dexvis.dex.wf.DexTask
 import com.dexvis.dex.wf.DexEnvironment
+import com.dexvis.dex.wf.DexTask
 import com.dexvis.dex.wf.DexTaskState
-import com.dexvis.javafx.event.ReflectiveActionEventHandler
+import com.dexvis.javafx.scene.control.DexFileChooser
 import com.dexvis.javafx.scene.control.NodeFactory
 
 @Root
@@ -40,9 +37,11 @@ class WriteCsv extends DexTask {
   
   Button browseButton = new Button("Browse")
   
+  private DexFileChooser csvChooser = new DexFileChooser("data",
+  "Write CSV", "Write CSV", "CSV", "csv", outputFileText)
+  
   public WriteCsv() {
     super("Output", "Write CSV", "output/WriteCsv.html")
-    effectiveFile.setText(env.interpolate(outputFileText.getText()));
   }
   
   public DexTaskState execute(DexTaskState state) throws DexException {
@@ -84,56 +83,13 @@ class WriteCsv extends DexTask {
       configPane.add(outputFileText, "grow")
       configPane.add(browseButton, "span")
       
-      outputFileText.onKeyReleased = { event ->
+      browseButton.setOnAction({ action -> csvChooser.setTextPath(action)})
+      
+      outputFileText.textProperty().addListener((ChangeListener){obj, oldVal, newVal ->
         effectiveFile.setText(env.interpolate(outputFileText.getText()))
-      }
-      browseButton.setOnAction(new ReflectiveActionEventHandler(this, "open"))
+      })
     }
     
     return configPane
-  }
-  
-  public void open(ActionEvent evt) {
-    try {
-      FileChooser fc = new FileChooser()
-      fc.setTitle("Load Data File")
-      
-      File startDir
-      
-      try {
-        if (lastDir != null && lastDir.length() > 0) {
-          startDir = new File(new File(lastDir).getCanonicalPath())
-        }
-        else {
-          startDir = new File(new File("data").getCanonicalPath())
-        }
-      }
-      catch (Exception ex) {
-        startDir = new File(new File("data").getCanonicalPath())
-      }
-      
-      fc.setInitialDirectory(startDir)
-      fc.getExtensionFilters().addAll(new ExtensionFilter("CSV", "*.csv"))
-      
-      File loadFile = fc.showOpenDialog(null)
-      
-      if (loadFile != null) {
-        effectiveFile.setText(loadFile.getAbsolutePath())
-        
-        String filePath = loadFile.getAbsolutePath()
-        String userDir = System.getProperty("user.dir")
-        
-        if (userDir != null && userDir.length() > 0 && filePath.startsWith(userDir)) {
-          // Including the file separator.
-          filePath = filePath.substring(userDir.length() + File.separator.length());
-        }
-        
-        outputFileText.setText(filePath)
-        lastDir = loadFile.getParent()
-      }
-    }
-    catch(Exception ex) {
-      ex.printStackTrace()
-    }
   }
 }

@@ -27,6 +27,7 @@ import org.simpleframework.xml.Element
 import org.simpleframework.xml.Root
 import org.tbee.javafx.scene.layout.MigPane
 
+import com.dexvis.dex.Dex
 import com.dexvis.dex.exception.DexException
 import com.dexvis.dex.wf.DexEnvironment
 import com.dexvis.dex.wf.DexTask
@@ -90,7 +91,7 @@ class CreateJdbcTable extends DexTask {
   
   @Element(name="dbtype", required=false)
   private ChoiceBox dbCB = new ChoiceBox(FXCollections.observableArrayList(dbConfig.keySet()))
-
+  
   @Element(name="driver",required=false)
   private TextField driverText = new TextField("org.hsqldb.jdbc.JDBCDriver")
   @Element(name="url",required=false)
@@ -102,7 +103,7 @@ class CreateJdbcTable extends DexTask {
   @Element(name="table", required=false)
   private TextField tableText = new TextField("CSV")
   DexEnvironment env = DexEnvironment.getInstance()
-    
+  
   @Element(name="batch", required=false)
   private CheckBox batchCB = new CheckBox()
   
@@ -121,43 +122,38 @@ class CreateJdbcTable extends DexTask {
   RangeSlider stringLengthSlider = new RangeSlider(0, 4000, 16, 256)
   
   public DexTaskState execute(DexTaskState state) throws DexException {
-    try {
-      
-      // Filter out unwanted characters
-      state.dexData.header = state.dexData.header.collect
-      { it ->
-        (it =~ /[\s\/\-\\(\\)<>,]/).replaceAll("")
-      }
-      
-      updateMessage("Scrubbing column names")
-      // Replace unwanted keywords and convert to upper case
-      
-      state.dexData.header.eachWithIndex
-      { colName, i ->
-        String effColName = colName.toUpperCase()
-        if (effColName == "LEVEL")
-        {
-          effColName = "DLEVEL"
-        }
-        state.dexData.header[i] = effColName
-      }
-      
-      // Two major database types are supported; Traditional RDBMS and Neo4J GraphDB.
-      // Significant differences exist between the two, so I use distinct population
-      // methods for each.
-      if (driverText.getText().equals("org.neo4j.jdbc.Driver"))
-      {
-        populateGraphDb(state, env);
-      }
-      else
-      {
-        populateRDBMS(state, env);
-      }
+    
+    // Filter out unwanted characters
+    state.dexData.header = state.dexData.header.collect
+    { it ->
+      (it =~ /[\s\/\-\\(\\)<>,]/).replaceAll("")
     }
-    catch(Exception ex)
+    
+    updateMessage("Scrubbing column names")
+    // Replace unwanted keywords and convert to upper case
+    
+    state.dexData.header.eachWithIndex
+    { colName, i ->
+      String effColName = colName.toUpperCase()
+      if (effColName == "LEVEL")
+      {
+        effColName = "DLEVEL"
+      }
+      state.dexData.header[i] = effColName
+    }
+    
+    // Two major database types are supported; Traditional RDBMS and Neo4J GraphDB.
+    // Significant differences exist between the two, so I use distinct population
+    // methods for each.
+    if (driverText.getText().equals("org.neo4j.jdbc.Driver"))
     {
-      ex.printStackTrace()
+      populateGraphDb(state, env);
     }
+    else
+    {
+      populateRDBMS(state, env);
+    }
+    
     return state
   }
   
@@ -207,10 +203,10 @@ class CreateJdbcTable extends DexTask {
     
     def dbTypes = []
     Map<String, DateFormat> dateFmtMap = [:]
-
+    
     def selectedDb = dbCB.getSelectionModel().getSelectedItem()
     println "SELECTED DB: '${selectedDb}'"
-
+    
     def dbTypeMaps = [
       "default" : [
         "integer" : "NUMBER(19,0)",
@@ -224,8 +220,8 @@ class CreateJdbcTable extends DexTask {
         "date"    : "DATE",
         "string"  : "VARCHAR"
       ]
-    ]        
-
+    ]
+    
     def dbTypeMap = dbTypeMaps["default"]
     
     if (dbTypeMaps.containsKey(selectedDb))
@@ -301,10 +297,10 @@ class CreateJdbcTable extends DexTask {
     {
       populateRowByRow(con, state, insertSql, dataTypes, dateFmtMap)
     }
-
+    
     con.commit();
     con.setAutoCommit(prevAutoCommit);
-        
+    
     stmt.close()
     con.close()
   }

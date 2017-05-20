@@ -30,7 +30,7 @@ public class DexTaskTree extends TreeView<DexTaskItem> implements DexConstants
         "Root"));
     rootItem.setExpanded(true);
     
-    //System.out.println("TASKMAP: " + taskMap);
+    // System.out.println("TASKMAP: " + taskMap);
     add(rootItem, taskMap);
     
     setCellFactory(new Callback<TreeView<DexTaskItem>, TreeCell<DexTaskItem>>()
@@ -44,7 +44,9 @@ public class DexTaskTree extends TreeView<DexTaskItem> implements DexConstants
     
     setRoot(rootItem);
     setShowRoot(false);
-    setOnDragDetected(new ReflectiveMouseEventHandler(this, "onDragDetected"));
+    setOnDragDetected((event) -> {
+      onDragDetected(event);
+    });
   }
   
   private void add(TreeItem<DexTaskItem> parent, Map<String, Object> taskMap)
@@ -117,7 +119,7 @@ public class DexTaskTree extends TreeView<DexTaskItem> implements DexConstants
   
   public void onDragDetected(MouseEvent evt)
   {
-    System.out.println("On Drag Detected");
+    // System.out.println("On Drag Detected");
     DexTaskTree source = (DexTaskTree) evt.getSource();
     /* drag was detected, start a drag-and-drop gesture */
     /* allow any transfer mode */
@@ -130,7 +132,8 @@ public class DexTaskTree extends TreeView<DexTaskItem> implements DexConstants
     if (content != null && item != null && item.getTask() != null
         && item.getTask().get() != null)
     {
-      System.out.println("DND-SENDING: '" + DexUtil.dexTaskToString(item.getTask().get()) + "'");
+      // System.out.println("DND-SENDING: '" +
+      // DexUtil.dexTaskToString(item.getTask().get()) + "'");
       content.put(DEX_TASK_CREATE, item.getTask().get().getClass());
       db.setContent(content);
     }

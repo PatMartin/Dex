@@ -8,7 +8,6 @@ import javafx.geometry.Orientation
 import javafx.scene.Node
 import javafx.scene.control.Button
 import javafx.scene.control.SplitPane
-import javafx.scene.image.Image
 import javafx.scene.web.WebEngine
 import javafx.scene.web.WebView
 
@@ -20,7 +19,6 @@ import org.tbee.javafx.scene.layout.MigPane
 import com.dexvis.dex.exception.DexException
 import com.dexvis.dex.wf.DexTask
 import com.dexvis.dex.wf.DexTaskState
-import com.dexvis.javafx.event.ReflectiveActionEventHandler
 import com.dexvis.javafx.scene.control.DexFileChooser
 import com.dexvis.javafx.scene.control.NodeFactory
 import com.dexvis.javafx.scene.control.editor.CodeMirrorEditor
@@ -94,10 +92,10 @@ class P5Script extends DexTask {
       configPane.setStyle("-fx-background-color: white;")
 
       Button loadButton = new Button("Load")
-      loadButton.setOnAction(new ReflectiveActionEventHandler(this, "load"))
+      loadButton.setOnAction({ event -> load(event) })
 
       Button saveButton = new Button("Save")
-      saveButton.setOnAction(new ReflectiveActionEventHandler(this, "save"))
+      saveButton.setOnAction({ event -> save(event) })
 
       def bindings = [
         'mode'     : 'javascript',

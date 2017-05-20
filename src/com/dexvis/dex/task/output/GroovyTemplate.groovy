@@ -1,31 +1,19 @@
 package com.dexvis.dex.task.output
 
 import groovy.text.SimpleTemplateEngine
-import javafx.event.ActionEvent
 import javafx.scene.Node
 import javafx.scene.control.Button
 import javafx.scene.control.Label
-import javafx.scene.control.RadioButton
 import javafx.scene.control.TextField
-import javafx.scene.control.ToggleGroup
-import javafx.scene.image.Image
-import javafx.scene.input.KeyCode
-import javafx.scene.input.KeyEvent
 
 import org.apache.commons.io.FileUtils
-import org.openqa.selenium.WebDriver
-import org.openqa.selenium.chrome.ChromeDriver
-import org.openqa.selenium.chrome.ChromeOptions
-import org.openqa.selenium.firefox.FirefoxDriver
 import org.simpleframework.xml.Element
 import org.simpleframework.xml.Root
 import org.tbee.javafx.scene.layout.MigPane
 
-import com.dexvis.dex.exception.DexException;
+import com.dexvis.dex.exception.DexException
 import com.dexvis.dex.wf.DexTask
 import com.dexvis.dex.wf.DexTaskState
-import com.dexvis.javafx.event.ReflectiveActionEventHandler
-import com.dexvis.javafx.event.ReflectiveKeyEventHandler
 import com.dexvis.javafx.scene.control.DexFileChooser
 import com.dexvis.javafx.scene.control.ModalDialog
 import com.dexvis.javafx.scene.control.NodeFactory

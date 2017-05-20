@@ -1,14 +1,11 @@
 package com.dexvis.dex.task.input
 
-import javafx.event.ActionEvent
+import javafx.beans.value.ChangeListener
 import javafx.scene.Node
 import javafx.scene.control.Button
 import javafx.scene.control.CheckBox
 import javafx.scene.control.Label
 import javafx.scene.control.TextField
-import javafx.scene.image.Image
-import javafx.stage.FileChooser
-import javafx.stage.FileChooser.ExtensionFilter
 
 import org.simpleframework.xml.Element
 import org.simpleframework.xml.Root
@@ -16,12 +13,11 @@ import org.tbee.javafx.scene.layout.MigPane
 
 import au.com.bytecode.opencsv.CSVReader
 
-import com.dexvis.dex.DexProject;
 import com.dexvis.dex.exception.DexException
 import com.dexvis.dex.wf.DexEnvironment
 import com.dexvis.dex.wf.DexTask
 import com.dexvis.dex.wf.DexTaskState
-import com.dexvis.javafx.event.ReflectiveActionEventHandler
+import com.dexvis.javafx.scene.control.DexFileChooser
 import com.dexvis.javafx.scene.control.NodeFactory
 
 @Root
@@ -40,6 +36,9 @@ class ReadCsv extends DexTask {
   @Element(required=false)
   private TextField fileText = new TextField()
   
+  private DexFileChooser csvChooser = new DexFileChooser("data",
+    "Read CSV", "Read CSV", "CSV", "csv", fileText)
+  
   private Label rowLimitLabel = new Label("Limit Number Of Rows:")
   
   @Element(required=false)
@@ -52,10 +51,9 @@ class ReadCsv extends DexTask {
   private String lastDir = ""
   
   DexEnvironment env = DexEnvironment.getInstance()
-  
+
   public DexTaskState execute(DexTaskState state) throws DexException {
     println "Running: $name"
-    effectiveFile.setText(env.interpolate(fileText.getText()))
     
     CSVReader reader = new CSVReader(new FileReader(new File(
         env.interpolate(fileText.getText()))))
@@ -103,57 +101,13 @@ class ReadCsv extends DexTask {
       configPane.add(rowLimitLabel)
       configPane.add(rowLimitText, "grow")
       configPane.add(limitRows, "span")
-      browseButton.setOnAction(new ReflectiveActionEventHandler(this, "open"))
-      
-      fileText.onKeyReleased = { event ->
+      browseButton.setOnAction({ action -> csvChooser.setTextPath(action)})
+
+      fileText.textProperty().addListener((ChangeListener){obj, oldVal, newVal ->
         effectiveFile.setText(env.interpolate(fileText.getText()))
-      }
+      })
     }
     
     return configPane
-  }
-  
-  public void open(ActionEvent evt) {
-    try {
-      FileChooser fc = new FileChooser()
-      fc.setTitle("Load Csv File")
-      
-      File startDir
-      
-      try {
-        if (lastDir != null && lastDir.length() > 0) {
-          startDir = new File(new File(lastDir).getCanonicalPath())
-        }
-        else {
-          startDir = new File(new File("data").getCanonicalPath())
-        }
-      }
-      catch (Exception ex) {
-        startDir = new File(new File("data").getCanonicalPath())
-      }
-      
-      fc.setInitialDirectory(startDir)
-      fc.getExtensionFilters().addAll(new ExtensionFilter("CSV", "*.csv"))
-      
-      File loadFile = fc.showOpenDialog(null)
-      
-      if (loadFile != null) {
-        effectiveFile.setText(loadFile.getAbsolutePath())
-        
-        String filePath = loadFile.getAbsolutePath()
-        String userDir = System.getProperty("user.dir")
-        
-        if (userDir != null && userDir.length() > 0 && filePath.startsWith(userDir)) {
-          // Including the file separator.
-          filePath = filePath.substring(userDir.length() + File.separator.length());
-        }
-        
-        fileText.setText(filePath)
-        lastDir = loadFile.getParent()
-      }
-    }
-    catch(Exception ex) {
-      ex.printStackTrace()
-    }
   }
 }

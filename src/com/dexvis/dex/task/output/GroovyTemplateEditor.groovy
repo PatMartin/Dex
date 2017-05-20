@@ -9,7 +9,6 @@ import javafx.scene.control.Tab
 import javafx.scene.control.TabPane
 import javafx.scene.control.TextArea
 import javafx.scene.effect.DropShadow
-import javafx.scene.image.Image
 import javafx.scene.paint.Color
 import javafx.scene.text.Font
 import javafx.scene.text.FontWeight
@@ -27,8 +26,6 @@ import org.tbee.javafx.scene.layout.MigPane
 import com.dexvis.dex.exception.DexException
 import com.dexvis.dex.wf.DexTask
 import com.dexvis.dex.wf.DexTaskState
-import com.dexvis.javafx.event.ReflectiveActionEventHandler
-import com.dexvis.javafx.scene.control.ModalDialog
 
 /**
  * 
@@ -38,93 +35,83 @@ import com.dexvis.javafx.scene.control.ModalDialog
  *
  */
 @Root
-class GroovyTemplateEditor extends DexTask
-{
-  @Element(required=false)
+class GroovyTemplateEditor extends DexTask {
+  @Element(name="templateCode", required=false)
   private String templateCode = "Insert template code here..."
-
-  private TextArea templateText = new TextArea(templateCode)
+  
+  private String startDir = "template"
+  
+  private TextArea templateText
   private TextArea outputText = new TextArea("")
-
+  
   private WebView wv = new WebView()
   private WebEngine we = wv.getEngine()
-
+  
   /**
    * 
    * Override the default constructor to provide this component's name, category and help file.
    * Report that it has been constructed.
    * 
    */
-  public GroovyTemplateEditor()
-  {
-    super("Output", "Groovy Template Editor", "output/GroovyTemplate.html")
+  public GroovyTemplateEditor() {
+    super("Output", "Groovy Template Editor", "output/GroovyTemplateEditor.html")
   }
-
+  
   // Used to store our configuration pane.
   private MigPane configPane = null
-
+  
   public DexTaskState execute(DexTaskState state) throws DexException
   {
     println "Running: $name"
-
-    try
-    {
-      def text = templateText.getText()
-
-      def binding = [ "state":state, "dexData":state.dexData, "data":state.dexData.data, "header":state.dexData.header]
-
-      def engine = new SimpleTemplateEngine()
-      def template = engine.createTemplate(text).make(binding)
-
-      outputText.setText(template.toString())
-      we?.loadContent(template.toString())
-    }
-    catch(Exception ex)
-    {
-      StringWriter sw = new StringWriter()
-      ex.printStackTrace(new PrintWriter(sw))
-      ModalDialog dialog = new ModalDialog(stage, "Error", sw.toString(), "Ok")
-      ex.printStackTrace()
-    }
-
+    
+    def text = templateText.getText()
+    
+    def binding = [ "state":state, "dexData":state.dexData, "data":state.dexData.data, "header":state.dexData.header]
+    
+    def engine = new SimpleTemplateEngine()
+    def template = engine.createTemplate(text).make(binding)
+    
+    outputText.setText(template.toString())
+    we?.loadContent(template.toString())
+    
     return state
   }
-
+  
   public Node getConfig()
   {
     if (configPane == null)
     {
       configPane = new MigPane("", "[grow]", "[grow]")
       configPane.setStyle("-fx-background-color: white;")
-
+      
       TabPane tabPane = new TabPane()
       Tab configTab = new Tab("Configuration")
-
+      
       Text configText = new Text("Groovy Output Template Configuration")
-
+      
       DropShadow ds = new DropShadow()
       ds.setOffsetY(3.0f)
       ds.setColor(Color.color(0.4f, 0.4f, 0.4f))
-
+      
       configText.setEffect(ds)
       configText.setCache(true)
       configText.setX(10.0f)
       configText.setY(270.0f)
       configText.setFill(Color.DARKBLUE)
       configText.setFont(Font.font(null, FontWeight.BOLD, 24))
-
+      
       Separator sep = new Separator()
       sep.setStyle("-fx-background-color: darkblue;-fx-background-radius: 2;")
       templateText = new TextArea(templateCode)
-
+      
       Button loadButton = new Button("Load Template")
-      loadButton.setOnAction(new ReflectiveActionEventHandler(this, "loadTemplate"))
-
+      loadButton.setOnAction({ event -> loadTemplate(event)})
+      
       Button saveButton = new Button("Save Template")
-      saveButton.setOnAction(new ReflectiveActionEventHandler(this, "saveTemplate"))
-
+      saveButton.setOnAction({ event -> saveTemplate(event)})
+      
       Tab outputTab = new Tab("Output")
-
+      
       MigPane configTabPane = new MigPane("", "[][grow]", "[][][grow][]")
       configTabPane.add(configText, "grow, span")
       configTabPane.add(sep, "grow, span")
@@ -132,43 +119,43 @@ class GroovyTemplateEditor extends DexTask
       configTabPane.add(loadButton)
       configTabPane.add(saveButton)
       configTab.setContent(configTabPane)
-
+      
       MigPane outputTabPane = new MigPane("", "[grow]", "[grow][]")
       outputTabPane.add(outputText, "grow, span")
       
       Button saveOutputButton = new Button("Save Output")
-      saveOutputButton.setOnAction(new ReflectiveActionEventHandler(this, "saveOutput"))
+      saveOutputButton.setOnAction({ event -> saveOutput(event)})
       outputTabPane.add(saveOutputButton)
-
+      
       outputTab.setContent(outputTabPane)
-
+      
       Tab htmlTab = new Tab("HTML")
       MigPane htmlTabPane = new MigPane("", "[grow]", "[grow]")
       htmlTabPane.add(wv, "grow")
-
+      
       htmlTab.setContent(htmlTabPane)
-
+      
       tabPane.getTabs().addAll(configTab, outputTab, htmlTab)
-
+      
       configPane.add(tabPane, "grow")
     }
-
+    
     return configPane
   }
-
+  
   public loadTemplate(ActionEvent evt)
   {
     try
     {
       FileChooser fc = new FileChooser()
       fc.setTitle("Load Groovy Template")
-
-      File startDir = new File(new File("template").getCanonicalPath())
-      fc.setInitialDirectory(startDir)
-      fc.getExtensionFilters().addAll(new ExtensionFilter("TEMPLATE", "*.template"))
-
+      
+      File startDirFile = new File(startDir)
+      fc.setInitialDirectory(startDirFile)
+      fc.getExtensionFilters().addAll(new ExtensionFilter("GTMPL", "*.gtmpl"))
+      
       File loadFile = fc.showOpenDialog(null)
-
+      
       if (loadFile != null)
       {
         templateCode = FileUtils.readFileToString(loadFile)
@@ -180,20 +167,20 @@ class GroovyTemplateEditor extends DexTask
       ex.printStackTrace()
     }
   }
-
+  
   public saveTemplate(ActionEvent evt)
   {
     try
     {
       FileChooser fc = new FileChooser()
       fc.setTitle("Save Template File")
-
+      
       File startDir = new File(new File("template").getCanonicalPath())
       fc.setInitialDirectory(startDir)
-      fc.getExtensionFilters().addAll(new ExtensionFilter("TEMPLATE", "*.template"))
-
+      fc.getExtensionFilters().addAll(new ExtensionFilter("GTMPL", "*.gtmpl"))
+      
       File loadFile = fc.showSaveDialog(null)
-
+      
       if (loadFile != null)
       {
         templateCode = templateText.getText()
@@ -205,19 +192,19 @@ class GroovyTemplateEditor extends DexTask
       ex.printStackTrace()
     }
   }
-
+  
   public saveOutput(ActionEvent evt)
   {
     try
     {
       FileChooser fc = new FileChooser()
       fc.setTitle("Save Output File")
-
+      
       File startDir = new File(new File("output").getCanonicalPath())
       fc.setInitialDirectory(startDir)
-
+      
       File saveFile = fc.showSaveDialog(null)
-
+      
       if (saveFile != null)
       {
         FileUtils.writeStringToFile(saveFile, outputText.getText())

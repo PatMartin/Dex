@@ -10,7 +10,6 @@ import javafx.scene.Node
 import javafx.scene.control.Button
 import javafx.scene.control.ListView
 import javafx.scene.control.SplitPane
-import javafx.scene.image.Image
 import javafx.scene.web.WebEngine
 import javafx.scene.web.WebView
 import javafx.stage.FileChooser
@@ -28,7 +27,6 @@ import com.dexvis.dex.exception.DexException
 import com.dexvis.dex.wf.DexTask
 import com.dexvis.dex.wf.DexTaskState
 import com.dexvis.dex.wf.InternalTask
-import com.dexvis.javafx.event.ReflectiveActionEventHandler
 import com.dexvis.javafx.scene.control.NodeFactory
 import com.dexvis.util.WebViewUtil
 import com.thoughtworks.xstream.annotations.XStreamOmitField
@@ -267,7 +265,7 @@ class CompareDatasources extends DexTask {
       
       configPane.add(browseButton, "span")
       
-      browseButton.setOnAction(new ReflectiveActionEventHandler(this, "open"))
+      browseButton.setOnAction({event -> open(event)})
     }
     
     return configPane

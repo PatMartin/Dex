@@ -1,17 +1,15 @@
 package com.dexvis.dex.task.database
 
-import java.io.File
-import java.io.InputStream
 import java.sql.Connection
 import java.sql.DriverManager
 import java.sql.ResultSet
 import java.sql.ResultSetMetaData
-import java.sql.SQLException;
+import java.sql.SQLException
 import java.sql.Statement
-import java.util.List
 
 import javafx.beans.property.SimpleStringProperty
 import javafx.beans.property.StringProperty
+import javafx.beans.value.ChangeListener
 import javafx.beans.value.ObservableValue
 import javafx.collections.FXCollections
 import javafx.event.ActionEvent
@@ -19,7 +17,6 @@ import javafx.scene.control.Button
 import javafx.scene.control.ChoiceBox
 import javafx.scene.control.Label
 import javafx.scene.control.TextField
-import javafx.scene.image.Image
 import javafx.scene.web.WebEngine
 import javafx.scene.web.WebView
 
@@ -32,8 +29,6 @@ import com.dexvis.dex.exception.DexException
 import com.dexvis.dex.wf.DexEnvironment
 import com.dexvis.dex.wf.DexTask
 import com.dexvis.dex.wf.DexTaskState
-import com.dexvis.javafx.event.ReflectiveActionEventHandler
-import com.dexvis.javafx.event.ReflectiveChangeListener
 import com.dexvis.javafx.scene.control.DexFileChooser
 import com.dexvis.javafx.scene.control.NodeFactory
 import com.dexvis.javafx.scene.control.editor.CodeMirrorEditor
@@ -167,12 +162,13 @@ class QueryJdbc extends DexTask {
       configPane.setStyle("-fx-background-color: white;")
       
       Button loadButton = new Button("Load Sql")
-      loadButton.setOnAction(new ReflectiveActionEventHandler(this, "load"))
+      loadButton.setOnAction({ event -> load(event)})
       
       Button saveButton = new Button("Save Sql")
-      saveButton.setOnAction(new ReflectiveActionEventHandler(this, "save"))
+      saveButton.setOnAction({ event -> save(event)})
       
-      dbCB.getSelectionModel().selectedIndexProperty().addListener(new ReflectiveChangeListener(this, "selectDb"))
+      dbCB.getSelectionModel().selectedIndexProperty().addListener(
+        (ChangeListener){obj, oldVal, newVal -> selectDb(obj, oldVal, newVal)})
       
       configPane.add(NodeFactory.createTitle("JDBC Database Query Configuration"), "grow,span")
       configPane.add(new Label("Database Type:"))
