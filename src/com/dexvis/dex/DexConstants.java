@@ -1,5 +1,7 @@
 package com.dexvis.dex;
 
+import com.thoughtworks.xstream.annotations.XStreamOmitField;
+
 import javafx.scene.input.DataFormat;
 
 public interface DexConstants
@@ -21,8 +23,12 @@ public interface DexConstants
    * "#515D9C", "#3D2347", "#D7CBD3", "#7286AE", "#7CB4B9" };
    */
   
+  public static int NUM_CHART_COLORS = 8;
+  
   public static DataFormat DEX_TASK_CREATE = new DataFormat("DEX_TASK_CREATE");
   
   public static DataFormat DEX_TASK_LIST_MOVE = new DataFormat(
       "DEX_TASK_LIST_MOVE");
+  
+  public final static String TASK_HELP_DIR = "http://patmartin.gitbooks.io/dex-docs/content/tasks/";
 }
