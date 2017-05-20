@@ -1,7 +1,5 @@
 package com.dexvis.dex.wf;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,7 +19,6 @@ import org.tbee.javafx.scene.layout.MigPane;
 import com.dexvis.dex.Dex;
 import com.dexvis.dex.exception.DexException;
 import com.dexvis.javafx.scene.control.DexTaskItem;
-import com.dexvis.javafx.scene.control.ModalDialog;
 import com.dexvis.util.ThreadUtil;
 
 public class SerialJob implements DexJob
@@ -106,7 +103,8 @@ public class SerialJob implements DexJob
                   }
                   catch(DexException dEx)
                   {
-                    dEx.printStackTrace();
+                    //dEx.printStackTrace();
+                    Dex.reportException(stage, dEx);
                   }
                 });
                 
@@ -124,21 +122,11 @@ public class SerialJob implements DexJob
           }
           catch(Exception ex)
           {
-            ERROR = true;
             task.updateMessage("Error: " + task.getName() + " after "
                 + (System.currentTimeMillis() - startTime) + " ms");
             task.progressAborted();
-            
-            ThreadUtil.runAndWait(() -> {
-              StringWriter sw = new StringWriter();
-              ex.printStackTrace(new PrintWriter(sw));
-              
-              // Can't do this here, must pass the error back to JFX App Thread
-                ModalDialog dialog = new ModalDialog(stage, "Error", sw
-                    .toString(), "Ok");
-              });
-            
-            ex.printStackTrace();
+            ERROR = true;
+            Dex.reportException(stage, ex);
           }
         }
       }
@@ -216,6 +204,7 @@ public class SerialJob implements DexJob
     catch(Exception ex)
     {
       ex.printStackTrace();
+      Dex.reportException(stage, ex);
     }
     return status;
   }
