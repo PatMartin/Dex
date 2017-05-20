@@ -17,8 +17,6 @@ import javafx.util.Callback;
 
 import com.dexvis.dex.DexConstants;
 import com.dexvis.dex.wf.DexTask;
-import com.dexvis.javafx.event.ReflectiveMouseEventHandler;
-import com.dexvis.util.DexUtil;
 
 public class DexTaskTree extends TreeView<DexTaskItem> implements DexConstants
 {
