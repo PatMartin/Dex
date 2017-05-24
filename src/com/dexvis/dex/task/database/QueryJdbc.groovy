@@ -88,58 +88,46 @@ class QueryJdbc extends DexTask {
     
     updateProgress(-1.0, -1.0)
     
-    try {
-      updateMessage("Executing query")
-      
-      stmt = con.createStatement()
-      stmt.setFetchSize(1000)
-      
-      String query = env.interpolate(sqlScript.getValue())
-      query = query.replaceAll('[;\\s]*$', "");
-      println "QUERY: '${query}'"
-      
-      ResultSet rs = stmt.executeQuery(query)
-      
-      ResultSetMetaData md = rs.getMetaData();
-      
-      for (i in 0..<md.columnCount) {
-        header << md.getColumnLabel(i+1)
+    updateMessage("Executing query")
+    
+    stmt = con.createStatement()
+    stmt.setFetchSize(1000)
+    
+    String query = env.interpolate(sqlScript.getValue())
+    query = query.replaceAll('[;\\s]*$', "");
+    println "QUERY: '${query}'"
+    
+    ResultSet rs = stmt.executeQuery(query)
+    
+    ResultSetMetaData md = rs.getMetaData();
+    
+    for (i in 0..<md.columnCount) {
+      header << md.getColumnLabel(i+1)
+    }
+    //println "HEADER: ${header}"
+    
+    int ri = 1;
+    
+    while (rs.next())
+    {
+      row = []
+      header.each
+      { h ->
+        row << rs.getString(h)
       }
-      //println "HEADER: ${header}"
-      
-      int ri = 1;
-      
-      while (rs.next())
+      //println "ROW: ${row}"
+      if (ri%1000 == 0)
       {
-        row = []
-        header.each
-        { h ->
-          row << rs.getString(h)
-        }
-        //println "ROW: ${row}"
-        if (ri%1000 == 0)
-        {
-          updateMessage("Reading row ${ri}")
-        }
-        ri++;
-        data << row
+        updateMessage("Reading row ${ri}")
       }
-      
-      state.dexData.header = header
-      state.dexData.data = data
-      //println "STATE: ${state.dexData}"
+      ri++;
+      data << row
     }
-    catch (SQLException sqlEx)
-    {
-      sqlEx.printStackTrace()
-      println "SQL Error Code: ${sqlEx.getErrorCode()}"
-      println "SQL Message   : ${sqlEx.getMessage()}"
-      println "SQL State     : ${sqlEx.getSQLState()}"
-    }
-    catch(Exception ex)
-    {
-      ex.printStackTrace()
-    }
+    
+    state.dexData.header = header
+    state.dexData.data = data
+    //println "STATE: ${state.dexData}"
+    
     return state
   }
   
@@ -168,7 +156,7 @@ class QueryJdbc extends DexTask {
       saveButton.setOnAction({ event -> save(event)})
       
       dbCB.getSelectionModel().selectedIndexProperty().addListener(
-        (ChangeListener){obj, oldVal, newVal -> selectDb(obj, oldVal, newVal)})
+          (ChangeListener){obj, oldVal, newVal -> selectDb(obj, oldVal, newVal)})
       
       configPane.add(NodeFactory.createTitle("JDBC Database Query Configuration"), "grow,span")
       configPane.add(new Label("Database Type:"))
