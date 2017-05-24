@@ -18,8 +18,6 @@
     <title>Dex JS : Radial Tree</title>
   </head>
   <body>
-  <div id="config" style="visibility: hidden">
-  </div>
   <div id="ChartArea"></div>
 <script>
 <%
@@ -31,27 +29,33 @@
   println dexData.toCsvString();
 %>
 
-function setConfiguration(config)
-{
-  tree.configure(config);
-}
-
 var tree = dex.charts.d3.RadialTree({
   'parent' : "#ChartArea",
   'csv' : csv
 });
 
-//tree.load();
+tree.load();
 tree.render();
 
-function setValue(key, value)
+function setValue(chartName, key, value)
 {
-  tree.attr(key, value).update();
+  switch (chartName) {
+    case "tree":
+    {
+      tree.attr(key, value).update();
+      tree.save();
+      break;
+    }
+  }
 }
 
 function getGuiDefinition()
 {
-  return JSON.stringify(tree.getGuiDefinition());
+  var guiDef = {
+    'tree': tree.getGuiDefinition()
+  };
+
+  return JSON.stringify(guiDef);
 }
 
 </script>

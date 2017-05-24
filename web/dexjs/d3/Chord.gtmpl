@@ -15,7 +15,7 @@
 </style>
 <html>
   <head>
-    <title>DexCharts : Chord Diagram</title>
+    <title>DexJS : Chord Diagram</title>
   </head>
   <body>
   <div id="ChartArea"></div>
@@ -31,8 +31,6 @@
 
 var chord = new dex.charts.d3.Chord({
   parent : "#ChartArea",
-  resizable : true,
-  color : d3.scale.category20c(),
   csv : csv
 });
 

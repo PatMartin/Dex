@@ -10,7 +10,7 @@
 </style>
 <html>
   <head>
-    <title>DexCharts : Network</title>
+    <title>DexJS : Network</title>
   </head>
 <style>
   println new File("javascript/vis/latest/vis.css").text
@@ -25,17 +25,12 @@
 %>
 </script>
   <body>
-  <div id="config" style="display: none"></div>
   <div id="ChartArea"></div>
 <script>
 
 <%
   println dexData.toCsvString();
 %>
-
-function setConfiguration(config) {
-  network.configure(config).save("#config", config).update();
-}
 
 var network = dex.charts.vis.Network({
   'parent' : "#ChartArea",
@@ -45,6 +40,26 @@ var network = dex.charts.vis.Network({
 network.load();
 network.render();
 
+function setValue(chartName, key, value)
+{
+  switch (chartName) {
+    case "network":
+    {
+      network.attr(key, value).update();
+      network.save();
+      break;
+    }
+  }
+}
+
+function getGuiDefinition()
+{
+  var guiDef = {
+    'network': network.getGuiDefinition()
+  };
+
+  return JSON.stringify(guiDef);
+}
 </script>
 </body>
 </html>

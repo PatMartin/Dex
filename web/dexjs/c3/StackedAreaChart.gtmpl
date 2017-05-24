@@ -19,8 +19,6 @@
     <title>dex.js : Area Chart</title>
   </head>
   <body>
-  <div id="config" style="visibility: hidden">
-  </div>
   <div id="ChartArea"></div>
 <script>
 <%
@@ -36,11 +34,6 @@
   println dexData.toCsvString();
 %>
 
-function setConfiguration(config)
-{
-  stackedAreaChart.configure(config);
-}
-
 var stackedAreaChart = dex.charts.c3.StackedAreaChart({
   parent : "#ChartArea",
   "options.subchart.show": true,
@@ -51,6 +44,27 @@ var stackedAreaChart = dex.charts.c3.StackedAreaChart({
 stackedAreaChart.load();
 stackedAreaChart.render();
 
+
+function setValue(chartName, key, value)
+{
+  switch (chartName) {
+    case "stackedAreaChart":
+    {
+      stackedAreaChart.attr(key, value).render();
+      stackedAreaChart.save();
+      break;
+    }
+  }
+}
+
+function getGuiDefinition()
+{
+  var guiDef = {
+    'stackedAreaChart': stackedAreaChart.getGuiDefinition()
+  };
+
+  return JSON.stringify(guiDef);
+}
 </script>
 </body>
 </html>

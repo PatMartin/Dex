@@ -29,17 +29,9 @@
   println new File("javascript/jqueryui/latest/jquery-ui.min.js").text
   println new File("javascript/underscore/latest/underscore-min.js").text
   println new File("javascript/dexjs/latest/dex.min.js").text
-%>
-</script>
-<script>
-<%
+
   println dexData.toCsvString();
 %>
-
-function setConfiguration(config)
-{
-  stackedBarChart.configure(config);
-}
 
 var stackedBarChart = dex.charts.c3.StackedBarChart({
   parent : "#ChartArea",
@@ -51,6 +43,26 @@ var stackedBarChart = dex.charts.c3.StackedBarChart({
 stackedBarChart.load();
 stackedBarChart.render();
 
+function setValue(chartName, key, value)
+{
+  switch (chartName) {
+    case "stackedBarChart":
+    {
+      stackedBarChart.attr(key, value).render();
+      stackedBarChart.save();
+      break;
+    }
+  }
+}
+
+function getGuiDefinition()
+{
+  var guiDef = {
+    'stackedBarChart': stackedBarChart.getGuiDefinition()
+  };
+
+  return JSON.stringify(guiDef);
+}
 </script>
 </body>
 </html>

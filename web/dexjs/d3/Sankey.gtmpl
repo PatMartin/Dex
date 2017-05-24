@@ -17,7 +17,7 @@
 </style>
 
 <body>
-<svg id="ChartArea"></svg>
+<div id="ChartArea"></div>
 
 <script>
 <%
@@ -28,22 +28,34 @@
   println dexData.toCsvString();
 %>
 
-  // Configure a chart.
-  var sankey = new dex.charts.d3.Sankey({
-    'parent' : "#ChartArea",
-    'csv'    : csv
-  });
+// Configure a chart.
+var sankey = new dex.charts.d3.Sankey({
+  'parent' : "#ChartArea",
+  'csv'    : csv
+});
 
-  sankey.render();
+sankey.load();
+sankey.render();
 
-function setValue(key, value)
+function setValue(chartName, key, value)
 {
-  sankey.attr(key, value).update();
+  switch (chartName) {
+    case "sankey":
+    {
+      sankey.attr(key, value).update();
+      sankey.save();
+      break;
+    }
+  }
 }
 
 function getGuiDefinition()
 {
-  return JSON.stringify(sankey.getGuiDefinition());
+  var guiDef = {
+    'sankey': sankey.getGuiDefinition()
+  };
+
+  return JSON.stringify(guiDef);
 }
 
 </script>

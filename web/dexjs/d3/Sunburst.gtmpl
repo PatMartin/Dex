@@ -30,9 +30,7 @@
     <title>Dex: Sunburst</title>
   </head>
   <body>
-  <div id="config" style="visibility: hidden">
-  </div>
-  <svg id="ChartArea"></svg>
+  <div id="ChartArea"></div>
 <script>
 <%
   println new File("javascript/jquery/latest/jquery-2.1.3.min.js").text
@@ -54,14 +52,25 @@ var sunburst = dex.charts.d3.Sunburst({
 sunburst.load();
 sunburst.render();
 
-function setValue(key, value)
+function setValue(chartName, key, value)
 {
-  sunburst.attr(key, value).update();
+  switch (chartName) {
+    case "sunburst":
+    {
+      sunburst.attr(key, value).update();
+      sunburst.save();
+      break;
+    }
+  }
 }
 
 function getGuiDefinition()
 {
-  return JSON.stringify(sunburst.getGuiDefinition());
+  var guiDef = {
+    'sunburst': sunburst.getGuiDefinition()
+  };
+
+  return JSON.stringify(guiDef);
 }
 
 </script>
