@@ -703,7 +703,7 @@ var c3chart = function (userConfig) {
     var gtypes = dex.csv.guessTypes(csv);
     var ncsv = dex.csv.numericSubset(csv);
     var columns = dex.csv.transpose(csv);
-dex.console.log("CHART::::", chart);
+
     ncsv.data.unshift(ncsv.header);
     // Categorical axis
     if (gtypes[0] == "string") {
@@ -1066,6 +1066,7 @@ var bumpchart = function (userConfig) {
       'bottom': 50
     },
     'transform': "",
+    'colorScheme' : 'category10',
     'color': d3.scale.category10(),
     'format': d3.format("d"),
     'key': {'category': 0, 'sequence': 1, 'rank': 2},
@@ -1135,6 +1136,39 @@ var bumpchart = function (userConfig) {
 
   chart = new dex.component(userConfig, defaults);
 
+  chart.getGuiDefinition = function getGuiDefinition(config) {
+    var defaults = {
+      "type": "group",
+      "name": "C3 Settings",
+      "contents": [
+        dex.config.gui.dimensions(),
+        dex.config.gui.general(),
+        {
+          "type": "group",
+          "name": "Miscellaneous",
+          "contents": [
+            {
+              "name": "Color Scheme",
+              "description": "Color Scheme",
+              "type": "choice",
+              "choices": dex.color.colormaps(),
+              "target": "colorScheme"
+            }
+          ]
+        },
+        dex.config.gui.text({name: "Chart Label"}, "chartLabel"),
+        dex.config.gui.text({name: "Category Label"}, "categoryLabel"),
+        dex.config.gui.text({name: "Sequence Labels"}, "sequenceLabel"),
+        dex.config.gui.circle({name: "Nodes"}, "circle"),
+        dex.config.gui.link({name: "Lines"}, "line")
+      ]
+    };
+
+    var guiDef = dex.config.expandAndOverlay(config, defaults);
+    dex.config.gui.sync(chart, guiDef);
+    return guiDef;
+  };
+
   chart.render = function render() {
     d3 = dex.charts.d3.d3v3;
     chart.resize();
@@ -1148,8 +1182,9 @@ var bumpchart = function (userConfig) {
     var config = chart.config;
     var csv = config.csv;
     var margin = config.margin;
-    var width = config.width - margin.left - margin.right;
-    var height = config.height - margin.top - margin.bottom;
+    var width = +config.width - margin.left - margin.right;
+    var height = +config.height - margin.top - margin.bottom;
+    config.color = dex.color.getColormap(config.colorScheme);
 
     var categoryKey = dex.csv.getColumnName(csv, config.key.category);
     var sequenceKey = dex.csv.getColumnName(csv, config.key.sequence);
@@ -1397,9 +1432,9 @@ var bumpchart = function (userConfig) {
     // Allow method chaining
     return chart;
   };
-    chart.clone = function clone(userConfig) {
-        return bumpchart(userConfig, chart.defaults);
-    };
+  chart.clone = function clone(userConfig) {
+    return bumpchart(userConfig, chart.defaults);
+  };
 
   $(document).ready(function () {
     // Make the entire chart draggable.
@@ -1787,6 +1822,7 @@ var clusteredforce = function (userConfig) {
     'groups': [{'category': 0, 'value': 1, 'label': 0}],
     'transform': '',
     'color': d3.scale.category20(),
+    'colorScheme' : 'category10',
     'padding': 10,
     // TODO: Add normalization function.
     'sizingFunction': function () {
@@ -1856,13 +1892,20 @@ var clusteredforce = function (userConfig) {
           "name": "Physics and Sizing",
           "contents": [
             {
+              "name": "Color Scheme",
+              "description": "Color Scheme",
+              "type": "choice",
+              "choices": dex.color.colormaps(),
+              "target": "colorScheme"
+            },
+            {
               "name": "Minimum Radius",
               "description": "The minimum radius of nodes.",
               "target": "minRadius",
               "type": "int",
               "minValue": 1,
               "maxValue": 100,
-              "initialValue": 1
+              "initialValue": 10
             },
             {
               "name": "Maximum Radius",
@@ -1927,6 +1970,7 @@ var clusteredforce = function (userConfig) {
     var config = chart.config;
     var margin = config.margin;
     var csv = config.csv;
+    config.color = config.color = dex.color.getColormap(config.colorScheme);
 
     var radius = d3.scale.sqrt().range([0, 12]);
 
