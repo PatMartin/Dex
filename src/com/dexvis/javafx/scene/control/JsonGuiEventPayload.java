@@ -11,9 +11,9 @@ public class JsonGuiEventPayload
 {
   private String component = null;
   private String target = null;
-  private String value = null;
+  private Object value = null;
   
-  JsonGuiEventPayload(String component, String target, String value)
+  JsonGuiEventPayload(String component, String target, Object value)
   {
     this.component = component;
     this.target = target;
@@ -51,7 +51,7 @@ public class JsonGuiEventPayload
    * @return The JSON value.
    * 
    */
-  public String getValue()
+  public Object getValue()
   {
     return value;
   }

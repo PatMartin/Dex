@@ -258,7 +258,7 @@ class CompareDatasources extends DexTask {
       splitter.getItems().addAll(fileListView, wv)
       splitter.setDividerPositions(0.25f)
       
-      WebViewUtil.displayMessage(we, "No Data Loaded Yet...")
+      WebViewUtil.noData(we)
       
       configPane.add(NodeFactory.createTitle("Compare Datasources"), "grow,span")
       configPane.add(splitter, "grow,span")

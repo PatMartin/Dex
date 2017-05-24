@@ -3,6 +3,7 @@ package com.dexvis.javafx.scene.control;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import javafx.collections.FXCollections;
 import javafx.event.Event;
@@ -212,7 +213,7 @@ public class JsonGuiPane extends MigPane
     slider.valueProperty().addListener((observable, oldVal, newVal) -> {
       int val = newVal.intValue();
       valueLabel.setText("" + val);
-      fireEvent(chartName, spec.get("target").toString(), "" + val);
+      fireEvent(chartName, spec.get("target").toString(), val);
     });
     pane.add(slider, "growx");
     pane.add(valueLabel, "span");
@@ -231,7 +232,7 @@ public class JsonGuiPane extends MigPane
     slider.valueProperty().addListener((observable, oldVal, newVal) -> {
       double val = newVal.doubleValue();
       valueLabel.setText("" + val);
-      fireEvent(chartName, spec.get("target").toString(), "" + val);
+      fireEvent(chartName, spec.get("target").toString(), val);
     });
     pane.add(slider, "growx");
     pane.add(valueLabel, "span");
@@ -242,7 +243,7 @@ public class JsonGuiPane extends MigPane
   {
     TextField textField = new TextField(getValue(spec, "initialValue", ""));
     textField.textProperty().addListener((observable, oldVal, newVal) -> {
-      fireEvent(chartName, spec.get("target").toString(), newVal.toString());
+      fireEvent(chartName, spec.get("target").toString(), newVal);
     });
     pane.add(textField, "grow,span");
   }
@@ -250,13 +251,38 @@ public class JsonGuiPane extends MigPane
   private void addChoiceControl(MigPane pane, String chartName,
       Map<String, Object> spec)
   {
+    List<Object> choices = (List<Object>) spec.get("choices");
+    Map<String, String> choiceMap = new TreeMap<String, String>();
+    for (Object choice : choices)
+    {
+      System.out.println("CHOICE: " + choice);
+      if (choice instanceof Map)
+      {
+        Map<String, String> cm = (Map<String, String>) choice;
+        System.out.println("  NAME: " + cm.get("name") + ", VALUE: "
+            + cm.get("value"));
+        choiceMap.put(cm.get("name"), cm.get("value"));
+      }
+      else
+      {
+        System.out.println("  NAME/VALUE: " + (String) choice);
+        choiceMap.put((String) choice, (String) choice);
+      }
+    }
     ChoiceBox cb = new ChoiceBox(
-        FXCollections.observableArrayList((ArrayList) spec.get("choices")));
+        FXCollections.observableArrayList(new ArrayList(choiceMap.keySet())));
     cb.getSelectionModel().select(getValue(spec, "initialValue", ""));
     pane.add(cb, "grow,span");
     cb.setOnAction(action -> {
-      fireEvent(chartName, spec.get("target").toString(), cb
-          .getSelectionModel().selectedItemProperty().getValue().toString());
+      System.out
+          .println("Choicebox Fire Event: "
+              + cb.getSelectionModel().selectedItemProperty().getValue()
+                  .toString());
+      fireEvent(
+          chartName,
+          spec.get("target").toString(),
+          choiceMap.get(cb.getSelectionModel().selectedItemProperty()
+              .getValue()));
     });
   }
   
@@ -267,7 +293,7 @@ public class JsonGuiPane extends MigPane
     cb.setSelected(getBooleanValue(spec, "initialValue", false));
     
     cb.setOnAction(action -> {
-      fireEvent(chartName, spec.get("target").toString(), "" + cb.isSelected());
+      fireEvent(chartName, spec.get("target").toString(), cb.isSelected());
     });
     pane.add(cb, "grow,span");
   }
@@ -291,8 +317,10 @@ public class JsonGuiPane extends MigPane
   }
   
   // Convenience function to fire a JsonGuiEvent
-  private void fireEvent(String chartName, String target, String value)
+  private void fireEvent(String chartName, String target, Object value)
   {
+    System.out.println("fireEvent(" + chartName + "," + target + "," + value
+        + ")");
     fireEvent(new JsonGuiEvent(
         new JsonGuiEventPayload(chartName, target, value), null,
         JsonGuiEvent.CHANGE_EVENT));
