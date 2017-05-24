@@ -16,6 +16,13 @@ class WebViewUtil {
   
   public static void displayMessage(WebEngine we, String message)
   {
-    we?.loadContent("<h1>$message</h1>")
+    we?.loadContent(message)
+  }
+  
+  public static void noData(WebEngine we)
+  {
+    we?.loadContent("<div style='height:100%;width:100%;display:flex;align-items:center;" +
+      "justify-content:center;'><h1 style='text-align:center;width:100%;" +
+      "background:#428bca;color:white;'>No Data</h1></div>");
   }
 }
