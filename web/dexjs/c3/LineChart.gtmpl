@@ -19,8 +19,6 @@
     <title>dex.js : Area Chart</title>
   </head>
   <body>
-  <div id="config" style="visibility: hidden">
-  </div>
   <div id="ChartArea"></div>
 <script>
 <%
@@ -29,17 +27,9 @@
   println new File("javascript/jqueryui/latest/jquery-ui.min.js").text
   println new File("javascript/underscore/latest/underscore-min.js").text
   println new File("javascript/dexjs/latest/dex.min.js").text
-%>
-</script>
-<script>
-<%
+
   println dexData.toCsvString();
 %>
-
-function setConfiguration(config)
-{
-  lineChart.configure(config);
-}
 
 var lineChart = dex.charts.c3.LineChart({
   parent : "#ChartArea",
@@ -51,6 +41,26 @@ var lineChart = dex.charts.c3.LineChart({
 lineChart.load();
 lineChart.render();
 
+function setValue(chartName, key, value)
+{
+  switch (chartName) {
+    case "lineChart":
+    {
+      lineChart.attr(key, value).render();
+      lineChart.save();
+      break;
+    }
+  }
+}
+
+function getGuiDefinition()
+{
+  var guiDef = {
+    'lineChart': lineChart.getGuiDefinition()
+  };
+
+  return JSON.stringify(guiDef);
+}
 </script>
 </body>
 </html>

@@ -19,8 +19,6 @@
     <title>dex.js : Area Chart</title>
   </head>
   <body>
-  <div id="config" style="visibility: hidden">
-  </div>
   <div id="ChartArea"></div>
 <script>
 <%

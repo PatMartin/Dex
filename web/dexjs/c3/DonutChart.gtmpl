@@ -19,8 +19,6 @@
     <title>dex.js : Area Chart</title>
   </head>
   <body>
-  <div id="config" style="visibility: hidden">
-  </div>
   <div id="ChartArea"></div>
 <script>
 <%
@@ -29,17 +27,9 @@
   println new File("javascript/jqueryui/latest/jquery-ui.min.js").text
   println new File("javascript/underscore/latest/underscore-min.js").text
   println new File("javascript/dexjs/latest/dex.min.js").text
-%>
-</script>
-<script>
-<%
+
   println dexData.toCsvString();
 %>
-
-function setConfiguration(config)
-{
-  donutChart.configure(config);
-}
 
 var donutChart = dex.charts.c3.DonutChart({
   parent : "#ChartArea",
@@ -50,6 +40,26 @@ var donutChart = dex.charts.c3.DonutChart({
 donutChart.load();
 donutChart.render();
 
+function setValue(chartName, key, value)
+{
+  switch (chartName) {
+    case "donutChart":
+    {
+      donutChart.attr(key, value).render();
+      donutChart.save();
+      break;
+    }
+  }
+}
+
+function getGuiDefinition()
+{
+  var guiDef = {
+    'donutChart': donutChart.getGuiDefinition()
+  };
+
+  return JSON.stringify(guiDef);
+}
 </script>
 </body>
 </html>

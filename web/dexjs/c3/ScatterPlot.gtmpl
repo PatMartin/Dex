@@ -16,11 +16,9 @@
 </style>
 <html>
   <head>
-    <title>dex.js : Area Chart</title>
+    <title>Dex JS : Area Chart</title>
   </head>
   <body>
-  <div id="config" style="visibility: hidden">
-  </div>
   <div id="ChartArea"></div>
 <script>
 <%
@@ -29,17 +27,9 @@
   println new File("javascript/jqueryui/latest/jquery-ui.min.js").text
   println new File("javascript/underscore/latest/underscore-min.js").text
   println new File("javascript/dexjs/latest/dex.min.js").text
-%>
-</script>
-<script>
-<%
+
   println dexData.toCsvString();
 %>
-
-function setConfiguration(config)
-{
-  scatterplot.configure(config);
-}
 
 var scatterplot = dex.charts.c3.ScatterPlot({
   parent : "#ChartArea",
@@ -50,6 +40,26 @@ var scatterplot = dex.charts.c3.ScatterPlot({
 scatterplot.load();
 scatterplot.render();
 
+function setValue(chartName, key, value)
+{
+  switch (chartName) {
+    case "scatterplot":
+    {
+      scatterplot.attr(key, value).render();
+      scatterplot.save();
+      break;
+    }
+  }
+}
+
+function getGuiDefinition()
+{
+  var guiDef = {
+    'scatterplot': scatterplot.getGuiDefinition()
+  };
+
+  return JSON.stringify(guiDef);
+}
 </script>
 </body>
 </html>
