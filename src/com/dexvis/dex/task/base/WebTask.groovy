@@ -31,6 +31,7 @@ import com.dexvis.dex.wf.DexTaskState
 import com.dexvis.javafx.scene.control.DexFileChooser
 import com.dexvis.javafx.scene.control.JsonGuiEvent
 import com.dexvis.javafx.scene.control.JsonGuiPane
+import com.dexvis.util.WebViewUtil
 import com.thoughtworks.xstream.annotations.XStreamOmitField
 
 /**
@@ -78,7 +79,7 @@ class WebTask extends DexTask {
     if (htmlChooser == null)
     {
       htmlChooser = new DexFileChooser("output",
-          "Load HTML", "Save HTML", "HTML", "html")
+      "Load HTML", "Save HTML", "HTML", "html")
     }
     
     wv.minWidth(800);
@@ -88,12 +89,12 @@ class WebTask extends DexTask {
     
     this.templatePath = templatePath
     we.setOnAlert(new EventHandler<WebEvent<String>>()
-        {
-          public void handle(WebEvent<String> event)
-          {
-            System.out.println(event.getData());
-          }
-        });
+    {
+      public void handle(WebEvent<String> event)
+      {
+        System.out.println(event.getData());
+      }
+    });
   }
   
   public DexTaskState execute(DexTaskState state) throws DexException
@@ -129,24 +130,24 @@ class WebTask extends DexTask {
       output = template.toString()
       
       we.getLoadWorker().stateProperty().addListener(
-          new ChangeListener<State>() {
-            public void changed(ObservableValue ov, State oldState, State newState) {
-              if (newState == Worker.State.SUCCEEDED) {
-                try
-                {
-                  String guiDefinition = (String) we
-                      .executeScript("getGuiDefinition();");
-                  setConfigDefinition(guiDefinition);
-                }
-                catch (Exception ex)
-                {
-                  System.err.println("No GUI Definition for: '" + getName() +
-                      "': Add getGuiDefinition() function to '" +
-                      templatePath + "'");
-                }
-              }
+      new ChangeListener<State>() {
+        public void changed(ObservableValue ov, State oldState, State newState) {
+          if (newState == Worker.State.SUCCEEDED) {
+            try
+            {
+              String guiDefinition = (String) we
+              .executeScript("getGuiDefinition();");
+              setConfigDefinition(guiDefinition);
             }
-          });
+            catch (Exception ex)
+            {
+              System.err.println("No GUI Definition for: '" + getName() +
+              "': Add getGuiDefinition() function to '" +
+              templatePath + "'");
+            }
+          }
+        }
+      });
       
       File outputFile = new File("output.html");
       FileUtils.writeStringToFile(outputFile, output)
@@ -195,14 +196,27 @@ class WebTask extends DexTask {
     configGui.setGuiDefinition(getConfigDefinition());
     
     configGui.addEventHandler(
-        JsonGuiEvent.CHANGE_EVENT,
-        { event ->
-          println "setValue('${event.getPayload().getComponent()}, '${event.getPayload().getTarget()}', '${event.getPayload().getValue()}')"
-          we.executeScript("setValue(\"" +
-              event.getPayload().getComponent() + "\",\"" +
-              event.getPayload().getTarget()
-              + "\",\"" + event.getPayload().getValue() + "\");");
-        });
+    JsonGuiEvent.CHANGE_EVENT,
+    { event ->
+      println "setValue('${event.getPayload().getComponent()}, '${event.getPayload().getTarget()}', '${event.getPayload().getValue()}')"
+
+      Object value = event.getPayload().getValue();
+      println "CLASS TYPE: '${value.getClass().getName()}'"
+      if (value instanceof java.lang.String)
+      {
+        we.executeScript("setValue(\"" +
+        event.getPayload().getComponent() + "\",\"" +
+        event.getPayload().getTarget()
+        + "\",\"" + value + "\");");
+      }
+      else
+      {
+        we.executeScript("setValue(\"" +
+        event.getPayload().getComponent() + "\",\"" +
+        event.getPayload().getTarget()
+        + "\"," + value + ");");
+      }
+    });
     
     return configGui;
   }
@@ -213,7 +227,8 @@ class WebTask extends DexTask {
     {
       configPane = new MigPane("", "[grow]", "[grow]")
       configPane.add(wv, "grow")
-      configPane.setOnKeyPressed({ event -> keyPress(event) });
+      configPane.setOnKeyPressed({ event -> keyPress(event) })
+      WebViewUtil.noData(we)
     }
     
     return configPane
