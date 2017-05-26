@@ -99,9 +99,6 @@ class WebTask extends DexTask {
   
   public DexTaskState execute(DexTaskState state) throws DexException
   {
-    println "Running: $name"
-    println "Config  : ${config}"
-    println "Template: ${templatePath}"
     long start = System.currentTimeMillis()
     updateProgress(0, 100);
     
