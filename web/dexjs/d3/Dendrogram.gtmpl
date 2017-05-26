@@ -15,11 +15,9 @@
 </style>
 <html>
   <head>
-    <title>dex.js : Dendrogram</title>
+    <title>Dex JS : Dendrogram</title>
   </head>
   <body>
-  <div id="config" style="visibility: hidden">
-  </div>
   <div id="ChartArea"></div>
 <script>
 <%
@@ -27,17 +25,9 @@
   println new File("javascript/jqueryui/latest/jquery-ui.min.js").text
   println new File("javascript/underscore/latest/underscore-min.js").text
   println new File("javascript/dexjs/latest/dex.min.js").text
-%>
-</script>
-<script>
-<%
+
   println dexData.toCsvString();
 %>
-
-function setConfiguration(config)
-{
-  dendrogram.configure(config);
-}
 
 var dendrogram = dex.charts.d3.Dendrogram({
   parent : "#ChartArea",
@@ -48,14 +38,25 @@ var dendrogram = dex.charts.d3.Dendrogram({
 dendrogram.load();
 dendrogram.render();
 
-function setValue(key, value)
+function setValue(chartName, key, value)
 {
-  dendrogram.attr(key, value).update();
+  switch (chartName) {
+    case "dendrogram":
+    {
+      dendrogram.attr(key, value).render();
+      dendrogram.save();
+      break;
+    }
+  }
 }
 
 function getGuiDefinition()
 {
-  return "[" + JSON.stringify(dendrogram.getGuiDefinition()) + "]";
+  var guiDef = {
+    'dendrogram': dendrogram.getGuiDefinition()
+  };
+
+  return JSON.stringify(guiDef);
 }
 
 </script>
