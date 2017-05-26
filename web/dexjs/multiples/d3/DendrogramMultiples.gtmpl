@@ -108,49 +108,85 @@
 
 <html>
   <head>
-    <title>DexJS : Chord Multiples</title>
+    <title>dex.js : Dendrogram Multiples</title>
   </head>
   <body>
-  <div id="config" style="visibility: hidden">
-  </div>
   <div id="ChartArea"></div>
 <script>
 <%
   println new File("javascript/jquery/latest/jquery-2.1.3.min.js").text
   println new File("javascript/jqueryui/latest/jquery-ui.min.js").text
   println new File("javascript/underscore/latest/underscore-min.js").text
-  println new File("javascript/dexjs/latest/dex.js").text
+  println new File("javascript/dexjs/latest/dex.min.js").text
   println new File("javascript/gridster/latest/jquery.gridster.min.js").text
 
   println dexData.toCsvString()
 %>
 
-function setConfiguration(config)
-{
-  multiples.configure(config);
-}
-
   var frames = dex.csv.getFramesByIndex(csv, 0);
-
-  var multiples = dex.charts.multiples.GridsterMultiples({
-    'parent': '#ChartArea',
-    'frames': frames,
-    'gridsterConfig.widget_base_dimensions' : [ 50, 50 ],
-    'gridsterConfig.widget_margins' : [ 1, 1 ],
-    'cell.width' : 8,
-    'cell.height' : 8,
-    'baseChart': dex.charts.d3.Dendrogram({
+  
+  var base = new dex.component({
       'connection.length' : 'fit-text',
       'link.stroke.width' : 1,
       'link.stroke.color' : 'red',
       'link.stroke.dasharray' : '',
       'link.stroke.opacity' : .6,
       'root.name' : csv.header[0]
-      })
-  });
+      });
 
-  multiples.load();
-  multiples.render();
+  base.load("dexjs-config-dendrogram");
+  basechart = dex.charts.d3.Dendrogram(base.attr());
+  
+  var multipleBase = new dex.component({
+    'parent': '#ChartArea',
+    'frames': frames,
+    'gridsterConfig.widget_base_dimensions' : [ 50, 50 ],
+    'gridsterConfig.widget_margins' : [ 1, 1 ],
+    'cell.width' : 8,
+    'cell.height' : 8,
+    'baseChart': basechart
+  });
+  multipleBase.load("dexjs-config-multiples");
+
+  var multiples = dex.charts.multiples.GridsterMultiples(
+    multipleBase.attr()).render();
+
+function setValue(chartName, key, value)
+{
+  switch (chartName) {
+    case "multiples":
+    {
+      multipleBase.attr(key, value);
+      multipleBase.save("dexjs-config-multiples");
+      multiples.attr(key, value).render();
+      break;
+    }
+    case "basechart":
+    {
+      // REM: Due to the fact that clone only clones originally
+      // supplied construction parameters, here we create a new
+      // chart from all the parameters of the old one.  Kind of
+      // cumbersome until i figure out a better way to separate
+      // user configured things from automatic settings.
+      base.attr(key, value);
+      base.save("dexjs-config-dendrogram");
+      var newBase = dex.charts.d3.Dendrogram(base.attr());
+      multiples.attr("baseChart", newBase);      
+      multiples.render();
+      break;
+    }
+  }
+}
+
+function getGuiDefinition()
+{
+  var guiDef = {
+    'multiples': multiples.getGuiDefinition(),
+    'basechart': multiples.attr("charts")[0].getGuiDefinition()
+  };
+
+  return JSON.stringify(guiDef);
+}
 
 </script>
 </body>

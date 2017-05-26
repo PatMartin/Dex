@@ -108,11 +108,9 @@
 
 <html>
   <head>
-    <title>DexJS : Chord Multiples</title>
+    <title>dex.js : Chord Multiples</title>
   </head>
   <body>
-  <div id="config" style="visibility: hidden">
-  </div>
   <div id="ChartArea"></div>
 <script>
 <%
@@ -125,25 +123,68 @@
   println dexData.toCsvString()
 %>
 
-function setConfiguration(config)
-{
-  multiples.configure(config);
-}
-
   var frames = dex.csv.getFramesByIndex(csv, 0);
 
-  var multiples = dex.charts.multiples.GridsterMultiples({
+  
+  var base = new dex.component({
+      'margin' : { 'left':30, 'right':30, 'left':30, 'right':30 }
+    });
+
+  base.load("dexjs-config-chord");
+  var basechart = dex.charts.d3.Chord(base.attr());
+
+  var multipleBase = new dex.component({
     'parent': '#ChartArea',
     'frames': frames,
     'gridsterConfig.widget_base_dimensions' : [ 50, 50 ],
     'gridsterConfig.widget_margins' : [ 1, 1 ],
     'cell.width' : 8,
-    'cell.height' : 8,
-    'baseChart': dex.charts.d3.Chord({'margin' : { 'left':30, 'right':30, 'left':30, 'right':30 }})
+    'cell.height' : 8
   });
+  multipleBase.load("dexjs-config-multiples");
 
-  multiples.load();
+  var multiples = dex.charts.multiples.GridsterMultiples(
+    multipleBase.attr());
+  multiples.attr('baseChart', basechart);
   multiples.render();
+
+
+function setValue(chartName, key, value)
+{
+  switch (chartName) {
+    case "multiples":
+    {
+      multipleBase.attr(key, value);
+      multipleBase.save("dexjs-config-multiples");
+      multiples.attr(key, value).render();
+      break;
+    }
+    case "basechart":
+    {
+      // REM: Due to the fact that clone only clones originally
+      // supplied construction parameters, here we create a new
+      // chart from all the parameters of the old one.  Kind of
+      // cumbersome until i figure out a better way to separate
+      // user configured things from automatic settings.
+      base.attr(key, value);
+      base.save("dexjs-config-chord");
+      var newBase = dex.charts.d3.Chord(base.attr());
+      multiples.attr("baseChart", newBase);      
+      multiples.render();
+      break;
+    }
+  }
+}
+
+function getGuiDefinition()
+{
+  var guiDef = {
+    'multiples': multiples.getGuiDefinition(),
+    'basechart': multiples.attr("charts")[0].getGuiDefinition()
+  };
+
+  return JSON.stringify(guiDef);
+}
 
 </script>
 </body>
