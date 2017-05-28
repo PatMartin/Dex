@@ -1,6 +1,7 @@
 package com.dexvis.dex.task.base
 
 import groovy.text.SimpleTemplateEngine
+import javafx.application.Platform
 import javafx.beans.value.ChangeListener
 import javafx.beans.value.ObservableValue
 import javafx.concurrent.Worker
@@ -79,7 +80,7 @@ class WebTask extends DexTask {
     if (htmlChooser == null)
     {
       htmlChooser = new DexFileChooser("output",
-      "Load HTML", "Save HTML", "HTML", "html")
+          "Load HTML", "Save HTML", "HTML", "html")
     }
     
     wv.minWidth(800);
@@ -89,12 +90,12 @@ class WebTask extends DexTask {
     
     this.templatePath = templatePath
     we.setOnAlert(new EventHandler<WebEvent<String>>()
-    {
-      public void handle(WebEvent<String> event)
-      {
-        System.out.println(event.getData());
-      }
-    });
+        {
+          public void handle(WebEvent<String> event)
+          {
+            System.out.println(event.getData());
+          }
+        });
   }
   
   public DexTaskState execute(DexTaskState state) throws DexException
@@ -127,24 +128,24 @@ class WebTask extends DexTask {
       output = template.toString()
       
       we.getLoadWorker().stateProperty().addListener(
-      new ChangeListener<State>() {
-        public void changed(ObservableValue ov, State oldState, State newState) {
-          if (newState == Worker.State.SUCCEEDED) {
-            try
-            {
-              String guiDefinition = (String) we
-              .executeScript("getGuiDefinition();");
-              setConfigDefinition(guiDefinition);
+          new ChangeListener<State>() {
+            public void changed(ObservableValue ov, State oldState, State newState) {
+              if (newState == Worker.State.SUCCEEDED) {
+                try
+                {
+                  String guiDefinition = (String) we
+                      .executeScript("getGuiDefinition();");
+                  setConfigDefinition(guiDefinition);
+                }
+                catch (Exception ex)
+                {
+                  System.err.println("No GUI Definition for: '" + getName() +
+                      "': Add getGuiDefinition() function to '" +
+                      templatePath + "'");
+                }
+              }
             }
-            catch (Exception ex)
-            {
-              System.err.println("No GUI Definition for: '" + getName() +
-              "': Add getGuiDefinition() function to '" +
-              templatePath + "'");
-            }
-          }
-        }
-      });
+          });
       
       File outputFile = new File("output.html");
       FileUtils.writeStringToFile(outputFile, output)
@@ -191,29 +192,64 @@ class WebTask extends DexTask {
   {
     JsonGuiPane configGui = new JsonGuiPane("", "[grow]", "[]");
     configGui.setGuiDefinition(getConfigDefinition());
+    Queue<JsonGuiEvent> eventStack = new LinkedList<JsonGuiEvent>();
     
-    configGui.addEventHandler(
-    JsonGuiEvent.CHANGE_EVENT,
-    { event ->
-      println "setValue('${event.getPayload().getComponent()}, '${event.getPayload().getTarget()}', '${event.getPayload().getValue()}')"
-
-      Object value = event.getPayload().getValue();
-      println "CLASS TYPE: '${value.getClass().getName()}'"
-      if (value instanceof java.lang.String)
-      {
-        we.executeScript("setValue(\"" +
-        event.getPayload().getComponent() + "\",\"" +
-        event.getPayload().getTarget()
-        + "\",\"" + value + "\");");
-      }
-      else
-      {
-        we.executeScript("setValue(\"" +
-        event.getPayload().getComponent() + "\",\"" +
-        event.getPayload().getTarget()
-        + "\"," + value + ");");
-      }
-    });
+    Timer timer = new Timer();
+    def task = {
+      Platform.runLater({
+        Map<String, Object> eventMap = new HashMap<String, Object>()
+        
+        if (eventStack.isEmpty())
+        {
+          return;
+        }
+        
+        while (!eventStack.isEmpty())
+        {
+          JsonGuiEvent event = eventStack.remove()
+          eventMap.put(event.getPayload().getComponent() + "::" +
+              event.getPayload().getTarget(), event);
+        }
+        
+        def values = [];
+        
+        eventMap.each { key, event ->
+          
+          //println "setValue('${event.getPayload().getComponent()}, '${event.getPayload().getTarget()}', '${event.getPayload().getValue()}')"
+          
+          Object value = event.getPayload().getValue();
+          //println "CLASS TYPE: '${value.getClass().getName()}'"
+          println "{ chartName: \"" +
+              event.getPayload().getComponent() + "\", key: \"" +
+              event.getPayload().getTarget() + "\", value: \"" + value + "\" }";
+          
+          if (value instanceof java.lang.String)
+          {
+            values << "{ chartName: \"" +
+                event.getPayload().getComponent() + "\", key: \"" +
+                event.getPayload().getTarget() + "\", value: \"" + value + "\" }";
+          }
+          else
+          {
+            values << "{ chartName: \"" +
+                event.getPayload().getComponent() + "\", key: \"" +
+                event.getPayload().getTarget() + "\", value: " + value + " }";
+          }
+        }
+        
+        if (values.size() > 0)
+        {
+          println("setValues([" + values.join(",") + "]);")
+          we.executeScript("setValues([" + values.join(",") + "]);");
+        }
+      })
+    };
+    
+    timer.scheduleAtFixedRate(task, 0, 1000)
+    
+    configGui.addEventHandler(     
+        JsonGuiEvent.CHANGE_EVENT, { event ->
+          eventStack.add(event) });
     
     return configGui;
   }
