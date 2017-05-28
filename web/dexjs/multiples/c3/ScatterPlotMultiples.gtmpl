@@ -109,11 +109,9 @@
 
 <html>
   <head>
-    <title>DexJS : Chord Multiples</title>
+    <title>dex.js : C3 Scatterplot Multiples</title>
   </head>
   <body>
-  <div id="config" style="visibility: hidden">
-  </div>
   <div id="ChartArea"></div>
 <script>
 <%
@@ -127,25 +125,60 @@
   println dexData.toCsvString()
 %>
 
-function setConfiguration(config)
+var frames = dex.csv.getFramesByIndex(csv, 0);
+
+var base = new dex.component({});
+
+base.load("dexjs-config-c3-scatterplot");
+basechart = dex.charts.c3.ScatterPlot(base.attr());
+
+var multipleBase = new dex.component({
+  'parent': '#ChartArea',
+  'frames': frames,
+  'gridsterConfig.widget_base_dimensions' : [ 50, 50 ],
+  'gridsterConfig.widget_margins' : [ 1, 1 ],
+  'cell.width' : 8,
+  'cell.height' : 8
+});
+multipleBase.load("dexjs-config-multiples");
+
+var multiples = dex.charts.multiples.GridsterMultiples(
+multipleBase.attr());
+multiples.attr('baseChart', basechart);
+multiples.render();
+  
+function setValues(values)
 {
-  multiples.configure(config);
+  values.forEach(function(config) {
+    switch (config.chartName) {
+      case "multiples":
+      {
+        multiples.attr(config.key, config.value);
+        break;
+      }
+      case "basechart":
+      {
+        base.attr(config.key, config.value);
+        break;
+      }
+    }
+  });
+  base.save("dexjs-config-c3-scatterplot");
+  var newBase = dex.charts.c3.ScatterPlot(base.attr());
+  multiples.attr("baseChart", newBase);  
+  multipleBase.save("dexjs-config-multiples");
+  multiples.render();
 }
 
-  var frames = dex.csv.getFramesByIndex(csv, 0);
+function getGuiDefinition()
+{
+  var guiDef = {
+    'multiples': multiples.getGuiDefinition(),
+    'basechart': multiples.attr("charts")[0].getGuiDefinition()
+  };
 
-  var multiples = dex.charts.multiples.GridsterMultiples({
-    'parent': '#ChartArea',
-    'frames': frames,
-    'gridsterConfig.widget_base_dimensions' : [ 50, 50 ],
-    'gridsterConfig.widget_margins' : [ 1, 1 ],
-    'cell.width' : 6,
-    'cell.height' : 6,
-    'baseChart': dex.charts.c3.ScatterPlot()
-  });
-
-  multiples.load();
-  multiples.render();
+  return JSON.stringify(guiDef);
+}
 
 </script>
 </body>

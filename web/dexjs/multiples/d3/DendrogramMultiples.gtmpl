@@ -143,39 +143,36 @@
     'gridsterConfig.widget_base_dimensions' : [ 50, 50 ],
     'gridsterConfig.widget_margins' : [ 1, 1 ],
     'cell.width' : 8,
-    'cell.height' : 8,
-    'baseChart': basechart
+    'cell.height' : 8
   });
   multipleBase.load("dexjs-config-multiples");
 
   var multiples = dex.charts.multiples.GridsterMultiples(
-    multipleBase.attr()).render();
-
-function setValue(chartName, key, value)
+    multipleBase.attr());
+  multiples.attr('baseChart', basechart);
+  multiples.render();
+  
+function setValues(values)
 {
-  switch (chartName) {
-    case "multiples":
-    {
-      multipleBase.attr(key, value);
-      multipleBase.save("dexjs-config-multiples");
-      multiples.attr(key, value).render();
-      break;
+  values.forEach(function(config) {
+    switch (config.chartName) {
+      case "multiples":
+      {
+        multiples.attr(config.key, config.value);
+        break;
+      }
+      case "basechart":
+      {
+        base.attr(config.key, config.value);
+        break;
+      }
     }
-    case "basechart":
-    {
-      // REM: Due to the fact that clone only clones originally
-      // supplied construction parameters, here we create a new
-      // chart from all the parameters of the old one.  Kind of
-      // cumbersome until i figure out a better way to separate
-      // user configured things from automatic settings.
-      base.attr(key, value);
-      base.save("dexjs-config-dendrogram");
-      var newBase = dex.charts.d3.Dendrogram(base.attr());
-      multiples.attr("baseChart", newBase);      
-      multiples.render();
-      break;
-    }
-  }
+  });
+  base.save("dexjs-config-dendrogram");
+  var newBase = dex.charts.d3.Dendrogram(base.attr());
+  multiples.attr("baseChart", newBase);  
+  multipleBase.save("dexjs-config-multiples");
+  multiples.render();
 }
 
 function getGuiDefinition()

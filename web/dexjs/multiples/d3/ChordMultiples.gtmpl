@@ -149,31 +149,27 @@
   multiples.render();
 
 
-function setValue(chartName, key, value)
+function setValues(values)
 {
-  switch (chartName) {
-    case "multiples":
-    {
-      multipleBase.attr(key, value);
-      multipleBase.save("dexjs-config-multiples");
-      multiples.attr(key, value).render();
-      break;
+  values.forEach(function(config) {
+    switch (config.chartName) {
+      case "multiples":
+      {
+        multiples.attr(config.key, config.value);
+        break;
+      }
+      case "basechart":
+      {
+        base.attr(config.key, config.value);
+        break;
+      }
     }
-    case "basechart":
-    {
-      // REM: Due to the fact that clone only clones originally
-      // supplied construction parameters, here we create a new
-      // chart from all the parameters of the old one.  Kind of
-      // cumbersome until i figure out a better way to separate
-      // user configured things from automatic settings.
-      base.attr(key, value);
-      base.save("dexjs-config-chord");
-      var newBase = dex.charts.d3.Chord(base.attr());
-      multiples.attr("baseChart", newBase);      
-      multiples.render();
-      break;
-    }
-  }
+  });
+  base.save("dexjs-config-chord");
+  var newBase = dex.charts.d3.Chord(base.attr());
+  multiples.attr("baseChart", newBase);  
+  multipleBase.save("dexjs-config-multiples");
+  multiples.render();
 }
 
 function getGuiDefinition()

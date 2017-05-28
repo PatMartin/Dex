@@ -15,7 +15,7 @@
 </style>
 <html>
   <head>
-    <title>Dex JS : Radial Tree</title>
+    <title>dex.js : Radial Tree</title>
   </head>
   <body>
   <div id="ChartArea"></div>
@@ -37,16 +37,19 @@ var tree = dex.charts.d3.RadialTree({
 tree.load();
 tree.render();
 
-function setValue(chartName, key, value)
+function setValues(values)
 {
-  switch (chartName) {
-    case "tree":
-    {
-      tree.attr(key, value).update();
-      tree.save();
-      break;
+  values.forEach(function(config) {
+    switch (config.chartName) {
+      case "tree":
+      {
+        tree.attr(config.key, config.value);
+        break;
+      }
     }
-  }
+  });
+  tree.update();
+  tree.save();
 }
 
 function getGuiDefinition()

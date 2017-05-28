@@ -40,11 +40,6 @@
   println dexData.toCsvString();
 %>
 
-function setConfiguration(config)
-{
-  chord.configure(config);
-}
-
 var sunburst = dex.charts.d3.Sunburst({
   parent : "#ChartArea",
   csv : csv });
@@ -52,16 +47,19 @@ var sunburst = dex.charts.d3.Sunburst({
 sunburst.load();
 sunburst.render();
 
-function setValue(chartName, key, value)
+function setValues(values)
 {
-  switch (chartName) {
-    case "sunburst":
-    {
-      sunburst.attr(key, value).update();
-      sunburst.save();
-      break;
+  values.forEach(function(config) {
+    switch (config.chartName) {
+      case "sunburst":
+      {
+        sunburst.attr(config.key, config.value);
+        break;
+      }
     }
-  }
+  });
+  sunburst.update();
+  sunburst.save();
 }
 
 function getGuiDefinition()

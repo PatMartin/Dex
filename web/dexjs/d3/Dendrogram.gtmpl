@@ -15,7 +15,7 @@
 </style>
 <html>
   <head>
-    <title>Dex JS : Dendrogram</title>
+    <title>dex.js : Dendrogram</title>
   </head>
   <body>
   <div id="ChartArea"></div>
@@ -38,16 +38,19 @@ var dendrogram = dex.charts.d3.Dendrogram({
 dendrogram.load();
 dendrogram.render();
 
-function setValue(chartName, key, value)
+function setValues(values)
 {
-  switch (chartName) {
-    case "dendrogram":
-    {
-      dendrogram.attr(key, value).render();
-      dendrogram.save();
-      break;
+  values.forEach(function(config) {
+    switch (config.chartName) {
+      case "dendrogram":
+      {
+        dendrogram.attr(config.key, config.value);
+        break;
+      }
     }
-  }
+  });
+  dendrogram.update();
+  dendrogram.save();
 }
 
 function getGuiDefinition()

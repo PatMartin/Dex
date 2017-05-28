@@ -108,11 +108,9 @@
 
 <html>
   <head>
-    <title>DexJS : Sankey Multiples</title>
+    <title>dex.js : Sankey Multiples</title>
   </head>
   <body>
-  <div id="config" style="visibility: hidden">
-  </div>
   <div id="ChartArea"></div>
 <script>
 <%
@@ -125,26 +123,60 @@
   println dexData.toCsvString()
 %>
 
-function setConfiguration(config)
+var frames = dex.csv.getFramesByIndex(csv, 0);
+
+var base = new dex.component({});
+
+base.load("dexjs-config-d3-sankey");
+basechart = dex.charts.d3.Sankey(base.attr());
+
+var multipleBase = new dex.component({
+  'parent': '#ChartArea',
+  'frames': frames,
+  'gridsterConfig.widget_base_dimensions' : [ 50, 50 ],
+  'gridsterConfig.widget_margins' : [ 1, 1 ],
+  'cell.width' : 8,
+  'cell.height' : 8
+});
+multipleBase.load("dexjs-config-multiples");
+
+var multiples = dex.charts.multiples.GridsterMultiples(
+multipleBase.attr());
+multiples.attr('baseChart', basechart);
+multiples.render();
+  
+function setValues(values)
 {
-  multiples.configure(config);
+  values.forEach(function(config) {
+    switch (config.chartName) {
+      case "multiples":
+      {
+        multiples.attr(config.key, config.value);
+        break;
+      }
+      case "basechart":
+      {
+        base.attr(config.key, config.value);
+        break;
+      }
+    }
+  });
+  base.save("dexjs-config-d3-sankey");
+  var newBase = dex.charts.d3.Sankey(base.attr());
+  multiples.attr("baseChart", newBase);  
+  multipleBase.save("dexjs-config-multiples");
+  multiples.render();
 }
 
-  var frames = dex.csv.getFramesByIndex(csv, 0);
+function getGuiDefinition()
+{
+  var guiDef = {
+    'multiples': multiples.getGuiDefinition(),
+    'basechart': multiples.attr("charts")[0].getGuiDefinition()
+  };
 
-  var multiples = dex.charts.multiples.GridsterMultiples({
-    'parent': '#ChartArea',
-    'frames': frames,
-    'gridsterConfig.widget_base_dimensions' : [ 50, 50 ],
-    'gridsterConfig.widget_margins' : [ 1, 1 ],
-    'cell.width' : 8,
-    'cell.height' : 8,
-    'baseChart': dex.charts.d3.Sankey({
-      })
-  });
-
-  multiples.load();
-  multiples.render();
+  return JSON.stringify(guiDef);
+}
 
 </script>
 </body>

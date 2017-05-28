@@ -1,23 +1,16 @@
-
 <!doctype html>
 <html>
 <head>
-  <title>Network | Sizing</title>
+  <title>dex.js : Network</title>
 
-  <style type="text/css">
-  html,body{
-    height : 100%;
-    min-height : 100%;
-    width : 100%;
-    min-width : 100%;
-  }
-  #network {
-    height : 100%;
-    min-height : 100%;
-    width : 100%;
-    min-width : 100%;
-  }
-  </style>
+<style type="text/css">
+html,body,#ChartArea{
+  height : 100%;
+  min-height : 100%;
+  width : 100%;
+  min-width : 100%;
+}
+</style>
 
 <style>
 <%

@@ -8,7 +8,6 @@
     min-width: 100%;
   }
 
-  
 <%
   println new File("javascript/jqueryui/latest/jquery-ui.min.css").text
   println new File("javascript/jqueryui/latest/jquery-ui.theme.min.css").text
@@ -37,16 +36,19 @@ var sankey = new dex.charts.d3.Sankey({
 sankey.load();
 sankey.render();
 
-function setValue(chartName, key, value)
+function setValues(values)
 {
-  switch (chartName) {
-    case "sankey":
-    {
-      sankey.attr(key, value).update();
-      sankey.save();
-      break;
+  values.forEach(function(config) {
+    switch (config.chartName) {
+      case "sankey":
+      {
+        sankey.attr(config.key, config.value);
+        break;
+      }
     }
-  }
+  });
+  sankey.update();
+  sankey.save();
 }
 
 function getGuiDefinition()

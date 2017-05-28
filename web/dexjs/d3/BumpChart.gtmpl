@@ -37,16 +37,19 @@ var bumpchart = dex.charts.d3.BumpChart({
 bumpchart.load();
 bumpchart.render();
 
-function setValue(chartName, key, value)
+function setValues(values)
 {
-  switch (chartName) {
-    case "bumpchart":
-    {
-      bumpchart.attr(key, value).update();
-      bumpchart.save();
-      break;
+  values.forEach(function(config) {
+    switch (config.chartName) {
+      case "bumpchart":
+      {
+        bumpchart.attr(config.key, config.value);
+        break;
+      }
     }
-  }
+  });
+  bumpchart.update();
+  bumpchart.save();
 }
 
 function getGuiDefinition()

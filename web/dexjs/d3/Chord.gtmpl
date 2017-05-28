@@ -37,16 +37,19 @@ var chord = new dex.charts.d3.Chord({
 chord.load();
 chord.render();
 
-function setValue(chartName, key, value)
+function setValues(values)
 {
-  switch (chartName) {
-    case "chord":
-    {
-      chord.attr(key, value).update();
-      chord.save();
-      break;
+  values.forEach(function(config) {
+    switch (config.chartName) {
+      case "chord":
+      {
+        chord.attr(config.key, config.value);
+        break;
+      }
     }
-  }
+  });
+  chord.update();
+  chord.save();
 }
 
 function getGuiDefinition()

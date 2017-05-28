@@ -10,11 +10,13 @@
 </style>
 <html>
   <head>
-    <title>DexJS : Network</title>
+    <title>dex.js : Network</title>
   </head>
 <style>
   println new File("javascript/vis/latest/vis.css").text
 </style>
+  <body>
+  <div id="ChartArea"></div>
 <script>
 <%
   println new File("javascript/jquery/latest/jquery-2.1.3.min.js").text
@@ -22,13 +24,7 @@
   println new File("javascript/underscore/latest/underscore-min.js").text
   println new File("javascript/dexjs/latest/dex.js").text
   println new File("javascript/vis/latest/vis.js").text
-%>
-</script>
-  <body>
-  <div id="ChartArea"></div>
-<script>
 
-<%
   println dexData.toCsvString();
 %>
 
@@ -40,16 +36,19 @@ var network = dex.charts.vis.Network({
 network.load();
 network.render();
 
-function setValue(chartName, key, value)
+function setValues(values)
 {
-  switch (chartName) {
-    case "network":
-    {
-      network.attr(key, value).update();
-      network.save();
-      break;
+  values.forEach(function(config) {
+    switch (config.chartName) {
+      case "network":
+      {
+        network.attr(config.key, config.value);
+        break;
+      }
     }
-  }
+  });
+  network.update();
+  network.save();
 }
 
 function getGuiDefinition()
