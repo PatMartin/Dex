@@ -11601,9 +11601,10 @@ module.exports = function gui(dex) {
             "name": "Fill",
             "description": "The fill color or none.",
             "target": ns + "fillColor",
-            "type": "choice",
-            "choices": ["none", "red", "green", "blue", "black", "white", "yellow",
-              "purple", "orange", "pink", "cyan", "steelblue", "grey",],
+            "type": "color",
+            "colors": ["none", "black", "white", "red", "green",
+              "blue", "orange", "yellow", "pink", "gray", "maroon",
+              "teal", "cyan", "navy", "steelblue", "olive", "silver"],
             "initialValue": "none"
           },
           {
@@ -11922,8 +11923,7 @@ module.exports = function gui(dex) {
     'disable': function disable(config, field) {
       if (config.type == "group") {
         config.contents.forEach(function (elt, i) {
-          if (elt.hasOwnProperty("target") && elt.target == field)
-          {
+          if (elt.hasOwnProperty("target") && elt.target == field) {
             delete config.contents[i];
           }
           else {
@@ -11937,7 +11937,7 @@ module.exports = function gui(dex) {
     'sync': function sync(chart, guiDef) {
       if (guiDef.type == "group") {
         guiDef.contents.forEach(function (elt, i) {
-            sync(chart, elt);
+          sync(chart, elt);
         })
       }
       else {
