@@ -1,6 +1,7 @@
 package com.dexvis.javafx.scene.control;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -200,7 +201,7 @@ public class JsonGuiPane extends MigPane
     }
   }
   
-  private void addIntControl(MigPane pane, String chartName,
+  private void addIntControlOld(MigPane pane, String chartName,
       Map<String, Object> spec)
   {
     Slider slider = new Slider();
@@ -219,23 +220,105 @@ public class JsonGuiPane extends MigPane
     pane.add(valueLabel, "span");
   }
   
+  private void addIntControl(MigPane pane, String chartName,
+      Map<String, Object> spec)
+  {
+    MigPane sliderPane = new MigPane("", "[grow][]", "[]");
+    
+    Slider slider = new Slider(getIntValue(spec, "minValue", 0),
+        getIntValue(spec, "maxValue", 100), getIntValue(spec,
+            "initialValue", 0));
+    
+    int step = getIntValue(spec, "step", 1);
+    
+    slider.setMajorTickUnit(step);
+    slider.setMinorTickCount(0);
+    slider.setBlockIncrement(step);
+    slider.setSnapToTicks(true);
+    
+    TextField textField = new TextField(getValue(spec, "initialValue", ""));
+    textField.textProperty().addListener((observable, oldVal, newVal) -> {
+      try
+      {
+        double value = Double.parseDouble(newVal);
+        try
+        {
+          slider.setValue(value);
+        }
+        catch(Exception ex)
+        {
+          // May be out of range for slider, text overrides.
+      }
+      fireEvent(chartName, spec.get("target").toString(), newVal);
+    }
+    catch(Exception ex)
+    {
+      // Bad entry.
+    }
+  } );
+  
+    slider.valueProperty().addListener((observable, oldVal, newVal) -> {
+      int val = newVal.intValue();
+      textField.setText("" + val);
+      fireEvent(chartName, spec.get("target").toString(), val);
+    });
+    sliderPane.add(slider, "growx");
+    sliderPane.add(textField);
+    pane.add(sliderPane, "growx, span");
+  }
+  
   private void addFloatControl(MigPane pane, String chartName,
       Map<String, Object> spec)
   {
-    Slider slider = new Slider();
-    slider.setMin(getDoubleValue(spec, "minValue", 0.0));
-    slider.setMax(getDoubleValue(spec, "maxValue", 100.0));
-    slider.setValue(getDoubleValue(spec, "initialValue", 0.0));
+    MigPane sliderPane = new MigPane("", "[grow][]", "[]");
     
-    Label valueLabel = new Label(getValue(spec, "initialValue", "0"));
+    Slider slider = new Slider(getDoubleValue(spec, "minValue", 0.0),
+        getDoubleValue(spec, "maxValue", 100.0), getDoubleValue(spec,
+            "initialValue", 0.0));
+    
+    double step = getDoubleValue(spec, "step", .1);
+    String stepFormat = String.format("%.1f", step);
+    if (stepFormat.startsWith("0"))
+    {
+      stepFormat = stepFormat.substring(1);
+    }
+    stepFormat = "%" + stepFormat + "f";
+    final String stepFmt = stepFormat;
+    
+    slider.setMajorTickUnit(step);
+    slider.setMinorTickCount(0);
+    slider.setBlockIncrement(step);
+    slider.setSnapToTicks(true);
+    
+    TextField textField = new TextField(getValue(spec, "initialValue", ""));
+    textField.textProperty().addListener((observable, oldVal, newVal) -> {
+      try
+      {
+        double value = Double.parseDouble(newVal);
+        try
+        {
+          slider.setValue(value);
+        }
+        catch(Exception ex)
+        {
+          // May be out of range for slider, text overrides.
+      }
+      fireEvent(chartName, spec.get("target").toString(), newVal);
+    }
+    catch(Exception ex)
+    {
+      // Bad entry.
+    }
+  } );
     
     slider.valueProperty().addListener((observable, oldVal, newVal) -> {
       double val = newVal.doubleValue();
-      valueLabel.setText("" + val);
+      textField.setText(String.format(stepFmt, val));
       fireEvent(chartName, spec.get("target").toString(), val);
     });
-    pane.add(slider, "growx");
-    pane.add(valueLabel, "span");
+    sliderPane.add(slider, "growx");
+    sliderPane.add(textField);
+    pane.add(sliderPane, "growx, span");
   }
   
   private void addStringControl(MigPane pane, String chartName,
@@ -255,17 +338,13 @@ public class JsonGuiPane extends MigPane
     Map<String, String> choiceMap = new TreeMap<String, String>();
     for (Object choice : choices)
     {
-      System.out.println("CHOICE: " + choice);
       if (choice instanceof Map)
       {
         Map<String, String> cm = (Map<String, String>) choice;
-        System.out.println("  NAME: " + cm.get("name") + ", VALUE: "
-            + cm.get("value"));
         choiceMap.put(cm.get("name"), cm.get("value"));
       }
       else
       {
-        System.out.println("  NAME/VALUE: " + (String) choice);
         choiceMap.put((String) choice, (String) choice);
       }
     }
@@ -274,10 +353,10 @@ public class JsonGuiPane extends MigPane
     cb.getSelectionModel().select(getValue(spec, "initialValue", ""));
     pane.add(cb, "grow,span");
     cb.setOnAction(action -> {
-      System.out
-          .println("Choicebox Fire Event: "
-              + cb.getSelectionModel().selectedItemProperty().getValue()
-                  .toString());
+      //System.out
+      //    .println("Choicebox Fire Event: "
+      //        + cb.getSelectionModel().selectedItemProperty().getValue()
+      //            .toString());
       fireEvent(
           chartName,
           spec.get("target").toString(),
@@ -301,8 +380,41 @@ public class JsonGuiPane extends MigPane
   private void addColorControl(MigPane pane, String chartName,
       Map<String, Object> spec)
   {
+    MigPane colorPane = new MigPane("", "[][]", "[]");
+    
+    String defaultColors[] = { "black", "white", "red", "green", "blue",
+        "orange", "yellow", "pink", "gray", "maroon", "teal", "cyan", "navy",
+        "steelblue", "olive", "silver" };
+    List<String> defaultList = Arrays.asList(defaultColors);
+    
+    List<String> colorList = getStringListValue(spec, "colors", defaultList);
+    
+    ChoiceBox cb = new ChoiceBox(FXCollections.observableArrayList(colorList));
+    cb.getSelectionModel().select(getValue(spec, "initialValue", ""));
+    
     ColorPicker colorPicker = new ColorPicker();
-    pane.add(colorPicker, "grow,span");
+    colorPane.add(colorPicker);
+    
+    colorPane.add(cb, "");
+    cb.setOnAction(action -> {
+      String colorName = (String) cb.getSelectionModel().selectedItemProperty()
+          .getValue();
+      
+      if (colorName.equalsIgnoreCase("none"))
+      {
+        fireEvent(chartName, spec.get("target").toString(), colorName);
+      }
+      else
+      {
+        Color color = Color.web(colorName);
+        colorPicker.setValue(color);
+        String webColor = String.format("#%02X%02X%02X",
+            (int) (color.getRed() * 255), (int) (color.getGreen() * 255),
+            (int) (color.getBlue() * 255));
+        fireEvent(chartName, spec.get("target").toString(), webColor);
+      }
+    });
+    
     colorPicker.setOnAction(new EventHandler()
     {
       public void handle(Event t)
@@ -314,13 +426,15 @@ public class JsonGuiPane extends MigPane
         fireEvent(chartName, spec.get("target").toString(), webColor);
       }
     });
+    
+    pane.add(colorPane, "grow, span");
   }
   
   // Convenience function to fire a JsonGuiEvent
   private void fireEvent(String chartName, String target, Object value)
   {
-    System.out.println("fireEvent(" + chartName + "," + target + "," + value
-        + ")");
+    //System.out.println("fireEvent(" + chartName + "," + target + "," + value
+    //    + ")");
     fireEvent(new JsonGuiEvent(
         new JsonGuiEventPayload(chartName, target, value), null,
         JsonGuiEvent.CHANGE_EVENT));
@@ -446,6 +560,22 @@ public class JsonGuiPane extends MigPane
       try
       {
         return Double.parseDouble(map.get(key).toString());
+      }
+      catch(Exception ex)
+      {
+      }
+    }
+    return defaultValue;
+  }
+  
+  private List<String> getStringListValue(Map<String, Object> map, String key,
+      List<String> defaultValue)
+  {
+    if (map.containsKey(key))
+    {
+      try
+      {
+        return (List<String>) map.get(key);
       }
       catch(Exception ex)
       {
