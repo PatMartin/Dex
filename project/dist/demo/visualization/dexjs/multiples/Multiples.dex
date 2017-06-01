@@ -2,7 +2,7 @@
    <tasks class="java.util.ArrayList">
       <task-item name="Read CSV" active="true">
          <task class="com.dexvis.dex.task.input.ReadCsv">
-            
+            <config-def>[ { &quot;type&quot; : &quot;label&quot;, &quot;initialValue&quot;: &quot;No configuration is available&quot; } ]</config-def>
             <fileText>data\presidents_cleansed.csv</fileText>
             <limitRows>false</limitRows>
             <rowLimitText>0</rowLimitText>
@@ -11,7 +11,7 @@
       </task-item>
       <task-item name="Select Columns" active="true">
          <task class="com.dexvis.dex.task.tablemanipulation.SelectColumns">
-            
+            <config-def>[ { &quot;type&quot; : &quot;label&quot;, &quot;initialValue&quot;: &quot;No configuration is available&quot; } ]</config-def>
             <columnList>&lt;com.dexvis.simple.types.SimpleListSelectionView&gt;
   &lt;sourceList&gt;
     &lt;string&gt;Presidency&lt;/string&gt;
@@ -26,52 +26,52 @@
       </task-item>
       <task-item name="View Data" active="true">
          <task class="com.dexvis.dex.task.utilities.ViewData">
-            
+            <config-def>[ { &quot;type&quot; : &quot;label&quot;, &quot;initialValue&quot;: &quot;No configuration is available&quot; } ]</config-def>
          </task>
       </task-item>
       <task-item name="Dendrogram Multiples" active="false">
          <task class="com.dexvis.dex.task.vis.dexjs.multiples.d3.DendrogramMultiples">
-            
+            <config-def>[ { &quot;type&quot; : &quot;label&quot;, &quot;initialValue&quot;: &quot;No configuration is available&quot; } ]</config-def>
          </task>
       </task-item>
-      <task-item name="Chord Multiples" active="false">
+      <task-item name="Chord Multiples" active="true">
          <task class="com.dexvis.dex.task.vis.dexjs.multiples.d3.ChordMultiples">
-            
+            <config-def>[ { &quot;type&quot; : &quot;label&quot;, &quot;initialValue&quot;: &quot;No configuration is available&quot; } ]</config-def>
          </task>
       </task-item>
       <task-item name="Network Multiples" active="false">
          <task class="com.dexvis.dex.task.vis.dexjs.multiples.vis.NetworkMultiples">
-            
+            <config-def>[ { &quot;type&quot; : &quot;label&quot;, &quot;initialValue&quot;: &quot;No configuration is available&quot; } ]</config-def>
          </task>
       </task-item>
       <task-item name="Clustered Force Multiples" active="false">
          <task class="com.dexvis.dex.task.vis.dexjs.multiples.d3.ClusteredForceMultiples">
-            
+            <config-def>[ { &quot;type&quot; : &quot;label&quot;, &quot;initialValue&quot;: &quot;No configuration is available&quot; } ]</config-def>
          </task>
       </task-item>
       <task-item name="Orbital Layout Multiples" active="false">
          <task class="com.dexvis.dex.task.vis.dexjs.multiples.d3.OrbitalLayoutMultiples">
-            
+            <config-def>[ { &quot;type&quot; : &quot;label&quot;, &quot;initialValue&quot;: &quot;No configuration is available&quot; } ]</config-def>
          </task>
       </task-item>
       <task-item name="Parallel Coordinates Multiples" active="false">
          <task class="com.dexvis.dex.task.vis.dexjs.multiples.d3.ParallelCoordinatesMultiples">
-            
+            <config-def>[ { &quot;type&quot; : &quot;label&quot;, &quot;initialValue&quot;: &quot;No configuration is available&quot; } ]</config-def>
          </task>
       </task-item>
       <task-item name="Sankey Multiples" active="false">
          <task class="com.dexvis.dex.task.vis.dexjs.multiples.d3.SankeyMultiples">
-            
+            <config-def>[ { &quot;type&quot; : &quot;label&quot;, &quot;initialValue&quot;: &quot;No configuration is available&quot; } ]</config-def>
          </task>
       </task-item>
       <task-item name="Sunburst Multiples" active="false">
          <task class="com.dexvis.dex.task.vis.dexjs.multiples.d3.SunburstMultiples">
-            
+            <config-def>[ { &quot;type&quot; : &quot;label&quot;, &quot;initialValue&quot;: &quot;No configuration is available&quot; } ]</config-def>
          </task>
       </task-item>
-      <task-item name="Treemap Multiples" active="true">
+      <task-item name="Treemap Multiples" active="false">
          <task class="com.dexvis.dex.task.vis.dexjs.multiples.d3.TreemapMultiples">
-            
+            <config-def>[ { &quot;type&quot; : &quot;label&quot;, &quot;initialValue&quot;: &quot;No configuration is available&quot; } ]</config-def>
          </task>
       </task-item>
    </tasks>
