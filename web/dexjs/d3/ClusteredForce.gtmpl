@@ -15,11 +15,9 @@
 </style>
 <html>
   <head>
-    <title>DexCharts : Clustered Force</title>
+    <title>dex.js : Clustered Force</title>
   </head>
   <body>
-  <div id="config" style="visibility: hidden">
-  </div>
   <div id="ChartArea"></div>
 <script>
 <%
@@ -27,19 +25,11 @@
   println new File("javascript/jqueryui/latest/jquery-ui.min.js").text
   println new File("javascript/underscore/latest/underscore-min.js").text
   println new File("javascript/dexjs/latest/dex.min.js").text
-%>
-</script>
-<script>
-<%
+
   println dexData.toCsvString();
 %>
 
-function setConfiguration(config)
-{
-  clusteredForce.configure(config);
-}
-
-var clusteredForce = dex.charts.d3.ClusteredForce({
+var clusteredforce = dex.charts.d3.ClusteredForce({
   parent : "#ChartArea",
   resizable : true,
   groups: [{'category': 0, 'value': 2, 'label': 1}],
@@ -47,19 +37,32 @@ var clusteredForce = dex.charts.d3.ClusteredForce({
   csv : csv
 });
 
-clusteredForce.load();
-clusteredForce.render();
+clusteredforce.load();
+clusteredforce.render();
 
-function setValue(key, value)
+function setValues(values)
 {
-  clusteredForce.attr(key, value).update();
+  values.forEach(function(config) {
+    switch (config.chartName) {
+      case "clusteredforce":
+      {
+        clusteredforce.attr(config.key, config.value);
+        break;
+      }
+    }
+  });
+  clusteredforce.update();
+  clusteredforce.save();
 }
 
 function getGuiDefinition()
 {
-  return "[" + JSON.stringify(clusteredForce.getGuiDefinition()) + "]";
-}
+  var guiDef = {
+    'clusteredforce': clusteredforce.getGuiDefinition()
+  };
 
+  return JSON.stringify(guiDef);
+}
 </script>
 </body>
 </html>

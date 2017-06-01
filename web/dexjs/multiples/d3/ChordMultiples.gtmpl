@@ -148,7 +148,6 @@
   multiples.attr('baseChart', basechart);
   multiples.render();
 
-
 function setValues(values)
 {
   values.forEach(function(config) {
