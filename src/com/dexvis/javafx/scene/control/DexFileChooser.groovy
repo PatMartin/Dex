@@ -105,9 +105,7 @@ class DexFileChooser {
           filePath = filePath.substring(userDir.length() + File.separator.length());
         }
         
-        if (fileText != null) {
-          fileText.setText(filePath)
-        }
+        fileText?.textProperty()?.setValue(filePath)
         
         lastDir = loadFile.getParent()
       }
