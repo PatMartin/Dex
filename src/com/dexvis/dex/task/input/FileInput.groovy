@@ -33,7 +33,7 @@ class FileInput extends DexTask {
   TextField fileText = new TextField("")
   
   private DexFileChooser fileChooser = new DexFileChooser("data",
-    "Read File", "Read File", "ANY", "*", fileText)
+    "Read File", "Read File", "ANY", "*")
 
   public DexTaskState execute(DexTaskState state) throws DexException {
     println "Running: $name"
@@ -65,6 +65,8 @@ class FileInput extends DexTask {
       configPane.setStyle("-fx-background-color: white;")
       
       configPane.add(NodeFactory.createTitle("File Input Configuration"), "grow,span")
+      
+      fileChooser.setFileText(fileText);
       
       Button browseButton = new Button("Browse")
       

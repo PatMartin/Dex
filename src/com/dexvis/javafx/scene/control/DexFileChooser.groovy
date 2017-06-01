@@ -17,6 +17,7 @@ class DexFileChooser {
   private String ext
   private String lastDir = null;
   private TextField fileText = null;
+ 
   
   public DexFileChooser(String startDir, String loadTitle, String saveTitle, String filterName,
   String ext) {
@@ -26,15 +27,15 @@ class DexFileChooser {
     this.filterName = filterName
     this.ext = ext
   }
+    
+  public void setFileText(TextField fileText)
+  {
+    this.fileText = fileText;
+  }
   
-  public DexFileChooser(String startDir, String loadTitle, String saveTitle, String filterName,
-  String ext, TextField fileText) {
-    this.startDir = startDir
-    this.loadTitle = loadTitle
-    this.saveTitle = saveTitle
-    this.filterName = filterName
-    this.ext = ext
-    this.fileText = fileText
+  public void setLastDir(String lastDir)
+  {
+    this.lastDir = lastDir;
   }
   
   public File load(ActionEvent evt) {

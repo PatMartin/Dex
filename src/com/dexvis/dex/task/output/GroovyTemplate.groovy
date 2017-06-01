@@ -6,6 +6,7 @@ import javafx.scene.control.Button
 import javafx.scene.control.Label
 import javafx.scene.control.TextField
 
+import org.antlr.v4.codegen.model.OutputFile;
 import org.apache.commons.io.FileUtils
 import org.simpleframework.xml.Element
 import org.simpleframework.xml.Root
@@ -42,9 +43,9 @@ class GroovyTemplate extends DexTask {
   
   private String output = ""
   private DexFileChooser htmlChooser = new DexFileChooser("output",
-    "Choose HTML", "Save HTML", "HTML", "html", outputFileText)
+    "Choose HTML", "Save HTML", "HTML", "html")
   private DexFileChooser templateChooser = new DexFileChooser("web",
-    "Load Template", "Save Groovy Template", "GTMPL", "gtmpl", templateText)
+    "Load Template", "Save Groovy Template", "GTMPL", "gtmpl")
   
   /**
    * 
@@ -93,6 +94,9 @@ class GroovyTemplate extends DexTask {
     {
       configPane = new MigPane("", "[][grow][]", "[][][]")
       configPane.setStyle("-fx-background-color: white;")
+      
+      templateChooser.setFileText(templateText);
+      htmlChooser.setFileText(outputFileText);
       
       Button chooseTemplateButton = new Button("Choose Template")
       chooseTemplateButton.setOnAction({ action -> templateChooser.setTextPath(action)})

@@ -54,7 +54,7 @@ public class CodeMirrorEditor {
           public void changed(ObservableValue<? extends State> ov, State t, State t1) {
             if (t1 == Worker.State.SUCCEEDED) {
               JSObject window = (JSObject) we.executeScript("window");
-              println "BINDING JAVASCRIPT javaApp='$this' to '$window'"
+              //println "BINDING JAVASCRIPT javaApp='$this' to '$window'"
               // TODO: Figure out direct way of doing this.  Also restore hierarchy of:
               //
               // Editor -> JSEditor -> CodeMirrorEditor

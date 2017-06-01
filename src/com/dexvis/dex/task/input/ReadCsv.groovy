@@ -37,7 +37,7 @@ class ReadCsv extends DexTask {
   private TextField fileText = new TextField()
   
   private DexFileChooser csvChooser = new DexFileChooser("data",
-    "Read CSV", "Read CSV", "CSV", "csv", fileText)
+    "Read CSV", "Read CSV", "CSV", "csv")
   
   private Label rowLimitLabel = new Label("Limit Number Of Rows:")
   
@@ -97,6 +97,7 @@ class ReadCsv extends DexTask {
       configPane.add(effectiveFile, "grow,span")
       configPane.add(fileLabel)
       configPane.add(fileText, "grow")
+      csvChooser.setFileText(fileText);
       configPane.add(browseButton, "span")
       configPane.add(rowLimitLabel)
       configPane.add(rowLimitText, "grow")

@@ -38,7 +38,7 @@ class WriteCsv extends DexTask {
   Button browseButton = new Button("Browse")
   
   private DexFileChooser csvChooser = new DexFileChooser("data",
-  "Write CSV", "Write CSV", "CSV", "csv", outputFileText)
+  "Write CSV", "Write CSV", "CSV", "csv")
   
   public WriteCsv() {
     super("Output", "Write CSV", "output/WriteCsv.html")
@@ -82,6 +82,8 @@ class WriteCsv extends DexTask {
       configPane.add(outputFileLabel)
       configPane.add(outputFileText, "grow")
       configPane.add(browseButton, "span")
+      
+      csvChooser.setFileText(outputFileText);
       
       browseButton.setOnAction({ action -> csvChooser.setTextPath(action)})
       

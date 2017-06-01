@@ -57,9 +57,9 @@ class WebDriverTask extends DexTask {
   private String output = ""
   private static def drivers = [:]
   private DexFileChooser templateChooser = new DexFileChooser("web",
-  "Load Template", "Load Template", "GTMPL", "gtmpl", templateText)
+  "Load Template", "Load Template", "GTMPL", "gtmpl",)
   private DexFileChooser htmlChooser = new DexFileChooser("output",
-  "Choose HTML", "Save HTML", "HTML", "html", outputFileText)
+  "Choose HTML", "Save HTML", "HTML", "html")
   
   /**
    * 
@@ -205,6 +205,9 @@ class WebDriverTask extends DexTask {
     {
       configPane = new MigPane("", "[][grow][]", "[][][]")
       configPane.setStyle("-fx-background-color: white;")
+      
+      templateChooser.setFileText(templateText)
+      htmlChooser.setFileText(outputFileText)
       
       Button chooseTemplateButton = new Button("Choose Template")
       chooseTemplateButton.setOnAction({ action -> templateChooser.setTextPath(action)})
