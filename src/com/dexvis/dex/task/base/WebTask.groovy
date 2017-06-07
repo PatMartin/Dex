@@ -299,7 +299,6 @@ class WebTask extends DexTask {
     }
     else
     {
-      println "Ignoring keypress"
       evt.consume()
     }
   }
