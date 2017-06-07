@@ -198,6 +198,19 @@ module.exports = function array(dex) {
     'unique': function (array) {
       return _.uniq(array);
     },
+    'orderedUnique': function (array) {
+      var map = {};
+      var uniqueArray = [];
+      if (Array.isArray(array)) {
+        array.forEach(function (elt) {
+          if ((typeof map[elt]) == "undefined") {
+            uniqueArray.push(elt);
+            map[elt] = 1;
+          }
+        });
+      }
+      return uniqueArray;
+    },
     /**
      *
      * Take a slice of an array without modifying the original array.
@@ -393,6 +406,11 @@ module.exports = function array(dex) {
       return _.clone(array);
       // Deep copy:
       //return $.extend(true, {}, array);
+    },
+    'combine': function(array1, array2) {
+      var a1 = dex.array.copy(array1);
+      var a2 = dex.array.copy(array2);
+      return a1.concat(a2);
     },
     'isNumeric': function (array) {
       return array.every(dex.object.isNumeric);
@@ -943,7 +961,7 @@ module.exports = function charts() {
     'vis'      : require("./vis/vis")
   };
 };
-},{"./c3/c3":14,"./d3/d3":33,"./d3plus/d3plus":35,"./echarts/echarts":40,"./elegans/elegans":42,"./multiples/multiples":44,"./nvd3/nvd3":47,"./threejs/threejs":49,"./vis/vis":51}],16:[function(require,module,exports){
+},{"./c3/c3":14,"./d3/d3":33,"./d3plus/d3plus":35,"./echarts/echarts":42,"./elegans/elegans":44,"./multiples/multiples":46,"./nvd3/nvd3":49,"./threejs/threejs":51,"./vis/vis":53}],16:[function(require,module,exports){
 var bumpchart = function (userConfig) {
   d3 = dex.charts.d3.d3v3;
   var chart;
@@ -7587,491 +7605,619 @@ d3plus.RingNetwork = require("./RingNetwork");
 module.exports = d3plus;
 },{"./RingNetwork":34}],36:[function(require,module,exports){
 var echart = function (userConfig) {
-  var chart;
-  var internalChart;
-  var effectiveOptions;
+    var chart;
+    var internalChart;
+    var effectiveOptions;
 
-  var defaults = {
-    'parent': '#EChartParent',
-    'id': 'EChartId',
-    'class': 'EChartClass',
-    'resizable': true,
-    'csv': {
-      'header': [],
-      'data': []
-    },
-    'series': {type: 'line'},
-    'width': "100%",
-    'height': "100%",
-  };
-
-  chart = new dex.component(userConfig, defaults);
-
-  chart.render = function render() {
-    var config = chart.config;
-    var csv = config.csv;
-
-    d3.select(config.parent).selectAll("*").remove();
-    //d3.select(config.parent)
-    //  .attr("_echarts_instance_", null);
-
-    if (typeof internalChart != "undefined") {
-      internalChart.dispose();
-    }
-    internalChart = echarts.init(d3.select(config.parent)[0][0]);
-
-    // Calls update automatically.
-    chart.resize();
-
-    return chart;
-  };
-
-  chart.update = function () {
-    var config = chart.config;
-    var csv = config.csv;
-
-    if (config.categorizationMethod) {
-      config.categories = dex.csv.getCategorizationMethod(csv,
-        config.categorizationMethod);
-    }
-
-    var dataOptions = getOptions(csv);
-    effectiveOptions = dex.config.expandAndOverlay(config.options, dataOptions);
-    internalChart.setOption(effectiveOptions);
-    internalChart.resize();
-  };
-
-  function getOptions(csv) {
-    var seriesType = dex.object.getValue(chart.config, "series.type", "line");
-
-    var chartType = dex.object.getValue(chart.config, "type", "line");
-    switch (chartType) {
-      case "force" :
-      case "circular" :
-      case "graph" :
-        return getGraphOptions(csv);
-      case "timeline":
-        return getTimelineOptions(csv);
-      case "polar":
-        return getPolarOptions(csv);
-      case "linechart":
-      case "areachart":
-      case "bar":
-        return getCartesianOptions(csv);
-      default:
-        return getCartesianOptions(csv);
-    }
-  }
-
-  function getPolarOptions(csv) {
-    var options = {};
-    //var gtypes = dex.csv.guessTypes(csv);
-    options.legend = {data: csv.header};
-    var xdata = [];
-    csv.data.forEach(function (row, i) {
-      xdata.push(i + 1);
-    });
-
-    options.angleAxis = {type: 'value', startAngle: 0};
-    options.radiusAxis = {};
-    options.polar = {};
-
-    options.series = [];
-
-    var frames;
-
-    // If only 2 columns, then we have only 1 frame.
-    if (csv.header.length <= 2) {
-      frames = {frameIndices: ["line"], frames: [csv]};
-    }
-    // Frame by first column:
-    //
-    // REM: We need more sophisticated framing strategies for this.
-    //  EX: Frame 2 column by index.
-    else {
-      frames = dex.csv.getFramesByIndex(csv, 0);
-    }
-    options.legend = {data: frames.frameIndices};
-    dex.console.log("FRAMES", frames);
-
-    frames.frames.forEach(function (frame, fi) {
-      var series = dex.config.expandAndOverlay(chart.config.series,
-        {
-          coordinateSystem: 'polar',
-          name: frames.frameIndices[fi],
-          type: 'line',
-          data: frame.data
-        });
-      options.series.push(series);
-    });
-
-    //dex.console.log("OPTIONS", options);
-    return options;
-  }
-
-  function getCartesianOptions(csv) {
-    var options = {};
-    //var gtypes = dex.csv.guessTypes(csv);
-
-    var xyCsv = dex.csv.removeColumn(csv, 0);
-    options.legend = {data: xyCsv.remaining.header};
-
-    options.xAxis = {
-      type: 'category',
-      boundaryGap: false,
-      data: xyCsv.removed.data.map(function (row) {
-        return row[0]
-      })
-    };
-    options.yAxis = {type: 'value'};
-    options.series = [];
-
-    xyCsv.remaining.header.forEach(function (h) {
-      var series = dex.config.expandAndOverlay(chart.config.series,
-        {name: h, type: 'line', data: []});
-      options.series.push(series);
-    });
-
-    xyCsv.remaining.data.forEach(function (row, ri) {
-      row.forEach(function (col, ci) {
-        options.series[ci].data.push(col);
-      });
-    });
-
-    //dex.console.log("OPTIONS", options);
-    return options;
-  }
-
-  function getGraphOptions(csv) {
-    var options = {};
-
-    var nodes = {};
-    var nodeId = 0;
-
-    // Dynamically determine our categorization function:
-    var categorize = dex.csv.getCsvFunction(csv, chart.config.categories);
-
-    // Cateorize all data in csv.
-    var catMap = {};
-    var catNum = 0;
-
-    csv.data.forEach(function (row, ri) {
-      row.forEach(function (col, ci) {
-        var category = categorize(csv, ri, ci);
-        if (typeof catMap[category] == "undefined") {
-          catMap[category] = catNum;
-          catNum++;
-        }
-      });
-    });
-    var categories = Object.keys(catMap).map(function (key) {
-      return {name: key};
-    });
-
-    csv.data.forEach(function (row, ri) {
-      row.forEach(function (col, ci) {
-        var category = catMap[categorize(csv, ri, ci)];
-        var key = col + "::" + category;
-        nodes[key] = nodes[key] || {
-            id: nodeId++,
-            name: col,
-            symbolSize: 10,
-            itemStyle: null,
-            category: category,
-            value: 0,
-            draggable: true,
-            label: {normal: {show: true}}
-          };
-        nodes[key].value++;
-        nodes[key].symbolSize += 5;
-      });
-    });
-
-    var links = [];
-
-    var linkId = 0;
-    csv.data.forEach(function (row, ri) {
-      row.forEach(function (col, ci) {
-        if (ci < (row.length - 1)) {
-          var sourceCat = catMap[categorize(csv, ri, ci)];
-          var targetCat = catMap[categorize(csv, ri, ci + 1)];
-
-          links.push({
-            id: linkId,
-            source: nodes[row[ci] + "::" + sourceCat]["id"],
-            target: nodes[row[ci + 1] + "::" + targetCat]["id"]
-          });
-          linkId++;
-        }
-      });
-    });
-
-    options.legend = {
-      //selectedMode: 'single',
-      orient: 'vertical',
-      left: true,
-      top: true,
-      show: true,
-      data: categories
+    var defaults = {
+      'parent': '#EChartParent',
+      'id': 'EChartId',
+      'class': 'EChartClass',
+      'resizable': true,
+      'csv': {
+        'header': [],
+        'data': []
+      },
+      'series': {type: 'line'},
+      'width': "100%",
+      'height': "100%",
     };
 
-    options.series = dex.config.expandAndOverlay(chart.config.series,
-      {
-        name: "series",
-        type: 'graph',
-        layout: 'circular',
+    chart = new dex.component(userConfig, defaults);
 
-        lineStyle: {
-          normal: {
-            color: 'source',
-            curveness: 0.3
-          }
-        },
-        links: links,
-        data: Object.keys(nodes).map(function (key) {
-          return nodes[key];
-        }),
-        categories: categories,
-        roam: true,
-        label: {
-          normal: {
-            position: 'right',
-            formatter: '{b}'
-          }
-        }
-      });
+    chart.render = function render() {
+      var config = chart.config;
+      var csv = config.csv;
 
-    //dex.console.log("OPTIONS", options);
-    return options;
-  }
+      d3.select(config.parent).selectAll("*").remove();
 
-  function getTimelineOptions(csv) {
+      if (typeof internalChart != "undefined") {
+        internalChart.dispose();
+      }
+      internalChart = echarts.init(d3.select(config.parent)[0][0]);
 
-    // Dynamically determine our categorization function:
-    var getCategory = dex.csv.getRowFunction(csv, chart.config.categories);
-    var getSequence = dex.csv.getRowFunction(csv, chart.config.sequences);
+      // Calls update automatically.
+      chart.resize();
 
-    // Cateorize all data in csv.
-    var catMap = {};
-    var seqMap = {};
-    var category;
-    var sequence;
+      return chart;
+    };
 
-    csv.data.forEach(function (row, ri) {
-      category = getCategory(row, ri);
-      sequence = getSequence(row, ri);
+    chart.update = function () {
+      var config = chart.config;
+      var csv = config.csv;
 
-      //dex.console.log("CAT", category, "SEQ", sequence);
-
-      catMap[category] = 1;
-
-      if (typeof seqMap[sequence] == "undefined") {
-        seqMap[sequence] = {};
+      if (config.categorizationMethod) {
+        config.categories = dex.csv.getCategorizationMethod(csv,
+          config.categorizationMethod);
       }
 
-      seqMap[sequence][category] = row;
-    });
-
-    var categories = Object.keys(catMap).sort();
-    var sequences = Object.keys(seqMap).sort();
-
-    var baseData = [];
-
-    // Fill in gaps of data, carry down most recent data
-    // entry, or first encountered if there is none yet.
-
-    var curSeq = {};
-    sequences.forEach(function (seq) {
-      categories.forEach(function (cat) {
-        if ((typeof seqMap[seq][cat]) == "undefined") {
-          if ((typeof curSeq[cat]) == "undefined") {
-            seqMap[seq][cat] = [0, 0, 0, cat, seq];
-          }
-          else {
-            seqMap[seq][cat] = curSeq[cat];
-          }
-        }
-        curSeq[cat] = seqMap[seq][cat];
-      });
-    });
-
-    categories.forEach(function (cat) {
-      baseData.push(seqMap[sequences[0]][cat]);
-    });
-    dex.console.log("BASE-DATA", baseData);
-
-    var options = {
-      "baseOption": {
-        "timeline": {
-          "axisType": "category",
-          "orient": "vertical",
-          "autoPlay": true,
-          "inverse": true,
-          "playInterval": 1000,
-          "left": null,
-          "right": 20,
-          "top": 20,
-          "bottom": 20,
-          "width": 55,
-          "height": null,
-          "label": {
-            "normal": {
-              "textStyle": {
-                "color": "#999"
-              }
-            },
-            "emphasis": {
-              "textStyle": {
-                "color": "#fff"
-              }
-            }
-          },
-          "symbol": "none",
-          "lineStyle": {"color": "#555"},
-          "checkpointStyle": {
-            "color": "#bbb",
-            "borderColor": "#777",
-            "borderWidth": 2
-          },
-          "controlStyle": {
-            "showNextBtn": true,
-            "showPrevBtn": true,
-            "normal": {
-              "color": "#666",
-              "borderColor": "#666"
-            },
-            "emphasis": {
-              "color": "#aaa",
-              "borderColor": "#aaa"
-            }
-          },
-          "data": sequences
-        },
-        "backgroundColor": "#404a59",
-        "title": [{
-          "text": 1800,
-          "textAlign": "center",
-          "left": "63%",
-          "top": "55%",
-          "textStyle": {"fontSize": 100, "color": "rgba(255, 255, 255, 0.7)"}
-        }],
-        "tooltip": {
-          "padding": 5,
-          "backgroundColor": "#222",
-          "borderColor": "#777",
-          "borderWidth": 1,
-          formatter: function (obj) {
-            //dex.console.log("OBJECT", obj);
-            return "<table>" +
-              "<tr><td>" + csv.header[3] + ": </td><td>" + obj.data[3] + "</td></tr>" +
-              "<tr><td>" + csv.header[4] + ": </td><td>" + obj.data[4] + "</td></tr>" +
-              "<tr><td>" + csv.header[0] + ": </td><td>" + obj.data[0] + "</td></tr>" +
-              "<tr><td>" + csv.header[1] + ": </td><td>" + obj.data[1] + "</td></tr>" +
-              "<tr><td>" + csv.header[2] + ": </td><td>" + obj.data[2] + "</td></tr>" +
-              "</table>";
-          }
-        },
-        "grid": {
-          "left": "12%",
-          "right": "110"
-        },
-        "xAxis": {
-          "type": "value",
-          "name": csv.header[0],
-          "max": dex.csv.extent(csv, [0])[1],
-          "min": dex.csv.extent(csv, [0])[0],
-          "nameGap": 25,
-          "nameLocation": "middle",
-          "nameTextStyle": {"fontSize": 18},
-          "splitLine": {"show": false},
-          "axisLine": {"lineStyle": {"color": "#ccc"}},
-          "axisLabel": {"formatter": "{value}"}
-        },
-        "yAxis": {
-          "type": "value",
-          "name": csv.header[1],
-          "max": dex.csv.extent(csv, [1])[1],
-          "nameTextStyle": {"color": "#ccc", "fontSize": 18},
-          "axisLine": {"lineStyle": {"color": "#ccc"}},
-          "splitLine": {"show": false},
-          "axisLabel": {"formatter": "{value}"}
-        },
-        "visualMap": [{
-          "show": false,
-          "dimension": 3,
-          "categories": categories,
-          "calculable": true,
-          "precision": 0.1,
-          "textGap": 30,
-          "textStyle": {"color": "#ccc"},
-          "inRange": {"color": ["#bcd3bb", "#e88f70", "#edc1a5", "#9dc5c8", "#e1e8c8", "#7b7c68", "#e5b5b5", "#f0b489", "#928ea8", "#bda29a", "#bcd3bb", "#e88f70", "#edc1a5", "#9dc5c8", "#e1e8c8", "#7b7c68", "#e5b5b5", "#f0b489", "#928ea8", "#bda29a"]}
-        }],
-        "series": [{
-          "type": "scatter",
-          "itemStyle": {
-            "normal": {
-              "opacity": 0.8,
-              "shadowBlur": 10,
-              "shadowOffsetX": 0,
-              "shadowOffsetY": 0,
-              "shadowColor": "rgba(0, 0, 0, 0.5)"
-            }
-          },
-          "data": baseData
-        }],
-        "animationDurationUpdate": 1000,
-        "animationEasingUpdate": "quinticInOut"
-      },
-      options: []
+      var dataOptions = getOptions(csv);
+      effectiveOptions = dex.config.expandAndOverlay(config.options, dataOptions);
+      internalChart.setOption(effectiveOptions);
+      internalChart.resize();
     };
 
-    sequences.forEach(function (seq) {
-      var option = {
-        "title": {
-          show: true,
-          text: seq
-        }
+    function getOptions(csv) {
+      var chartType = dex.object.getValue(chart.config, "type", "line");
+      switch (chartType) {
+        case "force" :
+        case "circular" :
+        case "graph" :
+          return getGraphOptions(csv);
+        case "timeline":
+          return getTimelineOptions(csv);
+        case "polar":
+          return getPolarOptions(csv);
+        case "linechart":
+        case "areachart":
+        case "bar":
+          return getCartesianOptions(csv);
+        case 'single-axis':
+          return getSingleAxisOptions(csv);
+        default:
+          return getCartesianOptions(csv);
+      }
+    }
+
+    function getPolarOptions(csv) {
+      var config = chart.config;
+      var options = {
+        legend: {data: []},
+        series: [],
+        polar: {}
       };
-      var data = [];
-      categories.forEach(function (cat) {
-        data.push(seqMap[seq][cat]);
-      });
-      option.series = dex.config.expandAndOverlay(chart.config.series,
-        {
-          name: +seq,
-          type: 'scatter',
-          data: data,
-          symbolSize: function (row) {
-            //dex.console.log("SIZE OF", row);
-            if (typeof row == "undefined") {
-              return chart.config.radius.min;
-            }
-            //return 10;
-            var size = chart.config.sizes(row);
-            if (typeof size == "undefined" || size < 0) {
-              return chart.config.radius.min;
+      var gtypes = dex.csv.guessTypes(csv);
+
+      // Get our indices:
+      var angleIndex = dex.csv.getColumnNumber(csv, config.angleIndex);
+      var valueIndex = dex.csv.getColumnNumber(csv, config.valueIndex);
+      var seriesIndex = dex.csv.getColumnNumber(csv, config.seriesIndex);
+      var radiusIndex = dex.csv.getColumnNumber(csv, config.radiusIndex);
+
+      // Will contain required data indices for series.
+      var columns = [];
+
+      // We always need values.
+      columns.push(valueIndex);
+      dex.console.log("ANGLE INDEX: ", config.angleIndex, angleIndex);
+
+      switch (config.series.type) {
+        case "line":
+        case "scatter":
+        case "bar" : {
+          if (angleIndex === undefined) {
+            options.angleAxis = {
+              type: 'value',
+              startAngle: 0
+            };
+          }
+          else {
+            if (gtypes[angleIndex] == "string" ||
+              chart.config.angleAxisType == "category") {
+              options.angleAxis = {
+                type: "category",
+                data: dex.csv.uniqueArray(csv, angleIndex)
+              }
             }
             else {
-              return size;
+              var extents = dex.csv.extent(csv, angleIndex);
+              dex.console.log("EXTENT", extents);
+              options.angleAxis = {
+                type: "value",
+                min: "dataMin",
+                max: "dataMax",
+                boundaryGap: true
+              };
+              columns.push(angleIndex);
+            }
+          }
+
+          if (radiusIndex === undefined) {
+            options.radiusAxis = {};
+          }
+          else {
+            if (gtypes[radiusIndex] == "string" ||
+              chart.config.radiusAxisType == "category") {
+              options.radiusAxis = {
+                type: "category",
+                data: dex.csv.uniqueArray(csv, radiusIndex)
+              };
+            }
+            else {
+              options.radiusAxis = {};
+            }
+          }
+
+          break;
+        }
+      }
+
+      var seriesNames = [];
+
+      dex.console.log("COLUMNS", columns);
+
+      if (seriesIndex !== undefined) {
+        seriesNames = dex.csv.uniqueArray(csv, seriesIndex);
+        dex.console.log("SERIES-NAMES", seriesNames);
+        options.legend.data = seriesNames;
+
+        seriesNames.forEach(function (seriesName) {
+            var series = dex.config.expandAndOverlay(config.series,
+              {
+                name: seriesName,
+                coordinateSystem: 'polar',
+                type: 'line',
+                data: function (csv) {
+                  var selectedCsv = dex.csv.selectRows(csv, function (row) {
+                    return row[seriesIndex] == seriesName;
+                  });
+
+                  if (columns.length == 1) {
+                    return selectedCsv.data.map(function (row) {
+                      return row[columns[0]];
+                    });
+                  }
+                  else {
+                    return dex.csv.columnSlice(selectedCsv, columns).data;
+                  }
+                }(chart.config.csv)
+              });
+            options.series.push(series);
+          }
+        );
+      }
+      else {
+        var series = dex.config.expandAndOverlay(config.series,
+          {
+            name: 'Series',
+            coordinateSystem: 'polar',
+            type: 'line',
+            data: csv.data.map(function (row) {
+              return row[0];
+            })
+          });
+        options.series.push(series);
+      }
+
+      dex.console.log("OPTIONS", options);
+      return options;
+    }
+
+    function getCartesianOptions(csv) {
+      var options = {};
+      //var gtypes = dex.csv.guessTypes(csv);
+
+      var xyCsv = dex.csv.removeColumn(csv, 0);
+      options.legend = {data: xyCsv.remaining.header};
+
+      options.xAxis = {
+        type: 'category',
+        boundaryGap: false,
+        data: xyCsv.removed.data.map(function (row) {
+          return row[0]
+        })
+      };
+      options.yAxis = {type: 'value'};
+      options.series = [];
+
+      xyCsv.remaining.header.forEach(function (h) {
+        var series = dex.config.expandAndOverlay(chart.config.series,
+          {name: h, type: 'line', data: []});
+        options.series.push(series);
+      });
+
+      xyCsv.remaining.data.forEach(function (row, ri) {
+        row.forEach(function (col, ci) {
+          options.series[ci].data.push(col);
+        });
+      });
+
+      //dex.console.log("OPTIONS", options);
+      return options;
+    }
+
+    function getSingleAxisOptions(csv) {
+      var options = {
+        tooltip: {
+          position: 'top'
+        },
+        title: [],
+        singleAxis: [],
+        series: []
+      };
+
+      var frames = dex.csv.getFramesByIndex(csv, 0);
+
+      var scatterHeightPercent = 90;
+      var percentIncrement = scatterHeightPercent / frames.frameIndices.length;
+      var topOffset = 0;
+      var heightOffset = 0;
+
+      frames.frames.forEach(function (frame, fi) {
+
+        options.title.push({
+          textBaseline: 'middle',
+          top: "" + ((fi + .5) * scatterHeightPercent / frames.frameIndices.length) + "%",
+          text: frames.frameIndices[fi]
+        });
+
+        options.singleAxis.push({
+          left: 150,
+          type: 'category',
+          boundaryGap: true,
+          data: dex.matrix.slice(frame.data, [0]),
+          top: (fi * percentIncrement + topOffset) + '%',
+          height: (percentIncrement + heightOffset) + '%',
+          axisLabel: {interval: 2}
+        });
+
+        var series = dex.config.expandAndOverlay(chart.config.series, {
+          singleAxisIndex: fi,
+          coordinateSystem: 'singleAxis',
+          type: 'scatter',
+          data: dex.matrix.slice(frame.data, [0, 1]),
+          symbolSize: function (dataItem) {
+            return chart.config.sizeScale(dataItem[1]);
+          }
+        });
+        options.series.push(series);
+      });
+
+      //dex.console.log("OPTIONS", options);
+      return options;
+    }
+
+    function getGraphOptions(csv) {
+      var options = {};
+
+      var nodes = {};
+      var nodeId = 0;
+
+      // Dynamically determine our categorization function:
+      var categorize = dex.csv.getCsvFunction(csv, chart.config.categories);
+
+      // Cateorize all data in csv.
+      var catMap = {};
+      var catNum = 0;
+
+      csv.data.forEach(function (row, ri) {
+        row.forEach(function (col, ci) {
+          var category = categorize(csv, ri, ci);
+          if (typeof catMap[category] == "undefined") {
+            catMap[category] = catNum;
+            catNum++;
+          }
+        });
+      });
+      var categories = Object.keys(catMap).map(function (key) {
+        return {name: key};
+      });
+
+      csv.data.forEach(function (row, ri) {
+        row.forEach(function (col, ci) {
+          var category = catMap[categorize(csv, ri, ci)];
+          var key = col + "::" + category;
+          nodes[key] = nodes[key] || {
+              id: nodeId++,
+              name: col,
+              symbolSize: 10,
+              itemStyle: null,
+              category: category,
+              value: 0,
+              draggable: true,
+              label: {normal: {show: true}}
+            };
+          nodes[key].value++;
+          nodes[key].symbolSize += 5;
+        });
+      });
+
+      var links = [];
+
+      var linkId = 0;
+      csv.data.forEach(function (row, ri) {
+        row.forEach(function (col, ci) {
+          if (ci < (row.length - 1)) {
+            var sourceCat = catMap[categorize(csv, ri, ci)];
+            var targetCat = catMap[categorize(csv, ri, ci + 1)];
+
+            links.push({
+              id: linkId,
+              source: nodes[row[ci] + "::" + sourceCat]["id"],
+              target: nodes[row[ci + 1] + "::" + targetCat]["id"]
+            });
+            linkId++;
+          }
+        });
+      });
+
+      options.legend = {
+        //selectedMode: 'single',
+        orient: 'vertical',
+        left: true,
+        top: true,
+        show: true,
+        data: categories
+      };
+
+      options.series = dex.config.expandAndOverlay(chart.config.series,
+        {
+          name: "series",
+          type: 'graph',
+          layout: 'circular',
+
+          lineStyle: {
+            normal: {
+              color: 'source',
+              curveness: 0.3
+            }
+          },
+          links: links,
+          data: Object.keys(nodes).map(function (key) {
+            return nodes[key];
+          }),
+          categories: categories,
+          roam: true,
+          label: {
+            normal: {
+              position: 'right',
+              formatter: '{b}'
             }
           }
         });
-      option.series.type = 'scatter';
-      options.options.push(option);
+
+      //dex.console.log("OPTIONS", options);
+      return options;
+    }
+
+    function getTimelineOptions(csv) {
+
+      // Dynamically determine our categorization function:
+      var getCategory = dex.csv.getRowFunction(csv, chart.config.categories);
+      var getSequence = dex.csv.getRowFunction(csv, chart.config.sequences);
+
+      // Cateorize all data in csv.
+      var catMap = {};
+      var seqMap = {};
+      var category;
+      var sequence;
+
+      csv.data.forEach(function (row, ri) {
+        category = getCategory(row, ri);
+        sequence = getSequence(row, ri);
+
+        //dex.console.log("CAT", category, "SEQ", sequence);
+
+        catMap[category] = 1;
+
+        if (typeof seqMap[sequence] == "undefined") {
+          seqMap[sequence] = {};
+        }
+
+        seqMap[sequence][category] = row;
+      });
+
+      var categories = Object.keys(catMap).sort();
+      var sequences = Object.keys(seqMap).sort();
+
+      var baseData = [];
+
+      // Fill in gaps of data, carry down most recent data
+      // entry, or first encountered if there is none yet.
+
+      var curSeq = {};
+      sequences.forEach(function (seq) {
+        categories.forEach(function (cat) {
+          if ((typeof seqMap[seq][cat]) == "undefined") {
+            if ((typeof curSeq[cat]) == "undefined") {
+              seqMap[seq][cat] = [0, 0, 0, cat, seq];
+            }
+            else {
+              seqMap[seq][cat] = curSeq[cat];
+            }
+          }
+          curSeq[cat] = seqMap[seq][cat];
+        });
+      });
+
+      categories.forEach(function (cat) {
+        baseData.push(seqMap[sequences[0]][cat]);
+      });
+      dex.console.log("BASE-DATA", baseData);
+
+      var options = {
+        "baseOption": {
+          "timeline": {
+            "axisType": "category",
+            "orient": "vertical",
+            "autoPlay": true,
+            "inverse": true,
+            "playInterval": 1000,
+            "left": null,
+            "right": 20,
+            "top": 20,
+            "bottom": 20,
+            "width": 55,
+            "height": null,
+            "label": {
+              "normal": {
+                "textStyle": {
+                  "color": "#999"
+                }
+              },
+              "emphasis": {
+                "textStyle": {
+                  "color": "#fff"
+                }
+              }
+            },
+            "symbol": "none",
+            "lineStyle": {"color": "#555"},
+            "checkpointStyle": {
+              "color": "#bbb",
+              "borderColor": "#777",
+              "borderWidth": 2
+            },
+            "controlStyle": {
+              "showNextBtn": true,
+              "showPrevBtn": true,
+              "normal": {
+                "color": "#666",
+                "borderColor": "#666"
+              },
+              "emphasis": {
+                "color": "#aaa",
+                "borderColor": "#aaa"
+              }
+            },
+            "data": sequences
+          },
+          "backgroundColor": "#404a59",
+          "title": [{
+            "text": 1800,
+            "textAlign": "center",
+            "left": "63%",
+            "top": "55%",
+            "textStyle": {"fontSize": 100, "color": "rgba(255, 255, 255, 0.7)"}
+          }],
+          "tooltip": {
+            "padding": 5,
+            "backgroundColor": "#222",
+            "borderColor": "#777",
+            "borderWidth": 1,
+            formatter: function (obj) {
+              //dex.console.log("OBJECT", obj);
+              return "<table>" +
+                "<tr><td>" + csv.header[3] + ": </td><td>" + obj.data[3] + "</td></tr>" +
+                "<tr><td>" + csv.header[4] + ": </td><td>" + obj.data[4] + "</td></tr>" +
+                "<tr><td>" + csv.header[0] + ": </td><td>" + obj.data[0] + "</td></tr>" +
+                "<tr><td>" + csv.header[1] + ": </td><td>" + obj.data[1] + "</td></tr>" +
+                "<tr><td>" + csv.header[2] + ": </td><td>" + obj.data[2] + "</td></tr>" +
+                "</table>";
+            }
+          },
+          "grid": {
+            "left": "12%",
+            "right": "110"
+          },
+          "xAxis": {
+            "type": "value",
+            "name": csv.header[0],
+            "max": dex.csv.extent(csv, [0])[1],
+            "min": dex.csv.extent(csv, [0])[0],
+            "nameGap": 25,
+            "nameLocation": "middle",
+            "nameTextStyle": {"fontSize": 18},
+            "splitLine": {"show": false},
+            "axisLine": {"lineStyle": {"color": "#ccc"}},
+            "axisLabel": {"formatter": "{value}"}
+          },
+          "yAxis": {
+            "type": "value",
+            "name": csv.header[1],
+            "max": dex.csv.extent(csv, [1])[1],
+            "nameTextStyle": {"color": "#ccc", "fontSize": 18},
+            "axisLine": {"lineStyle": {"color": "#ccc"}},
+            "splitLine": {"show": false},
+            "axisLabel": {"formatter": "{value}"}
+          },
+          "visualMap": [{
+            "show": false,
+            "dimension": 3,
+            "categories": categories,
+            "calculable": true,
+            "precision": 0.1,
+            "textGap": 30,
+            "textStyle": {"color": "#ccc"},
+            "inRange": {"color": ["#bcd3bb", "#e88f70", "#edc1a5", "#9dc5c8", "#e1e8c8", "#7b7c68", "#e5b5b5", "#f0b489", "#928ea8", "#bda29a", "#bcd3bb", "#e88f70", "#edc1a5", "#9dc5c8", "#e1e8c8", "#7b7c68", "#e5b5b5", "#f0b489", "#928ea8", "#bda29a"]}
+          }],
+          "series": [{
+            "type": "scatter",
+            "itemStyle": {
+              "normal": {
+                "opacity": 0.8,
+                "shadowBlur": 10,
+                "shadowOffsetX": 0,
+                "shadowOffsetY": 0,
+                "shadowColor": "rgba(0, 0, 0, 0.5)"
+              }
+            },
+            "data": baseData
+          }],
+          "animationDurationUpdate": 1000,
+          "animationEasingUpdate": "quinticInOut"
+        },
+        options: []
+      };
+
+      sequences.forEach(function (seq) {
+        var option = {
+          "title": {
+            show: true,
+            text: seq
+          }
+        };
+        var data = [];
+        categories.forEach(function (cat) {
+          data.push(seqMap[seq][cat]);
+        });
+        option.series = dex.config.expandAndOverlay(chart.config.series,
+          {
+            name: +seq,
+            type: 'scatter',
+            data: data,
+            symbolSize: function (row) {
+              //dex.console.log("SIZE OF", row);
+              if (typeof row == "undefined") {
+                return chart.config.radius.min;
+              }
+              //return 10;
+              var size = chart.config.sizes(row);
+              if (typeof size == "undefined" || size < 0) {
+                return chart.config.radius.min;
+              }
+              else {
+                return size;
+              }
+            }
+          });
+        option.series.type = 'scatter';
+        options.options.push(option);
+      });
+
+      return options;
+    }
+
+    $(document).ready(function () {
+      // Make the entire chart draggable.
+      if (chart.config.draggable) {
+        $(chart.config.parent).draggable();
+      }
     });
 
-    return options;
+    return chart;
   }
-
-  $(document).ready(function () {
-    // Make the entire chart draggable.
-    if (chart.config.draggable) {
-      $(chart.config.parent).draggable();
-    }
-  });
-
-  return chart;
-};
+;
 
 module.exports = echart;
 },{}],37:[function(require,module,exports){
@@ -8362,6 +8508,384 @@ module.exports = network;
 },{}],39:[function(require,module,exports){
 /**
  *
+ * This module provides a ECharts Polar Plot
+ *
+ * @name dex/charts/echarts/PolarPlot
+ *
+ * @param userConfig
+ * @returns PolarPlot
+ */
+var polarplot = function (userConfig) {
+  var chart;
+  var sizeScale = undefined;
+  var defaults = {
+    'parent': '#ECharts_PolarPlot',
+    'id': 'ECharts_PolarPlot',
+    'class': 'ECharts_PolarPlot',
+    'resizable': true,
+    'width': "100%",
+    'height': "100%",
+    'type': 'polar',
+    'seriesIndex': 0,
+    'angleIndex': 1,
+    'valueIndex': 2,
+    'radiusIndex': undefined,
+    'radius': {'min': 1, 'max': 20},
+    'sizeMethod': 'linear',
+    'sizeScale': function (value) {
+      // No size scale exists, so let's establish one.
+      if (typeof sizeScale == "undefined") {
+        // We have a value index to size upon.
+        if (chart.config.valueIndex !== undefined) {
+          sizeScale = dex.csv.getScalingMethod(
+            chart.config.csv, chart.config.sizeMethod,
+            dex.csv.extent(chart.config.csv,
+              [dex.csv.getColumnNumber(chart.config.csv, chart.config.valueIndex)]),
+            [chart.config.radius.min, chart.config.radius.max]);
+        }
+        // There is no value index to size upon. so we will try another
+        // approach:
+        //
+        // 1. Create a csv which omits radius and angle indices from consideration
+        // 2. Omit non-numerics as well.
+        // 3. Get the extents from the remaining columns.
+        // 4. Map these extents to a scale based on radius min/max range.
+        else {
+          var excludes = [];
+          if (chart.config.radiusIndex != undefined) {
+            excludes.push(dex.csv.getColumnNumber(chart.config.radiusIndex));
+          }
+          if (chart.config.angleIndex !== undefined) {
+            excludes.push(dex.csv.getColumnNumber(chart.config.angleIndex));
+          }
+          var sizeCsv;
+          if (excludes.length == 0) {
+            sizeCsv = chart.config.csv;
+          }
+          else {
+            sizeCsv = dex.csv.exclude(chart.config.csv, excludes);
+          }
+          var ncols = dex.csv.getNumericIndices(sizeCsv);
+          var extents = dex.csv.extent(sizeCsv, ncols);
+          dex.console.log("EXTENTS", extents);
+          sizeScale = dex.csv.getScalingMethod(
+            chart.config.csv, chart.config.sizeMethod, extents,
+            [chart.config.radius.min, chart.config.radius.max]);
+        }
+      }
+      // If an array, value index is always first.
+      if (Array.isArray(value)) {
+        return sizeScale(value[0]);
+      }
+      // If a simple value, size on it.  IE: Polar Bar Chart
+      return sizeScale(value);
+    },
+    'series.coordinateSystem': 'polar',
+    'series.type': 'line',
+    'series.itemStyle.normal.opacity': .6,
+    'series.itemStyle.emphasis.opacity': .9,
+    "series.symbolSize": function (d) {
+      //dex.console.log("SIZING D", d);
+      if (typeof chart.config.sizeScale != "undefined") {
+        //dex.console.log("SIZING D", d, chart.config.sizeScale(+d[2]));
+        return chart.config.sizeScale(d);
+      }
+      return 5;
+    },
+    "options": {
+      tooltip: {
+        formatter: 'Group {a}: ({c})'
+      }
+    }
+  };
+
+  var combinedConfig = dex.config.expandAndOverlay(userConfig, defaults);
+  chart = dex.charts.echarts.EChart(combinedConfig);
+
+  chart.subscribe(chart, "attr", function (event) {
+    if (event.attr == "radius" || event.attr == "sizeMethod" ||
+      event.attr == "radius.min" || event.attr == "radius.max") {
+      // Causes next call to sizeScale to recreate it.
+      sizeScale = undefined;
+    }
+
+    if (event.attr == "valueIndex" && event.value == "none") {
+      sizeScale = undefined;
+    }
+  });
+
+  chart.getGuiDefinition = function getGuiDefinition(config) {
+    var defaults = {
+      "type": "group",
+      "name": "EChart Polar Plot Settings",
+      "contents": [
+        {
+          "type": "group",
+          "name": "General",
+          "contents": [
+            {
+              "name": "Chart Type",
+              "description": "The chart type.",
+              "type": "choice",
+              "choices": ["line", "bar", "scatter"],
+              "target": "series.type"
+            },
+            dex.config.gui.echartsTitle({}, "options.title")
+          ]
+        },
+        {
+          "type": "group",
+          "name": "Scaling",
+          "contents": [
+            {
+              "name": "Minimum Radius",
+              "description": "The minimum radius.",
+              "type": "int",
+              "minValue": 0,
+              "maxValue": 200,
+              "target": "radius.min",
+              "initialValue": 5
+            },
+            {
+              "name": "Maximum Radius",
+              "description": "The maximum radius.",
+              "type": "int",
+              "minValue": 0,
+              "maxValue": 200,
+              "target": "radius.max",
+              "initialValue": 5
+            },
+            {
+              "name": "Size Scaling Method",
+              "description": "The type of scaling method",
+              "type": "choice",
+              "target": "sizeMethod",
+              "choices": ["linear", "pow", "log", "sqrt", "time"],
+              "initialValue": "linear"
+            }
+          ]
+        },
+        {
+          "type": "group",
+          "name": "Series and Axis",
+          "contents": [
+            {
+              "name": "Stack Series",
+              "description": "To stack or not to stack, that is the question.",
+              "type": "boolean",
+              "target": "series.stack"
+            },
+            {
+              "name": "Angle Axis Data Type",
+              "description": "Angle axis data type.",
+              "type": "choice",
+              "choices": ["dynamic", "category"],
+              "target": "angleAxisType"
+            },
+            {
+              "name": "Radius Axis Data Type",
+              "description": "Radius axis data type.",
+              "type": "choice",
+              "choices": ["dynamic", "category"],
+              "target": "radiusAxisType"
+            },
+            {
+              "name": "Value Index",
+              "description": "The value index.",
+              "type": "choice",
+              "choices": dex.array.combine(["none"], chart.config.csv.header),
+              "target": "valueIndex"
+            },
+            {
+              "name": "Radius Index",
+              "description": "The radius index.",
+              "type": "choice",
+              "choices": dex.array.combine(["none"], chart.config.csv.header),
+              "target": "radiusIndex"
+            },
+            {
+              "name": "Angle Index",
+              "description": "The angle index.",
+              "type": "choice",
+              "choices": dex.array.combine(["none"], chart.config.csv.header),
+              "target": "angleIndex"
+            },
+            {
+              "name": "Series Index",
+              "description": "The series index.",
+              "type": "choice",
+              "choices": dex.array.combine(["none"], chart.config.csv.header),
+              "target": "seriesIndex"
+            }
+          ]
+        }
+      ]
+    };
+
+    var guiDef = dex.config.expandAndOverlay(config, defaults);
+    dex.config.gui.sync(chart, guiDef);
+    return guiDef;
+  };
+
+  return chart;
+};
+module.exports = polarplot;
+},{}],40:[function(require,module,exports){
+/**
+ *
+ * This module provides a ECharts Single Axis ScatterPlot.
+ *
+ * @name dex/charts/echarts/SingleAxisScatterPlot
+ *
+ * @param userConfig
+ * @returns SingleAxisScatterPlot
+ */
+var singleaxisscatterplot = function (userConfig) {
+  var chart;
+  var sizeScale = undefined;
+
+  var defaults = {
+    'parent': '#ECharts_SingleAxisScatterPlot',
+    'id': 'ECharts_LineChart',
+    'class': 'ECharts_LineChart',
+    'resizable': true,
+    'width': "100%",
+    'height': "100%",
+    'type': 'single-axis',
+    'radius': {'min': 1, 'max': 50},
+    'sizeMethod': 'linear',
+    'sizeScale': function (value) {
+      if (typeof sizeScale == "undefined") {
+        dex.console.log("EXTENT", dex.csv.extent(chart.config.csv, [2]));
+        sizeScale = dex.csv.getScalingMethod(
+          chart.config.csv, chart.config.sizeMethod,
+          dex.csv.extent(chart.config.csv, [2]),
+          [chart.config.radius.min, chart.config.radius.max]);
+      }
+      return sizeScale(value);
+    },
+    'palette': 'category10',
+    'series.coordinateSystem': 'singleAxis',
+    'series.symbol': 'circle',
+    'series.type': 'scatter',
+    'series.itemStyle': {
+      normal: {
+        shadowBlur: 10,
+        shadowColor: 'rgba(150, 36, 50, 0.5)',
+        shadowOffsetY: 5,
+        color: function (item) {
+          return new echarts.graphic.RadialGradient(0.7, 0.5, 1, [{
+            offset: .3,
+            color: dex.color.palette[chart.config.palette][
+            item.seriesIndex % dex.color.palette[
+              chart.config.palette].length],
+          }, {
+            offset: 1,
+            color: 'black'
+          }])
+        }
+      }
+    },
+    "options": {
+      dataZoom: [
+        {
+          handleSize: '100%',
+          filterMode: 'empty',
+          singleAxisIndex: dex.range(0, dex.csv.uniqueArray(csv, 0).length)
+        }
+      ],
+      tooltip: {
+        formatter: function(d) {
+          return "<table><tr><td><b>" + csv.header[1] + ":</b></td><td>" +
+              d.data[0] + "</td></tr><tr><td><b>" + csv.header[2] +
+              ":</b></td><td>" + d.data[1] + "</td></tr></table>";
+        }
+      }
+    }
+  };
+
+  var combinedConfig = dex.config.expandAndOverlay(userConfig, defaults);
+  chart = dex.charts.echarts.EChart(combinedConfig);
+
+  chart.getGuiDefinition = function getGuiDefinition(config) {
+    var defaults = {
+      "type": "group",
+      "name": "EChart Single Axis ScatterPlot Settings",
+      "contents": [
+        dex.config.gui.dimensions(),
+        dex.config.gui.general(),
+        {
+          "type": "group",
+          "name": "Miscellaneous",
+          "contents": [
+            {
+              "name": "Symbol Shape",
+              "description": "The shape of the symbol.",
+              "type": "choice",
+              "choices": ["circle", "rect", "roundRect", "triangle", "diamond", "pin", "arrow"],
+              "target": "series.symbol"
+            },
+            {
+              "name": "Minimum Symbol Size",
+              "description": "The minimum size of the symbols",
+              "type": "int",
+              "target": "radius.min",
+              "minValue": 0,
+              "maxValue": 100,
+              "initialValue": 5
+            },
+            {
+              "name": "Maximum Symbol Size",
+              "description": "The maximum size of the symbols",
+              "type": "int",
+              "target": "radius.max",
+              "minValue": 0,
+              "maxValue": 100,
+              "initialValue": 50
+            },
+            {
+              "name": "Size Scaling Method",
+              "description": "The type of scaling method",
+              "type": "choice",
+              "target": "sizeMethod",
+              "choices" : [ "linear", "pow", "log", "sqrt", "time" ],
+              "initialValue": "linear"
+            },
+            {
+              "name": "Color Scheme",
+              "description": "The color scheme.",
+              "target": "palette",
+              "type": "choice",
+              "choices": dex.color.colormaps({shortlist:true}),
+              "initialValue": "category10"
+            },
+            {
+              "name": "Series Type",
+              "description": "The series type",
+              "type": "choice",
+              "target": "series.type",
+              "choices": [ "scatter", "effectScatter" ]
+            }
+          ]
+        },
+        dex.config.gui.echartsItemStyle({name: "Item Style"}, "series.itemStyle.normal"),
+        dex.config.gui.echartsItemStyle({name: "Item Style (Emphasis)"}, "series.itemStyle.emphasis"),
+        dex.config.gui.echartsLabel({name: "Label"}, "series.label.normal"),
+        dex.config.gui.echartsLabel({name: "Label (Emphasis)"}, "series.label.emphasis")
+      ]
+    };
+
+    var guiDef = dex.config.expandAndOverlay(config, defaults);
+    dex.config.gui.sync(chart, guiDef);
+    return guiDef;
+  };
+
+  return chart;
+};
+module.exports = singleaxisscatterplot;
+},{}],41:[function(require,module,exports){
+/**
+ *
  * This module provides a ECharts Timeline.
  *
  * @name dex/charts/echarts/Timeline
@@ -8393,7 +8917,8 @@ var timeline = function (userConfig) {
       return chart.config.sizeScale(+row[2]);
     },
     'series.type': 'timeline',
-    "options": {}
+    "options": {
+    }
   };
 
   var combinedConfig = dex.config.expandAndOverlay(userConfig, defaults);
@@ -8449,7 +8974,7 @@ var timeline = function (userConfig) {
   return chart;
 };
 module.exports = timeline;
-},{}],40:[function(require,module,exports){
+},{}],42:[function(require,module,exports){
 /**
  *
  * This module provides ECharts 3.0 based visualization components.
@@ -8461,11 +8986,13 @@ var echarts = {};
 
 echarts.EChart = require("./EChart");
 echarts.LineChart = require("./LineChart");
+echarts.PolarPlot = require("./PolarPlot");
 echarts.Timeline = require("./Timeline");
 echarts.Network = require("./Network");
+echarts.SingleAxisScatterPlot = require("./SingleAxisScatterPlot");
 
 module.exports = echarts;
-},{"./EChart":36,"./LineChart":37,"./Network":38,"./Timeline":39}],41:[function(require,module,exports){
+},{"./EChart":36,"./LineChart":37,"./Network":38,"./PolarPlot":39,"./SingleAxisScatterPlot":40,"./Timeline":41}],43:[function(require,module,exports){
 var scatterplot = function (userConfig) {
   d3 = dex.charts.d3.d3v3;
   var chart;
@@ -8587,7 +9114,7 @@ var scatterplot = function (userConfig) {
 };
 
 module.exports = scatterplot;
-},{}],42:[function(require,module,exports){
+},{}],44:[function(require,module,exports){
 /**
  * @module dex/charts/c3
  */
@@ -8596,7 +9123,7 @@ var elegans = {};
 elegans.ScatterPlot = require("./ScatterPlot");
 
 module.exports = elegans;
-},{"./ScatterPlot":41}],43:[function(require,module,exports){
+},{"./ScatterPlot":43}],45:[function(require,module,exports){
 var gridstermultiples = function (userConfig) {
   var chart;
   var gridster;
@@ -8752,7 +9279,7 @@ var gridstermultiples = function (userConfig) {
 };
 
 module.exports = gridstermultiples;
-},{}],44:[function(require,module,exports){
+},{}],46:[function(require,module,exports){
 /**
  * @module dex/charts/gridster
  */
@@ -8761,7 +9288,7 @@ var multiples = {};
 multiples.GridsterMultiples = require("./GridsterMultiples");
 
 module.exports = multiples;
-},{"./GridsterMultiples":43}],45:[function(require,module,exports){
+},{"./GridsterMultiples":45}],47:[function(require,module,exports){
 var bubblechart = function (userConfig) {
     d3 = dex.charts.d3.d3v3;
     var chart;
@@ -8920,7 +9447,7 @@ var bubblechart = function (userConfig) {
 };
 
 module.exports = bubblechart;
-},{}],46:[function(require,module,exports){
+},{}],48:[function(require,module,exports){
 var stackedareachart = function (userConfig) {
     d3 = dex.charts.d3.d3v3;
     var chart;
@@ -9066,7 +9593,7 @@ var stackedareachart = function (userConfig) {
 };
 
 module.exports = stackedareachart;
-},{}],47:[function(require,module,exports){
+},{}],49:[function(require,module,exports){
 /**
  *
  * This module provides NVD3 based visualization components.
@@ -9080,7 +9607,7 @@ nvd3.StackedAreaChart = require("./StackedAreaChart");
 nvd3.BubbleChart = require("./BubbleChart");
 
 module.exports = nvd3;
-},{"./BubbleChart":45,"./StackedAreaChart":46}],48:[function(require,module,exports){
+},{"./BubbleChart":47,"./StackedAreaChart":48}],50:[function(require,module,exports){
 var scatterplot = function (userConfig) {
   var defaults = {
     // The parent container of this chart.
@@ -9450,7 +9977,7 @@ var scatterplot = function (userConfig) {
 };
 
 module.exports = scatterplot;
-},{}],49:[function(require,module,exports){
+},{}],51:[function(require,module,exports){
 /**
  *
  * This module provides ThreeJS/WebGL based visualization components.
@@ -9463,7 +9990,7 @@ var threejs = {};
 threejs.ScatterPlot = require("./ScatterPlot");
 
 module.exports = threejs;
-},{"./ScatterPlot":48}],50:[function(require,module,exports){
+},{"./ScatterPlot":50}],52:[function(require,module,exports){
 var network = function (userConfig) {
   var chart;
 
@@ -9850,7 +10377,7 @@ var network = function (userConfig) {
 };
 
 module.exports = network;
-},{}],51:[function(require,module,exports){
+},{}],53:[function(require,module,exports){
 /**
  *
  * This module provides routines for dealing with arrays.
@@ -9863,7 +10390,7 @@ var vis = {};
 vis.Network = require("./Network");
 
 module.exports = vis;
-},{"./Network":50}],52:[function(require,module,exports){
+},{"./Network":52}],54:[function(require,module,exports){
 /**
  *
  * This module provides routines for dealing with colors.
@@ -10004,9 +10531,26 @@ module.exports = function color(dex) {
      * @return {string[]} The list of available colormaps.
      *
      */
-    'colormaps': function () {
+    'colormaps': function (options) {
+      var opts = options || {};
+      if (opts.shortlist) {
+        return [
+          "category10", "category20b", "category20c", "category20", "c64Dark",
+          "c64Light", "divergingDark12", "divergingPastel12", "hueSoft128",
+          "hueHard128", "crayola8", "crayola120", "YlGn_9",
+          "YlGnBu_9", "GnBu_9", "BuGn_9", "PuBuGn_9", "PuBu_9",
+          "BuPu_9", "RdPu_9", "PuRd_9", "OrRd_9", "YlOrRd_9", "YlOrBr_9",
+          "Purples_9", "Blues_9", "Greens_9", "Oranges_9", "Reds_9",
+          "Greys_9", "PuOr_11", "BrBG_11", "PRGn_11", "PiYG_11",
+          "RdBu_11", "RdGy_11", "RdYlBu_11",
+          "Spectral_4", "Spectral_8", "Spectral_11",
+          "RdYlGn_11", "Accent_8", "Dark2_8", "Paired_12",
+          "Pastel1_9", "Pastel2_8", "Set1_9", "Set2_8", "Set3_12"
+        ];
+      }
       return Object.keys(dex.color.palette);
     },
+
     /**
      *
      * Given a domain of 2 or more items and a range of 2 colors,
@@ -10448,7 +10992,7 @@ module.exports = function color(dex) {
   };
 };
 
-},{}],53:[function(require,module,exports){
+},{}],55:[function(require,module,exports){
 module.exports = function (dex) {
 
   return function (userConfig, defaultConfig) {
@@ -10489,6 +11033,7 @@ module.exports = function (dex) {
 
         // This will handle the setting of a single attribute
         dex.object.setHierarchical(this.config, name, value, '.');
+        this.publish({ type: "attr", attr: name, value: value });
       }
       return this;
     };
@@ -10737,7 +11282,7 @@ module.exports = function (dex) {
     return this;
   };
 };
-},{}],54:[function(require,module,exports){
+},{}],56:[function(require,module,exports){
 /**
  *
  * Config module.
@@ -11927,7 +12472,7 @@ module.exports = function config(dex) {
     'gui': require("./gui")(dex)
   };
 };
-},{"./gui":55}],55:[function(require,module,exports){
+},{"./gui":57}],57:[function(require,module,exports){
 /**
  *
  * gui definition module.
@@ -12588,6 +13133,73 @@ module.exports = function gui(dex) {
       };
       return dex.config.expandAndOverlay(userConfig, defaults);
     },
+    'echartsItemStyle': function fill(config, prefix) {
+      var ns = (typeof prefix !== 'undefined') ? (prefix + ".") : "";
+      var userConfig = config || {};
+      var defaults = {
+        "type": "group",
+        "name": "Item Style",
+        "contents": [
+          {
+            "name": "Color",
+            "description": "Color.",
+            "target": ns + "color",
+            "type": "color",
+            "initialValue": "#aaa"
+          },
+          {
+            "name": "Border Color",
+            "description": "Border color.",
+            "target": ns + "borderColor",
+            "type": "color",
+            "initialValue": "#aaa"
+          },
+          {
+            "name": "Border Width",
+            "description": "Border Width.",
+            "target": ns + "borderWidth",
+            "type": "float",
+            "minValue": 0,
+            "maxValue": 10,
+            "initialValue": 1
+          },
+          {
+            "name": "Shadow Blur",
+            "description": "Shadow blur.",
+            "target": ns + "shadowBlur",
+            "type": "float",
+            "minValue": 0,
+            "maxValue": 20,
+            "initialValue": 0
+          },
+          {
+            "name": "Shadow Color",
+            "description": "Shadow color.",
+            "target": ns + "shadowColor",
+            "type": "color",
+            "initialValue": "#aaa"
+          },
+          {
+            "name": "Opacity",
+            "description": "Opacity.",
+            "target": ns + "opacity",
+            "type": "float",
+            "minValue": 0,
+            "maxValue": 1,
+            "initialValue": 1
+          },
+          {
+            "name": "Border Type",
+            "description": "Border type.",
+            "target": ns + "borderType",
+            "type": "choice",
+            "choices": ["solid", "dashed", "dotted"],
+            "initialValue": "solid"
+          }
+        ]
+      };
+      return dex.config.expandAndOverlay(userConfig, defaults);
+    },
     'echartsLineStyle': function fill(config, prefix) {
       var ns = (typeof prefix !== 'undefined') ? (prefix + ".") : "";
       var userConfig = config || {};
@@ -12649,6 +13261,78 @@ module.exports = function gui(dex) {
       };
       return dex.config.expandAndOverlay(userConfig, defaults);
     },
+    'echartsTitle': function fill(config, prefix) {
+      var ns = (typeof prefix !== 'undefined') ? (prefix + ".") : "";
+      var userConfig = config || {};
+      var defaults = {
+        "type": "group",
+        "name": "Title",
+        "contents": [
+          {
+            "name": "Text",
+            "description": "The text.",
+            "target": ns + "text",
+            "type": "string",
+            "initialValue": ""
+          },
+          {
+            "name": "Sub Text",
+            "description": "The subtext.",
+            "target": ns + "subtext",
+            "type": "string",
+            "initialValue": ""
+          },
+          {
+            "name": "Link",
+            "description": "An optional hyperlink.",
+            "target": ns + "link",
+            "type": "string",
+            "initialValue": ""
+          },
+          {
+            "name": "Link Target",
+            "description": "A tab target to open hyperlink in.",
+            "target": ns + "target",
+            "type": "string",
+            "initialValue": ""
+          },
+          {
+            "name": "Horizontal Alignment",
+            "description": "Text alignment.",
+            "target": ns + "textAlign",
+            "type": "choice",
+            "choices": ["left", "center", "right"],
+            "initialValue": "center"
+          },
+          {
+            "name": "Vertical Alignment",
+            "description": "Vertical alignment of title.",
+            "target": ns + "textBaseline",
+            "type": "choice",
+            "choices": ["top", "middle", "bottom"],
+            "initialValue": "top"
+          },
+          {
+            "name": "Sub Link",
+            "description": "An optional hyperlink.",
+            "target": ns + "sublink",
+            "type": "string",
+            "initialValue": ""
+          },
+          {
+            "name": "Sub Link Target",
+            "description": "A tab target to open hyperlink in.",
+            "target": ns + "subtarget",
+            "type": "string",
+            "initialValue": ""
+          },
+          dex.config.gui.echartsTextStyle(config.textStyle || {}, ns + "textStyle"),
+          dex.config.gui.echartsTextStyle(config.subtextStyle || {}, ns + "subtextStyle")
+        ]
+
+      };
+      return dex.config.expandAndOverlay(userConfig, defaults);
+    },
     // Utility functions here:
     'disable': function disable(config, field) {
       if (config.type == "group") {
@@ -12683,7 +13367,7 @@ module.exports = function gui(dex) {
     }
   };
 };
-},{}],56:[function(require,module,exports){
+},{}],58:[function(require,module,exports){
 /**
  *
  * This module provides console logging capabilities.
@@ -12820,7 +13504,7 @@ module.exports = function (dex) {
     }
   };
 };
-},{}],57:[function(require,module,exports){
+},{}],59:[function(require,module,exports){
 /**
  *
  * This module provides support for dealing with csv structures.  This
@@ -12923,9 +13607,9 @@ module.exports = function csv(dex) {
       return connectionMatrix;
     },
 
-    'getColumnNumber': function (csv, colIndex) {
+    'getColumnNumber': function (csv, colIndex, defaultValue) {
       if (colIndex === undefined) {
-        return -1;
+        return defaultValue;
       }
 
       var colNum = csv.header.indexOf(colIndex);
@@ -12938,7 +13622,7 @@ module.exports = function csv(dex) {
         return colIndex;
       }
 
-      return -1;
+      return undefined;
     },
 
     /**
@@ -13259,6 +13943,33 @@ module.exports = function csv(dex) {
       return slice;
     },
 
+    'include': function (csv, columns) {
+      var slice = {};
+      var columnNumbers = columns.map(function (column) {
+        return dex.csv.getColumnNumber(csv, column);
+      });
+
+      slice.header = dex.array.slice(csv.header, columnNumbers);
+      slice.data = dex.matrix.slice(csv.data, columnNumbers);
+
+      return slice;
+    },
+
+    'exclude': function (csv, columns) {
+      var slice = {};
+      var columnNumbers = columns.map(function (column) {
+        return dex.csv.getColumnNumber(csv, column);
+      });
+      var complement = dex.range(0, csv.header.length).filter(function (elt) {
+        return !(columnNumbers.includes(elt));
+      });
+
+      slice.header = dex.array.slice(csv.header, complement);
+      slice.data = dex.matrix.slice(csv.data, complement);
+
+      return slice;
+    },
+
     'removeColumn': function (csv, column) {
       var columnIndex = dex.csv.getColumnNumber(csv, column);
       var columns = dex.range(0, csv.header.length);
@@ -13305,27 +14016,27 @@ module.exports = function csv(dex) {
 
     'getCategorizationMethods': function (csv) {
       var methods = {
-        'Column Type' : function(csv, ri, ci) {
+        'Column Type': function (csv, ri, ci) {
           return csv.header[ci];
         },
-        'Column Value' : function(csv, ri, ci) {
+        'Column Value': function (csv, ri, ci) {
           return csv.data[ri][ci];
         },
-        'Row Number': function(csv, ri, ci) {
+        'Row Number': function (csv, ri, ci) {
           return ri;
         },
-        "None": function(csv, ri, ci) {
+        "None": function (csv, ri, ci) {
           return "Uncategorized";
         }
       };
 
-      var getColumnValue = function(columnIndex) {
-        return function(csv, ri, ci) {
+      var getColumnValue = function (columnIndex) {
+        return function (csv, ri, ci) {
           return csv.data[ri][columnIndex];
         };
       };
 
-      csv.header.forEach(function(h, hi) {
+      csv.header.forEach(function (h, hi) {
         methods[csv.header[hi] + " Value"] = getColumnValue(hi);
       });
 
@@ -13375,6 +14086,40 @@ module.exports = function csv(dex) {
 
           return csv.data[ri][ci];
         }
+      }
+    },
+
+    'getScalingMethods': function (csv) {
+      var methods;
+
+      // v4 methods
+      if (d3.version == "4.0") {
+        methods = {
+          'linear': d3.scaleLinear(),
+          'pow': d3.scalePow(),
+          'log': d3.scaleLog()
+        };
+      }
+      else {
+        methods = {
+          'linear': d3.scale.linear(),
+          'pow': d3.scale.pow(),
+          'log': d3.scale.log()
+        };
+      }
+
+      return methods;
+    },
+    'getScalingMethod': function (csv, method, domain, range) {
+      var methods = dex.csv.getScalingMethods(csv);
+      if (((typeof method) == "undefined") ||
+        ((typeof methods[method]) == "undefined")) {
+        return function (value) {
+          return value;
+        };
+      }
+      else {
+        return methods[method].domain(domain).range(range);
       }
     },
 
@@ -13564,6 +14309,62 @@ module.exports = function csv(dex) {
       return dex.matrix.extent(csv.data, columns);
     },
 
+    getFramesByColumn: function (csv, x) {
+      var xIndex = dex.csv.getColumnNumber(csv, x);
+      var frames = {frameIndices: [], frames: []};
+
+      csv.header.forEach(function (h, hi) {
+        if (hi != xIndex) {
+          var frame = {
+            header: [csv.header[xIndex], h],
+            data: []
+          };
+          frames.frameIndices.push(h);
+          csv.data.forEach(function (row) {
+            frame.data.push([row[xIndex], row[hi]]);
+          });
+          frames.frames.push(frame);
+        }
+      });
+
+      return frames;
+    },
+
+    getFramesByColumns: function (csv, columns) {
+      var columnIndexes = columns.map(function (col) {
+        return dex.csv.getColumnNumber(csv, col);
+      });
+
+      var axisCsv = dex.csv.include(csv, columnIndexes);
+      var seriesCsv = dex.csv.exclude(csv, columnIndexes);
+
+      // If there are no series.
+      if (seriesCsv.header.length == 0) {
+        return {
+          frameIndices: [ axisCsv.header.join(" vs ") ],
+          frames: [ axisCsv ]
+        }
+      }
+
+      dex.console.log(columnIndexes, "AXIS", axisCsv, "SERIES", seriesCsv);
+
+      var frames = {
+        frameIndices: [],
+        frames: []
+      };
+
+      seriesCsv.header.forEach(function (h, hi) {
+        frames.frameIndices.push(h);
+        var frame = dex.csv.copy(axisCsv);
+        frame.header.push(h);
+        seriesCsv.data.forEach(function (row, ri) {
+          frame.data[ri].push(row[hi]);
+        });
+        frames.frames.push(frame);
+      });
+      return frames;
+    },
+
     /**
      *
      * This routine will return a frames structure based on a csv and
@@ -13581,31 +14382,43 @@ module.exports = function csv(dex) {
      * @param columnIndex
      * @returns {{frameIndices: Array.<T>, frames: Array}}
      */
-    'getFramesByIndex': function (csv, columnIndex) {
+    'getFramesByIndex': function (csv, columnIndex, sort) {
       var types = dex.csv.guessTypes(csv);
       //dex.console.log("TYPES", types);
       var frameIndices;
 
       if (types[columnIndex] == "number") {
-        frameIndices = _.uniq(csv.data.map(function (row) {
+        frameIndices = dex.array.orderedUnique(csv.data.map(function (row) {
           return row[columnIndex]
-        })).sort(function (a, b) {
-          return a - b
-        });
+        }));
+
+        if ((typeof sort) != "undefined") {
+          frameIndices = frameIndices.sort(function (a, b) {
+            return a - b
+          });
+        }
       }
       else if (types[columnIndex] == "date") {
-        frameIndices = _.uniq(csv.data.map(function (row) {
+        frameIndices = dex.array.orderedUnique(csv.data.map(function (row) {
           return row[columnIndex]
-        })).sort(function (a, b) {
-          a = new Date(a);
-          b = new Date(b);
-          return a > b ? 1 : a < b ? -1 : 0;
-        });
+        }));
+
+        if ((typeof sort) != "undefined") {
+          frameIndices = frameIndices.sort(function (a, b) {
+            a = new Date(a);
+            b = new Date(b);
+            return a > b ? 1 : a < b ? -1 : 0;
+          });
+        }
       }
       else {
-        frameIndices = _.uniq(csv.data.map(function (row) {
+        frameIndices = dex.array.orderedUnique(csv.data.map(function (row) {
           return row[columnIndex]
-        })).sort();
+        }));
+
+        if (sort) {
+          frameIndices = frameIndices.sort();
+        }
       }
       //dex.console.log("FRAME-INDICES", frameIndices)
       var header = dex.array.copy(csv.header);
@@ -13683,7 +14496,6 @@ module.exports = function csv(dex) {
 
       return dex.csv.getFrames(csv, combos, gi);
     },
-
     'getFrames': function (csv, permutations, groupIndex) {
       var frameIndices = [];
       var frames = [];
@@ -14111,7 +14923,7 @@ module.exports = function csv(dex) {
     }
   };
 };
-},{}],58:[function(require,module,exports){
+},{}],60:[function(require,module,exports){
 /**
  *
  * This module provides support for creating various datasets.
@@ -14530,7 +15342,7 @@ module.exports = function datagen(dex) {
   };
 };
 
-},{}],59:[function(require,module,exports){
+},{}],61:[function(require,module,exports){
 // Allow user to override, but define this by default:
 
 /**
@@ -14791,7 +15603,7 @@ $.widget.bridge('uitooltip', $.ui.tooltip);
 $.widget.bridge('uibutton', $.ui.button);
 
 module.exports = dex;
-},{"../lib/pubsub":3,"./array/array":4,"./charts/charts":15,"./color/color":52,"./component/component":53,"./config/config":54,"./console/console":56,"./csv/csv":57,"./datagen/datagen":58,"./json/json":60,"./matrix/matrix":61,"./object/object":62,"./ui/ui":72,"./util/util":73}],60:[function(require,module,exports){
+},{"../lib/pubsub":3,"./array/array":4,"./charts/charts":15,"./color/color":54,"./component/component":55,"./config/config":56,"./console/console":58,"./csv/csv":59,"./datagen/datagen":60,"./json/json":62,"./matrix/matrix":63,"./object/object":64,"./ui/ui":74,"./util/util":75}],62:[function(require,module,exports){
 /**
  *
  * This module provides routines dealing with json data.
@@ -14894,7 +15706,7 @@ module.exports = function json(dex) {
   };
 };
 
-},{}],61:[function(require,module,exports){
+},{}],63:[function(require,module,exports){
 /**
  *
  * This module provides routines dealing with matrices.
@@ -15209,7 +16021,7 @@ module.exports = function matrix(dex) {
   };
 };
 
-},{}],62:[function(require,module,exports){
+},{}],64:[function(require,module,exports){
 /**
  *
  * This module provides routines dealing with javascript objects.
@@ -15531,7 +16343,7 @@ module.exports = function object(dex) {
 };
 
 
-},{}],63:[function(require,module,exports){
+},{}],65:[function(require,module,exports){
 /**
  *
  * This class creates and attaches a SqlQuery user interface onto the
@@ -15630,7 +16442,7 @@ var sqlquery = function (userConfig) {
 };
 
 module.exports = sqlquery;
-},{}],64:[function(require,module,exports){
+},{}],66:[function(require,module,exports){
 /**
  *
  * @constructor
@@ -15730,7 +16542,7 @@ var table = function (userConfig) {
 };
 
 module.exports = table;
-},{}],65:[function(require,module,exports){
+},{}],67:[function(require,module,exports){
 var typestable = function (userConfig) {
 
   var defaults =
@@ -15811,7 +16623,7 @@ var typestable = function (userConfig) {
 };
 
 module.exports = typestable;
-},{}],66:[function(require,module,exports){
+},{}],68:[function(require,module,exports){
 var configurationbox = function (userConfig) {
 
   var defaults =
@@ -15897,7 +16709,7 @@ var configurationbox = function (userConfig) {
 };
 
 module.exports = configurationbox;
-},{}],67:[function(require,module,exports){
+},{}],69:[function(require,module,exports){
 var player = function (userConfig) {
 
   var defaults = {
@@ -16095,7 +16907,7 @@ var player = function (userConfig) {
 };
 
 module.exports = player;
-},{}],68:[function(require,module,exports){
+},{}],70:[function(require,module,exports){
 var selectable = function (userConfig) {
 
   var defaults =
@@ -16192,7 +17004,7 @@ var selectable = function (userConfig) {
 };
 
 module.exports = selectable;
-},{}],69:[function(require,module,exports){
+},{}],71:[function(require,module,exports){
 var slider = function (userConfig) {
 
   var defaults = {
@@ -16284,7 +17096,7 @@ var slider = function (userConfig) {
 };
 
 module.exports = slider;
-},{}],70:[function(require,module,exports){
+},{}],72:[function(require,module,exports){
 var tabs = function (userConfig) {
   var defaults = {
     // The parent container of this chart.
@@ -16388,7 +17200,7 @@ var tabs = function (userConfig) {
 };
 
 module.exports = tabs;
-},{}],71:[function(require,module,exports){
+},{}],73:[function(require,module,exports){
 /**
  *
  * This module provides ui components based upon jquery-ui.
@@ -16406,7 +17218,7 @@ module.exports = function jqueryui(dex) {
     'Tabs': require("./Tabs")
   };
 };
-},{"./ConfigurationBox":66,"./Player":67,"./Selectable":68,"./Slider":69,"./Tabs":70}],72:[function(require,module,exports){
+},{"./ConfigurationBox":68,"./Player":69,"./Selectable":70,"./Slider":71,"./Tabs":72}],74:[function(require,module,exports){
 /**
  *
  * This module provides ui components from a variety of sources.
@@ -16432,7 +17244,7 @@ module.exports = function ui(dex) {
     'TypesTable': require("./TypesTable")
   };
 };
-},{"./SqlQuery":63,"./Table":64,"./TypesTable":65,"./jqueryui/jqueryui":71}],73:[function(require,module,exports){
+},{"./SqlQuery":65,"./Table":66,"./TypesTable":67,"./jqueryui/jqueryui":73}],75:[function(require,module,exports){
 /**
  *
  * This module provides utility routines.
@@ -16505,5 +17317,5 @@ module.exports = function util(dex) {
     }
   };
 };
-},{}]},{},[59])(59)
+},{}]},{},[61])(61)
 });
