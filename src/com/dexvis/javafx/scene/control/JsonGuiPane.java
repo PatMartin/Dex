@@ -14,6 +14,7 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
@@ -23,6 +24,8 @@ import org.tbee.javafx.scene.layout.MigPane;
 
 public class JsonGuiPane extends MigPane
 {
+  private MigPane mainPane;
+  
   /**
    * 
    * Create a new JsonGui pane with the supplied layout, column and row
@@ -53,6 +56,12 @@ public class JsonGuiPane extends MigPane
       String rowConstraint)
   {
     super(layoutConstraint, columnConstraint, rowConstraint);
+    ScrollPane scrollPane = new ScrollPane();
+    mainPane = new MigPane("", "[grow]", "[grow]");
+    scrollPane.setFitToHeight(true);
+    scrollPane.setFitToWidth(true);
+    scrollPane.setContent(mainPane);
+    add(scrollPane, "grow");
   }
   
   /**
@@ -67,13 +76,13 @@ public class JsonGuiPane extends MigPane
   {
     System.out.println("SetGuiDef: '" + guiDef + "'");
     // Clear out any old contents.
-    getChildren().clear();
+    mainPane.getChildren().clear();
     
     // Load our configuration into java objects.
     Object jsonSpec = JsonUtil.parseJsonString(guiDef);
     
     // Add the controls to the guiPane.
-    addChartControls(this, jsonSpec);
+    addChartControls(mainPane, jsonSpec);
   }
   
   private void addChartControls(MigPane pane, Object jsonSpec)
@@ -199,25 +208,6 @@ public class JsonGuiPane extends MigPane
         break;
       }
     }
-  }
-  
-  private void addIntControlOld(MigPane pane, String chartName,
-      Map<String, Object> spec)
-  {
-    Slider slider = new Slider();
-    slider.setMin(getIntValue(spec, "minValue", 0));
-    slider.setMax(getIntValue(spec, "maxValue", 100));
-    slider.setValue(getIntValue(spec, "initialValue", 0));
-    
-    Label valueLabel = new Label(getValue(spec, "initialValue", "0"));
-    
-    slider.valueProperty().addListener((observable, oldVal, newVal) -> {
-      int val = newVal.intValue();
-      valueLabel.setText("" + val);
-      fireEvent(chartName, spec.get("target").toString(), val);
-    });
-    pane.add(slider, "growx");
-    pane.add(valueLabel, "span");
   }
   
   private void addIntControl(MigPane pane, String chartName,
