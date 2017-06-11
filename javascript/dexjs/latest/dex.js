@@ -961,7 +961,7 @@ module.exports = function charts() {
     'vis'      : require("./vis/vis")
   };
 };
-},{"./c3/c3":14,"./d3/d3":33,"./d3plus/d3plus":35,"./echarts/echarts":42,"./elegans/elegans":44,"./multiples/multiples":46,"./nvd3/nvd3":49,"./threejs/threejs":51,"./vis/vis":53}],16:[function(require,module,exports){
+},{"./c3/c3":14,"./d3/d3":33,"./d3plus/d3plus":35,"./echarts/echarts":43,"./elegans/elegans":45,"./multiples/multiples":47,"./nvd3/nvd3":50,"./threejs/threejs":52,"./vis/vis":54}],16:[function(require,module,exports){
 var bumpchart = function (userConfig) {
   d3 = dex.charts.d3.d3v3;
   var chart;
@@ -7672,11 +7672,88 @@ var echart = function (userConfig) {
         case "areachart":
         case "bar":
           return getCartesianOptions(csv);
+        case "pie":
+          return getPieOptions(csv);
         case 'single-axis':
           return getSingleAxisOptions(csv);
         default:
           return getCartesianOptions(csv);
       }
+    }
+
+    function getPieOptions(csv) {
+      var config = chart.config;
+      var options = {
+        tooltip: {
+          trigger: 'item',
+          formatter: "{a} <br/>{b}: {c} ({d}%)"
+        },
+        legend: {
+          orient: 'vertical',
+          x: 'left',
+          data: []
+        },
+        series: []
+      };
+      var gtypes = dex.csv.guessTypes(csv);
+      dex.console.log("PIE CHART");
+
+      // Get our indices:
+      var seriesIndex = dex.csv.getColumnNumber(csv, config.seriesIndex);
+      var nameIndex = dex.csv.getColumnNumber(csv, config.nameIndex);
+      var valueIndex = dex.csv.getColumnNumber(csv, config.valueIndex);
+      var aggregationFunction = chart.config.aggregationFunction;
+
+      var pieCsv = dex.csv.columnSlice(csv, [seriesIndex, nameIndex, valueIndex]);
+
+      var frames = dex.csv.getFramesByIndex(csv, seriesIndex);
+
+      dex.console.log("FRAMES", frames);
+      var legendNames = {};
+
+      var maxPercent = chart.config.maxPercent || 80.0;
+      var maxPadding = chart.config.maxPadding || 10;
+      var availableRadius = chart.config.radius ||
+        Math.floor(maxPercent / (frames.frames.length + 2));
+      var padding = chart.config.padding ||
+        (Math.min((frames.frames.length <= 1) ? 0 :
+          Math.floor(maxPercent / (2 * frames.frames.length - 2)), maxPadding));
+
+      dex.console.log("PADDING", padding, "MAX-PERCENT", maxPercent,
+        "MAX-PADDING", maxPadding, "ARADIUS", availableRadius);
+
+      var startRadius = 0;
+      var endRadius = Math.floor(availableRadius * 2);
+
+      frames.frames.forEach(function (frame, fi) {
+        var nvp = {};
+        frame.data.forEach(function (row, ri) {
+            if (nvp[row[0]] === undefined) {
+              nvp[row[0]] = [];
+            }
+            nvp[row[0]].push(row[1]);
+          }
+        );
+        var data = [];
+        for (var name in nvp) {
+          legendNames[name] = 1;
+          data.push({"name": name, "value": aggregationFunction(nvp[name])});
+        }
+        var series = dex.config.expandAndOverlay(chart.config.series,
+          {
+            name: frames.frameIndices[fi],
+            radius: [startRadius + "%", endRadius + "%"],
+            data: data
+          });
+        options.series.push(series);
+        startRadius = padding + endRadius;
+        endRadius = startRadius + availableRadius;
+      });
+
+      options.legend.data = Object.keys(legendNames);
+
+      dex.console.log("OPTIONS", options);
+      return options;
     }
 
     function getPolarOptions(csv) {
@@ -8508,6 +8585,140 @@ module.exports = network;
 },{}],39:[function(require,module,exports){
 /**
  *
+ * This module provides a ECharts Pie Chart
+ *
+ * @name dex/charts/echarts/PieChart
+ *
+ * @param userConfig
+ * @returns PieChart
+ */
+var piechart = function (userConfig) {
+  var chart;
+  var sizeScale = undefined;
+  var defaults = {
+    'parent': '#ECharts_PieChart',
+    'id': 'ECharts_PieChart',
+    'class': 'ECharts_PieChart',
+    'resizable': true,
+    'width': "100%",
+    'height': "100%",
+    'type': 'pie',
+    'seriesIndex': 0,
+    'nameIndex': 1,
+    'valueIndex': 2,
+    'aggregationMethod': "Sum",
+    'aggregationFunction': function (values) {
+      return values.reduce(function (acc, value) {
+        return acc + value;
+      }, 0);
+    },
+    // Dynamic but can be overriden.
+    maxPadding: undefined,
+    maxPercent: undefined,
+    radius: undefined,
+    padding: undefined,
+    'series.type': 'pie',
+    'series.selectedMode': 'single',
+    'series.label.normal.position': 'inner'
+  };
+
+  var combinedConfig = dex.config.expandAndOverlay(userConfig, defaults);
+  chart = dex.charts.echarts.EChart(combinedConfig);
+
+  chart.subscribe(chart, "attr", function (event) {
+    if (event.attr == "aggregationMethod") {
+      switch (event.value) {
+        case "Average": {
+          chart.config.aggregationFunction = function (values) {
+            var sum = values.reduce(function (acc, value) {
+              return acc + value;
+            }, 0);
+            return sum / values.length;
+          }
+        }
+        case "Count": {
+          chart.config.aggregationFunction = function (values) {
+            return values.length;
+          }
+        }
+        case "Count Distinct": {
+          chart.config.aggregationFunction = function (values) {
+            return dex.array.unique(values).length;
+          }
+        }
+        case "Sum":
+        default: {
+          chart.config.aggregationFunction = function (values) {
+            return values.reduce(function (acc, value) {
+              return acc + value;
+            }, 0);
+          }
+        }
+      }
+    }
+  });
+
+  chart.getGuiDefinition = function getGuiDefinition(config) {
+    var defaults = {
+      "type": "group",
+      "name": "EChart Pie Chart Settings",
+      "contents": [
+        {
+          "type": "group",
+          "name": "General",
+          "contents": [
+            dex.config.gui.echartsTitle({}, "options.title"),
+            {
+              "name": "Aggregation Method",
+              "description": "The aggregation method",
+              "type": "choice",
+              "choices": ["Sum", "Average", "Count", "Count Distinct"],
+              "target": "aggregationMethod",
+              "initialValue": "Sum"
+            }
+          ]
+        },
+        {
+          "type": "group",
+          "name": "Series and Axis",
+          "contents": [
+            {
+              "name": "Series Index",
+              "description": "The series index.",
+              "type": "choice",
+              "choices": chart.config.csv.header,
+              "target": "seriesIndex"
+            },
+            {
+              "name": "Name Index",
+              "description": "The radius index.",
+              "type": "choice",
+              "choices": chart.config.csv.header,
+              "target": "nameIndex"
+            },
+            {
+              "name": "Value Index",
+              "description": "The value index.",
+              "type": "choice",
+              "choices": chart.config.csv.header,
+              "target": "valueIndex"
+            }
+          ]
+        }
+      ]
+    };
+
+    var guiDef = dex.config.expandAndOverlay(config, defaults);
+    dex.config.gui.sync(chart, guiDef);
+    return guiDef;
+  };
+
+  return chart;
+};
+module.exports = piechart;
+},{}],40:[function(require,module,exports){
+/**
+ *
  * This module provides a ECharts Polar Plot
  *
  * @name dex/charts/echarts/PolarPlot
@@ -8730,7 +8941,7 @@ var polarplot = function (userConfig) {
   return chart;
 };
 module.exports = polarplot;
-},{}],40:[function(require,module,exports){
+},{}],41:[function(require,module,exports){
 /**
  *
  * This module provides a ECharts Single Axis ScatterPlot.
@@ -8883,7 +9094,7 @@ var singleaxisscatterplot = function (userConfig) {
   return chart;
 };
 module.exports = singleaxisscatterplot;
-},{}],41:[function(require,module,exports){
+},{}],42:[function(require,module,exports){
 /**
  *
  * This module provides a ECharts Timeline.
@@ -8974,7 +9185,7 @@ var timeline = function (userConfig) {
   return chart;
 };
 module.exports = timeline;
-},{}],42:[function(require,module,exports){
+},{}],43:[function(require,module,exports){
 /**
  *
  * This module provides ECharts 3.0 based visualization components.
@@ -8990,9 +9201,10 @@ echarts.PolarPlot = require("./PolarPlot");
 echarts.Timeline = require("./Timeline");
 echarts.Network = require("./Network");
 echarts.SingleAxisScatterPlot = require("./SingleAxisScatterPlot");
+echarts.PieChart = require("./PieChart");
 
 module.exports = echarts;
-},{"./EChart":36,"./LineChart":37,"./Network":38,"./PolarPlot":39,"./SingleAxisScatterPlot":40,"./Timeline":41}],43:[function(require,module,exports){
+},{"./EChart":36,"./LineChart":37,"./Network":38,"./PieChart":39,"./PolarPlot":40,"./SingleAxisScatterPlot":41,"./Timeline":42}],44:[function(require,module,exports){
 var scatterplot = function (userConfig) {
   d3 = dex.charts.d3.d3v3;
   var chart;
@@ -9114,7 +9326,7 @@ var scatterplot = function (userConfig) {
 };
 
 module.exports = scatterplot;
-},{}],44:[function(require,module,exports){
+},{}],45:[function(require,module,exports){
 /**
  * @module dex/charts/c3
  */
@@ -9123,7 +9335,7 @@ var elegans = {};
 elegans.ScatterPlot = require("./ScatterPlot");
 
 module.exports = elegans;
-},{"./ScatterPlot":43}],45:[function(require,module,exports){
+},{"./ScatterPlot":44}],46:[function(require,module,exports){
 var gridstermultiples = function (userConfig) {
   var chart;
   var gridster;
@@ -9279,7 +9491,7 @@ var gridstermultiples = function (userConfig) {
 };
 
 module.exports = gridstermultiples;
-},{}],46:[function(require,module,exports){
+},{}],47:[function(require,module,exports){
 /**
  * @module dex/charts/gridster
  */
@@ -9288,7 +9500,7 @@ var multiples = {};
 multiples.GridsterMultiples = require("./GridsterMultiples");
 
 module.exports = multiples;
-},{"./GridsterMultiples":45}],47:[function(require,module,exports){
+},{"./GridsterMultiples":46}],48:[function(require,module,exports){
 var bubblechart = function (userConfig) {
     d3 = dex.charts.d3.d3v3;
     var chart;
@@ -9447,7 +9659,7 @@ var bubblechart = function (userConfig) {
 };
 
 module.exports = bubblechart;
-},{}],48:[function(require,module,exports){
+},{}],49:[function(require,module,exports){
 var stackedareachart = function (userConfig) {
     d3 = dex.charts.d3.d3v3;
     var chart;
@@ -9593,7 +9805,7 @@ var stackedareachart = function (userConfig) {
 };
 
 module.exports = stackedareachart;
-},{}],49:[function(require,module,exports){
+},{}],50:[function(require,module,exports){
 /**
  *
  * This module provides NVD3 based visualization components.
@@ -9607,7 +9819,7 @@ nvd3.StackedAreaChart = require("./StackedAreaChart");
 nvd3.BubbleChart = require("./BubbleChart");
 
 module.exports = nvd3;
-},{"./BubbleChart":47,"./StackedAreaChart":48}],50:[function(require,module,exports){
+},{"./BubbleChart":48,"./StackedAreaChart":49}],51:[function(require,module,exports){
 var scatterplot = function (userConfig) {
   var defaults = {
     // The parent container of this chart.
@@ -9977,7 +10189,7 @@ var scatterplot = function (userConfig) {
 };
 
 module.exports = scatterplot;
-},{}],51:[function(require,module,exports){
+},{}],52:[function(require,module,exports){
 /**
  *
  * This module provides ThreeJS/WebGL based visualization components.
@@ -9990,7 +10202,7 @@ var threejs = {};
 threejs.ScatterPlot = require("./ScatterPlot");
 
 module.exports = threejs;
-},{"./ScatterPlot":50}],52:[function(require,module,exports){
+},{"./ScatterPlot":51}],53:[function(require,module,exports){
 var network = function (userConfig) {
   var chart;
 
@@ -10377,7 +10589,7 @@ var network = function (userConfig) {
 };
 
 module.exports = network;
-},{}],53:[function(require,module,exports){
+},{}],54:[function(require,module,exports){
 /**
  *
  * This module provides routines for dealing with arrays.
@@ -10390,7 +10602,7 @@ var vis = {};
 vis.Network = require("./Network");
 
 module.exports = vis;
-},{"./Network":52}],54:[function(require,module,exports){
+},{"./Network":53}],55:[function(require,module,exports){
 /**
  *
  * This module provides routines for dealing with colors.
@@ -10992,7 +11204,7 @@ module.exports = function color(dex) {
   };
 };
 
-},{}],55:[function(require,module,exports){
+},{}],56:[function(require,module,exports){
 module.exports = function (dex) {
 
   return function (userConfig, defaultConfig) {
@@ -11282,7 +11494,7 @@ module.exports = function (dex) {
     return this;
   };
 };
-},{}],56:[function(require,module,exports){
+},{}],57:[function(require,module,exports){
 /**
  *
  * Config module.
@@ -12472,7 +12684,7 @@ module.exports = function config(dex) {
     'gui': require("./gui")(dex)
   };
 };
-},{"./gui":57}],57:[function(require,module,exports){
+},{"./gui":58}],58:[function(require,module,exports){
 /**
  *
  * gui definition module.
@@ -13367,7 +13579,7 @@ module.exports = function gui(dex) {
     }
   };
 };
-},{}],58:[function(require,module,exports){
+},{}],59:[function(require,module,exports){
 /**
  *
  * This module provides console logging capabilities.
@@ -13504,7 +13716,7 @@ module.exports = function (dex) {
     }
   };
 };
-},{}],59:[function(require,module,exports){
+},{}],60:[function(require,module,exports){
 /**
  *
  * This module provides support for dealing with csv structures.  This
@@ -14923,7 +15135,7 @@ module.exports = function csv(dex) {
     }
   };
 };
-},{}],60:[function(require,module,exports){
+},{}],61:[function(require,module,exports){
 /**
  *
  * This module provides support for creating various datasets.
@@ -15342,7 +15554,7 @@ module.exports = function datagen(dex) {
   };
 };
 
-},{}],61:[function(require,module,exports){
+},{}],62:[function(require,module,exports){
 // Allow user to override, but define this by default:
 
 /**
@@ -15603,7 +15815,7 @@ $.widget.bridge('uitooltip', $.ui.tooltip);
 $.widget.bridge('uibutton', $.ui.button);
 
 module.exports = dex;
-},{"../lib/pubsub":3,"./array/array":4,"./charts/charts":15,"./color/color":54,"./component/component":55,"./config/config":56,"./console/console":58,"./csv/csv":59,"./datagen/datagen":60,"./json/json":62,"./matrix/matrix":63,"./object/object":64,"./ui/ui":74,"./util/util":75}],62:[function(require,module,exports){
+},{"../lib/pubsub":3,"./array/array":4,"./charts/charts":15,"./color/color":55,"./component/component":56,"./config/config":57,"./console/console":59,"./csv/csv":60,"./datagen/datagen":61,"./json/json":63,"./matrix/matrix":64,"./object/object":65,"./ui/ui":75,"./util/util":76}],63:[function(require,module,exports){
 /**
  *
  * This module provides routines dealing with json data.
@@ -15706,7 +15918,7 @@ module.exports = function json(dex) {
   };
 };
 
-},{}],63:[function(require,module,exports){
+},{}],64:[function(require,module,exports){
 /**
  *
  * This module provides routines dealing with matrices.
@@ -16021,7 +16233,7 @@ module.exports = function matrix(dex) {
   };
 };
 
-},{}],64:[function(require,module,exports){
+},{}],65:[function(require,module,exports){
 /**
  *
  * This module provides routines dealing with javascript objects.
@@ -16343,7 +16555,7 @@ module.exports = function object(dex) {
 };
 
 
-},{}],65:[function(require,module,exports){
+},{}],66:[function(require,module,exports){
 /**
  *
  * This class creates and attaches a SqlQuery user interface onto the
@@ -16442,7 +16654,7 @@ var sqlquery = function (userConfig) {
 };
 
 module.exports = sqlquery;
-},{}],66:[function(require,module,exports){
+},{}],67:[function(require,module,exports){
 /**
  *
  * @constructor
@@ -16542,7 +16754,7 @@ var table = function (userConfig) {
 };
 
 module.exports = table;
-},{}],67:[function(require,module,exports){
+},{}],68:[function(require,module,exports){
 var typestable = function (userConfig) {
 
   var defaults =
@@ -16623,7 +16835,7 @@ var typestable = function (userConfig) {
 };
 
 module.exports = typestable;
-},{}],68:[function(require,module,exports){
+},{}],69:[function(require,module,exports){
 var configurationbox = function (userConfig) {
 
   var defaults =
@@ -16709,7 +16921,7 @@ var configurationbox = function (userConfig) {
 };
 
 module.exports = configurationbox;
-},{}],69:[function(require,module,exports){
+},{}],70:[function(require,module,exports){
 var player = function (userConfig) {
 
   var defaults = {
@@ -16907,7 +17119,7 @@ var player = function (userConfig) {
 };
 
 module.exports = player;
-},{}],70:[function(require,module,exports){
+},{}],71:[function(require,module,exports){
 var selectable = function (userConfig) {
 
   var defaults =
@@ -17004,7 +17216,7 @@ var selectable = function (userConfig) {
 };
 
 module.exports = selectable;
-},{}],71:[function(require,module,exports){
+},{}],72:[function(require,module,exports){
 var slider = function (userConfig) {
 
   var defaults = {
@@ -17096,7 +17308,7 @@ var slider = function (userConfig) {
 };
 
 module.exports = slider;
-},{}],72:[function(require,module,exports){
+},{}],73:[function(require,module,exports){
 var tabs = function (userConfig) {
   var defaults = {
     // The parent container of this chart.
@@ -17200,7 +17412,7 @@ var tabs = function (userConfig) {
 };
 
 module.exports = tabs;
-},{}],73:[function(require,module,exports){
+},{}],74:[function(require,module,exports){
 /**
  *
  * This module provides ui components based upon jquery-ui.
@@ -17218,7 +17430,7 @@ module.exports = function jqueryui(dex) {
     'Tabs': require("./Tabs")
   };
 };
-},{"./ConfigurationBox":68,"./Player":69,"./Selectable":70,"./Slider":71,"./Tabs":72}],74:[function(require,module,exports){
+},{"./ConfigurationBox":69,"./Player":70,"./Selectable":71,"./Slider":72,"./Tabs":73}],75:[function(require,module,exports){
 /**
  *
  * This module provides ui components from a variety of sources.
@@ -17244,7 +17456,7 @@ module.exports = function ui(dex) {
     'TypesTable': require("./TypesTable")
   };
 };
-},{"./SqlQuery":65,"./Table":66,"./TypesTable":67,"./jqueryui/jqueryui":73}],75:[function(require,module,exports){
+},{"./SqlQuery":66,"./Table":67,"./TypesTable":68,"./jqueryui/jqueryui":74}],76:[function(require,module,exports){
 /**
  *
  * This module provides utility routines.
@@ -17317,5 +17529,5 @@ module.exports = function util(dex) {
     }
   };
 };
-},{}]},{},[61])(61)
+},{}]},{},[62])(62)
 });
