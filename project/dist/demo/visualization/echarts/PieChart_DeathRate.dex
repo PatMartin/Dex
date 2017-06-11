@@ -1,0 +1,68 @@
+<dex-project version="0.8">
+   <tasks class="java.util.ArrayList">
+      <task-item name="Read CSV" active="true">
+         <task class="com.dexvis.dex.task.input.ReadCsv">
+            <config-def>[ { &quot;type&quot; : &quot;label&quot;, &quot;initialValue&quot;: &quot;No configuration is available&quot; } ]</config-def>
+            <fileText>data\BirthsAndDeaths.csv</fileText>
+            <limitRows>false</limitRows>
+            <rowLimitText>0</rowLimitText>
+            <lastDir></lastDir>
+         </task>
+      </task-item>
+      <task-item name="Select Columns" active="true">
+         <task class="com.dexvis.dex.task.tablemanipulation.SelectColumns">
+            <config-def>[ { &quot;type&quot; : &quot;label&quot;, &quot;initialValue&quot;: &quot;No configuration is available&quot; } ]</config-def>
+            <columnList>&lt;com.dexvis.simple.types.SimpleListSelectionView&gt;
+  &lt;sourceList&gt;
+    &lt;string&gt;Country&lt;/string&gt;
+    &lt;string&gt;Births per 1000 People&lt;/string&gt;
+    &lt;string&gt;Series&lt;/string&gt;
+    &lt;string&gt;population&lt;/string&gt;
+  &lt;/sourceList&gt;
+  &lt;targetList&gt;
+    &lt;string&gt;Year&lt;/string&gt;
+    &lt;string&gt;Country Abbreviation&lt;/string&gt;
+    &lt;string&gt;Deaths per 1000 People&lt;/string&gt;
+  &lt;/targetList&gt;
+&lt;/com.dexvis.simple.types.SimpleListSelectionView&gt;</columnList>
+         </task>
+      </task-item>
+      <task-item name="Groovy Filter" active="true">
+         <task class="com.dexvis.dex.task.utilities.GroovyFilter">
+            <config-def>[ { &quot;type&quot; : &quot;label&quot;, &quot;initialValue&quot;: &quot;No configuration is available&quot; } ]</config-def>
+            <operationCB>&lt;map&gt;
+  &lt;entry&gt;
+    &lt;string&gt;items&lt;/string&gt;
+    &lt;list&gt;
+      &lt;string&gt;INCLUDE&lt;/string&gt;
+      &lt;string&gt;EXCLUDE&lt;/string&gt;
+    &lt;/list&gt;
+  &lt;/entry&gt;
+  &lt;entry&gt;
+    &lt;string&gt;selected&lt;/string&gt;
+    &lt;string&gt;INCLUDE&lt;/string&gt;
+  &lt;/entry&gt;
+&lt;/map&gt;</operationCB>
+            <conditionCB>&lt;map&gt;
+  &lt;entry&gt;
+    &lt;string&gt;items&lt;/string&gt;
+    &lt;list&gt;
+      &lt;string&gt;IF&lt;/string&gt;
+      &lt;string&gt;UNLESS&lt;/string&gt;
+    &lt;/list&gt;
+  &lt;/entry&gt;
+  &lt;entry&gt;
+    &lt;string&gt;selected&lt;/string&gt;
+    &lt;string&gt;IF&lt;/string&gt;
+  &lt;/entry&gt;
+&lt;/map&gt;</conditionCB>
+            <groovyExpText>(col.Year as Integer) % 10 == 0</groovyExpText>
+         </task>
+      </task-item>
+      <task-item name="ECharts Pie Chart" active="true">
+         <task class="com.dexvis.dex.task.vis.echarts.EChartsPieChart">
+            <config-def>{&quot;piechart&quot;:{&quot;type&quot;:&quot;group&quot;,&quot;name&quot;:&quot;EChart Pie Chart Settings&quot;,&quot;contents&quot;:[{&quot;type&quot;:&quot;group&quot;,&quot;name&quot;:&quot;General&quot;,&quot;contents&quot;:[{&quot;type&quot;:&quot;group&quot;,&quot;name&quot;:&quot;Title&quot;,&quot;contents&quot;:[{&quot;name&quot;:&quot;Text&quot;,&quot;description&quot;:&quot;The text.&quot;,&quot;target&quot;:&quot;options.title.text&quot;,&quot;type&quot;:&quot;string&quot;,&quot;initialValue&quot;:&quot;&quot;},{&quot;name&quot;:&quot;Sub Text&quot;,&quot;description&quot;:&quot;The subtext.&quot;,&quot;target&quot;:&quot;options.title.subtext&quot;,&quot;type&quot;:&quot;string&quot;,&quot;initialValue&quot;:&quot;&quot;},{&quot;name&quot;:&quot;Link&quot;,&quot;description&quot;:&quot;An optional hyperlink.&quot;,&quot;target&quot;:&quot;options.title.link&quot;,&quot;type&quot;:&quot;string&quot;,&quot;initialValue&quot;:&quot;&quot;},{&quot;name&quot;:&quot;Link Target&quot;,&quot;description&quot;:&quot;A tab target to open hyperlink in.&quot;,&quot;target&quot;:&quot;options.title.target&quot;,&quot;type&quot;:&quot;string&quot;,&quot;initialValue&quot;:&quot;&quot;},{&quot;name&quot;:&quot;Horizontal Alignment&quot;,&quot;description&quot;:&quot;Text alignment.&quot;,&quot;target&quot;:&quot;options.title.textAlign&quot;,&quot;type&quot;:&quot;choice&quot;,&quot;choices&quot;:[&quot;left&quot;,&quot;center&quot;,&quot;right&quot;],&quot;initialValue&quot;:&quot;center&quot;},{&quot;name&quot;:&quot;Vertical Alignment&quot;,&quot;description&quot;:&quot;Vertical alignment of title.&quot;,&quot;target&quot;:&quot;options.title.textBaseline&quot;,&quot;type&quot;:&quot;choice&quot;,&quot;choices&quot;:[&quot;top&quot;,&quot;middle&quot;,&quot;bottom&quot;],&quot;initialValue&quot;:&quot;top&quot;},{&quot;name&quot;:&quot;Sub Link&quot;,&quot;description&quot;:&quot;An optional hyperlink.&quot;,&quot;target&quot;:&quot;options.title.sublink&quot;,&quot;type&quot;:&quot;string&quot;,&quot;initialValue&quot;:&quot;&quot;},{&quot;name&quot;:&quot;Sub Link Target&quot;,&quot;description&quot;:&quot;A tab target to open hyperlink in.&quot;,&quot;target&quot;:&quot;options.title.subtarget&quot;,&quot;type&quot;:&quot;string&quot;,&quot;initialValue&quot;:&quot;&quot;},{&quot;type&quot;:&quot;group&quot;,&quot;name&quot;:&quot;Text Style&quot;,&quot;contents&quot;:[{&quot;name&quot;:&quot;Text Color&quot;,&quot;description&quot;:&quot;The color of the text.&quot;,&quot;target&quot;:&quot;options.title.textStyle.color&quot;,&quot;type&quot;:&quot;color&quot;,&quot;initialValue&quot;:&quot;#ffffff&quot;},{&quot;name&quot;:&quot;Font Style&quot;,&quot;description&quot;:&quot;The color of the text.&quot;,&quot;target&quot;:&quot;options.title.textStyle.fontStyle&quot;,&quot;type&quot;:&quot;choice&quot;,&quot;choices&quot;:[&quot;normal&quot;,&quot;italic&quot;,&quot;oblique&quot;],&quot;initialValue&quot;:&quot;normal&quot;},{&quot;name&quot;:&quot;Font Weight&quot;,&quot;description&quot;:&quot;The weight of the text.&quot;,&quot;target&quot;:&quot;options.title.textStyle.fontWeight&quot;,&quot;type&quot;:&quot;choice&quot;,&quot;choices&quot;:[&quot;normal&quot;,&quot;bold&quot;,&quot;bolder&quot;,&quot;lighter&quot;,&quot;100&quot;,&quot;200&quot;,&quot;300&quot;,&quot;400&quot;,&quot;500&quot;,&quot;600&quot;,&quot;700&quot;,&quot;800&quot;,&quot;900&quot;],&quot;initialValue&quot;:&quot;normal&quot;},{&quot;name&quot;:&quot;Font Family&quot;,&quot;description&quot;:&quot;The color of the text.&quot;,&quot;target&quot;:&quot;options.title.textStyle.fontFamily&quot;,&quot;type&quot;:&quot;choice&quot;,&quot;choices&quot;:[&quot;sans-serif&quot;,&quot;arial&quot;,&quot;courier&quot;,&quot;courier new&quot;,&quot;arial narrow&quot;,&quot;allegro&quot;,&quot;lucidia console&quot;,&quot;lucida sans&quot;,&quot;times&quot;,&quot;arial rounded mt bold&quot;],&quot;initialValue&quot;:&quot;sans-serif&quot;},{&quot;name&quot;:&quot;Font Size&quot;,&quot;description&quot;:&quot;The font family.&quot;,&quot;target&quot;:&quot;options.title.textStyle.fontSize&quot;,&quot;type&quot;:&quot;int&quot;,&quot;minValue&quot;:0,&quot;maxValue&quot;:128,&quot;initialValue&quot;:12}]},{&quot;type&quot;:&quot;group&quot;,&quot;name&quot;:&quot;Text Style&quot;,&quot;contents&quot;:[{&quot;name&quot;:&quot;Text Color&quot;,&quot;description&quot;:&quot;The color of the text.&quot;,&quot;target&quot;:&quot;options.title.subtextStyle.color&quot;,&quot;type&quot;:&quot;color&quot;,&quot;initialValue&quot;:&quot;#ffffff&quot;},{&quot;name&quot;:&quot;Font Style&quot;,&quot;description&quot;:&quot;The color of the text.&quot;,&quot;target&quot;:&quot;options.title.subtextStyle.fontStyle&quot;,&quot;type&quot;:&quot;choice&quot;,&quot;choices&quot;:[&quot;normal&quot;,&quot;italic&quot;,&quot;oblique&quot;],&quot;initialValue&quot;:&quot;normal&quot;},{&quot;name&quot;:&quot;Font Weight&quot;,&quot;description&quot;:&quot;The weight of the text.&quot;,&quot;target&quot;:&quot;options.title.subtextStyle.fontWeight&quot;,&quot;type&quot;:&quot;choice&quot;,&quot;choices&quot;:[&quot;normal&quot;,&quot;bold&quot;,&quot;bolder&quot;,&quot;lighter&quot;,&quot;100&quot;,&quot;200&quot;,&quot;300&quot;,&quot;400&quot;,&quot;500&quot;,&quot;600&quot;,&quot;700&quot;,&quot;800&quot;,&quot;900&quot;],&quot;initialValue&quot;:&quot;normal&quot;},{&quot;name&quot;:&quot;Font Family&quot;,&quot;description&quot;:&quot;The color of the text.&quot;,&quot;target&quot;:&quot;options.title.subtextStyle.fontFamily&quot;,&quot;type&quot;:&quot;choice&quot;,&quot;choices&quot;:[&quot;sans-serif&quot;,&quot;arial&quot;,&quot;courier&quot;,&quot;courier new&quot;,&quot;arial narrow&quot;,&quot;allegro&quot;,&quot;lucidia console&quot;,&quot;lucida sans&quot;,&quot;times&quot;,&quot;arial rounded mt bold&quot;],&quot;initialValue&quot;:&quot;sans-serif&quot;},{&quot;name&quot;:&quot;Font Size&quot;,&quot;description&quot;:&quot;The font family.&quot;,&quot;target&quot;:&quot;options.title.subtextStyle.fontSize&quot;,&quot;type&quot;:&quot;int&quot;,&quot;minValue&quot;:0,&quot;maxValue&quot;:128,&quot;initialValue&quot;:12}]}]},{&quot;name&quot;:&quot;Aggregation Method&quot;,&quot;description&quot;:&quot;The aggregation method&quot;,&quot;type&quot;:&quot;choice&quot;,&quot;choices&quot;:[&quot;Sum&quot;,&quot;Average&quot;,&quot;Count&quot;,&quot;Count Distinct&quot;],&quot;target&quot;:&quot;aggregationMethod&quot;,&quot;initialValue&quot;:&quot;Sum&quot;}]},{&quot;type&quot;:&quot;group&quot;,&quot;name&quot;:&quot;Series and Axis&quot;,&quot;contents&quot;:[{&quot;name&quot;:&quot;Series Index&quot;,&quot;description&quot;:&quot;The series index.&quot;,&quot;type&quot;:&quot;choice&quot;,&quot;choices&quot;:[&quot;Year&quot;,&quot;Country Abbreviation&quot;,&quot;Deaths per 1000 People&quot;],&quot;target&quot;:&quot;seriesIndex&quot;,&quot;initialValue&quot;:0},{&quot;name&quot;:&quot;Name Index&quot;,&quot;description&quot;:&quot;The radius index.&quot;,&quot;type&quot;:&quot;choice&quot;,&quot;choices&quot;:[&quot;Year&quot;,&quot;Country Abbreviation&quot;,&quot;Deaths per 1000 People&quot;],&quot;target&quot;:&quot;nameIndex&quot;,&quot;initialValue&quot;:1},{&quot;name&quot;:&quot;Value Index&quot;,&quot;description&quot;:&quot;The value index.&quot;,&quot;type&quot;:&quot;choice&quot;,&quot;choices&quot;:[&quot;Year&quot;,&quot;Country Abbreviation&quot;,&quot;Deaths per 1000 People&quot;],&quot;target&quot;:&quot;valueIndex&quot;,&quot;initialValue&quot;:2}]}]}}</config-def>
+         </task>
+      </task-item>
+   </tasks>
+</dex-project>
