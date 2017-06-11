@@ -101,6 +101,7 @@ class WebTask extends DexTask {
   public DexTaskState execute(DexTaskState state) throws DexException
   {
     long start = System.currentTimeMillis()
+    println "WebKit USER AGENT: '${we?.getUserAgent()}"
     updateProgress(0, 100);
     
     if (templatePath.startsWith("http://"))
