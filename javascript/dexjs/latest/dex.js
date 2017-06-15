@@ -9863,6 +9863,7 @@ var tauchart = function (userConfig) {
         'tooltip': true
       },
       'color': 0,
+      'colormap': 'category10',
       'x': 1,
       'y': 2,
       'size': "count",
@@ -9901,6 +9902,14 @@ var tauchart = function (userConfig) {
               "stacked-bar", "horizontal-stacked-bar"],
             "target": "options.type",
             "initialValue": "scatterplot"
+          },
+          {
+            "name": "Colormap",
+            "description": "Colormap.",
+            "type": "choice",
+            "choices": dex.color.colormaps({shortlist: true}),
+            "target": "colormap",
+            "initialValue": "category10"
           },
           {
             "name": "Fit Model Settings",
@@ -10034,7 +10043,10 @@ var tauchart = function (userConfig) {
         y: dex.csv.getColumnName(config.csv, config.y),
         color: dex.csv.getColumnName(config.csv, config.color),
         size: dex.csv.getColumnName(config.csv, config.size),
-        plugins: []
+        plugins: [],
+        guide: {
+          color: { brewer: dex.color.palette[config.colormap] }
+        }
       };
 
       if (config.plugins.tooltip) {
@@ -14231,6 +14243,10 @@ module.exports = function csv(dex) {
           switch (gtypes[hi]) {
             case "number": {
               jsonRow[header] = +(row[hi]);
+              break;
+            }
+            case "date": {
+              jsonRow[header] = new Date(row[hi]);
               break;
             }
             default: {
