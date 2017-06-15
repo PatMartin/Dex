@@ -962,7 +962,7 @@ module.exports = function charts() {
     'vis'      : require("./vis/vis")
   };
 };
-},{"./c3/c3":14,"./d3/d3":33,"./d3plus/d3plus":35,"./echarts/echarts":43,"./elegans/elegans":45,"./multiples/multiples":47,"./nvd3/nvd3":50,"./taucharts/taucharts":52,"./threejs/threejs":54,"./vis/vis":56}],16:[function(require,module,exports){
+},{"./c3/c3":14,"./d3/d3":33,"./d3plus/d3plus":35,"./echarts/echarts":43,"./elegans/elegans":45,"./multiples/multiples":47,"./nvd3/nvd3":50,"./taucharts/taucharts":59,"./threejs/threejs":61,"./vis/vis":63}],16:[function(require,module,exports){
 var bumpchart = function (userConfig) {
   d3 = dex.charts.d3.d3v3;
   var chart;
@@ -9841,6 +9841,202 @@ nvd3.BubbleChart = require("./BubbleChart");
 
 module.exports = nvd3;
 },{"./BubbleChart":48,"./StackedAreaChart":49}],51:[function(require,module,exports){
+/**
+ *
+ * This module provides a TauCharts AreaChart.
+ *
+ * @name dex/charts/taucharts/AreaChart
+ *
+ * @param userConfig
+ * @returns AreaChart
+ */
+var areachart = function (userConfig) {
+  var chart;
+  var defaults = {
+    'parent': '#TauCharts_AreaChart',
+    'id': 'TauCharts_AreaChart',
+    'class': 'TauCharts_AreaChart',
+    'resizable': true,
+    'width': "100%",
+    'height': "100%",
+    'type': 'area'
+  };
+
+  var combinedConfig = dex.config.expandAndOverlay(userConfig, defaults);
+  chart = dex.charts.taucharts.TauChart(combinedConfig);
+
+  return chart;
+};
+module.exports = areachart;
+},{}],52:[function(require,module,exports){
+/**
+ *
+ * This module provides a TauCharts BarChart.
+ *
+ * @name dex/charts/taucharts/BarChart
+ *
+ * @param userConfig
+ * @returns BarChart
+ */
+var barchart = function (userConfig) {
+  var chart;
+  var defaults = {
+    'parent': '#TauCharts_BarChart',
+    'id': 'TauCharts_BarChart',
+    'class': 'TauCharts_BarChart',
+    'resizable': true,
+    'width': "100%",
+    'height': "100%",
+    'type': 'bar'
+  };
+
+  var combinedConfig = dex.config.expandAndOverlay(userConfig, defaults);
+  chart = dex.charts.taucharts.TauChart(combinedConfig);
+
+  return chart;
+};
+module.exports = barchart;
+},{}],53:[function(require,module,exports){
+/**
+ *
+ * This module provides a TauCharts HorizontalBarChart.
+ *
+ * @name dex/charts/taucharts/HorizontalBarChart
+ *
+ * @param userConfig
+ * @returns HorizontalBarChart
+ */
+var horizontalbarchart = function (userConfig) {
+  var chart;
+  var defaults = {
+    'parent': '#TauCharts_HorizontalBarChart',
+    'id': 'TauCharts_HorizontalBarChart',
+    'class': 'TauCharts_HorizontalBarChart',
+    'resizable': true,
+    'width': "100%",
+    'height': "100%",
+    'type': 'horizontal-bar'
+  };
+
+  var combinedConfig = dex.config.expandAndOverlay(userConfig, defaults);
+  chart = dex.charts.taucharts.TauChart(combinedConfig);
+
+  return chart;
+};
+module.exports = horizontalbarchart;
+},{}],54:[function(require,module,exports){
+/**
+ *
+ * This module provides a TauCharts HorizontalStackedBarChart.
+ *
+ * @name dex/charts/taucharts/HorizontalStackedBarChart
+ *
+ * @param userConfig
+ * @returns HorizontalStackedBarChart
+ */
+var horizontalstackedbarchart = function (userConfig) {
+  var chart;
+  var defaults = {
+    'parent': '#TauCharts_HorizontalStackedBarChart',
+    'id': 'TauCharts_HorizontalStackedBarChart',
+    'class': 'TauCharts_HorizontalStackedBarChart',
+    'resizable': true,
+    'width': "100%",
+    'height': "100%",
+    'type': 'horizontal-stacked-bar'
+  };
+
+  var combinedConfig = dex.config.expandAndOverlay(userConfig, defaults);
+  chart = dex.charts.taucharts.TauChart(combinedConfig);
+
+  return chart;
+};
+module.exports = horizontalstackedbarchart;
+},{}],55:[function(require,module,exports){
+/**
+ *
+ * This module provides a TauCharts Line Chart.
+ *
+ * @name dex/charts/taucharts/LineChart
+ *
+ * @param userConfig
+ * @returns LineChart
+ */
+var linechart = function (userConfig) {
+  var chart;
+  var defaults = {
+    'parent': '#TauCharts_LineChart',
+    'id': 'TauCharts_LineChart',
+    'class': 'TauCharts_LineChart',
+    'resizable': true,
+    'width': "100%",
+    'height': "100%",
+    'type': 'line'
+  };
+
+  var combinedConfig = dex.config.expandAndOverlay(userConfig, defaults);
+  chart = dex.charts.taucharts.TauChart(combinedConfig);
+
+  return chart;
+};
+module.exports = linechart;
+},{}],56:[function(require,module,exports){
+/**
+ *
+ * This module provides a TauCharts Scatterplot.
+ *
+ * @name dex/charts/taucharts/ScatterPlot
+ *
+ * @param userConfig
+ * @returns ScatterPlot
+ */
+var scatterplot = function (userConfig) {
+  var chart;
+  var defaults = {
+    'parent': '#TauCharts_ScatterPlot',
+    'id': 'TauCharts_ScatterPlot',
+    'class': 'TauCharts_ScatterPlot',
+    'resizable': true,
+    'width': "100%",
+    'height': "100%",
+    'type': 'scatterplot'
+  };
+
+  var combinedConfig = dex.config.expandAndOverlay(userConfig, defaults);
+  chart = dex.charts.taucharts.TauChart(combinedConfig);
+
+  return chart;
+};
+module.exports = scatterplot;
+},{}],57:[function(require,module,exports){
+/**
+ *
+ * This module provides a TauCharts StackedBarChart.
+ *
+ * @name dex/charts/taucharts/StackedBarChart
+ *
+ * @param userConfig
+ * @returns StackedBarChart
+ */
+var stackedbarchart = function (userConfig) {
+  var chart;
+  var defaults = {
+    'parent': '#TauCharts_StackedBarChart',
+    'id': 'TauCharts_StackedBarChart',
+    'class': 'TauCharts_StackedBarChart',
+    'resizable': true,
+    'width': "100%",
+    'height': "100%",
+    'type': 'stacked-bar'
+  };
+
+  var combinedConfig = dex.config.expandAndOverlay(userConfig, defaults);
+  chart = dex.charts.taucharts.TauChart(combinedConfig);
+
+  return chart;
+};
+module.exports = stackedbarchart;
+},{}],58:[function(require,module,exports){
 var tauchart = function (userConfig) {
     var chart;
     var internalChart = undefined;
@@ -9863,12 +10059,19 @@ var tauchart = function (userConfig) {
         'tooltip': true
       },
       'color': 0,
+      'reverseColormap': false,
       'colormap': 'category10',
       'x': 1,
       'y': 2,
-      'size': "count",
+      'size': undefined,
+      'split': undefined,
       'width': "100%",
       'height': "100%",
+      options: {
+        guide: {
+          size: {minSize: 10, maxSize: 10}
+        }
+      }
     };
 
     chart = new dex.component(userConfig, defaults);
@@ -9912,11 +10115,18 @@ var tauchart = function (userConfig) {
             "initialValue": "category10"
           },
           {
+            "name": "Reverse Colormap",
+            "description": "Reverse the colormap?",
+            "type": "boolean",
+            "target": "reverseColormap",
+            "initialValue": true
+          },
+          {
             "name": "Fit Model Settings",
             "description": "Fit settings.",
             "type": "choice",
             "choices": ["normal", "minimal", "entire-view", "fit-width",
-              "fit-height" ],
+              "fit-height"],
             "target": "options.settings.fitModel",
             "initialValue": "normal"
           },
@@ -9939,6 +10149,24 @@ var tauchart = function (userConfig) {
             "initialValue": "0.25"
           },
           {
+            "name": "Min Size",
+            "description": "Minimum Size",
+            "type": "int",
+            "minValue": 0,
+            "maxValue": 200,
+            "target": "options.guide.size.minSize",
+            "initialValue": "1"
+          },
+          {
+            "name": "Max Size",
+            "description": "Maximum Size",
+            "type": "int",
+            "minValue": 0,
+            "maxValue": 200,
+            "target": "options.guide.size.maxSize",
+            "initialValue": "25"
+          },
+          {
             "name": "Animation Speed",
             "description": "Animation speed.",
             "type": "int",
@@ -9959,7 +10187,7 @@ var tauchart = function (userConfig) {
             "description": "Fit settings.",
             "type": "choice",
             "choices": ["normal", "minimal", "entire-view", "fit-width",
-              "fit-height" ],
+              "fit-height"],
             "target": "options.settings.fitModel",
             "initialValue": "normal"
           },
@@ -9992,6 +10220,13 @@ var tauchart = function (userConfig) {
             "target": "options.size"
           },
           {
+            "name": "Split",
+            "description": "Split colors/series on.",
+            "type": "choice",
+            "choices": dex.array.combine(["none"], chart.config.csv.header),
+            "target": "options.split"
+          },
+          {
             "name": "Enable Legend",
             "description": "Enable the legend.",
             "type": "boolean",
@@ -10010,7 +10245,7 @@ var tauchart = function (userConfig) {
             "description": "Enable the quick filters.",
             "type": "boolean",
             "target": "plugins.quickfilters",
-            "initialValue": false
+            "initialValue": true
           },
           {
             "name": "Enable Trend Lines",
@@ -10027,7 +10262,6 @@ var tauchart = function (userConfig) {
       return guiDef;
     };
 
-
     chart.update = function () {
       var config = chart.config;
       var csv = config.csv;
@@ -10035,17 +10269,52 @@ var tauchart = function (userConfig) {
       internalChart.render();
     };
 
+    chart.subscribe(chart, "attr", function (event) {
+      if (event.attr == "color") {
+        switch (event.value) {
+          case "none":
+            config.color = undefined;
+        }
+      }
+
+      if (event.attr == "size") {
+        switch (event.value) {
+          case "none":
+            config.size = undefined;
+        }
+      }
+
+      if (event.attr == "valueIndex" && event.value == "none") {
+        sizeScale = undefined;
+      }
+    });
+
     function getOptions(config) {
       var options = {
         data: {},
         type: config.type,
-        x: dex.csv.getColumnName(config.csv, config.x),
-        y: dex.csv.getColumnName(config.csv, config.y),
-        color: dex.csv.getColumnName(config.csv, config.color),
-        size: dex.csv.getColumnName(config.csv, config.size),
+        x: ((config.x !== undefined) ?
+          dex.csv.getColumnName(config.csv, config.x) :
+          undefined),
+        y: ((config.y !== undefined) ?
+          dex.csv.getColumnName(config.csv, config.y) :
+          undefined),
+        color: ((config.color !== undefined) ?
+          dex.csv.getColumnName(config.csv, config.color) :
+          undefined),
+        size: ((config.size !== undefined) ?
+          dex.csv.getColumnName(config.csv, config.size) :
+          undefined),
+        split: ((config.split !== undefined) ?
+          dex.csv.getColumnName(config.csv, config.split) :
+          undefined),
         plugins: [],
         guide: {
-          color: { brewer: dex.color.palette[config.colormap] }
+          color: {
+            brewer: ((config.reverseColormap === true) ?
+              dex.array.copy(dex.color.palette[config.colormap]).reverse() :
+              dex.color.palette[config.colormap])
+          }
         }
       };
 
@@ -10079,7 +10348,7 @@ var tauchart = function (userConfig) {
 ;
 
 module.exports = tauchart;
-},{}],52:[function(require,module,exports){
+},{}],59:[function(require,module,exports){
 /**
  *
  * This module provides TauChart based visualization components.
@@ -10090,9 +10359,15 @@ module.exports = tauchart;
 var taucharts = {};
 
 taucharts.TauChart = require("./TauChart");
-
+taucharts.AreaChart = require("./AreaChart");
+taucharts.LineChart = require("./LineChart");
+taucharts.ScatterPlot = require("./ScatterPlot");
+taucharts.BarChart = require("./BarChart");
+taucharts.StackedBarChart = require("./StackedBarChart");
+taucharts.HorizontalBarChart = require("./HorizontalBarChart");
+taucharts.HorizontalStackedBarChart = require("./HorizontalStackedBarChart");
 module.exports = taucharts;
-},{"./TauChart":51}],53:[function(require,module,exports){
+},{"./AreaChart":51,"./BarChart":52,"./HorizontalBarChart":53,"./HorizontalStackedBarChart":54,"./LineChart":55,"./ScatterPlot":56,"./StackedBarChart":57,"./TauChart":58}],60:[function(require,module,exports){
 var scatterplot = function (userConfig) {
   var defaults = {
     // The parent container of this chart.
@@ -10462,7 +10737,7 @@ var scatterplot = function (userConfig) {
 };
 
 module.exports = scatterplot;
-},{}],54:[function(require,module,exports){
+},{}],61:[function(require,module,exports){
 /**
  *
  * This module provides ThreeJS/WebGL based visualization components.
@@ -10475,7 +10750,7 @@ var threejs = {};
 threejs.ScatterPlot = require("./ScatterPlot");
 
 module.exports = threejs;
-},{"./ScatterPlot":53}],55:[function(require,module,exports){
+},{"./ScatterPlot":60}],62:[function(require,module,exports){
 var network = function (userConfig) {
   var chart;
 
@@ -10862,7 +11137,7 @@ var network = function (userConfig) {
 };
 
 module.exports = network;
-},{}],56:[function(require,module,exports){
+},{}],63:[function(require,module,exports){
 /**
  *
  * This module provides routines for dealing with arrays.
@@ -10875,7 +11150,7 @@ var vis = {};
 vis.Network = require("./Network");
 
 module.exports = vis;
-},{"./Network":55}],57:[function(require,module,exports){
+},{"./Network":62}],64:[function(require,module,exports){
 /**
  *
  * This module provides routines for dealing with colors.
@@ -11020,6 +11295,8 @@ module.exports = function color(dex) {
       var opts = options || {};
       if (opts.shortlist) {
         return [
+          "Stop Light", "White to Red", "White to Blue",
+          "Red White and Blue",
           "category10", "category20b", "category20c", "category20", "c64Dark",
           "c64Light", "divergingDark12", "divergingPastel12", "hueSoft128",
           "hueHard128", "crayola8", "crayola120", "YlGn_9",
@@ -11077,6 +11354,10 @@ module.exports = function color(dex) {
       };
     },
     'palette': {
+      'Stop Light': [ '#ff0000', '#ffff00', '#00ff00' ],
+      'White to Red': [ '#ffffff', '#ff0000' ],
+      'White to Blue': [ '#ffffff', '#0000ff' ],
+      'Red White and Blue': [ '#ff0000', '#ffffff', '#0000ff' ],
       'category10': [
         '#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd',
         '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf'
@@ -11477,7 +11758,7 @@ module.exports = function color(dex) {
   };
 };
 
-},{}],58:[function(require,module,exports){
+},{}],65:[function(require,module,exports){
 module.exports = function (dex) {
 
   return function (userConfig, defaultConfig) {
@@ -11767,7 +12048,7 @@ module.exports = function (dex) {
     return this;
   };
 };
-},{}],59:[function(require,module,exports){
+},{}],66:[function(require,module,exports){
 /**
  *
  * Config module.
@@ -12957,7 +13238,7 @@ module.exports = function config(dex) {
     'gui': require("./gui")(dex)
   };
 };
-},{"./gui":60}],60:[function(require,module,exports){
+},{"./gui":67}],67:[function(require,module,exports){
 /**
  *
  * gui definition module.
@@ -13852,7 +14133,7 @@ module.exports = function gui(dex) {
     }
   };
 };
-},{}],61:[function(require,module,exports){
+},{}],68:[function(require,module,exports){
 /**
  *
  * This module provides console logging capabilities.
@@ -13989,7 +14270,7 @@ module.exports = function (dex) {
     }
   };
 };
-},{}],62:[function(require,module,exports){
+},{}],69:[function(require,module,exports){
 /**
  *
  * This module provides support for dealing with csv structures.  This
@@ -15433,7 +15714,7 @@ module.exports = function csv(dex) {
     }
   };
 };
-},{}],63:[function(require,module,exports){
+},{}],70:[function(require,module,exports){
 /**
  *
  * This module provides support for creating various datasets.
@@ -15852,7 +16133,7 @@ module.exports = function datagen(dex) {
   };
 };
 
-},{}],64:[function(require,module,exports){
+},{}],71:[function(require,module,exports){
 // Allow user to override, but define this by default:
 
 /**
@@ -16113,7 +16394,7 @@ $.widget.bridge('uitooltip', $.ui.tooltip);
 $.widget.bridge('uibutton', $.ui.button);
 
 module.exports = dex;
-},{"../lib/pubsub":3,"./array/array":4,"./charts/charts":15,"./color/color":57,"./component/component":58,"./config/config":59,"./console/console":61,"./csv/csv":62,"./datagen/datagen":63,"./json/json":65,"./matrix/matrix":66,"./object/object":67,"./ui/ui":77,"./util/util":78}],65:[function(require,module,exports){
+},{"../lib/pubsub":3,"./array/array":4,"./charts/charts":15,"./color/color":64,"./component/component":65,"./config/config":66,"./console/console":68,"./csv/csv":69,"./datagen/datagen":70,"./json/json":72,"./matrix/matrix":73,"./object/object":74,"./ui/ui":84,"./util/util":85}],72:[function(require,module,exports){
 /**
  *
  * This module provides routines dealing with json data.
@@ -16216,7 +16497,7 @@ module.exports = function json(dex) {
   };
 };
 
-},{}],66:[function(require,module,exports){
+},{}],73:[function(require,module,exports){
 /**
  *
  * This module provides routines dealing with matrices.
@@ -16531,7 +16812,7 @@ module.exports = function matrix(dex) {
   };
 };
 
-},{}],67:[function(require,module,exports){
+},{}],74:[function(require,module,exports){
 /**
  *
  * This module provides routines dealing with javascript objects.
@@ -16853,7 +17134,7 @@ module.exports = function object(dex) {
 };
 
 
-},{}],68:[function(require,module,exports){
+},{}],75:[function(require,module,exports){
 /**
  *
  * This class creates and attaches a SqlQuery user interface onto the
@@ -16952,7 +17233,7 @@ var sqlquery = function (userConfig) {
 };
 
 module.exports = sqlquery;
-},{}],69:[function(require,module,exports){
+},{}],76:[function(require,module,exports){
 /**
  *
  * @constructor
@@ -17052,7 +17333,7 @@ var table = function (userConfig) {
 };
 
 module.exports = table;
-},{}],70:[function(require,module,exports){
+},{}],77:[function(require,module,exports){
 var typestable = function (userConfig) {
 
   var defaults =
@@ -17133,7 +17414,7 @@ var typestable = function (userConfig) {
 };
 
 module.exports = typestable;
-},{}],71:[function(require,module,exports){
+},{}],78:[function(require,module,exports){
 var configurationbox = function (userConfig) {
 
   var defaults =
@@ -17219,7 +17500,7 @@ var configurationbox = function (userConfig) {
 };
 
 module.exports = configurationbox;
-},{}],72:[function(require,module,exports){
+},{}],79:[function(require,module,exports){
 var player = function (userConfig) {
 
   var defaults = {
@@ -17417,7 +17698,7 @@ var player = function (userConfig) {
 };
 
 module.exports = player;
-},{}],73:[function(require,module,exports){
+},{}],80:[function(require,module,exports){
 var selectable = function (userConfig) {
 
   var defaults =
@@ -17514,7 +17795,7 @@ var selectable = function (userConfig) {
 };
 
 module.exports = selectable;
-},{}],74:[function(require,module,exports){
+},{}],81:[function(require,module,exports){
 var slider = function (userConfig) {
 
   var defaults = {
@@ -17606,7 +17887,7 @@ var slider = function (userConfig) {
 };
 
 module.exports = slider;
-},{}],75:[function(require,module,exports){
+},{}],82:[function(require,module,exports){
 var tabs = function (userConfig) {
   var defaults = {
     // The parent container of this chart.
@@ -17710,7 +17991,7 @@ var tabs = function (userConfig) {
 };
 
 module.exports = tabs;
-},{}],76:[function(require,module,exports){
+},{}],83:[function(require,module,exports){
 /**
  *
  * This module provides ui components based upon jquery-ui.
@@ -17728,7 +18009,7 @@ module.exports = function jqueryui(dex) {
     'Tabs': require("./Tabs")
   };
 };
-},{"./ConfigurationBox":71,"./Player":72,"./Selectable":73,"./Slider":74,"./Tabs":75}],77:[function(require,module,exports){
+},{"./ConfigurationBox":78,"./Player":79,"./Selectable":80,"./Slider":81,"./Tabs":82}],84:[function(require,module,exports){
 /**
  *
  * This module provides ui components from a variety of sources.
@@ -17754,7 +18035,7 @@ module.exports = function ui(dex) {
     'TypesTable': require("./TypesTable")
   };
 };
-},{"./SqlQuery":68,"./Table":69,"./TypesTable":70,"./jqueryui/jqueryui":76}],78:[function(require,module,exports){
+},{"./SqlQuery":75,"./Table":76,"./TypesTable":77,"./jqueryui/jqueryui":83}],85:[function(require,module,exports){
 /**
  *
  * This module provides utility routines.
@@ -17827,5 +18108,5 @@ module.exports = function util(dex) {
     }
   };
 };
-},{}]},{},[64])(64)
+},{}]},{},[71])(71)
 });

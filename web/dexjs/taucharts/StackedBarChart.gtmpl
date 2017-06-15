@@ -30,7 +30,7 @@
   println dexData.toCsvString();
 %>
 
-var scatterplot = dex.charts.taucharts.ScatterPlot({
+var scatterplot = dex.charts.taucharts.StackedBarChart({
   parent : "#ChartArea",
   csv : csv
 });
