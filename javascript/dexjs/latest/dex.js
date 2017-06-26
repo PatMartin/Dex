@@ -8317,6 +8317,7 @@ var echart = function (userConfig) {
         singleAxis: {
           max: 'dataMax',
           min: 'dataMin',
+          bottom: "10%",
           axisPointer: {
             animation: true,
             label: {
@@ -8357,13 +8358,15 @@ var echart = function (userConfig) {
 
       options.dataZoom = [
         {
-          handleSize: '100%',
-          filterMode: 'empty',
-          singleAxisIndex: dex.range(0, dex.csv.uniqueArray(seriesData, 0).length)
+          show: true,
+          realtime: true,
+          start: 0,
+          end: 100,
+          singleAxisIndex: 0
         }
       ];
 
-      dex.console.log("LEGEND", options.legend, "SERIES-DATA", seriesData);
+      //dex.console.log("LEGEND", options.legend, "SERIES-DATA", seriesData);
 
       var series = dex.config.expandAndOverlay(chart.config.series, {
         type: 'themeRiver',
@@ -8667,7 +8670,7 @@ var echart = function (userConfig) {
       categories.forEach(function (cat) {
         baseData.push(seqMap[sequences[0]][cat]);
       });
-      dex.console.log("BASE-DATA", baseData);
+      //dex.console.log("BASE-DATA", baseData);
 
       var options = {
         "baseOption": {
