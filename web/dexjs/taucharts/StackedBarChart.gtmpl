@@ -1,66 +1,18 @@
-<!DOCTYPE html>
-<meta charset="utf-8">
-<style>
-  html,body,#ChartArea{
-    height : 100%;
-    min-height : 100%;
-    width : 100%;
-    min-width : 100%;
-  }
-  
 <%
-  println new File("javascript/jqueryui/latest/jquery-ui.min.css").text
-  println new File("javascript/jqueryui/latest/jquery-ui.theme.min.css").text
-  println new File("javascript/taucharts/latest/tauCharts.min.css").text
+import static com.dexvis.util.GroovyUtil.renderTemplate as render;
+
+println render("web/include/dexjs.inc", [
+      "state"         : state,
+      "dexData"       : dexData,
+      "data"          : data,
+      "header"        : header,
+      "basedir"       : basedir,
+      "context"       : [
+        "title"       : "dex.js : TauCharts Stacked Bar Chart",
+        "chart"       : "dex.charts.taucharts.StackedBarChart",
+        "type"        : "stackedbarchart",
+        "styles"      : [ "javascript/taucharts/latest/tauCharts.min.css" ],
+        "postscripts" : [ "javascript/taucharts/latest/tauCharts.min.js" ]
+      ]
+    ])
 %>
-</style>
-<html>
-  <head>
-    <title>dex.js : TauCharts ScatterPlot</title>
-  </head>
-  <body>
-  <div id="ChartArea"></div>
-<script>
-<%
-  println new File("javascript/jquery/latest/jquery-2.1.3.min.js").text
-  println new File("javascript/jqueryui/latest/jquery-ui.min.js").text
-  println new File("javascript/underscore/latest/underscore-min.js").text
-  println new File("javascript/dexjs/latest/dex.min.js").text
-  println new File("javascript/taucharts/latest/tauCharts.min.js").text
-  println dexData.toCsvString();
-%>
-
-var scatterplot = dex.charts.taucharts.StackedBarChart({
-  parent : "#ChartArea",
-  csv : csv
-});
-
-scatterplot.load();
-scatterplot.render();
-
-function setValues(values)
-{
-  values.forEach(function(config) {
-    switch (config.chartName) {
-      case "scatterplot":
-      {
-        scatterplot.attr(config.key, config.value);
-        break;
-      }
-    }
-  });
-  scatterplot.render();
-  scatterplot.save();
-}
-
-function getGuiDefinition()
-{
-  var guiDef = {
-    'scatterplot': scatterplot.getGuiDefinition()
-  };
-
-  return JSON.stringify(guiDef);
-}
-</script>
-</body>
-</html>

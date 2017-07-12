@@ -4,9 +4,9 @@
     <title>Grid</title>
 <style>
 <%
-   println new File("javascript/jqueryui/latest/jquery-ui.min.css").text
-   println new File("javascript/jqueryui/latest/jquery-ui.structure.min.css").text
-   println new File("javascript/jqueryui/latest/jquery-ui.theme.css").text
+   println new File("javascript/jquery-ui/latest/jquery-ui.min.css").text
+   println new File("javascript/jquery-ui/latest/jquery-ui.structure.min.css").text
+   println new File("javascript/jquery-ui/latest/jquery-ui.theme.css").text
    println new File("javascript/jqGrid/latest/css/ui.jqgrid.css").text
    println new File("javascript/jqGrid/latest/plugins/searchFilter.css").text
    println new File("javascript/jqGrid/latest/src/css/ui.multiselect.css").text
@@ -14,9 +14,9 @@
 </style>
 <script>
 <%
-  println new File("javascript/jquery/latest/jquery-2.1.3.min.js").text
-  println new File("javascript/jqueryui/latest/jquery-ui.min.js").text
-//  println new File("javascript/jqueryui/latest/themes/latest/jquery.themes.min.js").text
+  println new File("javascript/jquery/latest/jquery.min.js").text
+  println new File("javascript/jquery-ui/latest/jquery-ui.min.js").text
+//  println new File("javascript/jquery-ui/latest/themes/latest/jquery.themes.min.js").text
 
   println new File("javascript/jqGrid/latest/plugins/ui.multiselect.js").text
   println new File("javascript/jqGrid/latest/js/i18n/grid.locale-en.js").text

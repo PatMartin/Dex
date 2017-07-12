@@ -1,69 +1,17 @@
-<!DOCTYPE html>
-<meta charset="utf-8">
-<style>
-  html,body,#ChartArea{
-    height : 100%;
-    min-height : 100%;
-    width : 100%;
-    min-width : 100%;
-  }
-  
 <%
-  println new File("javascript/jqueryui/latest/jquery-ui.min.css").text
-  println new File("javascript/jqueryui/latest/jquery-ui.theme.min.css").text
+import static com.dexvis.util.GroovyUtil.renderTemplate as render;
+
+println render("web/include/dexjs.inc", [
+      "state"     : state,
+      "dexData"   : dexData,
+      "data"      : data,
+      "header"    : header,
+      "basedir"   : basedir,
+      "context"   : [
+        "title"   : "dex.js : ECharts Network",
+        "chart"   : "dex.charts.echarts.Network",
+        "type"    : "echartsnetwork",
+        "scripts" : [ "javascript/echarts/latest/echarts.min.js" ]
+      ]
+    ])
 %>
-</style>
-<html>
-  <head>
-    <title>dex.js : ECharts Network</title>
-  </head>
-  <body>
-  <div id="ChartArea"></div>
-<script>
-<%
-  println new File("javascript/three/latest/three.min.js").text
-  println new File("javascript/jquery/latest/jquery-2.1.3.min.js").text
-  println new File("javascript/jqueryui/latest/jquery-ui.min.js").text
-  println new File("javascript/underscore/latest/underscore-min.js").text
-  println new File("javascript/echarts/latest/echarts.min.js").text
-  println new File("javascript/dexjs/latest/dex.min.js").text
-
-  println dexData.toCsvString();
-%>
-
-
-var network = dex.charts.echarts.Network({
-  parent: '#ChartArea',
-  categories: function(csv, ri, ci) { return csv.data[ri][0]; },
-  csv: csv
-});
-
-network.load();
-network.render();
-
-function setValues(values)
-{
-  values.forEach(function(config) {
-    switch (config.chartName) {
-      case "network":
-      {
-        network.attr(config.key, config.value);
-        break;
-      }
-    }
-  });
-  network.update();
-  network.save();
-}
-
-function getGuiDefinition()
-{
-  var guiDef = {
-    'network': network.getGuiDefinition()
-  };
-
-  return JSON.stringify(guiDef);
-}
-</script>
-</body>
-</html>

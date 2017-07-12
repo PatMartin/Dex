@@ -1,64 +1,18 @@
-<!DOCTYPE html>
-<meta charset="utf-8">
-<style>
-  html,body, #ChartArea{
-    height :100%;
-    min-height: 100%;
-    width : 100%;
-    min-width : 100%;
-  }
-</style>
-<html>
-  <head>
-    <title>dex.js : Network</title>
-  </head>
-<style>
-  println new File("javascript/vis/latest/vis.css").text
-</style>
-  <body>
-  <div id="ChartArea"></div>
-<script>
 <%
-  println new File("javascript/jquery/latest/jquery-2.1.3.min.js").text
-  println new File("javascript/jqueryui/latest/jquery-ui.min.js").text
-  println new File("javascript/underscore/latest/underscore-min.js").text
-  println new File("javascript/dexjs/latest/dex.js").text
-  println new File("javascript/vis/latest/vis.js").text
+import static com.dexvis.util.GroovyUtil.renderTemplate as render;
 
-  println dexData.toCsvString();
+println render("web/include/dexjs.inc", [
+      "state"     : state,
+      "dexData"   : dexData,
+      "data"      : data,
+      "header"    : header,
+      "basedir"   : basedir,
+      "context"   : [
+        "title"   : "dex.js : Vis.js Network",
+        "chart"   : "dex.charts.vis.Network",
+        "type"    : "visjsnetwork",
+        "styles"  : [ "javascript/vis/latest/vis.css" ],
+        "scripts" : [ "javascript/vis/latest/vis.js" ]
+      ]
+    ])
 %>
-
-var network = dex.charts.vis.Network({
-  'parent' : "#ChartArea",
-  'csv'    : csv
-});
-
-network.load();
-network.render();
-
-function setValues(values)
-{
-  values.forEach(function(config) {
-    switch (config.chartName) {
-      case "network":
-      {
-        network.attr(config.key, config.value);
-        break;
-      }
-    }
-  });
-  network.update();
-  network.save();
-}
-
-function getGuiDefinition()
-{
-  var guiDef = {
-    'network': network.getGuiDefinition()
-  };
-
-  return JSON.stringify(guiDef);
-}
-</script>
-</body>
-</html>

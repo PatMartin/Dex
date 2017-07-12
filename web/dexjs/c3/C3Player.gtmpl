@@ -9,8 +9,8 @@
   <style>
 <%
   println new File("javascript/c3/latest/c3.min.css").text
-  //println new File("javascript/jqueryui/latest/jquery-ui.min.css").text
-  //println new File("javascript/jqueryui/latest/jquery-ui.theme.min.css").text
+  //println new File("javascript/jquery-ui/latest/jquery-ui.min.css").text
+  //println new File("javascript/jquery-ui/latest/jquery-ui.theme.min.css").text
 %>
     #toolbar {
       padding: 4px;

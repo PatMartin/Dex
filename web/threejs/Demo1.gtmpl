@@ -27,7 +27,7 @@
 </script>
 
 <script>
-<% println new File("javascript/jquery/latest/jquery-2.1.3.min.js").text %>
+<% println new File("javascript/jquery/latest/jquery.min.js").text %>
 </script>
 <!--	 src="js/Three.js"-->
 

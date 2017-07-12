@@ -4,15 +4,15 @@
 <style>
 <%
    def theme = "flick"
-   println new File("javascript/jqueryui/latest/themes/$theme/jquery-ui.css").text
-   println new File("javascript/jqueryui/latest/themes/$theme/jquery.ui.theme.css").text
+   println new File("javascript/jquery-ui/latest/themes/$theme/jquery-ui.css").text
+   println new File("javascript/jquery-ui/latest/themes/$theme/jquery.ui.theme.css").text
    println new File("javascript/jqGrid/latest/css/ui.jqgrid.css").text
 %>
 </style>
 <script>
 <%
-  println new File("javascript/jqueryui/latest/jquery.1.9.1.min.js").text
-  println new File("javascript/jqueryui/latest/ui/minified/jquery-ui.min.js").text
+  println new File("javascript/jquery-ui/latest/jquery.1.9.1.min.js").text
+  println new File("javascript/jquery-ui/latest/ui/minified/jquery-ui.min.js").text
   println new File("javascript/jqGrid/latest/plugins/ui.multiselect.js").text
   println new File("javascript/jqGrid/latest/js/i18n/grid.locale-en.js").text
   //println new File("javascript/jqGrid/latest/plugins/jquery.contextmenu.js").text

@@ -1,70 +1,16 @@
-<!DOCTYPE html>
-<meta charset="utf-8">
-<style>
-  html,body,#ChartArea{
-    height : 100%;
-    min-height : 100%;
-    width : 100%;
-    min-width : 100%;
-  }
-
 <%
-  println new File("javascript/jqueryui/latest/jquery-ui.min.css").text
-  println new File("javascript/jqueryui/latest/jquery-ui.theme.min.css").text
+import static com.dexvis.util.GroovyUtil.renderTemplate as render;
+
+println render("web/include/dexjs.inc", [
+      "state"   : state,
+      "dexData" : dexData,
+      "data"    : data,
+      "header"  : header,
+      "basedir" : basedir,
+      "context" : [
+        "title" : "dex.js : Parallel Coordinates",
+        "chart" : "dex.charts.d3.ParallelCoordinates",
+        "type"  : "chord"
+      ]
+    ])
 %>
-
-
-</style>
-<html>
-  <head>
-<script>
-<%
-  println new File("javascript/jquery/latest/jquery-2.1.3.min.js").text
-  println new File("javascript/jqueryui/latest/jquery-ui.min.js").text
-  println new File("javascript/underscore/latest/underscore-min.js").text
-  println new File("javascript/dexjs/latest/dex.js").text
-%>
-</script>
-<title>DexCharts : Parallel Coordinates</title>
-  </head>
-  <body>
-  <div id="config" style="visibility: hidden"></div>
-  <div id="ChartArea"></div>
-<script>
-
-<%
-  println dexData.toCsvString()
-%>
-
-var chart = dex.charts.d3.ParallelCoordinates({
-  parent : "#ChartArea",
-  csv : csv
-});
-
-chart.load();
-chart.render();
-
-function setValue(chartName, key, value)
-{
-  switch (chartName) {
-    case "pc":
-    {
-      chart.attr(key, value).update();
-      chart.save();
-      break;
-    }
-  }
-}
-
-function getGuiDefinition()
-{
-  var guiDef = {
-    'pc': chart.getGuiDefinition()
-  };
-
-  return JSON.stringify(guiDef);
-}
-
-</script>
-</body>
-</html>

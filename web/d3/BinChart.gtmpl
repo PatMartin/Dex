@@ -13,14 +13,14 @@ println new File("javascript/d3/latest/lib/colorbrewer/colorbrewer.js").text
 </script>
 
 <style>
-<% println new File("javascript/jqueryui/latest/jquery-ui.min.css").text %>
+<% println new File("javascript/jquery-ui/latest/jquery-ui.min.css").text %>
 <% println new File("web/d3/d3.css").text %>
 </style>
 
 <script>
 <%
 println new File("javascript/jquery/latest/jquery-2.1.3.js").text
-println new File("javascript/jqueryui/latest/jquery-ui.min.js").text
+println new File("javascript/jquery-ui/latest/jquery-ui.min.js").text
 println new File("javascript/dex/dexutils.js").text
 %>
 </script>
