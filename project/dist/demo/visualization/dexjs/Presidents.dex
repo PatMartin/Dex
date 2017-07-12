@@ -34,7 +34,7 @@
 &lt;/com.dexvis.simple.types.SimpleListSelectionView&gt;</columnList>
          </task>
       </task-item>
-      <task-item name="Chord" active="false">
+      <task-item name="Chord" active="true">
          <task class="com.dexvis.dex.task.vis.dexjs.Chord">
             <config-def>[ { &quot;type&quot; : &quot;label&quot;, &quot;initialValue&quot;: &quot;No configuration is available&quot; } ]</config-def>
          </task>
@@ -59,7 +59,7 @@
             <config-def>[ { &quot;type&quot; : &quot;label&quot;, &quot;initialValue&quot;: &quot;No configuration is available&quot; } ]</config-def>
          </task>
       </task-item>
-      <task-item name="Par Coord -&gt; Chord" active="true">
+      <task-item name="Par Coord -&gt; Chord" active="false">
          <task class="com.dexvis.dex.task.vis.dexjs.ParCoor2Chord">
             <config-def>[ { &quot;type&quot; : &quot;label&quot;, &quot;initialValue&quot;: &quot;No configuration is available&quot; } ]</config-def>
          </task>

@@ -2,7 +2,7 @@
    <tasks class="java.util.ArrayList">
       <task-item name="Groovy Script" active="true">
          <task class="com.dexvis.dex.task.prg.GroovyScript">
-            
+            <config-def>[ { &quot;type&quot; : &quot;label&quot;, &quot;initialValue&quot;: &quot;No configuration is available&quot; } ]</config-def>
             <processbytable>&lt;map&gt;
   &lt;entry&gt;
     &lt;string&gt;text&lt;/string&gt;
@@ -25,25 +25,25 @@
     &lt;string&gt;Column&lt;/string&gt;
   &lt;/entry&gt;
 &lt;/map&gt;</processbycolumn>
-            <groovyCode class="javafx.beans.property.SimpleStringProperty">header = [ &quot;angle&quot; ]
-data = [ [&quot;sin&quot;], [&quot;cos&quot;]]
+            <groovyCode class="javafx.beans.property.SimpleStringProperty">header = [ &quot;equation&quot;, &quot;angle&quot;, &quot;value&quot; ]
+data = [ ]
 
 (-360).step(361, 15) {
   angle -&gt;
-  header &lt;&lt; angle;
   def radians = angle * (Math.PI / 180);
-  data[0] &lt;&lt; Math.sin(radians)
-  data[1] &lt;&lt; Math.cos(radians)
+  data &lt;&lt; [ &quot;sin&quot;, angle, Math.sin(radians) ]
+  data &lt;&lt; [ &quot;cos&quot;, angle, Math.cos(radians) ]
 }</groovyCode>
          </task>
       </task-item>
       <task-item name="View Data" active="true">
          <task class="com.dexvis.dex.task.utilities.ViewData">
-            
+            <config-def>[ { &quot;type&quot; : &quot;label&quot;, &quot;initialValue&quot;: &quot;No configuration is available&quot; } ]</config-def>
          </task>
       </task-item>
       <task-item name="Radar Chart" active="true">
          <task class="com.dexvis.dex.task.vis.dexjs.RadarChart">
+            <config-def>[ { &quot;type&quot; : &quot;label&quot;, &quot;initialValue&quot;: &quot;No configuration is available&quot; } ]</config-def>
          </task>
       </task-item>
    </tasks>
