@@ -342,6 +342,7 @@ public class JsonGuiPane extends MigPane
         FXCollections.observableArrayList(new ArrayList(choiceMap.keySet())));
     cb.getSelectionModel().select(getValue(spec, "initialValue", ""));
     pane.add(cb, "grow,span");
+
     cb.setOnAction(action -> {
       //System.out
       //    .println("Choicebox Fire Event: "
