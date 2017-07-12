@@ -1,5 +1,9 @@
 package com.dexvis.util
 
+import groovy.text.SimpleTemplateEngine
+
+import org.apache.commons.io.FileUtils
+
 class GroovyUtil
 {
   public static String removeAllChars(String str, String pattern, String replaceStr)
@@ -35,6 +39,17 @@ class GroovyUtil
     return map
   }
 
+  public static String renderTemplate(String templatePath, Map state)
+  {
+    def templateCode = FileUtils.readFileToString(new File(templatePath))
+  
+    //println "Template Code: '$templateCode'"
+  
+    def engine = new SimpleTemplateEngine()
+    def template = engine.createTemplate(templateCode).make(state)
+    return template.toString()
+  }
+  
   public static void main(String[] args)
   {
     def list = [ [ "A" ], [ "B" ]]
