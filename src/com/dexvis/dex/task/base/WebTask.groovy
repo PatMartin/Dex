@@ -7,12 +7,10 @@ import javafx.beans.value.ObservableValue
 import javafx.concurrent.Worker
 import javafx.concurrent.Worker.State
 import javafx.event.ActionEvent
-import javafx.event.EventHandler
 import javafx.scene.Node
 import javafx.scene.input.KeyCode
 import javafx.scene.input.KeyEvent
 import javafx.scene.web.WebEngine
-import javafx.scene.web.WebEvent
 import javafx.scene.web.WebView
 
 import javax.xml.transform.OutputKeys
@@ -89,13 +87,6 @@ class WebTask extends DexTask {
     wv.prefHeight(600);
     
     this.templatePath = templatePath
-    we.setOnAlert(new EventHandler<WebEvent<String>>()
-        {
-          public void handle(WebEvent<String> event)
-          {
-            System.out.println(event.getData());
-          }
-        });
   }
   
   public DexTaskState execute(DexTaskState state) throws DexException
@@ -248,7 +239,7 @@ class WebTask extends DexTask {
     
     timer.scheduleAtFixedRate(task, 0, 1000)
     
-    configGui.addEventHandler(     
+    configGui.addEventHandler(
         JsonGuiEvent.CHANGE_EVENT, { event ->
           eventStack.add(event) });
     
@@ -329,17 +320,17 @@ class WebTask extends DexTask {
       
       if (saveFile != null)
       {
-        if (saveDynamic)
-        {
-          //FileUtils.writeStringToFile(saveFile, toString(we.getDocument()))
-          String html = (String) we.executeScript("document.documentElement.outerHTML");
-          //println html
-          FileUtils.writeStringToFile(saveFile, html)
-        }
-        else
-        {
-          FileUtils.writeStringToFile(saveFile, output)
-        }
+        // Replace output config with dexjs-config
+        we.executeScript("save();");
+        String config = we.executeScript(
+            "(document.getElementById('dexjs-config')" +
+            "=== undefined) ? '' : " +
+            "document.getElementById('dexjs-config').outerHTML;");
+        String saveOutput = output.replace("<body>", "<body>\n" + config);
+        
+        println "CONFIG: '${config}'";
+        // Write last template output.
+        FileUtils.writeStringToFile(saveFile, saveOutput)
       }
     }
     catch(Exception ex)
