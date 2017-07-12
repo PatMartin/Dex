@@ -22,7 +22,7 @@
 // You are one of those who like to know how things work inside?
 // Let me show you the cogs that make impress.js run...
 (function ( document, window ) {
-    'use strict';
+    
     
     // HELPER FUNCTIONS
     
@@ -654,7 +654,7 @@
 // In future I think about moving it to make them optional, move to separate files
 // and treat more like a 'plugins'.
 (function ( document, window ) {
-    'use strict';
+    
     
     // throttling function calls, by Remy Sharp
     // http://remysharp.com/2010/07/21/throttling-function-calls/

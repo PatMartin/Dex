@@ -105,7 +105,7 @@ amdclean['constants'] = function (require) {
   };
 }({});
 amdclean['core'] = function (require, shim, constants) {
-  'use strict';
+  
   var constants = constants;
   var p5 = function (sketch, node, sync) {
     if (arguments.length === 2 && typeof node === 'boolean') {
@@ -963,7 +963,7 @@ amdclean['p5Graphics'] = function (require, core, constants) {
   return p5.Graphics;
 }({}, amdclean['core'], amdclean['constants']);
 amdclean['filters'] = function (require) {
-  'use strict';
+  
   var Filters = {};
   Filters._toPixels = function (canvas) {
     if (canvas instanceof ImageData) {
@@ -1313,7 +1313,7 @@ amdclean['filters'] = function (require) {
   return Filters;
 }({});
 amdclean['p5Image'] = function (require, core, filters) {
-  'use strict';
+  
   var p5 = core;
   var Filters = filters;
   p5.Image = function (width, height) {
@@ -1440,7 +1440,7 @@ amdclean['polargeometry'] = function (require) {
   };
 }({});
 amdclean['p5Vector'] = function (require, core, polargeometry, constants) {
-  'use strict';
+  
   var p5 = core;
   var polarGeometry = polargeometry;
   var constants = constants;
@@ -1754,7 +1754,7 @@ amdclean['p5Vector'] = function (require, core, polargeometry, constants) {
   return p5.Vector;
 }({}, amdclean['core'], amdclean['polargeometry'], amdclean['constants']);
 amdclean['p5TableRow'] = function (require, core) {
-  'use strict';
+  
   var p5 = core;
   p5.TableRow = function (str, separator) {
     var arr = [];
@@ -1828,7 +1828,7 @@ amdclean['p5TableRow'] = function (require, core) {
   return p5.TableRow;
 }({}, amdclean['core']);
 amdclean['p5Table'] = function (require, core) {
-  'use strict';
+  
   var p5 = core;
   p5.Table = function (rows) {
     this.columns = [];
@@ -2054,7 +2054,7 @@ amdclean['p5Table'] = function (require, core) {
   return p5.Table;
 }({}, amdclean['core']);
 amdclean['colorcreating_reading'] = function (require, core, p5Color) {
-  'use strict';
+  
   var p5 = core;
   p5.prototype.alpha = function (c) {
     if (c instanceof p5.Color || c instanceof Array) {
@@ -2132,7 +2132,7 @@ amdclean['colorcreating_reading'] = function (require, core, p5Color) {
   return p5;
 }({}, amdclean['core'], amdclean['p5Color']);
 amdclean['colorsetting'] = function (require, core, constants, p5Color) {
-  'use strict';
+  
   var p5 = core;
   var constants = constants;
   p5.prototype._doStroke = true;
@@ -2210,7 +2210,7 @@ amdclean['colorsetting'] = function (require, core, constants, p5Color) {
   return p5;
 }({}, amdclean['core'], amdclean['constants'], amdclean['p5Color']);
 amdclean['dataconversion'] = function (require, core) {
-  'use strict';
+  
   var p5 = core;
   p5.prototype.float = function (str) {
     return parseFloat(str);
@@ -2230,7 +2230,7 @@ amdclean['dataconversion'] = function (require, core) {
   return p5;
 }({}, amdclean['core']);
 amdclean['dataarray_functions'] = function (require, core) {
-  'use strict';
+  
   var p5 = core;
   p5.prototype.append = function (array, value) {
     array.push(value);
@@ -2308,7 +2308,7 @@ amdclean['dataarray_functions'] = function (require, core) {
   return p5;
 }({}, amdclean['core']);
 amdclean['datastring_functions'] = function (require, core) {
-  'use strict';
+  
   var p5 = core;
   p5.prototype.join = function (list, separator) {
     return list.join(separator);
@@ -2429,7 +2429,7 @@ amdclean['datastring_functions'] = function (require, core) {
   return p5;
 }({}, amdclean['core']);
 amdclean['environment'] = function (require, core, constants) {
-  'use strict';
+  
   var p5 = core;
   var C = constants;
   var standardCursors = [
@@ -2573,7 +2573,7 @@ amdclean['environment'] = function (require, core, constants) {
   return p5;
 }({}, amdclean['core'], amdclean['constants']);
 amdclean['imageimage'] = function (require, core, constants) {
-  'use strict';
+  
   var p5 = core;
   var constants = constants;
   p5.prototype._imageMode = constants.CORNER;
@@ -2651,7 +2651,7 @@ amdclean['canvas'] = function (require, constants) {
   };
 }({}, amdclean['constants']);
 amdclean['imageloading_displaying'] = function (require, core, filters, canvas, constants) {
-  'use strict';
+  
   var p5 = core;
   var Filters = filters;
   var canvas = canvas;
@@ -2736,7 +2736,7 @@ amdclean['imageloading_displaying'] = function (require, core, filters, canvas, 
   return p5;
 }({}, amdclean['core'], amdclean['filters'], amdclean['canvas'], amdclean['constants']);
 amdclean['imagepixels'] = function (require, core, filters, p5Color) {
-  'use strict';
+  
   var p5 = core;
   var Filters = filters;
   p5.prototype.pixels = [];
@@ -3330,7 +3330,7 @@ amdclean['imagepixels'] = function (require, core, filters, p5Color) {
   return reqwest;
 });
 amdclean['inputfiles'] = function (require, core, reqwest) {
-  'use strict';
+  
   var p5 = core;
   var reqwest = reqwest;
   p5.prototype.createInput = function () {
@@ -3617,7 +3617,7 @@ amdclean['inputfiles'] = function (require, core, reqwest) {
   return p5;
 }({}, amdclean['core'], amdclean['reqwest']);
 amdclean['inputkeyboard'] = function (require, core) {
-  'use strict';
+  
   var p5 = core;
   var downKeys = {};
   p5.prototype.isKeyPressed = false;
@@ -3680,7 +3680,7 @@ amdclean['inputkeyboard'] = function (require, core) {
   return p5;
 }({}, amdclean['core']);
 amdclean['inputacceleration'] = function (require, core) {
-  'use strict';
+  
   var p5 = core;
   p5.prototype.deviceOrientation = undefined;
   p5.prototype.accelerationX = 0;
@@ -3757,7 +3757,7 @@ amdclean['inputacceleration'] = function (require, core) {
   return p5;
 }({}, amdclean['core']);
 amdclean['inputmouse'] = function (require, core, constants) {
-  'use strict';
+  
   var p5 = core;
   var constants = constants;
   p5.prototype.mouseX = 0;
@@ -3896,7 +3896,7 @@ amdclean['inputmouse'] = function (require, core, constants) {
   return p5;
 }({}, amdclean['core'], amdclean['constants']);
 amdclean['inputtime_date'] = function (require, core) {
-  'use strict';
+  
   var p5 = core;
   p5.prototype.day = function () {
     return new Date().getDate();
@@ -3922,7 +3922,7 @@ amdclean['inputtime_date'] = function (require, core) {
   return p5;
 }({}, amdclean['core']);
 amdclean['inputtouch'] = function (require, core) {
-  'use strict';
+  
   var p5 = core;
   p5.prototype.touchX = 0;
   p5.prototype.touchY = 0;
@@ -4018,7 +4018,7 @@ amdclean['inputtouch'] = function (require, core) {
   return p5;
 }({}, amdclean['core']);
 amdclean['mathmath'] = function (require, core) {
-  'use strict';
+  
   var p5 = core;
   p5.prototype.createVector = function (x, y, z) {
     if (this instanceof p5) {
@@ -4030,7 +4030,7 @@ amdclean['mathmath'] = function (require, core) {
   return p5;
 }({}, amdclean['core']);
 amdclean['mathcalculation'] = function (require, core) {
-  'use strict';
+  
   var p5 = core;
   p5.prototype.abs = Math.abs;
   p5.prototype.ceil = Math.ceil;
@@ -4078,7 +4078,7 @@ amdclean['mathcalculation'] = function (require, core) {
   return p5;
 }({}, amdclean['core']);
 amdclean['mathrandom'] = function (require, core) {
-  'use strict';
+  
   var p5 = core;
   var seeded = false;
   var lcg = function () {
@@ -4145,7 +4145,7 @@ amdclean['mathrandom'] = function (require, core) {
   return p5;
 }({}, amdclean['core']);
 amdclean['mathnoise'] = function (require, core) {
-  'use strict';
+  
   var p5 = core;
   var PERLIN_YWRAPB = 4;
   var PERLIN_YWRAP = 1 << PERLIN_YWRAPB;
@@ -4267,7 +4267,7 @@ amdclean['mathnoise'] = function (require, core) {
   return p5;
 }({}, amdclean['core']);
 amdclean['mathtrigonometry'] = function (require, core, polargeometry, constants) {
-  'use strict';
+  
   var p5 = core;
   var polarGeometry = polargeometry;
   var constants = constants;
@@ -4335,7 +4335,7 @@ amdclean['mathtrigonometry'] = function (require, core, polargeometry, constants
   return p5;
 }({}, amdclean['core'], amdclean['polargeometry'], amdclean['constants']);
 amdclean['outputfiles'] = function (require, core) {
-  'use strict';
+  
   var p5 = core;
   window.URL = window.URL || window.webkitURL;
   p5.prototype._pWriters = [];
@@ -4592,7 +4592,7 @@ amdclean['outputfiles'] = function (require, core) {
   return p5;
 }({}, amdclean['core']);
 amdclean['outputimage'] = function (require, core) {
-  'use strict';
+  
   var p5 = core;
   var frames = [];
   p5.prototype.saveCanvas = function (_cnv, filename, extension) {
@@ -4707,7 +4707,7 @@ amdclean['outputimage'] = function (require, core) {
   return p5;
 }({}, amdclean['core']);
 amdclean['outputtext_area'] = function (require, core) {
-  'use strict';
+  
   var p5 = core;
   if (window.console && console.log) {
     p5.prototype.print = console.log.bind(console);
@@ -4789,7 +4789,7 @@ amdclean['renderingrendering'] = function (require, core, constants) {
   return p5;
 }({}, amdclean['core'], amdclean['constants']);
 amdclean['shape2d_primitives'] = function (require, core, canvas, constants) {
-  'use strict';
+  
   var p5 = core;
   var canvas = canvas;
   var constants = constants;
@@ -5009,7 +5009,7 @@ amdclean['shape2d_primitives'] = function (require, core, canvas, constants) {
   return p5;
 }({}, amdclean['core'], amdclean['canvas'], amdclean['constants']);
 amdclean['shapeattributes'] = function (require, core, constants) {
-  'use strict';
+  
   var p5 = core;
   var constants = constants;
   p5.prototype._rectMode = constants.CORNER;
@@ -5059,7 +5059,7 @@ amdclean['shapeattributes'] = function (require, core, constants) {
   return p5;
 }({}, amdclean['core'], amdclean['constants']);
 amdclean['shapecurves'] = function (require, core) {
-  'use strict';
+  
   var p5 = core;
   var bezierDetail = 20;
   var curveDetail = 20;
@@ -5121,7 +5121,7 @@ amdclean['shapecurves'] = function (require, core) {
   return p5;
 }({}, amdclean['core']);
 amdclean['shapevertex'] = function (require, core, constants) {
-  'use strict';
+  
   var p5 = core;
   var constants = constants;
   var shapeKind = null;
@@ -5466,7 +5466,7 @@ amdclean['shapevertex'] = function (require, core, constants) {
   return p5;
 }({}, amdclean['core'], amdclean['constants']);
 amdclean['structure'] = function (require, core) {
-  'use strict';
+  
   var p5 = core;
   p5.prototype.exit = function () {
     throw 'exit() not implemented, see remove()';
@@ -5542,7 +5542,7 @@ amdclean['structure'] = function (require, core) {
   return p5;
 }({}, amdclean['core']);
 amdclean['transform'] = function (require, core, constants, outputtext_area) {
-  'use strict';
+  
   var p5 = core;
   var constants = constants;
   p5.prototype.applyMatrix = function (n00, n01, n02, n10, n11, n12) {
@@ -5607,7 +5607,7 @@ amdclean['transform'] = function (require, core, constants, outputtext_area) {
   return p5;
 }({}, amdclean['core'], amdclean['constants'], amdclean['outputtext_area']);
 amdclean['typographyattributes'] = function (require, core, constants) {
-  'use strict';
+  
   var p5 = core;
   var constants = constants;
   p5.prototype._textLeading = 15;
@@ -5706,7 +5706,7 @@ amdclean['typographyattributes'] = function (require, core, constants) {
   return p5;
 }({}, amdclean['core'], amdclean['constants']);
 amdclean['typographyloading_displaying'] = function (require, core) {
-  'use strict';
+  
   var p5 = core;
   p5.prototype.text = function (str, x, y, maxWidth, maxHeight) {
     if (typeof str !== 'string') {
@@ -5756,7 +5756,7 @@ amdclean['typographyloading_displaying'] = function (require, core) {
   return p5;
 }({}, amdclean['core']);
 amdclean['src_app'] = function (require, core, p5Color, p5Element, p5Graphics, p5Image, p5File, p5Vector, p5TableRow, p5Table, colorcreating_reading, colorsetting, constants, dataconversion, dataarray_functions, datastring_functions, environment, imageimage, imageloading_displaying, imagepixels, inputfiles, inputkeyboard, inputacceleration, inputmouse, inputtime_date, inputtouch, mathmath, mathcalculation, mathrandom, mathnoise, mathtrigonometry, outputfiles, outputimage, outputtext_area, renderingrendering, shape2d_primitives, shapeattributes, shapecurves, shapevertex, structure, transform, typographyattributes, typographyloading_displaying) {
-  'use strict';
+  
   var p5 = core;
   var _globalInit = function () {
     if (!window.PHANTOMJS && !window.mocha) {

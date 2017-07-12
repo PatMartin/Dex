@@ -188,7 +188,7 @@ nv.dom.read = function(callback) {
  It also has 'pointXValue', which is the conversion of mouseX to the x-axis scale.
  */
 nv.interactiveGuideline = function() {
-    "use strict";
+    
 
     var margin = { left: 0, top: 0 } //Pass the chart's top and left magins. Used to calculate the mouseX/Y.
         ,   width = null
@@ -448,7 +448,7 @@ nv.interactiveGuideline = function() {
  * Won't work if there are duplicate x coordinate values.
  */
 nv.interactiveBisect = function (values, searchVal, xAccessor) {
-    "use strict";
+    
     if (! (values instanceof Array)) {
         return null;
     }
@@ -505,7 +505,7 @@ nv.interactiveBisect = function (values, searchVal, xAccessor) {
  Otherwise, returns null.
  */
 nv.nearestValueIndex = function (values, searchVal, threshold) {
-    "use strict";
+    
     var yDistMax = Infinity, indexToHighlight = null;
     values.forEach(function(d,i) {
         var delta = Math.abs(searchVal - d);
@@ -525,7 +525,7 @@ nv.nearestValueIndex = function (values, searchVal, threshold) {
  tip();    //just invoke the returned function to render tooltip.
  */
 nv.models.tooltip = function() {
-    "use strict";
+    
 
     /*
     Tooltip data. If data is given in the proper format, a consistent tooltip is generated.
@@ -1585,7 +1585,7 @@ nv.utils.arrayEquals = function (array1, array2) {
     return true;
 };
 nv.models.axis = function() {
-    "use strict";
+    
 
     //============================================================
     // Public Variables with Default Settings
@@ -1977,7 +1977,7 @@ nv.models.axis = function() {
     return chart;
 };
 nv.models.boxPlot = function() {
-    "use strict";
+    
 
     //============================================================
     // Public Variables with Default Settings
@@ -2302,7 +2302,7 @@ nv.models.boxPlot = function() {
     return chart;
 };
 nv.models.boxPlotChart = function() {
-    "use strict";
+    
 
     //============================================================
     // Public Variables with Default Settings
@@ -2539,7 +2539,7 @@ nv.models.boxPlotChart = function() {
 // http://projects.instantcognition.com/protovis/bulletchart/
 
 nv.models.bullet = function() {
-    "use strict";
+    
 
     //============================================================
     // Public Variables with Default Settings
@@ -2850,7 +2850,7 @@ nv.models.bullet = function() {
 // based on the work of Clint Ivy, Jamie Love, and Jason Davies.
 // http://projects.instantcognition.com/protovis/bulletchart/
 nv.models.bulletChart = function() {
-    "use strict";
+    
 
     //============================================================
     // Public Variables with Default Settings
@@ -3063,7 +3063,7 @@ nv.models.bulletChart = function() {
 
 
 nv.models.candlestickBar = function() {
-    "use strict";
+    
 
     //============================================================
     // Public Variables with Default Settings
@@ -3289,7 +3289,7 @@ nv.models.candlestickBar = function() {
 };
 
 nv.models.cumulativeLineChart = function() {
-    "use strict";
+    
 
     //============================================================
     // Public Variables with Default Settings
@@ -3943,7 +3943,7 @@ nv.models.cumulativeLineChart = function() {
 };
 //TODO: consider deprecating by adding necessary features to multiBar model
 nv.models.discreteBar = function() {
-    "use strict";
+    
 
     //============================================================
     // Public Variables with Default Settings
@@ -4197,7 +4197,7 @@ nv.models.discreteBar = function() {
 };
 
 nv.models.discreteBarChart = function() {
-    "use strict";
+    
 
     //============================================================
     // Public Variables with Default Settings
@@ -4480,7 +4480,7 @@ nv.models.discreteBarChart = function() {
 }
 
 nv.models.distribution = function() {
-    "use strict";
+    
     //============================================================
     // Public Variables with Default Settings
     //------------------------------------------------------------
@@ -4639,7 +4639,7 @@ nv.models.distribution = function() {
     return chart;
 }
 nv.models.focus = function(content) {
-    "use strict";
+    
 
     //============================================================
     // Public Variables with Default Settings
@@ -4933,7 +4933,7 @@ nv.models.focus = function(content) {
     return chart;
 };
 nv.models.forceDirectedGraph = function() {
-    "use strict";
+    
 
     //============================================================
     // Public Variables with Default Settings
@@ -5122,7 +5122,7 @@ nv.models.forceDirectedGraph = function() {
     return chart;
 };
 nv.models.furiousLegend = function() {
-    "use strict";
+    
 
     //============================================================
     // Public Variables with Default Settings
@@ -5472,7 +5472,7 @@ nv.models.furiousLegend = function() {
 };
 //TODO: consider deprecating and using multibar with single series for this
 nv.models.historicalBar = function() {
-    "use strict";
+    
 
     //============================================================
     // Public Variables with Default Settings
@@ -5706,7 +5706,7 @@ nv.models.historicalBar = function() {
 };
 
 nv.models.historicalBarChart = function(bar_model) {
-    "use strict";
+    
 
     //============================================================
     // Public Variables with Default Settings
@@ -6109,7 +6109,7 @@ nv.models.candlestickBarChart = function() {
     return chart;
 };
 nv.models.legend = function() {
-    "use strict";
+    
 
     //============================================================
     // Public Variables with Default Settings
@@ -6494,7 +6494,7 @@ nv.models.legend = function() {
 };
 
 nv.models.line = function() {
-    "use strict";
+    
     //============================================================
     // Public Variables with Default Settings
     //------------------------------------------------------------
@@ -6722,7 +6722,7 @@ nv.models.line = function() {
     return chart;
 };
 nv.models.lineChart = function() {
-    "use strict";
+    
 
     //============================================================
     // Public Variables with Default Settings
@@ -7275,7 +7275,7 @@ nv.models.lineWithFocusChart = function() {
     .focusEnable( true );
 };
 nv.models.linePlusBarChart = function() {
-    "use strict";
+    
 
     //============================================================
     // Public Variables with Default Settings
@@ -7945,7 +7945,7 @@ nv.models.linePlusBarChart = function() {
 };
 
 nv.models.multiBar = function() {
-    "use strict";
+    
 
     //============================================================
     // Public Variables with Default Settings
@@ -8374,7 +8374,7 @@ nv.models.multiBar = function() {
     return chart;
 };
 nv.models.multiBarChart = function() {
-    "use strict";
+    
 
     //============================================================
     // Public Variables with Default Settings
@@ -8887,7 +8887,7 @@ nv.models.multiBarChart = function() {
 };
 
 nv.models.multiBarHorizontal = function() {
-    "use strict";
+    
 
     //============================================================
     // Public Variables with Default Settings
@@ -9249,7 +9249,7 @@ nv.models.multiBarHorizontal = function() {
 };
 
 nv.models.multiBarHorizontalChart = function() {
-    "use strict";
+    
 
     //============================================================
     // Public Variables with Default Settings
@@ -9627,7 +9627,7 @@ nv.models.multiBarHorizontalChart = function() {
     return chart;
 };
 nv.models.multiChart = function() {
-    "use strict";
+    
 
     //============================================================
     // Public Variables with Default Settings
@@ -10226,7 +10226,7 @@ nv.models.multiChart = function() {
 };
 
 nv.models.ohlcBar = function() {
-    "use strict";
+    
 
     //============================================================
     // Public Variables with Default Settings
@@ -10458,7 +10458,7 @@ nv.models.ohlcBar = function() {
 // Code adapted from Jason Davies' "Parallel Coordinates"
 // http://bl.ocks.org/jasondavies/1341281
 nv.models.parallelCoordinates = function() {
-    "use strict";
+    
 
     //============================================================
     // Public Variables with Default Settings
@@ -10947,7 +10947,7 @@ nv.models.parallelCoordinates = function() {
     return chart;
 };
 nv.models.parallelCoordinatesChart = function () {
-        "use strict";
+        
         //============================================================
         // Public Variables with Default Settings
         //------------------------------------------------------------
@@ -11247,7 +11247,7 @@ nv.models.parallelCoordinatesChart = function () {
         return chart;
     };
 nv.models.pie = function() {
-    "use strict";
+    
 
     //============================================================
     // Public Variables with Default Settings
@@ -11683,7 +11683,7 @@ nv.models.pie = function() {
     return chart;
 };
 nv.models.pieChart = function() {
-    "use strict";
+    
 
     //============================================================
     // Public Variables with Default Settings
@@ -11934,7 +11934,7 @@ nv.models.pieChart = function() {
     return chart;
 };
 nv.models.sankey = function() {
-    'use strict';
+    
 
     // Sources:
     // - https://bost.ocks.org/mike/sankey/
@@ -12261,7 +12261,7 @@ nv.models.sankey = function() {
     return sankey;
 };
 nv.models.sankeyChart = function() {
-    "use strict";
+    
 
     // Sources:
     // - https://bost.ocks.org/mike/sankey/
@@ -12497,7 +12497,7 @@ nv.models.sankeyChart = function() {
 };
 
 nv.models.scatter = function() {
-    "use strict";
+    
 
     //============================================================
     // Public Variables with Default Settings
@@ -13140,7 +13140,7 @@ nv.models.scatter = function() {
 };
 
 nv.models.scatterChart = function() {
-    "use strict";
+    
 
     //============================================================
     // Public Variables with Default Settings
@@ -13533,7 +13533,7 @@ nv.models.scatterChart = function() {
 };
 
 nv.models.sparkline = function() {
-    "use strict";
+    
 
     //============================================================
     // Public Variables with Default Settings
@@ -13675,7 +13675,7 @@ nv.models.sparkline = function() {
 };
 
 nv.models.sparklinePlus = function() {
-    "use strict";
+    
 
     //============================================================
     // Public Variables with Default Settings
@@ -13892,7 +13892,7 @@ nv.models.sparklinePlus = function() {
 };
 
 nv.models.stackedArea = function() {
-    "use strict";
+    
 
     //============================================================
     // Public Variables with Default Settings
@@ -14223,7 +14223,7 @@ nv.models.stackedArea = function() {
 };
 
 nv.models.stackedAreaChart = function() {
-    "use strict";
+    
 
     //============================================================
     // Public Variables with Default Settings
@@ -14896,7 +14896,7 @@ nv.models.stackedAreaWithFocusChart = function() {
 };
 // based on http://bl.ocks.org/kerryrodden/477c1bfb081b783f80ad
 nv.models.sunburst = function() {
-    "use strict";
+    
 
     //============================================================
     // Public Variables with Default Settings
@@ -15280,7 +15280,7 @@ nv.models.sunburst = function() {
     return chart;
 };
 nv.models.sunburstChart = function() {
-    "use strict";
+    
 
     //============================================================
     // Public Variables with Default Settings

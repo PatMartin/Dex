@@ -2,7 +2,7 @@
 	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
 	typeof define === 'function' && define.amd ? define(['exports'], factory) :
 	(factory((global.THREE = global.THREE || {})));
-}(this, (function (exports) { 'use strict';
+}(this, (function (exports) { 
 
 	// Polyfills
 
@@ -52,7 +52,7 @@
 
 			Object.assign = function ( target ) {
 
-				'use strict';
+				
 
 				if ( target === undefined || target === null ) {
 

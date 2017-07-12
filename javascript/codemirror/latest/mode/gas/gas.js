@@ -12,7 +12,7 @@
 "use strict";
 
 CodeMirror.defineMode("gas", function(_config, parserConfig) {
-  'use strict';
+  
 
   // If an architecture is specified, its initialization function may
   // populate this array with custom parsing functions which will be

@@ -23,7 +23,7 @@
  * Vis.js may be distributed under either license.
  */
 
-"use strict";
+
 
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -82,7 +82,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
   // utils
-  'use strict';
+  
 
   exports.util = __webpack_require__(1);
   exports.DOMutil = __webpack_require__(7);
@@ -166,7 +166,7 @@ return /******/ (function(modules) { // webpackBootstrap
   // first check if moment.js is already loaded in the browser window, if so,
   // use this instance. Else, load via commonjs.
 
-  'use strict';
+  
 
   var moment = __webpack_require__(2);
   var uuid = __webpack_require__(6);
@@ -1573,7 +1573,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
   // first check if moment.js is already loaded in the browser window, if so,
   // use this instance. Else, load via commonjs.
-  'use strict';
+  
 
   module.exports = typeof window !== 'undefined' && window['moment'] || __webpack_require__(3);
 
@@ -1591,7 +1591,7 @@ return /******/ (function(modules) { // webpackBootstrap
        true ? module.exports = factory() :
       typeof define === 'function' && define.amd ? define(factory) :
       global.moment = factory()
-  }(this, function () { 'use strict';
+  }(this, function () { 
 
       var hookCallback;
 
@@ -5222,7 +5222,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 6 */
 /***/ function(module, exports) {
 
-  /* WEBPACK VAR INJECTION */(function(global) {'use strict';
+  /* WEBPACK VAR INJECTION */(function(global) {
 
   var _rng;
 
@@ -5445,7 +5445,7 @@ return /******/ (function(modules) { // webpackBootstrap
    * @param JSONcontainer
    * @private
    */
-  'use strict';
+  
 
   exports.prepareElements = function (JSONcontainer) {
     // cleanup the redundant svgElements;
@@ -5650,7 +5650,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 8 */
 /***/ function(module, exports, __webpack_require__) {
 
-  'use strict';
+  
 
   var util = __webpack_require__(1);
   var Queue = __webpack_require__(9);
@@ -6590,7 +6590,7 @@ return /******/ (function(modules) { // webpackBootstrap
    *                               Default value of max is Infinity.
    * @constructor
    */
-  'use strict';
+  
 
   function Queue(options) {
     // options
@@ -6782,7 +6782,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 10 */
 /***/ function(module, exports, __webpack_require__) {
 
-  'use strict';
+  
 
   var util = __webpack_require__(1);
   var DataSet = __webpack_require__(8);
@@ -7165,7 +7165,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
-  'use strict';
+  
 
   var Emitter = __webpack_require__(12);
   var DataSet = __webpack_require__(8);
@@ -9593,7 +9593,7 @@ return /******/ (function(modules) { // webpackBootstrap
    * @param {Number} [y]
    * @param {Number} [z]
    */
-  "use strict";
+  
 
   function Point3d(x, y, z) {
     this.x = x !== undefined ? x : 0;
@@ -9675,7 +9675,7 @@ return /******/ (function(modules) { // webpackBootstrap
    * @param {Number} [x]
    * @param {Number} [y]
    */
-  "use strict";
+  
 
   function Point2d(x, y) {
     this.x = x !== undefined ? x : 0;
@@ -9688,7 +9688,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 15 */
 /***/ function(module, exports, __webpack_require__) {
 
-  'use strict';
+  
 
   var Point3d = __webpack_require__(13);
 
@@ -9829,7 +9829,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 16 */
 /***/ function(module, exports, __webpack_require__) {
 
-  'use strict';
+  
 
   var DataView = __webpack_require__(10);
 
@@ -10040,7 +10040,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 17 */
 /***/ function(module, exports, __webpack_require__) {
 
-  'use strict';
+  
 
   var util = __webpack_require__(1);
 
@@ -10413,7 +10413,7 @@ return /******/ (function(modules) { // webpackBootstrap
    * @param {boolean} prettyStep Optional. If true, the step size is rounded
    *               To a pretty step size (like 1, 2, 5, 10, 20, 50, ...)
    */
-  "use strict";
+  
 
   function StepNumber(start, end, step, prettyStep) {
     // set default values
@@ -10532,7 +10532,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 19 */
 /***/ function(module, exports, __webpack_require__) {
 
-  'use strict';
+  
 
   var Emitter = __webpack_require__(12);
   var Hammer = __webpack_require__(20);
@@ -11077,7 +11077,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
   // Only load hammer.js when in a browser environment
   // (loading hammer.js in a node.js environment gives errors)
-  'use strict';
+  
 
   if (typeof window !== 'undefined') {
     var propagating = __webpack_require__(21);
@@ -11095,7 +11095,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 21 */
 /***/ function(module, exports, __webpack_require__) {
 
-  var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;'use strict';
+  var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;
 
   (function (factory) {
     if (true) {
@@ -11339,7 +11339,7 @@ return /******/ (function(modules) { // webpackBootstrap
    * Copyright (c) 2015 Jorik Tangelder;
    * Licensed under the  license */
   (function(window, document, exportName, undefined) {
-    'use strict';
+    
 
   var VENDOR_PREFIXES = ['', 'webkit', 'Moz', 'MS', 'ms', 'o'];
   var TEST_ELEMENT = document.createElement('div');
@@ -13907,7 +13907,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 23 */
 /***/ function(module, exports, __webpack_require__) {
 
-  'use strict';
+  
 
   var util = __webpack_require__(1);
   var hammerUtil = __webpack_require__(24);
@@ -14618,7 +14618,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 24 */
 /***/ function(module, exports, __webpack_require__) {
 
-  'use strict';
+  
 
   var Hammer = __webpack_require__(20);
 
@@ -14677,7 +14677,7 @@ return /******/ (function(modules) { // webpackBootstrap
    * @param {{dom: Object, domProps: Object, emitter: Emitter, range: Range}} [body]
    * @param {Object} [options]
    */
-  "use strict";
+  
 
   function Component(body, options) {
     this.options = null;
@@ -14740,7 +14740,7 @@ return /******/ (function(modules) { // webpackBootstrap
    * @param {Object} body
    * @param {Array | Object} hiddenDates
    */
-  "use strict";
+  
 
   exports.convertHiddenOptions = function (moment, body, hiddenDates) {
     if (hiddenDates && !Array.isArray(hiddenDates)) {
@@ -15204,7 +15204,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 27 */
 /***/ function(module, exports, __webpack_require__) {
 
-  'use strict';
+  
 
   var Emitter = __webpack_require__(12);
   var Hammer = __webpack_require__(20);
@@ -16234,7 +16234,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 28 */
 /***/ function(module, exports, __webpack_require__) {
 
-  'use strict';
+  
 
   var Hammer = __webpack_require__(20);
   var util = __webpack_require__(1);
@@ -18143,7 +18143,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 29 */
 /***/ function(module, exports, __webpack_require__) {
 
-  'use strict';
+  
 
   var moment = __webpack_require__(2);
   var DateUtil = __webpack_require__(26);
@@ -18853,7 +18853,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 30 */
 /***/ function(module, exports, __webpack_require__) {
 
-  'use strict';
+  
 
   var util = __webpack_require__(1);
   var stack = __webpack_require__(31);
@@ -19479,7 +19479,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports) {
 
   // Utility functions for ordering and stacking of items
-  'use strict';
+  
 
   var EPSILON = 0.001; // used when checking collisions, to prevent round-off errors
 
@@ -19602,7 +19602,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 32 */
 /***/ function(module, exports, __webpack_require__) {
 
-  'use strict';
+  
 
   var Hammer = __webpack_require__(20);
   var Item = __webpack_require__(33);
@@ -19898,7 +19898,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 33 */
 /***/ function(module, exports, __webpack_require__) {
 
-  'use strict';
+  
 
   var Hammer = __webpack_require__(20);
   var util = __webpack_require__(1);
@@ -20199,7 +20199,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 34 */
 /***/ function(module, exports, __webpack_require__) {
 
-  'use strict';
+  
 
   var util = __webpack_require__(1);
   var Group = __webpack_require__(30);
@@ -20263,7 +20263,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 35 */
 /***/ function(module, exports, __webpack_require__) {
 
-  'use strict';
+  
 
   var Item = __webpack_require__(33);
   var util = __webpack_require__(1);
@@ -20503,7 +20503,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 36 */
 /***/ function(module, exports, __webpack_require__) {
 
-  'use strict';
+  
 
   var Item = __webpack_require__(33);
 
@@ -20709,7 +20709,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 37 */
 /***/ function(module, exports, __webpack_require__) {
 
-  'use strict';
+  
 
   var Hammer = __webpack_require__(20);
   var Item = __webpack_require__(33);
@@ -20930,7 +20930,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 38 */
 /***/ function(module, exports, __webpack_require__) {
 
-  'use strict';
+  
 
   var util = __webpack_require__(1);
   var Component = __webpack_require__(25);
@@ -21407,7 +21407,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 39 */
 /***/ function(module, exports, __webpack_require__) {
 
-  'use strict';
+  
 
   var keycharm = __webpack_require__(40);
   var Emitter = __webpack_require__(12);
@@ -21566,7 +21566,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 40 */
 /***/ function(module, exports, __webpack_require__) {
 
-  var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;"use strict";
+  var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;
   /**
    * Created by Alex on 11/6/2014.
    */
@@ -21765,7 +21765,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 41 */
 /***/ function(module, exports, __webpack_require__) {
 
-  'use strict';
+  
 
   var Hammer = __webpack_require__(20);
   var util = __webpack_require__(1);
@@ -22017,7 +22017,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports) {
 
   // English
-  'use strict';
+  
 
   exports['en'] = {
     current: 'current',
@@ -22038,7 +22038,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 43 */
 /***/ function(module, exports, __webpack_require__) {
 
-  'use strict';
+  
 
   var util = __webpack_require__(1);
   var Component = __webpack_require__(25);
@@ -22216,7 +22216,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 44 */
 /***/ function(module, exports, __webpack_require__) {
 
-  'use strict';
+  
 
   Object.defineProperty(exports, '__esModule', {
     value: true
@@ -23020,7 +23020,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 45 */
 /***/ function(module, exports, __webpack_require__) {
 
-  'use strict';
+  
 
   Object.defineProperty(exports, '__esModule', {
     value: true
@@ -23632,7 +23632,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 46 */
 /***/ function(module, exports, __webpack_require__) {
 
-  'use strict';
+  
 
   Object.defineProperty(exports, '__esModule', {
     value: true
@@ -23955,7 +23955,7 @@ return /******/ (function(modules) { // webpackBootstrap
    * __any__ means that the name of the property does not matter.
    * __type__ is a required field for all objects and contains the allowed types of all objects
    */
-  'use strict';
+  
 
   Object.defineProperty(exports, '__esModule', {
     value: true
@@ -24189,7 +24189,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 48 */
 /***/ function(module, exports, __webpack_require__) {
 
-  'use strict';
+  
 
   var Emitter = __webpack_require__(12);
   var Hammer = __webpack_require__(20);
@@ -24529,7 +24529,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 49 */
 /***/ function(module, exports, __webpack_require__) {
 
-  'use strict';
+  
 
   var util = __webpack_require__(1);
   var DOMutil = __webpack_require__(7);
@@ -25559,7 +25559,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 50 */
 /***/ function(module, exports, __webpack_require__) {
 
-  'use strict';
+  
 
   var util = __webpack_require__(1);
   var DOMutil = __webpack_require__(7);
@@ -26123,7 +26123,7 @@ return /******/ (function(modules) { // webpackBootstrap
    * Created by ludo on 25-1-16.
    */
 
-  'use strict';
+  
 
   function DataScale(start, end, autoScaleStart, autoScaleEnd, containerHeight, majorCharHeight) {
     var zeroAlign = arguments.length <= 6 || arguments[6] === undefined ? false : arguments[6];
@@ -26361,7 +26361,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 52 */
 /***/ function(module, exports, __webpack_require__) {
 
-  'use strict';
+  
 
   var util = __webpack_require__(1);
   var DOMutil = __webpack_require__(7);
@@ -26522,7 +26522,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 53 */
 /***/ function(module, exports, __webpack_require__) {
 
-  'use strict';
+  
 
   var DOMutil = __webpack_require__(7);
   var Points = __webpack_require__(54);
@@ -26783,7 +26783,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 54 */
 /***/ function(module, exports, __webpack_require__) {
 
-  'use strict';
+  
 
   var DOMutil = __webpack_require__(7);
 
@@ -26860,7 +26860,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 55 */
 /***/ function(module, exports, __webpack_require__) {
 
-  "use strict";
+  
 
   var DOMutil = __webpack_require__(7);
 
@@ -27149,7 +27149,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 56 */
 /***/ function(module, exports, __webpack_require__) {
 
-  'use strict';
+  
 
   var util = __webpack_require__(1);
   var DOMutil = __webpack_require__(7);
@@ -27375,7 +27375,7 @@ return /******/ (function(modules) { // webpackBootstrap
    * __any__ means that the name of the property does not matter.
    * __type__ is a required field for all objects and contains the allowed types of all objects
    */
-  'use strict';
+  
 
   Object.defineProperty(exports, '__esModule', {
     value: true
@@ -27655,7 +27655,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
   // Load custom shapes into CanvasRenderingContext2D
-  'use strict';
+  
 
   function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
@@ -28287,7 +28287,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 59 */
 /***/ function(module, exports, __webpack_require__) {
 
-  "use strict";
+  
 
   Object.defineProperty(exports, "__esModule", {
     value: true
@@ -28429,7 +28429,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 60 */
 /***/ function(module, exports, __webpack_require__) {
 
-  'use strict';
+  
 
   Object.defineProperty(exports, '__esModule', {
     value: true
@@ -28944,7 +28944,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 61 */
 /***/ function(module, exports, __webpack_require__) {
 
-  'use strict';
+  
 
   Object.defineProperty(exports, '__esModule', {
     value: true
@@ -29472,7 +29472,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 62 */
 /***/ function(module, exports, __webpack_require__) {
 
-  'use strict';
+  
 
   Object.defineProperty(exports, '__esModule', {
     value: true
@@ -29793,7 +29793,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 63 */
 /***/ function(module, exports, __webpack_require__) {
 
-  'use strict';
+  
 
   Object.defineProperty(exports, '__esModule', {
     value: true
@@ -29908,7 +29908,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 64 */
 /***/ function(module, exports) {
 
-  "use strict";
+  
 
   Object.defineProperty(exports, "__esModule", {
     value: true
@@ -30005,7 +30005,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 65 */
 /***/ function(module, exports, __webpack_require__) {
 
-  'use strict';
+  
 
   Object.defineProperty(exports, '__esModule', {
     value: true
@@ -30091,7 +30091,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 66 */
 /***/ function(module, exports, __webpack_require__) {
 
-  'use strict';
+  
 
   Object.defineProperty(exports, '__esModule', {
     value: true
@@ -30290,7 +30290,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 67 */
 /***/ function(module, exports, __webpack_require__) {
 
-  'use strict';
+  
 
   Object.defineProperty(exports, '__esModule', {
     value: true
@@ -30396,7 +30396,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 68 */
 /***/ function(module, exports, __webpack_require__) {
 
-  'use strict';
+  
 
   Object.defineProperty(exports, '__esModule', {
     value: true
@@ -30506,7 +30506,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 69 */
 /***/ function(module, exports, __webpack_require__) {
 
-  'use strict';
+  
 
   Object.defineProperty(exports, '__esModule', {
     value: true
@@ -30562,7 +30562,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 70 */
 /***/ function(module, exports, __webpack_require__) {
 
-  'use strict';
+  
 
   Object.defineProperty(exports, '__esModule', {
     value: true
@@ -30670,7 +30670,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 71 */
 /***/ function(module, exports, __webpack_require__) {
 
-  'use strict';
+  
 
   Object.defineProperty(exports, '__esModule', {
     value: true
@@ -30727,7 +30727,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 72 */
 /***/ function(module, exports, __webpack_require__) {
 
-  'use strict';
+  
 
   Object.defineProperty(exports, '__esModule', {
     value: true
@@ -30846,7 +30846,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 73 */
 /***/ function(module, exports, __webpack_require__) {
 
-  'use strict';
+  
 
   Object.defineProperty(exports, '__esModule', {
     value: true
@@ -30961,7 +30961,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 74 */
 /***/ function(module, exports, __webpack_require__) {
 
-  'use strict';
+  
 
   Object.defineProperty(exports, '__esModule', {
     value: true
@@ -31077,7 +31077,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 75 */
 /***/ function(module, exports, __webpack_require__) {
 
-  'use strict';
+  
 
   Object.defineProperty(exports, '__esModule', {
     value: true
@@ -31133,7 +31133,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 76 */
 /***/ function(module, exports, __webpack_require__) {
 
-  'use strict';
+  
 
   Object.defineProperty(exports, '__esModule', {
     value: true
@@ -31189,7 +31189,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 77 */
 /***/ function(module, exports, __webpack_require__) {
 
-  'use strict';
+  
 
   Object.defineProperty(exports, '__esModule', {
     value: true
@@ -31275,7 +31275,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 78 */
 /***/ function(module, exports, __webpack_require__) {
 
-  'use strict';
+  
 
   Object.defineProperty(exports, '__esModule', {
     value: true
@@ -31331,7 +31331,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 79 */
 /***/ function(module, exports, __webpack_require__) {
 
-  'use strict';
+  
 
   Object.defineProperty(exports, '__esModule', {
     value: true
@@ -31387,7 +31387,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 80 */
 /***/ function(module, exports, __webpack_require__) {
 
-  'use strict';
+  
 
   Object.defineProperty(exports, '__esModule', {
     value: true
@@ -31829,7 +31829,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 81 */
 /***/ function(module, exports, __webpack_require__) {
 
-  'use strict';
+  
 
   Object.defineProperty(exports, '__esModule', {
     value: true
@@ -32429,7 +32429,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 82 */
 /***/ function(module, exports, __webpack_require__) {
 
-  'use strict';
+  
 
   Object.defineProperty(exports, '__esModule', {
     value: true
@@ -32578,7 +32578,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 83 */
 /***/ function(module, exports, __webpack_require__) {
 
-  'use strict';
+  
 
   Object.defineProperty(exports, '__esModule', {
     value: true
@@ -32664,7 +32664,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 84 */
 /***/ function(module, exports, __webpack_require__) {
 
-  'use strict';
+  
 
   Object.defineProperty(exports, '__esModule', {
     value: true
@@ -32807,7 +32807,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 85 */
 /***/ function(module, exports, __webpack_require__) {
 
-  'use strict';
+  
 
   Object.defineProperty(exports, '__esModule', {
     value: true
@@ -33396,7 +33396,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 86 */
 /***/ function(module, exports, __webpack_require__) {
 
-  "use strict";
+  
 
   Object.defineProperty(exports, "__esModule", {
     value: true
@@ -33595,7 +33595,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 87 */
 /***/ function(module, exports, __webpack_require__) {
 
-  'use strict';
+  
 
   Object.defineProperty(exports, '__esModule', {
     value: true
@@ -33861,7 +33861,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 88 */
 /***/ function(module, exports, __webpack_require__) {
 
-  'use strict';
+  
 
   Object.defineProperty(exports, '__esModule', {
     value: true
@@ -33970,7 +33970,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 89 */
 /***/ function(module, exports, __webpack_require__) {
 
-  'use strict';
+  
 
   Object.defineProperty(exports, '__esModule', {
     value: true
@@ -34773,7 +34773,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 90 */
 /***/ function(module, exports) {
 
-  "use strict";
+  
 
   Object.defineProperty(exports, "__esModule", {
     value: true
@@ -35275,7 +35275,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 91 */
 /***/ function(module, exports) {
 
-  "use strict";
+  
 
   Object.defineProperty(exports, "__esModule", {
     value: true
@@ -35370,7 +35370,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 92 */
 /***/ function(module, exports) {
 
-  "use strict";
+  
 
   Object.defineProperty(exports, "__esModule", {
     value: true
@@ -35461,7 +35461,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 93 */
 /***/ function(module, exports) {
 
-  "use strict";
+  
 
   Object.defineProperty(exports, "__esModule", {
     value: true
@@ -35571,7 +35571,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 94 */
 /***/ function(module, exports) {
 
-  "use strict";
+  
 
   Object.defineProperty(exports, "__esModule", {
     value: true
@@ -35700,7 +35700,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 95 */
 /***/ function(module, exports) {
 
-  "use strict";
+  
 
   Object.defineProperty(exports, "__esModule", {
     value: true
@@ -35769,7 +35769,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 96 */
 /***/ function(module, exports, __webpack_require__) {
 
-  "use strict";
+  
 
   Object.defineProperty(exports, "__esModule", {
     value: true
@@ -35843,7 +35843,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 97 */
 /***/ function(module, exports, __webpack_require__) {
 
-  "use strict";
+  
 
   Object.defineProperty(exports, "__esModule", {
     value: true
@@ -35899,7 +35899,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 98 */
 /***/ function(module, exports, __webpack_require__) {
 
-  'use strict';
+  
 
   Object.defineProperty(exports, '__esModule', {
     value: true
@@ -36751,7 +36751,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 99 */
 /***/ function(module, exports, __webpack_require__) {
 
-  "use strict";
+  
 
   Object.defineProperty(exports, "__esModule", {
     value: true
@@ -36886,7 +36886,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 100 */
 /***/ function(module, exports, __webpack_require__) {
 
-  'use strict';
+  
 
   Object.defineProperty(exports, '__esModule', {
     value: true
@@ -36931,7 +36931,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 101 */
 /***/ function(module, exports, __webpack_require__) {
 
-  'use strict';
+  
 
   Object.defineProperty(exports, '__esModule', {
     value: true
@@ -37299,7 +37299,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 102 */
 /***/ function(module, exports, __webpack_require__) {
 
-  'use strict';
+  
 
   Object.defineProperty(exports, '__esModule', {
     value: true
@@ -37745,7 +37745,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 103 */
 /***/ function(module, exports, __webpack_require__) {
 
-  'use strict';
+  
 
   Object.defineProperty(exports, '__esModule', {
     value: true
@@ -38090,7 +38090,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 104 */
 /***/ function(module, exports, __webpack_require__) {
 
-  'use strict';
+  
 
   Object.defineProperty(exports, '__esModule', {
     value: true
@@ -38862,7 +38862,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 105 */
 /***/ function(module, exports, __webpack_require__) {
 
-  'use strict';
+  
 
   Object.defineProperty(exports, '__esModule', {
     value: true
@@ -39197,7 +39197,7 @@ return /******/ (function(modules) { // webpackBootstrap
    * @param {Object} [style]     An object containing borderColor,
    *                             backgroundColor, etc.
    */
-  'use strict';
+  
 
   Object.defineProperty(exports, '__esModule', {
     value: true
@@ -39314,7 +39314,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 107 */
 /***/ function(module, exports, __webpack_require__) {
 
-  "use strict";
+  
 
   Object.defineProperty(exports, "__esModule", {
     value: true
@@ -40070,7 +40070,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 108 */
 /***/ function(module, exports, __webpack_require__) {
 
-  'use strict';
+  
 
   Object.defineProperty(exports, '__esModule', {
     value: true
@@ -41538,7 +41538,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 109 */
 /***/ function(module, exports, __webpack_require__) {
 
-  'use strict';
+  
 
   Object.defineProperty(exports, '__esModule', {
     value: true
@@ -42762,7 +42762,7 @@ return /******/ (function(modules) { // webpackBootstrap
    * __any__ means that the name of the property does not matter.
    * __type__ is a required field for all objects and contains the allowed types of all objects
    */
-  'use strict';
+  
 
   Object.defineProperty(exports, '__esModule', {
     value: true
@@ -43275,7 +43275,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
   // distance finding algorithm
-  "use strict";
+  
 
   Object.defineProperty(exports, "__esModule", {
     value: true
@@ -43563,7 +43563,7 @@ return /******/ (function(modules) { // webpackBootstrap
    * Created by Alex on 10-Aug-15.
    */
 
-  "use strict";
+  
 
   Object.defineProperty(exports, "__esModule", {
     value: true
@@ -43633,7 +43633,7 @@ return /******/ (function(modules) { // webpackBootstrap
   /**
    * Canvas shapes used by Network
    */
-  'use strict';
+  
 
   if (typeof CanvasRenderingContext2D !== 'undefined') {
 
@@ -43930,7 +43930,7 @@ return /******/ (function(modules) { // webpackBootstrap
    *                          {Object[]} nodes
    *                          {Object[]} edges
    */
-  'use strict';
+  
 
   function parseDOT(data) {
     dot = data;
@@ -44815,7 +44815,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 115 */
 /***/ function(module, exports) {
 
-  'use strict';
+  
 
   function parseGephi(gephiJSON, optionsObj) {
     var edges = [];
@@ -44897,7 +44897,7 @@ return /******/ (function(modules) { // webpackBootstrap
    * @class Images
    * This class loads images and keeps them stored.
    */
-  "use strict";
+  
 
   Object.defineProperty(exports, "__esModule", {
       value: true
@@ -45020,7 +45020,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports) {
 
   // English
-  'use strict';
+  
 
   exports['en'] = {
     edit: 'Edit',

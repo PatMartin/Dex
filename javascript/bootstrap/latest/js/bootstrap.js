@@ -9,7 +9,7 @@ if (typeof jQuery === 'undefined') {
 }
 
 +function ($) {
-  'use strict';
+  
   var version = $.fn.jquery.split(' ')[0].split('.')
   if ((version[0] < 2 && version[1] < 9) || (version[0] == 1 && version[1] == 9 && version[2] < 1)) {
     throw new Error('Bootstrap\'s JavaScript requires jQuery version 1.9.1 or higher')
@@ -26,7 +26,7 @@ if (typeof jQuery === 'undefined') {
 
 
 +function ($) {
-  'use strict';
+  
 
   // CSS TRANSITION SUPPORT (Shoutout: http://www.modernizr.com/)
   // ============================================================
@@ -86,7 +86,7 @@ if (typeof jQuery === 'undefined') {
 
 
 +function ($) {
-  'use strict';
+  
 
   // ALERT CLASS DEFINITION
   // ======================
@@ -181,7 +181,7 @@ if (typeof jQuery === 'undefined') {
 
 
 +function ($) {
-  'use strict';
+  
 
   // BUTTON PUBLIC CLASS DEFINITION
   // ==============================
@@ -302,7 +302,7 @@ if (typeof jQuery === 'undefined') {
 
 
 +function ($) {
-  'use strict';
+  
 
   // CAROUSEL CLASS DEFINITION
   // =========================
@@ -540,7 +540,7 @@ if (typeof jQuery === 'undefined') {
 
 
 +function ($) {
-  'use strict';
+  
 
   // COLLAPSE PUBLIC CLASS DEFINITION
   // ================================
@@ -752,7 +752,7 @@ if (typeof jQuery === 'undefined') {
 
 
 +function ($) {
-  'use strict';
+  
 
   // DROPDOWN CLASS DEFINITION
   // =========================
@@ -918,7 +918,7 @@ if (typeof jQuery === 'undefined') {
 
 
 +function ($) {
-  'use strict';
+  
 
   // MODAL CLASS DEFINITION
   // ======================
@@ -1257,7 +1257,7 @@ if (typeof jQuery === 'undefined') {
 
 
 +function ($) {
-  'use strict';
+  
 
   // TOOLTIP PUBLIC CLASS DEFINITION
   // ===============================
@@ -1771,7 +1771,7 @@ if (typeof jQuery === 'undefined') {
 
 
 +function ($) {
-  'use strict';
+  
 
   // POPOVER PUBLIC CLASS DEFINITION
   // ===============================
@@ -1880,7 +1880,7 @@ if (typeof jQuery === 'undefined') {
 
 
 +function ($) {
-  'use strict';
+  
 
   // SCROLLSPY CLASS DEFINITION
   // ==========================
@@ -2053,7 +2053,7 @@ if (typeof jQuery === 'undefined') {
 
 
 +function ($) {
-  'use strict';
+  
 
   // TAB CLASS DEFINITION
   // ====================
@@ -2209,7 +2209,7 @@ if (typeof jQuery === 'undefined') {
 
 
 +function ($) {
-  'use strict';
+  
 
   // AFFIX CLASS DEFINITION
   // ======================

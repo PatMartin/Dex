@@ -2,7 +2,7 @@
 // Distributed under an MIT license: http://codemirror.net/LICENSE
 
 (function(mod) {
-  'use strict';
+  
   if (typeof exports == 'object' && typeof module == 'object') // CommonJS
     mod(require('codemirror'));
   else if (typeof define == 'function' && define.amd) // AMD
@@ -10,7 +10,7 @@
   else // Plain browser env
     mod(window.CodeMirror);
 })(function(CodeMirror) {
-'use strict';
+
 
 CodeMirror.defineMode('powershell', function() {
   function buildRegexp(patterns, options) {

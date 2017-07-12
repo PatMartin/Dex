@@ -42,7 +42,7 @@
   else // Plain browser env
     mod(CodeMirror);
 })(function(CodeMirror) {
-  'use strict';
+  
 
   var defaultKeymap = [
     // Key to key mapping. This goes first to make it possible to override

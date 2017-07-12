@@ -1,6 +1,4 @@
 (function (window) {
-    'use strict';
-
     /*global define, module, exports, require */
 
     var c3 = { version: "0.4.11-rc4" };
@@ -7384,7 +7382,7 @@
     //changes which were implemented in Firefox 43 and Chrome 46.
     //Chrome 48 removes these APIs, so this polyfill is required.
 
-    (function() { "use strict";
+    (function() { 
      if (!("SVGPathSeg" in window)) {
          // Spec: http://www.w3.org/TR/SVG11/single-page.html#paths-InterfaceSVGPathSeg
          window.SVGPathSeg = function(type, typeAsLetter, owningPathSegList) {
