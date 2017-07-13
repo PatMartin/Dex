@@ -322,13 +322,19 @@ class WebTask extends DexTask {
       {
         // Replace output config with dexjs-config
         we.executeScript("save();");
-        String config = we.executeScript(
-            "(document.getElementById('dexjs-config')" +
-            "=== undefined) ? '' : " +
-            "document.getElementById('dexjs-config').outerHTML;");
-        String saveOutput = output.replace("<body>", "<body>\n" + config);
+        String saveOutput = output;
+        try {
+          String config = we.executeScript(
+              "(document.getElementById('dexjs-config')" +
+              "=== undefined) ? '' : " +
+              "document.getElementById('dexjs-config').outerHTML;");
+          saveOutput = output.replace("<body>", "<body>\n" + config);
+          println "CONFIG: '${config}'";
+        }
+        catch (Exception ex) {
+          println "CONFIG: empty";
+        }
         
-        println "CONFIG: '${config}'";
         // Write last template output.
         FileUtils.writeStringToFile(saveFile, saveOutput)
       }
