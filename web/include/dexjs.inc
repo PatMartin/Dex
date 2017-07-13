@@ -46,7 +46,7 @@ if (context.postscripts) {
     <div class='ui-layout-west'>
       <div id='ConfigurationPane'></div>
     </div>
-</div>
+  </div>
 
 <!-- Enable Firebug 
 <script type="text/javascript"

@@ -5,22 +5,49 @@
 <%
 import static com.dexvis.util.GroovyUtil.renderTemplate as render;
 
-println render("web/include/styles.inc", [:])
-println render("web/include/multiples_styles.inc", [:])
-println render("web/include/scripts.inc", [:])
-println render("web/include/multiples_scripts.inc", [:])
+println render("web/include/styles_multiples.inc", [:])
+
+if (context.styles) {
+  context.styles.each {
+    style ->
+
+    println "<style>";
+    println new File(style).text;
+    println "</style>";
+  }
+}
+
+if (context.scripts) {
+  context.scripts.each {
+    script ->
+
+    println "<script>"
+    println new File(script).text;
+    println "</script>"
+  }
+}
+println render("web/include/scripts_multiples.inc", [:])
+if (context.postscripts) {
+  context.postscripts.each {
+    script ->
+
+    println "<script>"
+    println new File(script).text;
+    println "</script>"
+  }
+}
 %>
   <title>${context.title}</title>
 </head>
 <body>
   <div class='layout-container'>
-    <div class='ui-layout-center'>
-      <div id='ChartArea'></div>
-    </div>
     <div class='ui-layout-west'>
       <div id='ConfigurationPane'></div>
     </div>
-</div>
+    <div class='ui-layout-center'>
+      <div id='ChartArea'></div>
+    </div>
+  </div>
 
 <!-- Enable Firebug 
 <script type="text/javascript"
@@ -32,27 +59,43 @@ src="https://getfirebug.com/firebug-lite.js">
     enableTrace: true
 }
 </script>
-    -->
+-->
+
 <script>
 
-<%
-  println dexData.toCsvString();
-%>
+<% println dexData.toCsvString(); %>
 
-var frames = dex.csv.getFramesByIndex(csv, 0);
+var base = ${context.base}({});
+base.load();
+
+var multiples = dex.charts.multiples.GridsterMultiples({
+    'parent': '#ChartArea',
+    'csv': csv,
+    'gridsterConfig.widget_base_dimensions' : [ 50, 50 ],
+    'gridsterConfig.widget_margins' : [ 1, 1 ],
+    'cell.width' : 8,
+    'cell.height' : 8,
+    'baseChart': base
+  }); 
 
 function save()
 {
-  chart.save();
+  //multiples.save();
+  //base.save();
 }
 
 function setValues(values)
 {
   values.forEach(function(config) {
     switch (config.chartName) {
-      case "${context.type}":
+      case "multiples":
       {
-        chart.attrSave(config.key, config.value);
+        multiples.attr(config.key, config.value);
+        break;
+      }
+      case "basechart":
+      {
+        base.attrSave(config.key, config.value);
         break;
       }
     }
@@ -63,16 +106,12 @@ function setValues(values)
 function getGuiDefinition()
 {
   var guiDef = {
-    '${context.type}': chart.getGuiDefinition()
+    'multiples': multiples.getGuiDefinition(),
+    'basechart': multiples.attr("charts")[0].getGuiDefinition()
   };
 
   return JSON.stringify(guiDef);
 }
-
-var chart = ${context.chart}({
-    parent : "#ChartArea",
-    csv : dex.csv.limitRows(csv, 100)
-  });
 
 \$(document).ready(function () {
 
@@ -82,20 +121,17 @@ var chart = ${context.chart}({
       size: 335
     },
     onresize: function () {
-      // REM: Hack, calling resize hangs for some reason.
-      var width = d3.select(chart.config.parent).property("clientWidth");
-      var height = d3.select(chart.config.parent).property("clientHeight");
-      chart.attr("width", width).attr("height", height).update();
+       multiples.render();
     }
   });
 
-  chart.load();
-  chart.render();
+  multiples.load();
+  multiples.render();
 
   configPane = dex.ui.ConfigurationPane({
     "parent": "#ConfigurationPane",
     "csv": csv,
-    "components": [ chart ]
+    "components": [ multiples ]
   }).render();
 });
 </script>
