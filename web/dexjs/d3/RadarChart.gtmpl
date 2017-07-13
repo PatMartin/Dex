@@ -1,83 +1,16 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="utf-8">
-
 <%
 import static com.dexvis.util.GroovyUtil.renderTemplate as render;
 
-println render("web/include/styles.inc", [:])
-println render("web/include/scripts.inc", [:])
+println render("web/include/dexjs.inc", [
+      "state"   : state,
+      "dexData" : dexData,
+      "data"    : data,
+      "header"  : header,
+      "basedir" : basedir,
+      "context" : [
+        "title" : "dex.js : Radar Chart",
+        "chart" : "dex.charts.d3.RadarChart",
+        "type"  : "chord"
+      ]
+    ])
 %>
-    <title>dex.js : Radar Chart</title>
-  </head>
-<body>
-  <div class="ui-layout-center">
-    <div id="ChartArea"></div>
-  </div>
-  <div class="ui-layout-west">
-    <div id="ColumnFilter"></div>
-  </div>
-<script>
-<% println dexData.toCsvString(); %>
-
-\$(document).ready(function () {
-  // Removing leftovers from previous render
-  \$(".ui-layout-resizer").remove();
-  \$('body').layout({
-    applyDemoStyles: false,
-    west: {
-      size: 335
-    },
-    onresize: function () {
-      // REM: Hack, calling resize hangs for some reason.
-      var width = d3.select(chart.config.parent).property("clientWidth");
-      var height = d3.select(chart.config.parent).property("clientHeight");
-      radarChart.attr("width", width).attr("height", height).update();
-    }
-  });
-
-var columnFilter = dex.ui.ColumnFilter({
-  "parent": "#ColumnFilter",
-  "csv": csv
-}).render();
-
-var radarChart = new dex.charts.d3.RadarChart({
-  parent : "#ChartArea",
-  csv : csv
-});
-
-radarChart.load();
-radarChart.render();
-
-function setValues(values)
-{
-  values.forEach(function(config) {
-    switch (config.chartName) {
-      case "radarChart":
-      {
-        radarChart.attr(config.key, config.value);
-        break;
-      }
-    }
-  });
-  radarChart.update();
-  radarChart.save();
-}
-
-radarChart.subscribe(columnFilter, "select", function (msg) {
-    radarChart.attr('csv', msg.selected).update();
-});
-
-function getGuiDefinition()
-{
-  var guiDef = {
-    'radarChart': radarChart.getGuiDefinition()
-  };
-
-  return JSON.stringify(guiDef);
-}
-});
-</script>
-</body>
-</html>
