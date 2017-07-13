@@ -33712,7 +33712,6 @@ var gridstermultiples = function (userConfig) {
     'id': 'GridsterMultiplesId',
     'class': 'GridsterMultiplesClass',
     'resizable': true,
-    'frames': {},
     'width': "100%",
     'height': "100%",
     'cell': {
@@ -33788,7 +33787,7 @@ var gridstermultiples = function (userConfig) {
 
   chart.render = function render() {
     var config = chart.config;
-    var frames = config.frames;
+    var frames = dex.csv.getFramesByIndex(config.csv, 0);
 
     if (config.charts) {
       // Unregisters any window resize handlers.
@@ -36181,7 +36180,7 @@ module.exports = function (dex) {
 
     function createComponent(cmp) {
       // Allows component construction from other components.
-      if (userConfig.hasOwnProperty('config')) {
+      if (cmp.userConfig.hasOwnProperty('config')) {
         cmp.config = dex.config.expandAndOverlay(cmp.userConfig, cmp.defaultConfig);
       }
       // Else, we have a configuration.
@@ -41863,7 +41862,7 @@ var configurationpane = function (userConfig) {
     config.components.forEach(function (component) {
       dex.console.log("Component Subscription: ", component, dataFilterPane);
       component.subscribe(dataFilterPane, "select", function (msg) {
-        dex.console.log("Component: " + component.config.id + " received select csv event");
+        dex.console.log("Component: " + component.config.id + " received select csv event", msg);
         component.attr('csv', msg.selected);
         component.render();
       });
