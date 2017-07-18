@@ -1,4 +1,4 @@
-package com.dexvis.util;
+package com.dexvis.javafx.scene.control;
 
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -26,26 +26,38 @@ public class JsonUtil
 {
   /**
    * 
-   * Given a string containing valid JSON, return it's Java
-   * object representation.
+   * Given a string containing valid JSON, return it's Java object
+   * representation.
    * 
-   * @param jsonStr The JSON string to parse.
+   * @param jsonStr
+   *          The JSON string to parse.
    * 
    * @return The java object equivalent to the JSON string.
    * 
    */
   public static Object parseJsonString(String jsonStr)
   {
-    JsonReader reader = Json.createReader(new StringReader(jsonStr));
-    JsonStructure jsonStruct = reader.read();
-    return parseJsonValue(jsonStruct);
+    try
+    {
+      System.out.println("PARSING-JSON: '" + jsonStr);
+      JsonReader reader = Json.createReader(new StringReader(jsonStr));
+      JsonStructure jsonStruct = reader.read();
+      return parseJsonValue(jsonStruct);
+    }
+    catch(Exception ex)
+    {
+      ex.printStackTrace();
+      Object empty[] = new Object[0];
+      return empty;
+    }
   }
-
+  
   /**
    * 
    * Given a JSON Value, return it's Java object representation.
    * 
-   * @param value The JSON value to convert.
+   * @param value
+   *          The JSON value to convert.
    * 
    * @return The Java object value of the converted JSON.
    * 
@@ -78,6 +90,7 @@ public class JsonUtil
           }
           catch(Exception iEx)
           {
+            iEx.printStackTrace();
             return num;
           }
         }
@@ -90,12 +103,13 @@ public class JsonUtil
     }
     return null;
   }
-
+  
   /**
    * 
    * Given a JsonArray, convert it to a list of objects.
    * 
-   * @param array The JsonArray to convert.
+   * @param array
+   *          The JsonArray to convert.
    * 
    * @return A list of objects.
    * 
@@ -113,14 +127,14 @@ public class JsonUtil
     }
     return objects;
   }
-
+  
   /**
    * 
    * Given a JsonObject, return it's equivalent as a Map.
    * 
-   * @param obj The JSON object to convert.
-   * @return An equivalent representation expressed as a
-   * Map<String, Object.
+   * @param obj
+   *          The JSON object to convert.
+   * @return An equivalent representation expressed as a Map<String, Object.
    */
   public static Map<String, Object> parseJsonObject(JsonObject obj)
   {
