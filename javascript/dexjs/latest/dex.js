@@ -1,5 +1,5 @@
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.dex = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-var css = "/** CSS Dependencies **/\n/*\r\n * Default Layout Theme\r\n *\r\n * Created for jquery.layout\r\n *\r\n * Copyright (c) 2010\r\n *   Fabrizio Balliano (http://www.fabrizioballiano.net)\r\n *   Kevin Dalman (http://allpro.net)\r\n *\r\n * Dual licensed under the GPL (http://www.gnu.org/licenses/gpl.html)\r\n * and MIT (http://www.opensource.org/licenses/mit-license.php) licenses.\r\n *\r\n * Last Updated: 2010-02-10\r\n * NOTE: For best code readability, view this with a fixed-space font and tabs equal to 4-chars\r\n */\n/*\r\n *\tDEFAULT FONT\r\n *\tJust to make demo-pages look better - not actually relevant to Layout!\r\n */\nbody {\n  font-family: Geneva, Arial, Helvetica, sans-serif;\n  font-size: 100%;\n  *font-size: 80%;\n}\n/*\r\n *\tPANES & CONTENT-DIVs\r\n */\n.ui-layout-pane {\n  /* all 'panes' */\n  background: #FFF;\n  border: 1px solid #BBB;\n  padding: 10px;\n  overflow: auto;\n  /* DO NOT add scrolling (or padding) to 'panes' that have a content-div,\r\n       otherwise you may get double-scrollbars - on the pane AND on the content-div\r\n       - use ui-layout-wrapper class if pane has a content-div\r\n       - use ui-layout-container if pane has an inner-layout\r\n    */\n}\n/* (scrolling) content-div inside pane allows for fixed header(s) and/or footer(s) */\n.ui-layout-content {\n  padding: 10px;\n  position: relative;\n  /* contain floated or positioned elements */\n  overflow: auto;\n  /* add scrolling to content-div */\n}\n/*\r\n *\tUTILITY CLASSES\r\n *\tMust come AFTER pane-class above so will override\r\n *\tThese classes are NOT auto-generated and are NOT used by Layout\r\n */\n.layout-child-container,\n.layout-content-container {\n  padding: 0;\n  overflow: hidden;\n}\n.layout-child-container {\n  border: 0;\n  /* remove border because inner-layout-panes probably have borders */\n}\n.layout-scroll {\n  overflow: auto;\n}\n.layout-hide {\n  display: none;\n}\n/*\r\n *\tRESIZER-BARS\r\n */\n.ui-layout-resizer {\n  /* all 'resizer-bars' */\n  background: #DDD;\n  border: 1px solid #BBB;\n  border-width: 0;\n}\n.ui-layout-resizer-drag {\n  /* REAL resizer while resize in progress */\n}\n.ui-layout-resizer-hover {\n  /* affects both open and closed states */\n}\n/* NOTE: It looks best when 'hover' and 'dragging' are set to the same color,\r\n    otherwise color shifts while dragging when bar can't keep up with mouse */\n.ui-layout-resizer-open-hover,\n/* hover-color to 'resize' */\r\n.ui-layout-resizer-dragging {\n  /* resizer beging 'dragging' */\n  background: #C4E1A4;\n}\n.ui-layout-resizer-dragging {\n  /* CLONED resizer being dragged */\n  border: 1px solid #BBB;\n}\n.ui-layout-resizer-north-dragging,\n.ui-layout-resizer-south-dragging {\n  border-width: 1px 0;\n}\n.ui-layout-resizer-west-dragging,\n.ui-layout-resizer-east-dragging {\n  border-width: 0 1px;\n}\n/* NOTE: Add a 'dragging-limit' color to provide visual feedback when resizer hits min/max size limits */\n.ui-layout-resizer-dragging-limit {\n  /* CLONED resizer at min or max size-limit */\n  background: #E1A4A4;\n  /* red */\n}\n.ui-layout-resizer-closed-hover {\n  /* hover-color to 'slide open' */\n  background: #EBD5AA;\n}\n.ui-layout-resizer-sliding {\n  /* resizer when pane is 'slid open' */\n  opacity: .10;\n  /* show only a slight shadow */\n  filter: alpha(opacity=10);\n}\n.ui-layout-resizer-sliding-hover {\n  /* sliding resizer - hover */\n  opacity: 1.00;\n  /* on-hover, show the resizer-bar normally */\n  filter: alpha(opacity=100);\n}\n/* sliding resizer - add 'outside-border' to resizer on-hover\r\n * this sample illustrates how to target specific panes and states */\n.ui-layout-resizer-north-sliding-hover {\n  border-bottom-width: 1px;\n}\n.ui-layout-resizer-south-sliding-hover {\n  border-top-width: 1px;\n}\n.ui-layout-resizer-west-sliding-hover {\n  border-right-width: 1px;\n}\n.ui-layout-resizer-east-sliding-hover {\n  border-left-width: 1px;\n}\n/*\r\n *\tTOGGLER-BUTTONS\r\n */\n.ui-layout-toggler {\n  border: 1px solid #BBB;\n  /* match pane-border */\n  background-color: #BBB;\n}\n.ui-layout-resizer-hover .ui-layout-toggler {\n  opacity: .60;\n  filter: alpha(opacity=60);\n}\n.ui-layout-toggler-hover,\n/* need when NOT resizable */\r\n.ui-layout-resizer-hover .ui-layout-toggler-hover {\n  /* need specificity when IS resizable */\n  background-color: #FC6;\n  opacity: 1.00;\n  filter: alpha(opacity=100);\n}\n.ui-layout-toggler-north,\n.ui-layout-toggler-south {\n  border-width: 0 1px;\n  /* left/right borders */\n}\n.ui-layout-toggler-west,\n.ui-layout-toggler-east {\n  border-width: 1px 0;\n  /* top/bottom borders */\n}\n/* hide the toggler-button when the pane is 'slid open' */\n.ui-layout-resizer-sliding  .ui-layout-toggler {\n  display: none;\n}\n/*\r\n *\tstyle the text we put INSIDE the togglers\r\n */\n.ui-layout-toggler .content {\n  color: #666;\n  font-size: 12px;\n  font-weight: bold;\n  width: 100%;\n  padding-bottom: 0.35ex;\n  /* to 'vertically center' text inside text-span */\n}\n/*\r\n *\tPANE-MASKS\r\n *\tthese styles are hard-coded on mask elems, but are also\r\n *\tincluded here as !important to ensure will overrides any generic styles\r\n */\n.ui-layout-mask {\n  border: none !important;\n  padding: 0 !important;\n  margin: 0 !important;\n  overflow: hidden !important;\n  position: absolute !important;\n  opacity: 0 !important;\n  filter: Alpha(Opacity=\"0\") !important;\n}\n.ui-layout-mask-inside-pane {\n  /* masks always inside pane EXCEPT when pane is an iframe */\n  top: 0 !important;\n  left: 0 !important;\n  width: 100% !important;\n  height: 100% !important;\n}\n\n/* standard mask for iframes */\n\n/* extra mask for objects/applets */\n/*\r\n *\tDefault printing styles\r\n */\n@media print {\n  /*\r\n     *\tUnless you want to print the layout as it appears onscreen,\r\n     *\tthese html/body styles are needed to allow the content to 'flow'\r\n     */\n\n  html {\n    height: auto !important;\n    overflow: visible !important;\n  }\n\n  body.ui-layout-container {\n    position: static !important;\n    top: auto !important;\n    bottom: auto !important;\n    left: auto !important;\n    right: auto !important;\n    /* only IE6 has container width & height set by Layout */\n    _width: auto !important;\n    _height: auto !important;\n  }\n\n  .ui-layout-resizer,\n  .ui-layout-toggler {\n    display: none !important;\n  }\n\n  /*\r\n     *\tDefault pane print styles disables positioning, borders and backgrounds.\r\n     *\tYou can modify these styles however it suit your needs.\r\n     */\n\n  .ui-layout-pane {\n    border: none !important;\n    background: transparent !important;\n    position: relative !important;\n    top: auto !important;\n    bottom: auto !important;\n    left: auto !important;\n    right: auto !important;\n    width: auto !important;\n    height: auto !important;\n    overflow: visible !important;\n  }\n}\n.uix-multiselect-original {\n  position: absolute;\n  left: -999999px;\n}\n.uix-multiselect {\n  position: relative;\n  float: left;\n}\n.uix-multiselect {\n  width: 100% !important;\n}\n/** CSS to make the control scalable **/\n.uix-multiselect .multiselect-selected-list {\n  position: absolute;\n  overflow: hidden;\n  width: 50% !important;\n  left: 0% !important;\n}\n.uix-multiselect .multiselect-available-list {\n  position: absolute;\n  overflow: hidden;\n  left: 50% !important;\n  width: 50% !important;\n}\n.uix-multiselect .ui-widget-header {\n  overflow: hidden;\n  white-space: nowrap;\n  padding: 2px 4px;\n}\n.uix-multiselect .ui-widget-header div.header-text {\n  white-space: nowrap;\n  font-size: .9em;\n}\n.uix-multiselect .ui-widget-header .uix-control-right,\n.uix-multiselect .ui-widget-header .uix-control-left {\n  width: 16px;\n  height: 16px;\n}\n.uix-multiselect .ui-widget-header .uix-control-right {\n  float: right;\n}\n.uix-multiselect .ui-widget-header .uix-control-left {\n  float: left;\n}\n.uix-multiselect .ui-widget-header .uix-search {\n  float: right;\n  height: 14px;\n  font-size: 80%;\n}\n.uix-multiselect .uix-list-container {\n  position: relative;\n  overflow: auto;\n  -webkit-touch-callout: none;\n  -webkit-user-select: none;\n  -khtml-user-select: none;\n  -moz-user-select: none;\n  -ms-user-select: none;\n  user-select: none;\n}\n.uix-multiselect .uix-list-container .ui-priority-secondary {\n  padding-right: 0;\n}\n.uix-multiselect .group-element {\n  position: relative;\n  padding-left: 0;\n  white-space: nowrap;\n  overflow: hidden;\n}\n.uix-multiselect .group-element-collapsable {\n  padding-left: 16px;\n}\n.uix-multiselect .group-element span.collapse-handle {\n  position: absolute;\n  margin-top: -8px;\n  top: 50%;\n  left: 0;\n}\n.uix-multiselect .group-element .label {\n  margin: 0 3px;\n  white-space: nowrap;\n  overflow: hidden;\n}\n.uix-multiselect .group-element .ui-icon {\n  float: left;\n  cursor: pointer;\n}\n.uix-multiselect .option-element,\n.dragged-element {\n  cursor: pointer;\n  padding: 0 2px;\n}\n.uix-multiselect .option-element.ui-state-disabled {\n  font-style: italic;\n}\n.dragged-element,\n.dragged-grouped-element {\n  padding: 1px 3px;\n}\n.dragged-grouped-element {\n  padding-left: 16px;\n}\n.uix-multiselect .grouped-option {\n  position: relative;\n  padding-left: 16px;\n}\n.uix-multiselect .grouped-option .ui-icon {\n  position: absolute;\n  left: 0;\n}\n/*! =======================================================\r\n                      VERSION  9.8.0\r\n========================================================= */\n/*! =========================================================\r\n * bootstrap-slider.js\r\n *\r\n * Maintainers:\r\n *\t\tKyle Kemp\r\n *\t\t\t- Twitter: @seiyria\r\n *\t\t\t- Github:  seiyria\r\n *\t\tRohit Kalkur\r\n *\t\t\t- Twitter: @Rovolutionary\r\n *\t\t\t- Github:  rovolution\r\n *\r\n * =========================================================\r\n  *\r\n * bootstrap-slider is released under the MIT License\r\n * Copyright (c) 2017 Kyle Kemp, Rohit Kalkur, and contributors\r\n *\r\n * Permission is hereby granted, free of charge, to any person\r\n * obtaining a copy of this software and associated documentation\r\n * files (the \"Software\"), to deal in the Software without\r\n * restriction, including without limitation the rights to use,\r\n * copy, modify, merge, publish, distribute, sublicense, and/or sell\r\n * copies of the Software, and to permit persons to whom the\r\n * Software is furnished to do so, subject to the following\r\n * conditions:\r\n *\r\n * The above copyright notice and this permission notice shall be\r\n * included in all copies or substantial portions of the Software.\r\n *\r\n * THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND,\r\n * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES\r\n * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND\r\n * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT\r\n * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,\r\n * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING\r\n * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR\r\n * OTHER DEALINGS IN THE SOFTWARE.\r\n *\r\n * ========================================================= */\n.slider {\n  display: inline-block;\n  vertical-align: middle;\n  position: relative;\n}\n.slider.slider-horizontal {\n  width: 210px;\n  height: 20px;\n}\n.slider.slider-horizontal .slider-track {\n  height: 10px;\n  width: 100%;\n  margin-top: -5px;\n  top: 50%;\n  left: 0;\n}\n.slider.slider-horizontal .slider-selection,\n.slider.slider-horizontal .slider-track-low,\n.slider.slider-horizontal .slider-track-high {\n  height: 100%;\n  top: 0;\n  bottom: 0;\n}\n.slider.slider-horizontal .slider-tick,\n.slider.slider-horizontal .slider-handle {\n  margin-left: -10px;\n}\n.slider.slider-horizontal .slider-tick.triangle,\n.slider.slider-horizontal .slider-handle.triangle {\n  position: relative;\n  top: 50%;\n  transform: translateY(-50%);\n  border-width: 0 10px 10px 10px;\n  width: 0;\n  height: 0;\n  border-bottom-color: #0480be;\n  margin-top: 0;\n}\n.slider.slider-horizontal .slider-tick-container {\n  white-space: nowrap;\n  position: absolute;\n  top: 0;\n  left: 0;\n  width: 100%;\n}\n.slider.slider-horizontal .slider-tick-label-container {\n  white-space: nowrap;\n  margin-top: 20px;\n}\n.slider.slider-horizontal .slider-tick-label-container .slider-tick-label {\n  padding-top: 4px;\n  display: inline-block;\n  text-align: center;\n}\n.slider.slider-horizontal.slider-rtl .slider-track {\n  left: initial;\n  right: 0;\n}\n.slider.slider-horizontal.slider-rtl .slider-tick,\n.slider.slider-horizontal.slider-rtl .slider-handle {\n  margin-left: initial;\n  margin-right: -10px;\n}\n.slider.slider-horizontal.slider-rtl .slider-tick-container {\n  left: initial;\n  right: 0;\n}\n.slider.slider-vertical {\n  height: 210px;\n  width: 20px;\n}\n.slider.slider-vertical .slider-track {\n  width: 10px;\n  height: 100%;\n  left: 25%;\n  top: 0;\n}\n.slider.slider-vertical .slider-selection {\n  width: 100%;\n  left: 0;\n  top: 0;\n  bottom: 0;\n}\n.slider.slider-vertical .slider-track-low,\n.slider.slider-vertical .slider-track-high {\n  width: 100%;\n  left: 0;\n  right: 0;\n}\n.slider.slider-vertical .slider-tick,\n.slider.slider-vertical .slider-handle {\n  margin-top: -10px;\n}\n.slider.slider-vertical .slider-tick.triangle,\n.slider.slider-vertical .slider-handle.triangle {\n  border-width: 10px 0 10px 10px;\n  width: 1px;\n  height: 1px;\n  border-left-color: #0480be;\n  border-right-color: #0480be;\n  margin-left: 0;\n  margin-right: 0;\n}\n.slider.slider-vertical .slider-tick-label-container {\n  white-space: nowrap;\n}\n.slider.slider-vertical .slider-tick-label-container .slider-tick-label {\n  padding-left: 4px;\n}\n.slider.slider-vertical.slider-rtl .slider-track {\n  left: initial;\n  right: 25%;\n}\n.slider.slider-vertical.slider-rtl .slider-selection {\n  left: initial;\n  right: 0;\n}\n.slider.slider-vertical.slider-rtl .slider-tick.triangle,\n.slider.slider-vertical.slider-rtl .slider-handle.triangle {\n  border-width: 10px 10px 10px 0;\n}\n.slider.slider-vertical.slider-rtl .slider-tick-label-container .slider-tick-label {\n  padding-left: initial;\n  padding-right: 4px;\n}\n.slider.slider-disabled .slider-handle {\n  background-image: -webkit-linear-gradient(top, #dfdfdf 0%, #bebebe 100%);\n  background-image: -o-linear-gradient(top, #dfdfdf 0%, #bebebe 100%);\n  background-image: linear-gradient(to bottom, #dfdfdf 0%, #bebebe 100%);\n  background-repeat: repeat-x;\n  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffdfdfdf', endColorstr='#ffbebebe', GradientType=0);\n}\n.slider.slider-disabled .slider-track {\n  background-image: -webkit-linear-gradient(top, #e5e5e5 0%, #e9e9e9 100%);\n  background-image: -o-linear-gradient(top, #e5e5e5 0%, #e9e9e9 100%);\n  background-image: linear-gradient(to bottom, #e5e5e5 0%, #e9e9e9 100%);\n  background-repeat: repeat-x;\n  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffe5e5e5', endColorstr='#ffe9e9e9', GradientType=0);\n  cursor: not-allowed;\n}\n.slider input {\n  display: none;\n}\n.slider .tooltip.top {\n  margin-top: -36px;\n}\n.slider .tooltip-inner {\n  white-space: nowrap;\n  max-width: none;\n}\n.slider .hide {\n  display: none;\n}\n.slider-track {\n  position: absolute;\n  cursor: pointer;\n  background-image: -webkit-linear-gradient(top, #f5f5f5 0%, #f9f9f9 100%);\n  background-image: -o-linear-gradient(top, #f5f5f5 0%, #f9f9f9 100%);\n  background-image: linear-gradient(to bottom, #f5f5f5 0%, #f9f9f9 100%);\n  background-repeat: repeat-x;\n  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#fff5f5f5', endColorstr='#fff9f9f9', GradientType=0);\n  -webkit-box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);\n  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);\n  border-radius: 4px;\n}\n.slider-selection {\n  position: absolute;\n  background-image: -webkit-linear-gradient(top, #f9f9f9 0%, #f5f5f5 100%);\n  background-image: -o-linear-gradient(top, #f9f9f9 0%, #f5f5f5 100%);\n  background-image: linear-gradient(to bottom, #f9f9f9 0%, #f5f5f5 100%);\n  background-repeat: repeat-x;\n  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#fff9f9f9', endColorstr='#fff5f5f5', GradientType=0);\n  -webkit-box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.15);\n  box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.15);\n  -webkit-box-sizing: border-box;\n  -moz-box-sizing: border-box;\n  box-sizing: border-box;\n  border-radius: 4px;\n}\n.slider-selection.tick-slider-selection {\n  background-image: -webkit-linear-gradient(top, #89cdef 0%, #81bfde 100%);\n  background-image: -o-linear-gradient(top, #89cdef 0%, #81bfde 100%);\n  background-image: linear-gradient(to bottom, #89cdef 0%, #81bfde 100%);\n  background-repeat: repeat-x;\n  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff89cdef', endColorstr='#ff81bfde', GradientType=0);\n}\n.slider-track-low,\n.slider-track-high {\n  position: absolute;\n  background: transparent;\n  -webkit-box-sizing: border-box;\n  -moz-box-sizing: border-box;\n  box-sizing: border-box;\n  border-radius: 4px;\n}\n.slider-handle {\n  position: absolute;\n  top: 0;\n  width: 20px;\n  height: 20px;\n  background-color: #337ab7;\n  background-image: -webkit-linear-gradient(top, #149bdf 0%, #0480be 100%);\n  background-image: -o-linear-gradient(top, #149bdf 0%, #0480be 100%);\n  background-image: linear-gradient(to bottom, #149bdf 0%, #0480be 100%);\n  background-repeat: repeat-x;\n  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff149bdf', endColorstr='#ff0480be', GradientType=0);\n  filter: none;\n  -webkit-box-shadow: inset 0 1px 0 rgba(255,255,255,.2), 0 1px 2px rgba(0,0,0,.05);\n  box-shadow: inset 0 1px 0 rgba(255,255,255,.2), 0 1px 2px rgba(0,0,0,.05);\n  border: 0px solid transparent;\n}\n.slider-handle.round {\n  border-radius: 50%;\n}\n.slider-handle.triangle {\n  background: transparent none;\n}\n.slider-handle.custom {\n  background: transparent none;\n}\n.slider-handle.custom::before {\n  line-height: 20px;\n  font-size: 20px;\n  content: '\\2605';\n  color: #726204;\n}\n.slider-tick {\n  position: absolute;\n  width: 20px;\n  height: 20px;\n  background-image: -webkit-linear-gradient(top, #f9f9f9 0%, #f5f5f5 100%);\n  background-image: -o-linear-gradient(top, #f9f9f9 0%, #f5f5f5 100%);\n  background-image: linear-gradient(to bottom, #f9f9f9 0%, #f5f5f5 100%);\n  background-repeat: repeat-x;\n  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#fff9f9f9', endColorstr='#fff5f5f5', GradientType=0);\n  -webkit-box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.15);\n  box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.15);\n  -webkit-box-sizing: border-box;\n  -moz-box-sizing: border-box;\n  box-sizing: border-box;\n  filter: none;\n  opacity: 0.8;\n  border: 0px solid transparent;\n}\n.slider-tick.round {\n  border-radius: 50%;\n}\n.slider-tick.triangle {\n  background: transparent none;\n}\n.slider-tick.custom {\n  background: transparent none;\n}\n.slider-tick.custom::before {\n  line-height: 20px;\n  font-size: 20px;\n  content: '\\2605';\n  color: #726204;\n}\n.slider-tick.in-selection {\n  background-image: -webkit-linear-gradient(top, #89cdef 0%, #81bfde 100%);\n  background-image: -o-linear-gradient(top, #89cdef 0%, #81bfde 100%);\n  background-image: linear-gradient(to bottom, #89cdef 0%, #81bfde 100%);\n  background-repeat: repeat-x;\n  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff89cdef', endColorstr='#ff81bfde', GradientType=0);\n  opacity: 1;\n}\n/*\r\n   MODULE: bootstrap-multiselect 0.9.13\r\n   SITE  : https://github.com/davidstutz/bootstrap-multiselect\r\n   SOURCE: https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.13/css/bootstrap-multiselect.css\r\n*/\n.multiselect-container {\n  position: absolute;\n  list-style-type: none;\n  margin: 0;\n  padding: 0;\n}\n.multiselect-container .input-group {\n  margin: 5px;\n}\n.multiselect-container > li {\n  padding: 0;\n}\n.multiselect-container > li > a.multiselect-all label {\n  font-weight: 700;\n}\n.multiselect-container > li.multiselect-group label {\n  margin: 0;\n  padding: 3px 20px 3px 20px;\n  height: 100%;\n  font-weight: 700;\n}\n.multiselect-container > li.multiselect-group-clickable label {\n  cursor: pointer;\n}\n.multiselect-container > li > a {\n  padding: 0;\n}\n.multiselect-container > li > a > label {\n  margin: 0;\n  height: 100%;\n  cursor: pointer;\n  font-weight: 400;\n  padding: 3px 20px 3px 40px;\n}\n.multiselect-container > li > a > label.radio,\n.multiselect-container > li > a > label.checkbox {\n  margin: 0;\n}\n.multiselect-container > li > a > label > input[type=checkbox] {\n  margin-bottom: 5px;\n}\n.btn-group > .btn-group:nth-child(2) > .multiselect.btn {\n  border-top-left-radius: 4px;\n  border-bottom-left-radius: 4px;\n}\n.form-inline .multiselect-container label.checkbox,\n.form-inline .multiselect-container label.radio {\n  padding: 3px 20px 3px 40px;\n}\n.form-inline .multiselect-container li a label.checkbox input[type=checkbox],\n.form-inline .multiselect-container li a label.radio input[type=radio] {\n  margin-left: -20px;\n  margin-right: 0;\n}\n/*! ========================================================================\r\n * Bootstrap Toggle: bootstrap-toggle.css v2.2.0\r\n * http://www.bootstraptoggle.com\r\n * ========================================================================\r\n * Copyright 2014 Min Hur, The New York Times Company\r\n * Licensed under MIT\r\n * ======================================================================== */\n.checkbox label .toggle,\n.checkbox-inline .toggle {\n  margin-left: -20px;\n  margin-right: 5px;\n}\n.toggle {\n  position: relative;\n  overflow: hidden;\n}\n.toggle input[type=\"checkbox\"] {\n  display: none;\n}\n.toggle-group {\n  position: absolute;\n  width: 200%;\n  top: 0;\n  bottom: 0;\n  left: 0;\n  transition: left 0.35s;\n  -webkit-transition: left 0.35s;\n  -moz-user-select: none;\n  -webkit-user-select: none;\n}\n.toggle.off .toggle-group {\n  left: -100%;\n}\n.toggle-on {\n  position: absolute;\n  top: 0;\n  bottom: 0;\n  left: 0;\n  right: 50%;\n  margin: 0;\n  border: 0;\n  border-radius: 0;\n}\n.toggle-off {\n  position: absolute;\n  top: 0;\n  bottom: 0;\n  left: 50%;\n  right: 0;\n  margin: 0;\n  border: 0;\n  border-radius: 0;\n}\n.toggle-handle {\n  position: relative;\n  margin: 0 auto;\n  padding-top: 0px;\n  padding-bottom: 0px;\n  height: 100%;\n  width: 0px;\n  border-width: 0 1px;\n}\n.toggle.btn {\n  min-width: 59px;\n  min-height: 34px;\n}\n.toggle-on.btn {\n  padding-right: 24px;\n}\n.toggle-off.btn {\n  padding-left: 24px;\n}\n.toggle.btn-lg {\n  min-width: 79px;\n  min-height: 45px;\n}\n.toggle-on.btn-lg {\n  padding-right: 31px;\n}\n.toggle-off.btn-lg {\n  padding-left: 31px;\n}\n.toggle-handle.btn-lg {\n  width: 40px;\n}\n.toggle.btn-sm {\n  min-width: 50px;\n  min-height: 30px;\n}\n.toggle-on.btn-sm {\n  padding-right: 20px;\n}\n.toggle-off.btn-sm {\n  padding-left: 20px;\n}\n.toggle.btn-xs {\n  min-width: 35px;\n  min-height: 22px;\n}\n.toggle-on.btn-xs {\n  padding-right: 12px;\n}\n.toggle-off.btn-xs {\n  padding-left: 12px;\n}\n/***\r\nSpectrum Colorpicker v1.8.0\r\nhttps://github.com/bgrins/spectrum\r\nAuthor: Brian Grinstead\r\nLicense: MIT\r\n***/\n.sp-container {\n  position: absolute;\n  top: 0;\n  left: 0;\n  display: inline-block;\n  *display: inline;\n  *zoom: 1;\n  /* https://github.com/bgrins/spectrum/issues/40 */\n  z-index: 9999994;\n  overflow: hidden;\n}\n.sp-container.sp-flat {\n  position: relative;\n}\n/* Fix for * { box-sizing: border-box; } */\n.sp-container,\n.sp-container * {\n  -webkit-box-sizing: content-box;\n  -moz-box-sizing: content-box;\n  box-sizing: content-box;\n}\n/* http://ansciath.tumblr.com/post/7347495869/css-aspect-ratio */\n.sp-top {\n  position: relative;\n  width: 100%;\n  display: inline-block;\n}\n.sp-top-inner {\n  position: absolute;\n  top: 0;\n  left: 0;\n  bottom: 0;\n  right: 0;\n}\n.sp-color {\n  position: absolute;\n  top: 0;\n  left: 0;\n  bottom: 0;\n  right: 20%;\n}\n.sp-hue {\n  position: absolute;\n  top: 0;\n  right: 0;\n  bottom: 0;\n  left: 84%;\n  height: 100%;\n}\n.sp-clear-enabled .sp-hue {\n  top: 33px;\n  height: 77.5%;\n}\n.sp-fill {\n  padding-top: 80%;\n}\n.sp-sat,\n.sp-val {\n  position: absolute;\n  top: 0;\n  left: 0;\n  right: 0;\n  bottom: 0;\n}\n.sp-alpha-enabled .sp-top {\n  margin-bottom: 18px;\n}\n.sp-alpha-enabled .sp-alpha {\n  display: block;\n}\n.sp-alpha-handle {\n  position: absolute;\n  top: -4px;\n  bottom: -4px;\n  width: 6px;\n  left: 50%;\n  cursor: pointer;\n  border: 1px solid black;\n  background: white;\n  opacity: .8;\n}\n.sp-alpha {\n  display: none;\n  position: absolute;\n  bottom: -14px;\n  right: 0;\n  left: 0;\n  height: 8px;\n}\n.sp-alpha-inner {\n  border: solid 1px #333;\n}\n.sp-clear {\n  display: none;\n}\n.sp-clear.sp-clear-display {\n  background-position: center;\n}\n.sp-clear-enabled .sp-clear {\n  display: block;\n  position: absolute;\n  top: 0px;\n  right: 0;\n  bottom: 0;\n  left: 84%;\n  height: 28px;\n}\n/* Don't allow text selection */\n.sp-container,\n.sp-replacer,\n.sp-preview,\n.sp-dragger,\n.sp-slider,\n.sp-alpha,\n.sp-clear,\n.sp-alpha-handle,\n.sp-container.sp-dragging .sp-input,\n.sp-container button {\n  -webkit-user-select: none;\n  -moz-user-select: -moz-none;\n  -o-user-select: none;\n  user-select: none;\n}\n.sp-container.sp-input-disabled .sp-input-container {\n  display: none;\n}\n.sp-container.sp-buttons-disabled .sp-button-container {\n  display: none;\n}\n.sp-container.sp-palette-buttons-disabled .sp-palette-button-container {\n  display: none;\n}\n.sp-palette-only .sp-picker-container {\n  display: none;\n}\n.sp-palette-disabled .sp-palette-container {\n  display: none;\n}\n.sp-initial-disabled .sp-initial {\n  display: none;\n}\n/* Gradients for hue, saturation and value instead of images.  Not pretty... but it works */\n.sp-sat {\n  background-image: -webkit-gradient(linear,  0 0, 100% 0, from(#FFF), to(rgba(204, 154, 129, 0)));\n  background-image: -webkit-linear-gradient(left, #FFF, rgba(204, 154, 129, 0));\n  background-image: -moz-linear-gradient(left, #fff, rgba(204, 154, 129, 0));\n  background-image: -o-linear-gradient(left, #fff, rgba(204, 154, 129, 0));\n  background-image: -ms-linear-gradient(left, #fff, rgba(204, 154, 129, 0));\n  background-image: linear-gradient(to right, #fff, rgba(204, 154, 129, 0));\n  -ms-filter: \"progid:DXImageTransform.Microsoft.gradient(GradientType = 1, startColorstr=#FFFFFFFF, endColorstr=#00CC9A81)\";\n  filter: progid:DXImageTransform.Microsoft.gradient(GradientType = 1, startColorstr='#FFFFFFFF', endColorstr='#00CC9A81');\n}\n.sp-val {\n  background-image: -webkit-gradient(linear, 0 100%, 0 0, from(#000000), to(rgba(204, 154, 129, 0)));\n  background-image: -webkit-linear-gradient(bottom, #000000, rgba(204, 154, 129, 0));\n  background-image: -moz-linear-gradient(bottom, #000, rgba(204, 154, 129, 0));\n  background-image: -o-linear-gradient(bottom, #000, rgba(204, 154, 129, 0));\n  background-image: -ms-linear-gradient(bottom, #000, rgba(204, 154, 129, 0));\n  background-image: linear-gradient(to top, #000, rgba(204, 154, 129, 0));\n  -ms-filter: \"progid:DXImageTransform.Microsoft.gradient(startColorstr=#00CC9A81, endColorstr=#FF000000)\";\n  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#00CC9A81', endColorstr='#FF000000');\n}\n.sp-hue {\n  background: -moz-linear-gradient(top, #ff0000 0%, #ffff00 17%, #00ff00 33%, #00ffff 50%, #0000ff 67%, #ff00ff 83%, #ff0000 100%);\n  background: -ms-linear-gradient(top, #ff0000 0%, #ffff00 17%, #00ff00 33%, #00ffff 50%, #0000ff 67%, #ff00ff 83%, #ff0000 100%);\n  background: -o-linear-gradient(top, #ff0000 0%, #ffff00 17%, #00ff00 33%, #00ffff 50%, #0000ff 67%, #ff00ff 83%, #ff0000 100%);\n  background: -webkit-gradient(linear, left top, left bottom, from(#ff0000), color-stop(0.17, #ffff00), color-stop(0.33, #00ff00), color-stop(0.5, #00ffff), color-stop(0.67, #0000ff), color-stop(0.83, #ff00ff), to(#ff0000));\n  background: -webkit-linear-gradient(top, #ff0000 0%, #ffff00 17%, #00ff00 33%, #00ffff 50%, #0000ff 67%, #ff00ff 83%, #ff0000 100%);\n  background: linear-gradient(to bottom, #ff0000 0%, #ffff00 17%, #00ff00 33%, #00ffff 50%, #0000ff 67%, #ff00ff 83%, #ff0000 100%);\n}\n/* IE filters do not support multiple color stops.\r\n   Generate 6 divs, line them up, and do two color gradients for each.\r\n   Yes, really.\r\n */\n.sp-1 {\n  height: 17%;\n  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff0000', endColorstr='#ffff00');\n}\n.sp-2 {\n  height: 16%;\n  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffff00', endColorstr='#00ff00');\n}\n.sp-3 {\n  height: 17%;\n  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#00ff00', endColorstr='#00ffff');\n}\n.sp-4 {\n  height: 17%;\n  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#00ffff', endColorstr='#0000ff');\n}\n.sp-5 {\n  height: 16%;\n  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#0000ff', endColorstr='#ff00ff');\n}\n.sp-6 {\n  height: 17%;\n  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff00ff', endColorstr='#ff0000');\n}\n.sp-hidden {\n  display: none !important;\n}\n/* Clearfix hack */\n.sp-cf:before,\n.sp-cf:after {\n  content: \"\";\n  display: table;\n}\n.sp-cf:after {\n  clear: both;\n}\n.sp-cf {\n  *zoom: 1;\n}\n/* Mobile devices, make hue slider bigger so it is easier to slide */\n@media (max-device-width: 480px) {\n  .sp-color {\n    right: 40%;\n  }\n\n  .sp-hue {\n    left: 63%;\n  }\n\n  .sp-fill {\n    padding-top: 60%;\n  }\n}\n.sp-dragger {\n  border-radius: 5px;\n  height: 5px;\n  width: 5px;\n  border: 1px solid #fff;\n  background: #000;\n  cursor: pointer;\n  position: absolute;\n  top: 0;\n  left: 0;\n}\n.sp-slider {\n  position: absolute;\n  top: 0;\n  cursor: pointer;\n  height: 3px;\n  left: -1px;\n  right: -1px;\n  border: 1px solid #000;\n  background: white;\n  opacity: .8;\n}\n/*\r\nTheme authors:\r\nHere are the basic themeable display options (colors, fonts, global widths).\r\nSee http://bgrins.github.io/spectrum/themes/ for instructions.\r\n*/\n.sp-container {\n  border-radius: 0;\n  background-color: #ECECEC;\n  border: solid 1px #f0c49B;\n  padding: 0;\n}\n.sp-container,\n.sp-container button,\n.sp-container input,\n.sp-color,\n.sp-hue,\n.sp-clear {\n  font: normal 12px \"Lucida Grande\", \"Lucida Sans Unicode\", \"Lucida Sans\", Geneva, Verdana, sans-serif;\n  -webkit-box-sizing: border-box;\n  -moz-box-sizing: border-box;\n  -ms-box-sizing: border-box;\n  box-sizing: border-box;\n}\n.sp-top {\n  margin-bottom: 3px;\n}\n.sp-color,\n.sp-hue,\n.sp-clear {\n  border: solid 1px #666;\n}\n/* Input */\n.sp-input-container {\n  float: right;\n  width: 100px;\n  margin-bottom: 4px;\n}\n.sp-initial-disabled  .sp-input-container {\n  width: 100%;\n}\n.sp-input {\n  font-size: 12px !important;\n  border: 1px inset;\n  padding: 4px 5px;\n  margin: 0;\n  width: 100%;\n  background: transparent;\n  border-radius: 3px;\n  color: #222;\n}\n.sp-input:focus {\n  border: 1px solid orange;\n}\n.sp-input.sp-validation-error {\n  border: 1px solid red;\n  background: #fdd;\n}\n.sp-picker-container,\n.sp-palette-container {\n  float: left;\n  position: relative;\n  padding: 10px;\n  padding-bottom: 300px;\n  margin-bottom: -290px;\n}\n.sp-picker-container {\n  width: 172px;\n  border-left: solid 1px #fff;\n}\n/* Palettes */\n.sp-palette-container {\n  border-right: solid 1px #ccc;\n}\n.sp-palette-only .sp-palette-container {\n  border: 0;\n}\n.sp-palette .sp-thumb-el {\n  display: block;\n  position: relative;\n  float: left;\n  width: 24px;\n  height: 15px;\n  margin: 3px;\n  cursor: pointer;\n  border: solid 2px transparent;\n}\n.sp-palette .sp-thumb-el:hover,\n.sp-palette .sp-thumb-el.sp-thumb-active {\n  border-color: orange;\n}\n.sp-thumb-el {\n  position: relative;\n}\n/* Initial */\n.sp-initial {\n  float: left;\n  border: solid 1px #333;\n}\n.sp-initial span {\n  width: 30px;\n  height: 25px;\n  border: none;\n  display: block;\n  float: left;\n  margin: 0;\n}\n.sp-initial .sp-clear-display {\n  background-position: center;\n}\n/* Buttons */\n.sp-palette-button-container,\n.sp-button-container {\n  float: right;\n}\n/* Replacer (the little preview div that shows up instead of the <input>) */\n.sp-replacer {\n  margin: 0;\n  overflow: hidden;\n  cursor: pointer;\n  padding: 4px;\n  display: inline-block;\n  *zoom: 1;\n  *display: inline;\n  border: solid 1px #91765d;\n  background: #eee;\n  color: #333;\n  vertical-align: middle;\n}\n.sp-replacer:hover,\n.sp-replacer.sp-active {\n  border-color: #F0C49B;\n  color: #111;\n}\n.sp-replacer.sp-disabled {\n  cursor: default;\n  border-color: silver;\n  color: silver;\n}\n.sp-dd {\n  padding: 2px 0;\n  height: 16px;\n  line-height: 16px;\n  float: left;\n  font-size: 10px;\n}\n.sp-preview {\n  position: relative;\n  width: 25px;\n  height: 20px;\n  border: solid 1px #222;\n  margin-right: 5px;\n  float: left;\n  z-index: 0;\n}\n.sp-palette {\n  *width: 220px;\n  max-width: 220px;\n}\n.sp-palette .sp-thumb-el {\n  width: 16px;\n  height: 16px;\n  margin: 2px 1px;\n  border: solid 1px #d0d0d0;\n}\n.sp-container {\n  padding-bottom: 0;\n}\n/* Buttons: http://hellohappy.org/css3-buttons/ */\n.sp-container button {\n  background-color: #eeeeee;\n  background-image: -webkit-linear-gradient(top, #eeeeee, #cccccc);\n  background-image: -moz-linear-gradient(top, #eeeeee, #cccccc);\n  background-image: -ms-linear-gradient(top, #eeeeee, #cccccc);\n  background-image: -o-linear-gradient(top, #eeeeee, #cccccc);\n  background-image: linear-gradient(to bottom, #eeeeee, #cccccc);\n  border: 1px solid #ccc;\n  border-bottom: 1px solid #bbb;\n  border-radius: 3px;\n  color: #333;\n  font-size: 14px;\n  line-height: 1;\n  padding: 5px 4px;\n  text-align: center;\n  text-shadow: 0 1px 0 #eee;\n  vertical-align: middle;\n}\n.sp-container button:hover {\n  background-color: #dddddd;\n  background-image: -webkit-linear-gradient(top, #dddddd, #bbbbbb);\n  background-image: -moz-linear-gradient(top, #dddddd, #bbbbbb);\n  background-image: -ms-linear-gradient(top, #dddddd, #bbbbbb);\n  background-image: -o-linear-gradient(top, #dddddd, #bbbbbb);\n  background-image: linear-gradient(to bottom, #dddddd, #bbbbbb);\n  border: 1px solid #bbb;\n  border-bottom: 1px solid #999;\n  cursor: pointer;\n  text-shadow: 0 1px 0 #ddd;\n}\n.sp-container button:active {\n  border: 1px solid #aaa;\n  border-bottom: 1px solid #888;\n  -webkit-box-shadow: inset 0 0 5px 2px #aaaaaa, 0 1px 0 0 #eeeeee;\n  -moz-box-shadow: inset 0 0 5px 2px #aaaaaa, 0 1px 0 0 #eeeeee;\n  -ms-box-shadow: inset 0 0 5px 2px #aaaaaa, 0 1px 0 0 #eeeeee;\n  -o-box-shadow: inset 0 0 5px 2px #aaaaaa, 0 1px 0 0 #eeeeee;\n  box-shadow: inset 0 0 5px 2px #aaaaaa, 0 1px 0 0 #eeeeee;\n}\n.sp-cancel {\n  font-size: 11px;\n  color: #d93f3f !important;\n  margin: 0;\n  padding: 2px;\n  margin-right: 5px;\n  vertical-align: middle;\n  text-decoration: none;\n}\n.sp-cancel:hover {\n  color: #d93f3f !important;\n  text-decoration: underline;\n}\n.sp-palette span:hover,\n.sp-palette span.sp-thumb-active {\n  border-color: #000;\n}\n.sp-preview,\n.sp-alpha,\n.sp-thumb-el {\n  position: relative;\n  background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAIAAADZF8uwAAAAGUlEQVQYV2M4gwH+YwCGIasIUwhT25BVBADtzYNYrHvv4gAAAABJRU5ErkJggg==);\n}\n.sp-preview-inner,\n.sp-alpha-inner,\n.sp-thumb-inner {\n  display: block;\n  position: absolute;\n  top: 0;\n  left: 0;\n  bottom: 0;\n  right: 0;\n}\n.sp-palette .sp-thumb-inner {\n  background-position: 50% 50%;\n  background-repeat: no-repeat;\n}\n.sp-palette .sp-thumb-light.sp-thumb-active .sp-thumb-inner {\n  background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAIVJREFUeNpiYBhsgJFMffxAXABlN5JruT4Q3wfi/0DsT64h8UD8HmpIPCWG/KemIfOJCUB+Aoacx6EGBZyHBqI+WsDCwuQ9mhxeg2A210Ntfo8klk9sOMijaURm7yc1UP2RNCMbKE9ODK1HM6iegYLkfx8pligC9lCD7KmRof0ZhjQACDAAceovrtpVBRkAAAAASUVORK5CYII=);\n}\n.sp-palette .sp-thumb-dark.sp-thumb-active .sp-thumb-inner {\n  background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAadEVYdFNvZnR3YXJlAFBhaW50Lk5FVCB2My41LjEwMPRyoQAAAMdJREFUOE+tkgsNwzAMRMugEAahEAahEAZhEAqlEAZhEAohEAYh81X2dIm8fKpEspLGvudPOsUYpxE2BIJCroJmEW9qJ+MKaBFhEMNabSy9oIcIPwrB+afvAUFoK4H0tMaQ3XtlrggDhOVVMuT4E5MMG0FBbCEYzjYT7OxLEvIHQLY2zWwQ3D+9luyOQTfKDiFD3iUIfPk8VqrKjgAiSfGFPecrg6HN6m/iBcwiDAo7WiBeawa+Kwh7tZoSCGLMqwlSAzVDhoK+6vH4G0P5wdkAAAAASUVORK5CYII=);\n}\n.sp-clear-display {\n  background-repeat: no-repeat;\n  background-position: center;\n  background-image: url(data:image/gif;base64,R0lGODlhFAAUAPcAAAAAAJmZmZ2dnZ6enqKioqOjo6SkpKWlpaampqenp6ioqKmpqaqqqqurq/Hx8fLy8vT09PX19ff39/j4+Pn5+fr6+vv7+wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAEAAP8ALAAAAAAUABQAAAihAP9FoPCvoMGDBy08+EdhQAIJCCMybCDAAYUEARBAlFiQQoMABQhKUJBxY0SPICEYHBnggEmDKAuoPMjS5cGYMxHW3IiT478JJA8M/CjTZ0GgLRekNGpwAsYABHIypcAgQMsITDtWJYBR6NSqMico9cqR6tKfY7GeBCuVwlipDNmefAtTrkSzB1RaIAoXodsABiZAEFB06gIBWC1mLVgBa0AAOw==);\n}\n/* DataFilterPane */\n.DataFilterPaneClass {\n  display: inline-block;\n  width: 100%;\n  height: 100%;\n  max-width: 100%;\n  max-height: 100%;\n}\n.DataFilterPaneClass h4 {\n  text-align: center;\n  width: 100%;\n  background: #428bca;\n  color: white;\n  padding: 0px;\n  margin-right: 0px;\n  margin-top: 5px;\n  margin-bottom: 5px;\n  margin-left: 0px;\n}\n.DataFilterPaneClass h5 {\n  width: 100%;\n  color: black;\n  padding: 0px;\n  text-align: center;\n  margin-right: 0px;\n  margin-top: 10px;\n  margin-bottom: 0px;\n  margin-left: 0px;\n}\n/* Trigger button */\n.DataFilterPaneClass .btn-group {\n  width: 100%;\n}\n.DataFilterPaneClass #ColumnSelector {\n  height: 160px;\n  margin-bottom: 5px;\n  width: 100%;\n}\n.DataFilterPaneClass .slider {\n  width: 95% !important;\n  margin-left: 5px;\n}\n.DataFilterPaneClass .multiselect {\n  width: 100%;\n  max-width: 100%;\n  max-height: 100%;\n}\n/* ConfigurationPane */\n.ConfigurationPaneClass {\n  display: inline-block;\n  height: 100%;\n  width: 100%;\n  max-height: 100%;\n  max-width: 100%;\n}\n.ConfigurationPaneClass label {\n  font-size: medium;\n}\n.ConfigurationPaneClass .control-string input {\n  width: 100%;\n}\n.ConfigurationPaneClass div,\n.ConfigurationPaneClass h1,\n.ConfigurationPaneClass h2,\n.ConfigurationPaneClass h3,\n.ConfigurationPaneClass h4,\n.ConfigurationPaneClass h5 {\n  padding: 1px !important;\n  margin: 0px !important;\n}\n.ConfigurationPaneClass h1 {\n  font-size: 2.5em !important;\n  font-weight: normal !important;\n  color: white;\n  background-color: #878787;\n  text-align: center;\n}\n.ConfigurationPaneClass h2 {\n  font-size: 2.25em !important;\n  font-weight: normal !important;\n  color: white;\n  background-color: #3288bd;\n  text-align: center;\n}\n.ConfigurationPaneClass h3 {\n  font-size: 2em !important;\n  font-weight: normal !important;\n  color: white;\n  background-color: #1a9850;\n  text-align: center;\n}\n.ConfigurationPaneClass h4 {\n  font-size: 1.5em !important;\n  font-weight: normal !important;\n  color: white;\n  background-color: #d58512;\n  text-align: center;\n}\n.ConfigurationPaneClass h5 {\n  font-size: 1.2em !important;\n  font-weight: normal !important;\n  color: white;\n  background-color: #3e999f;\n  text-align: center;\n}\n.ConfigurationPaneClass h1:hover,\n.ConfigurationPaneClass h2:hover,\n.ConfigurationPaneClass h3:hover,\n.ConfigurationPaneClass h4:hover,\n.ConfigurationPaneClass h5:hover {\n  box-shadow: inset 0 0 100px 100px rgba(255, 255, 255, 0.1);\n  color: yellow;\n}\n.ConfigurationPaneClass .control-boolean label,\n.ConfigurationPaneClass .control-boolean input,\n.ConfigurationPaneClass .control-string label,\n.ConfigurationPaneClass .control-string input {\n  padding: 1px !important;\n  margin: 0px !important;\n}\n.ConfigurationPaneClass .control-float {\n  margin: 10px;\n}\n.ConfigurationPaneClass .slider {\n  margin-left: 5px !important;\n  margin-bottom: 15px !important;\n  margin-top: 0px !important;\n}\n.ConfigurationPaneClass .slider-handle {\n  top: 5px !important;\n}\n/** Treemap **/\n.TreemapClass text {\n  pointer-events: none;\n}\n.TreemapClass .grandparent text {\n  font-weight: bold;\n}\n.TreemapClass rect {\n  fill: none;\n  stroke: #fff;\n}\n.TreemapClass rect.parent,\n.grandparent rect {\n  stroke-width: 2px;\n}\n.TreemapClass .grandparent rect {\n  fill: steelblue;\n}\n.grandparent:hover rect {\n  fill: #ee9700;\n}\n.TreemapClass .children rect.parent,\n.grandparent rect {\n  cursor: pointer;\n}\n.TreemapClass .children rect.parent {\n  fill-opacity: .1;\n}\n.TreemapClass .children:hover rect.child {\n  fill-opacity: .8;\n}\n/** Treemap Bar Chart **/\n.TreemapBarChartClass label {\n  font-family: sans-serif;\n  font-size: 14px;\n  position: absolute;\n  left: 92px;\n  top: 26px;\n}\n.TreemapBarChartClass .axis .domain {\n  display: none;\n}\n.TreemapBarChartClass .axis line {\n  stroke: #ccc;\n}\n.TreemapBarChartClass .axis.x0 text {\n  font-weight: 700;\n}\n.TreemapBarChartClass .hover-active rect {\n  opacity: .75;\n}\n.TreemapBarChartClass .hover-active rect.hover {\n  opacity: 1;\n}\n"; (require("browserify-css").createStyle(css, { "href": "css\\dex.css" }, { "insertAt": "bottom" })); module.exports = css;
+var css = "/** CSS Dependencies **/\n/*\r\n * Default Layout Theme\r\n *\r\n * Created for jquery.layout\r\n *\r\n * Copyright (c) 2010\r\n *   Fabrizio Balliano (http://www.fabrizioballiano.net)\r\n *   Kevin Dalman (http://allpro.net)\r\n *\r\n * Dual licensed under the GPL (http://www.gnu.org/licenses/gpl.html)\r\n * and MIT (http://www.opensource.org/licenses/mit-license.php) licenses.\r\n *\r\n * Last Updated: 2010-02-10\r\n * NOTE: For best code readability, view this with a fixed-space font and tabs equal to 4-chars\r\n */\n/*\r\n *\tDEFAULT FONT\r\n *\tJust to make demo-pages look better - not actually relevant to Layout!\r\n */\nbody {\n  font-family: Geneva, Arial, Helvetica, sans-serif;\n  font-size: 100%;\n  *font-size: 80%;\n}\n/*\r\n *\tPANES & CONTENT-DIVs\r\n */\n.ui-layout-pane {\n  /* all 'panes' */\n  background: #FFF;\n  border: 1px solid #BBB;\n  padding: 10px;\n  overflow: auto;\n  /* DO NOT add scrolling (or padding) to 'panes' that have a content-div,\r\n       otherwise you may get double-scrollbars - on the pane AND on the content-div\r\n       - use ui-layout-wrapper class if pane has a content-div\r\n       - use ui-layout-container if pane has an inner-layout\r\n    */\n}\n/* (scrolling) content-div inside pane allows for fixed header(s) and/or footer(s) */\n.ui-layout-content {\n  padding: 10px;\n  position: relative;\n  /* contain floated or positioned elements */\n  overflow: auto;\n  /* add scrolling to content-div */\n}\n/*\r\n *\tUTILITY CLASSES\r\n *\tMust come AFTER pane-class above so will override\r\n *\tThese classes are NOT auto-generated and are NOT used by Layout\r\n */\n.layout-child-container,\n.layout-content-container {\n  padding: 0;\n  overflow: hidden;\n}\n.layout-child-container {\n  border: 0;\n  /* remove border because inner-layout-panes probably have borders */\n}\n.layout-scroll {\n  overflow: auto;\n}\n.layout-hide {\n  display: none;\n}\n/*\r\n *\tRESIZER-BARS\r\n */\n.ui-layout-resizer {\n  /* all 'resizer-bars' */\n  background: #DDD;\n  border: 1px solid #BBB;\n  border-width: 0;\n}\n.ui-layout-resizer-drag {\n  /* REAL resizer while resize in progress */\n}\n.ui-layout-resizer-hover {\n  /* affects both open and closed states */\n}\n/* NOTE: It looks best when 'hover' and 'dragging' are set to the same color,\r\n    otherwise color shifts while dragging when bar can't keep up with mouse */\n.ui-layout-resizer-open-hover,\n/* hover-color to 'resize' */\r\n.ui-layout-resizer-dragging {\n  /* resizer beging 'dragging' */\n  background: #C4E1A4;\n}\n.ui-layout-resizer-dragging {\n  /* CLONED resizer being dragged */\n  border: 1px solid #BBB;\n}\n.ui-layout-resizer-north-dragging,\n.ui-layout-resizer-south-dragging {\n  border-width: 1px 0;\n}\n.ui-layout-resizer-west-dragging,\n.ui-layout-resizer-east-dragging {\n  border-width: 0 1px;\n}\n/* NOTE: Add a 'dragging-limit' color to provide visual feedback when resizer hits min/max size limits */\n.ui-layout-resizer-dragging-limit {\n  /* CLONED resizer at min or max size-limit */\n  background: #E1A4A4;\n  /* red */\n}\n.ui-layout-resizer-closed-hover {\n  /* hover-color to 'slide open' */\n  background: #EBD5AA;\n}\n.ui-layout-resizer-sliding {\n  /* resizer when pane is 'slid open' */\n  opacity: .10;\n  /* show only a slight shadow */\n  filter: alpha(opacity=10);\n}\n.ui-layout-resizer-sliding-hover {\n  /* sliding resizer - hover */\n  opacity: 1.00;\n  /* on-hover, show the resizer-bar normally */\n  filter: alpha(opacity=100);\n}\n/* sliding resizer - add 'outside-border' to resizer on-hover\r\n * this sample illustrates how to target specific panes and states */\n.ui-layout-resizer-north-sliding-hover {\n  border-bottom-width: 1px;\n}\n.ui-layout-resizer-south-sliding-hover {\n  border-top-width: 1px;\n}\n.ui-layout-resizer-west-sliding-hover {\n  border-right-width: 1px;\n}\n.ui-layout-resizer-east-sliding-hover {\n  border-left-width: 1px;\n}\n/*\r\n *\tTOGGLER-BUTTONS\r\n */\n.ui-layout-toggler {\n  border: 1px solid #BBB;\n  /* match pane-border */\n  background-color: #BBB;\n}\n.ui-layout-resizer-hover .ui-layout-toggler {\n  opacity: .60;\n  filter: alpha(opacity=60);\n}\n.ui-layout-toggler-hover,\n/* need when NOT resizable */\r\n.ui-layout-resizer-hover .ui-layout-toggler-hover {\n  /* need specificity when IS resizable */\n  background-color: #FC6;\n  opacity: 1.00;\n  filter: alpha(opacity=100);\n}\n.ui-layout-toggler-north,\n.ui-layout-toggler-south {\n  border-width: 0 1px;\n  /* left/right borders */\n}\n.ui-layout-toggler-west,\n.ui-layout-toggler-east {\n  border-width: 1px 0;\n  /* top/bottom borders */\n}\n/* hide the toggler-button when the pane is 'slid open' */\n.ui-layout-resizer-sliding  .ui-layout-toggler {\n  display: none;\n}\n/*\r\n *\tstyle the text we put INSIDE the togglers\r\n */\n.ui-layout-toggler .content {\n  color: #666;\n  font-size: 12px;\n  font-weight: bold;\n  width: 100%;\n  padding-bottom: 0.35ex;\n  /* to 'vertically center' text inside text-span */\n}\n/*\r\n *\tPANE-MASKS\r\n *\tthese styles are hard-coded on mask elems, but are also\r\n *\tincluded here as !important to ensure will overrides any generic styles\r\n */\n.ui-layout-mask {\n  border: none !important;\n  padding: 0 !important;\n  margin: 0 !important;\n  overflow: hidden !important;\n  position: absolute !important;\n  opacity: 0 !important;\n  filter: Alpha(Opacity=\"0\") !important;\n}\n.ui-layout-mask-inside-pane {\n  /* masks always inside pane EXCEPT when pane is an iframe */\n  top: 0 !important;\n  left: 0 !important;\n  width: 100% !important;\n  height: 100% !important;\n}\n\n/* standard mask for iframes */\n\n/* extra mask for objects/applets */\n/*\r\n *\tDefault printing styles\r\n */\n@media print {\n  /*\r\n     *\tUnless you want to print the layout as it appears onscreen,\r\n     *\tthese html/body styles are needed to allow the content to 'flow'\r\n     */\n\n  html {\n    height: auto !important;\n    overflow: visible !important;\n  }\n\n  body.ui-layout-container {\n    position: static !important;\n    top: auto !important;\n    bottom: auto !important;\n    left: auto !important;\n    right: auto !important;\n    /* only IE6 has container width & height set by Layout */\n    _width: auto !important;\n    _height: auto !important;\n  }\n\n  .ui-layout-resizer,\n  .ui-layout-toggler {\n    display: none !important;\n  }\n\n  /*\r\n     *\tDefault pane print styles disables positioning, borders and backgrounds.\r\n     *\tYou can modify these styles however it suit your needs.\r\n     */\n\n  .ui-layout-pane {\n    border: none !important;\n    background: transparent !important;\n    position: relative !important;\n    top: auto !important;\n    bottom: auto !important;\n    left: auto !important;\n    right: auto !important;\n    width: auto !important;\n    height: auto !important;\n    overflow: visible !important;\n  }\n}\n.uix-multiselect-original {\n  position: absolute;\n  left: -999999px;\n}\n.uix-multiselect {\n  position: relative;\n  float: left;\n}\n.uix-multiselect {\n  width: 100% !important;\n}\n/** CSS to make the control scalable **/\n.uix-multiselect .multiselect-selected-list {\n  position: absolute;\n  overflow: hidden;\n  width: 50% !important;\n  left: 0% !important;\n}\n.uix-multiselect .multiselect-available-list {\n  position: absolute;\n  overflow: hidden;\n  left: 50% !important;\n  width: 50% !important;\n}\n.uix-multiselect .ui-widget-header {\n  overflow: hidden;\n  white-space: nowrap;\n  padding: 2px 4px;\n}\n.uix-multiselect .ui-widget-header div.header-text {\n  white-space: nowrap;\n  font-size: .9em;\n}\n.uix-multiselect .ui-widget-header .uix-control-right,\n.uix-multiselect .ui-widget-header .uix-control-left {\n  width: 16px;\n  height: 16px;\n}\n.uix-multiselect .ui-widget-header .uix-control-right {\n  float: right;\n}\n.uix-multiselect .ui-widget-header .uix-control-left {\n  float: left;\n}\n.uix-multiselect .ui-widget-header .uix-search {\n  float: right;\n  height: 14px;\n  font-size: 80%;\n}\n.uix-multiselect .uix-list-container {\n  position: relative;\n  overflow: auto;\n  -webkit-touch-callout: none;\n  -webkit-user-select: none;\n  -khtml-user-select: none;\n  -moz-user-select: none;\n  -ms-user-select: none;\n  user-select: none;\n}\n.uix-multiselect .uix-list-container .ui-priority-secondary {\n  padding-right: 0;\n}\n.uix-multiselect .group-element {\n  position: relative;\n  padding-left: 0;\n  white-space: nowrap;\n  overflow: hidden;\n}\n.uix-multiselect .group-element-collapsable {\n  padding-left: 16px;\n}\n.uix-multiselect .group-element span.collapse-handle {\n  position: absolute;\n  margin-top: -8px;\n  top: 50%;\n  left: 0;\n}\n.uix-multiselect .group-element .label {\n  margin: 0 3px;\n  white-space: nowrap;\n  overflow: hidden;\n}\n.uix-multiselect .group-element .ui-icon {\n  float: left;\n  cursor: pointer;\n}\n.uix-multiselect .option-element,\n.dragged-element {\n  cursor: pointer;\n  padding: 0 2px;\n}\n.uix-multiselect .option-element.ui-state-disabled {\n  font-style: italic;\n}\n.dragged-element,\n.dragged-grouped-element {\n  padding: 1px 3px;\n}\n.dragged-grouped-element {\n  padding-left: 16px;\n}\n.uix-multiselect .grouped-option {\n  position: relative;\n  padding-left: 16px;\n}\n.uix-multiselect .grouped-option .ui-icon {\n  position: absolute;\n  left: 0;\n}\n/*! =======================================================\r\n                      VERSION  9.8.0\r\n========================================================= */\n/*! =========================================================\r\n * bootstrap-slider.js\r\n *\r\n * Maintainers:\r\n *\t\tKyle Kemp\r\n *\t\t\t- Twitter: @seiyria\r\n *\t\t\t- Github:  seiyria\r\n *\t\tRohit Kalkur\r\n *\t\t\t- Twitter: @Rovolutionary\r\n *\t\t\t- Github:  rovolution\r\n *\r\n * =========================================================\r\n  *\r\n * bootstrap-slider is released under the MIT License\r\n * Copyright (c) 2017 Kyle Kemp, Rohit Kalkur, and contributors\r\n *\r\n * Permission is hereby granted, free of charge, to any person\r\n * obtaining a copy of this software and associated documentation\r\n * files (the \"Software\"), to deal in the Software without\r\n * restriction, including without limitation the rights to use,\r\n * copy, modify, merge, publish, distribute, sublicense, and/or sell\r\n * copies of the Software, and to permit persons to whom the\r\n * Software is furnished to do so, subject to the following\r\n * conditions:\r\n *\r\n * The above copyright notice and this permission notice shall be\r\n * included in all copies or substantial portions of the Software.\r\n *\r\n * THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND,\r\n * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES\r\n * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND\r\n * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT\r\n * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,\r\n * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING\r\n * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR\r\n * OTHER DEALINGS IN THE SOFTWARE.\r\n *\r\n * ========================================================= */\n.slider {\n  display: inline-block;\n  vertical-align: middle;\n  position: relative;\n}\n.slider.slider-horizontal {\n  width: 210px;\n  height: 20px;\n}\n.slider.slider-horizontal .slider-track {\n  height: 10px;\n  width: 100%;\n  margin-top: -5px;\n  top: 50%;\n  left: 0;\n}\n.slider.slider-horizontal .slider-selection,\n.slider.slider-horizontal .slider-track-low,\n.slider.slider-horizontal .slider-track-high {\n  height: 100%;\n  top: 0;\n  bottom: 0;\n}\n.slider.slider-horizontal .slider-tick,\n.slider.slider-horizontal .slider-handle {\n  margin-left: -10px;\n}\n.slider.slider-horizontal .slider-tick.triangle,\n.slider.slider-horizontal .slider-handle.triangle {\n  position: relative;\n  top: 50%;\n  transform: translateY(-50%);\n  border-width: 0 10px 10px 10px;\n  width: 0;\n  height: 0;\n  border-bottom-color: #0480be;\n  margin-top: 0;\n}\n.slider.slider-horizontal .slider-tick-container {\n  white-space: nowrap;\n  position: absolute;\n  top: 0;\n  left: 0;\n  width: 100%;\n}\n.slider.slider-horizontal .slider-tick-label-container {\n  white-space: nowrap;\n  margin-top: 20px;\n}\n.slider.slider-horizontal .slider-tick-label-container .slider-tick-label {\n  padding-top: 4px;\n  display: inline-block;\n  text-align: center;\n}\n.slider.slider-horizontal.slider-rtl .slider-track {\n  left: initial;\n  right: 0;\n}\n.slider.slider-horizontal.slider-rtl .slider-tick,\n.slider.slider-horizontal.slider-rtl .slider-handle {\n  margin-left: initial;\n  margin-right: -10px;\n}\n.slider.slider-horizontal.slider-rtl .slider-tick-container {\n  left: initial;\n  right: 0;\n}\n.slider.slider-vertical {\n  height: 210px;\n  width: 20px;\n}\n.slider.slider-vertical .slider-track {\n  width: 10px;\n  height: 100%;\n  left: 25%;\n  top: 0;\n}\n.slider.slider-vertical .slider-selection {\n  width: 100%;\n  left: 0;\n  top: 0;\n  bottom: 0;\n}\n.slider.slider-vertical .slider-track-low,\n.slider.slider-vertical .slider-track-high {\n  width: 100%;\n  left: 0;\n  right: 0;\n}\n.slider.slider-vertical .slider-tick,\n.slider.slider-vertical .slider-handle {\n  margin-top: -10px;\n}\n.slider.slider-vertical .slider-tick.triangle,\n.slider.slider-vertical .slider-handle.triangle {\n  border-width: 10px 0 10px 10px;\n  width: 1px;\n  height: 1px;\n  border-left-color: #0480be;\n  border-right-color: #0480be;\n  margin-left: 0;\n  margin-right: 0;\n}\n.slider.slider-vertical .slider-tick-label-container {\n  white-space: nowrap;\n}\n.slider.slider-vertical .slider-tick-label-container .slider-tick-label {\n  padding-left: 4px;\n}\n.slider.slider-vertical.slider-rtl .slider-track {\n  left: initial;\n  right: 25%;\n}\n.slider.slider-vertical.slider-rtl .slider-selection {\n  left: initial;\n  right: 0;\n}\n.slider.slider-vertical.slider-rtl .slider-tick.triangle,\n.slider.slider-vertical.slider-rtl .slider-handle.triangle {\n  border-width: 10px 10px 10px 0;\n}\n.slider.slider-vertical.slider-rtl .slider-tick-label-container .slider-tick-label {\n  padding-left: initial;\n  padding-right: 4px;\n}\n.slider.slider-disabled .slider-handle {\n  background-image: -webkit-linear-gradient(top, #dfdfdf 0%, #bebebe 100%);\n  background-image: -o-linear-gradient(top, #dfdfdf 0%, #bebebe 100%);\n  background-image: linear-gradient(to bottom, #dfdfdf 0%, #bebebe 100%);\n  background-repeat: repeat-x;\n  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffdfdfdf', endColorstr='#ffbebebe', GradientType=0);\n}\n.slider.slider-disabled .slider-track {\n  background-image: -webkit-linear-gradient(top, #e5e5e5 0%, #e9e9e9 100%);\n  background-image: -o-linear-gradient(top, #e5e5e5 0%, #e9e9e9 100%);\n  background-image: linear-gradient(to bottom, #e5e5e5 0%, #e9e9e9 100%);\n  background-repeat: repeat-x;\n  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffe5e5e5', endColorstr='#ffe9e9e9', GradientType=0);\n  cursor: not-allowed;\n}\n.slider input {\n  display: none;\n}\n.slider .tooltip.top {\n  margin-top: -36px;\n}\n.slider .tooltip-inner {\n  white-space: nowrap;\n  max-width: none;\n}\n.slider .hide {\n  display: none;\n}\n.slider-track {\n  position: absolute;\n  cursor: pointer;\n  background-image: -webkit-linear-gradient(top, #f5f5f5 0%, #f9f9f9 100%);\n  background-image: -o-linear-gradient(top, #f5f5f5 0%, #f9f9f9 100%);\n  background-image: linear-gradient(to bottom, #f5f5f5 0%, #f9f9f9 100%);\n  background-repeat: repeat-x;\n  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#fff5f5f5', endColorstr='#fff9f9f9', GradientType=0);\n  -webkit-box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);\n  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);\n  border-radius: 4px;\n}\n.slider-selection {\n  position: absolute;\n  background-image: -webkit-linear-gradient(top, #f9f9f9 0%, #f5f5f5 100%);\n  background-image: -o-linear-gradient(top, #f9f9f9 0%, #f5f5f5 100%);\n  background-image: linear-gradient(to bottom, #f9f9f9 0%, #f5f5f5 100%);\n  background-repeat: repeat-x;\n  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#fff9f9f9', endColorstr='#fff5f5f5', GradientType=0);\n  -webkit-box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.15);\n  box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.15);\n  -webkit-box-sizing: border-box;\n  -moz-box-sizing: border-box;\n  box-sizing: border-box;\n  border-radius: 4px;\n}\n.slider-selection.tick-slider-selection {\n  background-image: -webkit-linear-gradient(top, #89cdef 0%, #81bfde 100%);\n  background-image: -o-linear-gradient(top, #89cdef 0%, #81bfde 100%);\n  background-image: linear-gradient(to bottom, #89cdef 0%, #81bfde 100%);\n  background-repeat: repeat-x;\n  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff89cdef', endColorstr='#ff81bfde', GradientType=0);\n}\n.slider-track-low,\n.slider-track-high {\n  position: absolute;\n  background: transparent;\n  -webkit-box-sizing: border-box;\n  -moz-box-sizing: border-box;\n  box-sizing: border-box;\n  border-radius: 4px;\n}\n.slider-handle {\n  position: absolute;\n  top: 0;\n  width: 20px;\n  height: 20px;\n  background-color: #337ab7;\n  background-image: -webkit-linear-gradient(top, #149bdf 0%, #0480be 100%);\n  background-image: -o-linear-gradient(top, #149bdf 0%, #0480be 100%);\n  background-image: linear-gradient(to bottom, #149bdf 0%, #0480be 100%);\n  background-repeat: repeat-x;\n  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff149bdf', endColorstr='#ff0480be', GradientType=0);\n  filter: none;\n  -webkit-box-shadow: inset 0 1px 0 rgba(255,255,255,.2), 0 1px 2px rgba(0,0,0,.05);\n  box-shadow: inset 0 1px 0 rgba(255,255,255,.2), 0 1px 2px rgba(0,0,0,.05);\n  border: 0px solid transparent;\n}\n.slider-handle.round {\n  border-radius: 50%;\n}\n.slider-handle.triangle {\n  background: transparent none;\n}\n.slider-handle.custom {\n  background: transparent none;\n}\n.slider-handle.custom::before {\n  line-height: 20px;\n  font-size: 20px;\n  content: '\\2605';\n  color: #726204;\n}\n.slider-tick {\n  position: absolute;\n  width: 20px;\n  height: 20px;\n  background-image: -webkit-linear-gradient(top, #f9f9f9 0%, #f5f5f5 100%);\n  background-image: -o-linear-gradient(top, #f9f9f9 0%, #f5f5f5 100%);\n  background-image: linear-gradient(to bottom, #f9f9f9 0%, #f5f5f5 100%);\n  background-repeat: repeat-x;\n  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#fff9f9f9', endColorstr='#fff5f5f5', GradientType=0);\n  -webkit-box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.15);\n  box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.15);\n  -webkit-box-sizing: border-box;\n  -moz-box-sizing: border-box;\n  box-sizing: border-box;\n  filter: none;\n  opacity: 0.8;\n  border: 0px solid transparent;\n}\n.slider-tick.round {\n  border-radius: 50%;\n}\n.slider-tick.triangle {\n  background: transparent none;\n}\n.slider-tick.custom {\n  background: transparent none;\n}\n.slider-tick.custom::before {\n  line-height: 20px;\n  font-size: 20px;\n  content: '\\2605';\n  color: #726204;\n}\n.slider-tick.in-selection {\n  background-image: -webkit-linear-gradient(top, #89cdef 0%, #81bfde 100%);\n  background-image: -o-linear-gradient(top, #89cdef 0%, #81bfde 100%);\n  background-image: linear-gradient(to bottom, #89cdef 0%, #81bfde 100%);\n  background-repeat: repeat-x;\n  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff89cdef', endColorstr='#ff81bfde', GradientType=0);\n  opacity: 1;\n}\n/*\r\n   MODULE: bootstrap-multiselect 0.9.13\r\n   SITE  : https://github.com/davidstutz/bootstrap-multiselect\r\n   SOURCE: https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.13/css/bootstrap-multiselect.css\r\n*/\n.multiselect-container {\n  position: absolute;\n  list-style-type: none;\n  margin: 0;\n  padding: 0;\n}\n.multiselect-container .input-group {\n  margin: 5px;\n}\n.multiselect-container > li {\n  padding: 0;\n}\n.multiselect-container > li > a.multiselect-all label {\n  font-weight: 700;\n}\n.multiselect-container > li.multiselect-group label {\n  margin: 0;\n  padding: 3px 20px 3px 20px;\n  height: 100%;\n  font-weight: 700;\n}\n.multiselect-container > li.multiselect-group-clickable label {\n  cursor: pointer;\n}\n.multiselect-container > li > a {\n  padding: 0;\n}\n.multiselect-container > li > a > label {\n  margin: 0;\n  height: 100%;\n  cursor: pointer;\n  font-weight: 400;\n  padding: 3px 20px 3px 40px;\n}\n.multiselect-container > li > a > label.radio,\n.multiselect-container > li > a > label.checkbox {\n  margin: 0;\n}\n.multiselect-container > li > a > label > input[type=checkbox] {\n  margin-bottom: 5px;\n}\n.btn-group > .btn-group:nth-child(2) > .multiselect.btn {\n  border-top-left-radius: 4px;\n  border-bottom-left-radius: 4px;\n}\n.form-inline .multiselect-container label.checkbox,\n.form-inline .multiselect-container label.radio {\n  padding: 3px 20px 3px 40px;\n}\n.form-inline .multiselect-container li a label.checkbox input[type=checkbox],\n.form-inline .multiselect-container li a label.radio input[type=radio] {\n  margin-left: -20px;\n  margin-right: 0;\n}\n/*! ========================================================================\r\n * Bootstrap Toggle: bootstrap-toggle.css v2.2.0\r\n * http://www.bootstraptoggle.com\r\n * ========================================================================\r\n * Copyright 2014 Min Hur, The New York Times Company\r\n * Licensed under MIT\r\n * ======================================================================== */\n.checkbox label .toggle,\n.checkbox-inline .toggle {\n  margin-left: -20px;\n  margin-right: 5px;\n}\n.toggle {\n  position: relative;\n  overflow: hidden;\n}\n.toggle input[type=\"checkbox\"] {\n  display: none;\n}\n.toggle-group {\n  position: absolute;\n  width: 200%;\n  top: 0;\n  bottom: 0;\n  left: 0;\n  transition: left 0.35s;\n  -webkit-transition: left 0.35s;\n  -moz-user-select: none;\n  -webkit-user-select: none;\n}\n.toggle.off .toggle-group {\n  left: -100%;\n}\n.toggle-on {\n  position: absolute;\n  top: 0;\n  bottom: 0;\n  left: 0;\n  right: 50%;\n  margin: 0;\n  border: 0;\n  border-radius: 0;\n}\n.toggle-off {\n  position: absolute;\n  top: 0;\n  bottom: 0;\n  left: 50%;\n  right: 0;\n  margin: 0;\n  border: 0;\n  border-radius: 0;\n}\n.toggle-handle {\n  position: relative;\n  margin: 0 auto;\n  padding-top: 0px;\n  padding-bottom: 0px;\n  height: 100%;\n  width: 0px;\n  border-width: 0 1px;\n}\n.toggle.btn {\n  min-width: 59px;\n  min-height: 34px;\n}\n.toggle-on.btn {\n  padding-right: 24px;\n}\n.toggle-off.btn {\n  padding-left: 24px;\n}\n.toggle.btn-lg {\n  min-width: 79px;\n  min-height: 45px;\n}\n.toggle-on.btn-lg {\n  padding-right: 31px;\n}\n.toggle-off.btn-lg {\n  padding-left: 31px;\n}\n.toggle-handle.btn-lg {\n  width: 40px;\n}\n.toggle.btn-sm {\n  min-width: 50px;\n  min-height: 30px;\n}\n.toggle-on.btn-sm {\n  padding-right: 20px;\n}\n.toggle-off.btn-sm {\n  padding-left: 20px;\n}\n.toggle.btn-xs {\n  min-width: 35px;\n  min-height: 22px;\n}\n.toggle-on.btn-xs {\n  padding-right: 12px;\n}\n.toggle-off.btn-xs {\n  padding-left: 12px;\n}\n/***\r\nSpectrum Colorpicker v1.8.0\r\nhttps://github.com/bgrins/spectrum\r\nAuthor: Brian Grinstead\r\nLicense: MIT\r\n***/\n.sp-container {\n  position: absolute;\n  top: 0;\n  left: 0;\n  display: inline-block;\n  *display: inline;\n  *zoom: 1;\n  /* https://github.com/bgrins/spectrum/issues/40 */\n  z-index: 9999994;\n  overflow: hidden;\n}\n.sp-container.sp-flat {\n  position: relative;\n}\n/* Fix for * { box-sizing: border-box; } */\n.sp-container,\n.sp-container * {\n  -webkit-box-sizing: content-box;\n  -moz-box-sizing: content-box;\n  box-sizing: content-box;\n}\n/* http://ansciath.tumblr.com/post/7347495869/css-aspect-ratio */\n.sp-top {\n  position: relative;\n  width: 100%;\n  display: inline-block;\n}\n.sp-top-inner {\n  position: absolute;\n  top: 0;\n  left: 0;\n  bottom: 0;\n  right: 0;\n}\n.sp-color {\n  position: absolute;\n  top: 0;\n  left: 0;\n  bottom: 0;\n  right: 20%;\n}\n.sp-hue {\n  position: absolute;\n  top: 0;\n  right: 0;\n  bottom: 0;\n  left: 84%;\n  height: 100%;\n}\n.sp-clear-enabled .sp-hue {\n  top: 33px;\n  height: 77.5%;\n}\n.sp-fill {\n  padding-top: 80%;\n}\n.sp-sat,\n.sp-val {\n  position: absolute;\n  top: 0;\n  left: 0;\n  right: 0;\n  bottom: 0;\n}\n.sp-alpha-enabled .sp-top {\n  margin-bottom: 18px;\n}\n.sp-alpha-enabled .sp-alpha {\n  display: block;\n}\n.sp-alpha-handle {\n  position: absolute;\n  top: -4px;\n  bottom: -4px;\n  width: 6px;\n  left: 50%;\n  cursor: pointer;\n  border: 1px solid black;\n  background: white;\n  opacity: .8;\n}\n.sp-alpha {\n  display: none;\n  position: absolute;\n  bottom: -14px;\n  right: 0;\n  left: 0;\n  height: 8px;\n}\n.sp-alpha-inner {\n  border: solid 1px #333;\n}\n.sp-clear {\n  display: none;\n}\n.sp-clear.sp-clear-display {\n  background-position: center;\n}\n.sp-clear-enabled .sp-clear {\n  display: block;\n  position: absolute;\n  top: 0px;\n  right: 0;\n  bottom: 0;\n  left: 84%;\n  height: 28px;\n}\n/* Don't allow text selection */\n.sp-container,\n.sp-replacer,\n.sp-preview,\n.sp-dragger,\n.sp-slider,\n.sp-alpha,\n.sp-clear,\n.sp-alpha-handle,\n.sp-container.sp-dragging .sp-input,\n.sp-container button {\n  -webkit-user-select: none;\n  -moz-user-select: -moz-none;\n  -o-user-select: none;\n  user-select: none;\n}\n.sp-container.sp-input-disabled .sp-input-container {\n  display: none;\n}\n.sp-container.sp-buttons-disabled .sp-button-container {\n  display: none;\n}\n.sp-container.sp-palette-buttons-disabled .sp-palette-button-container {\n  display: none;\n}\n.sp-palette-only .sp-picker-container {\n  display: none;\n}\n.sp-palette-disabled .sp-palette-container {\n  display: none;\n}\n.sp-initial-disabled .sp-initial {\n  display: none;\n}\n/* Gradients for hue, saturation and value instead of images.  Not pretty... but it works */\n.sp-sat {\n  background-image: -webkit-gradient(linear,  0 0, 100% 0, from(#FFF), to(rgba(204, 154, 129, 0)));\n  background-image: -webkit-linear-gradient(left, #FFF, rgba(204, 154, 129, 0));\n  background-image: -moz-linear-gradient(left, #fff, rgba(204, 154, 129, 0));\n  background-image: -o-linear-gradient(left, #fff, rgba(204, 154, 129, 0));\n  background-image: -ms-linear-gradient(left, #fff, rgba(204, 154, 129, 0));\n  background-image: linear-gradient(to right, #fff, rgba(204, 154, 129, 0));\n  -ms-filter: \"progid:DXImageTransform.Microsoft.gradient(GradientType = 1, startColorstr=#FFFFFFFF, endColorstr=#00CC9A81)\";\n  filter: progid:DXImageTransform.Microsoft.gradient(GradientType = 1, startColorstr='#FFFFFFFF', endColorstr='#00CC9A81');\n}\n.sp-val {\n  background-image: -webkit-gradient(linear, 0 100%, 0 0, from(#000000), to(rgba(204, 154, 129, 0)));\n  background-image: -webkit-linear-gradient(bottom, #000000, rgba(204, 154, 129, 0));\n  background-image: -moz-linear-gradient(bottom, #000, rgba(204, 154, 129, 0));\n  background-image: -o-linear-gradient(bottom, #000, rgba(204, 154, 129, 0));\n  background-image: -ms-linear-gradient(bottom, #000, rgba(204, 154, 129, 0));\n  background-image: linear-gradient(to top, #000, rgba(204, 154, 129, 0));\n  -ms-filter: \"progid:DXImageTransform.Microsoft.gradient(startColorstr=#00CC9A81, endColorstr=#FF000000)\";\n  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#00CC9A81', endColorstr='#FF000000');\n}\n.sp-hue {\n  background: -moz-linear-gradient(top, #ff0000 0%, #ffff00 17%, #00ff00 33%, #00ffff 50%, #0000ff 67%, #ff00ff 83%, #ff0000 100%);\n  background: -ms-linear-gradient(top, #ff0000 0%, #ffff00 17%, #00ff00 33%, #00ffff 50%, #0000ff 67%, #ff00ff 83%, #ff0000 100%);\n  background: -o-linear-gradient(top, #ff0000 0%, #ffff00 17%, #00ff00 33%, #00ffff 50%, #0000ff 67%, #ff00ff 83%, #ff0000 100%);\n  background: -webkit-gradient(linear, left top, left bottom, from(#ff0000), color-stop(0.17, #ffff00), color-stop(0.33, #00ff00), color-stop(0.5, #00ffff), color-stop(0.67, #0000ff), color-stop(0.83, #ff00ff), to(#ff0000));\n  background: -webkit-linear-gradient(top, #ff0000 0%, #ffff00 17%, #00ff00 33%, #00ffff 50%, #0000ff 67%, #ff00ff 83%, #ff0000 100%);\n  background: linear-gradient(to bottom, #ff0000 0%, #ffff00 17%, #00ff00 33%, #00ffff 50%, #0000ff 67%, #ff00ff 83%, #ff0000 100%);\n}\n/* IE filters do not support multiple color stops.\r\n   Generate 6 divs, line them up, and do two color gradients for each.\r\n   Yes, really.\r\n */\n.sp-1 {\n  height: 17%;\n  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff0000', endColorstr='#ffff00');\n}\n.sp-2 {\n  height: 16%;\n  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffff00', endColorstr='#00ff00');\n}\n.sp-3 {\n  height: 17%;\n  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#00ff00', endColorstr='#00ffff');\n}\n.sp-4 {\n  height: 17%;\n  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#00ffff', endColorstr='#0000ff');\n}\n.sp-5 {\n  height: 16%;\n  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#0000ff', endColorstr='#ff00ff');\n}\n.sp-6 {\n  height: 17%;\n  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff00ff', endColorstr='#ff0000');\n}\n.sp-hidden {\n  display: none !important;\n}\n/* Clearfix hack */\n.sp-cf:before,\n.sp-cf:after {\n  content: \"\";\n  display: table;\n}\n.sp-cf:after {\n  clear: both;\n}\n.sp-cf {\n  *zoom: 1;\n}\n/* Mobile devices, make hue slider bigger so it is easier to slide */\n@media (max-device-width: 480px) {\n  .sp-color {\n    right: 40%;\n  }\n\n  .sp-hue {\n    left: 63%;\n  }\n\n  .sp-fill {\n    padding-top: 60%;\n  }\n}\n.sp-dragger {\n  border-radius: 5px;\n  height: 5px;\n  width: 5px;\n  border: 1px solid #fff;\n  background: #000;\n  cursor: pointer;\n  position: absolute;\n  top: 0;\n  left: 0;\n}\n.sp-slider {\n  position: absolute;\n  top: 0;\n  cursor: pointer;\n  height: 3px;\n  left: -1px;\n  right: -1px;\n  border: 1px solid #000;\n  background: white;\n  opacity: .8;\n}\n/*\r\nTheme authors:\r\nHere are the basic themeable display options (colors, fonts, global widths).\r\nSee http://bgrins.github.io/spectrum/themes/ for instructions.\r\n*/\n.sp-container {\n  border-radius: 0;\n  background-color: #ECECEC;\n  border: solid 1px #f0c49B;\n  padding: 0;\n}\n.sp-container,\n.sp-container button,\n.sp-container input,\n.sp-color,\n.sp-hue,\n.sp-clear {\n  font: normal 12px \"Lucida Grande\", \"Lucida Sans Unicode\", \"Lucida Sans\", Geneva, Verdana, sans-serif;\n  -webkit-box-sizing: border-box;\n  -moz-box-sizing: border-box;\n  -ms-box-sizing: border-box;\n  box-sizing: border-box;\n}\n.sp-top {\n  margin-bottom: 3px;\n}\n.sp-color,\n.sp-hue,\n.sp-clear {\n  border: solid 1px #666;\n}\n/* Input */\n.sp-input-container {\n  float: right;\n  width: 100px;\n  margin-bottom: 4px;\n}\n.sp-initial-disabled  .sp-input-container {\n  width: 100%;\n}\n.sp-input {\n  font-size: 12px !important;\n  border: 1px inset;\n  padding: 4px 5px;\n  margin: 0;\n  width: 100%;\n  background: transparent;\n  border-radius: 3px;\n  color: #222;\n}\n.sp-input:focus {\n  border: 1px solid orange;\n}\n.sp-input.sp-validation-error {\n  border: 1px solid red;\n  background: #fdd;\n}\n.sp-picker-container,\n.sp-palette-container {\n  float: left;\n  position: relative;\n  padding: 10px;\n  padding-bottom: 300px;\n  margin-bottom: -290px;\n}\n.sp-picker-container {\n  width: 172px;\n  border-left: solid 1px #fff;\n}\n/* Palettes */\n.sp-palette-container {\n  border-right: solid 1px #ccc;\n}\n.sp-palette-only .sp-palette-container {\n  border: 0;\n}\n.sp-palette .sp-thumb-el {\n  display: block;\n  position: relative;\n  float: left;\n  width: 24px;\n  height: 15px;\n  margin: 3px;\n  cursor: pointer;\n  border: solid 2px transparent;\n}\n.sp-palette .sp-thumb-el:hover,\n.sp-palette .sp-thumb-el.sp-thumb-active {\n  border-color: orange;\n}\n.sp-thumb-el {\n  position: relative;\n}\n/* Initial */\n.sp-initial {\n  float: left;\n  border: solid 1px #333;\n}\n.sp-initial span {\n  width: 30px;\n  height: 25px;\n  border: none;\n  display: block;\n  float: left;\n  margin: 0;\n}\n.sp-initial .sp-clear-display {\n  background-position: center;\n}\n/* Buttons */\n.sp-palette-button-container,\n.sp-button-container {\n  float: right;\n}\n/* Replacer (the little preview div that shows up instead of the <input>) */\n.sp-replacer {\n  margin: 0;\n  overflow: hidden;\n  cursor: pointer;\n  padding: 4px;\n  display: inline-block;\n  *zoom: 1;\n  *display: inline;\n  border: solid 1px #91765d;\n  background: #eee;\n  color: #333;\n  vertical-align: middle;\n}\n.sp-replacer:hover,\n.sp-replacer.sp-active {\n  border-color: #F0C49B;\n  color: #111;\n}\n.sp-replacer.sp-disabled {\n  cursor: default;\n  border-color: silver;\n  color: silver;\n}\n.sp-dd {\n  padding: 2px 0;\n  height: 16px;\n  line-height: 16px;\n  float: left;\n  font-size: 10px;\n}\n.sp-preview {\n  position: relative;\n  width: 25px;\n  height: 20px;\n  border: solid 1px #222;\n  margin-right: 5px;\n  float: left;\n  z-index: 0;\n}\n.sp-palette {\n  *width: 220px;\n  max-width: 220px;\n}\n.sp-palette .sp-thumb-el {\n  width: 16px;\n  height: 16px;\n  margin: 2px 1px;\n  border: solid 1px #d0d0d0;\n}\n.sp-container {\n  padding-bottom: 0;\n}\n/* Buttons: http://hellohappy.org/css3-buttons/ */\n.sp-container button {\n  background-color: #eeeeee;\n  background-image: -webkit-linear-gradient(top, #eeeeee, #cccccc);\n  background-image: -moz-linear-gradient(top, #eeeeee, #cccccc);\n  background-image: -ms-linear-gradient(top, #eeeeee, #cccccc);\n  background-image: -o-linear-gradient(top, #eeeeee, #cccccc);\n  background-image: linear-gradient(to bottom, #eeeeee, #cccccc);\n  border: 1px solid #ccc;\n  border-bottom: 1px solid #bbb;\n  border-radius: 3px;\n  color: #333;\n  font-size: 14px;\n  line-height: 1;\n  padding: 5px 4px;\n  text-align: center;\n  text-shadow: 0 1px 0 #eee;\n  vertical-align: middle;\n}\n.sp-container button:hover {\n  background-color: #dddddd;\n  background-image: -webkit-linear-gradient(top, #dddddd, #bbbbbb);\n  background-image: -moz-linear-gradient(top, #dddddd, #bbbbbb);\n  background-image: -ms-linear-gradient(top, #dddddd, #bbbbbb);\n  background-image: -o-linear-gradient(top, #dddddd, #bbbbbb);\n  background-image: linear-gradient(to bottom, #dddddd, #bbbbbb);\n  border: 1px solid #bbb;\n  border-bottom: 1px solid #999;\n  cursor: pointer;\n  text-shadow: 0 1px 0 #ddd;\n}\n.sp-container button:active {\n  border: 1px solid #aaa;\n  border-bottom: 1px solid #888;\n  -webkit-box-shadow: inset 0 0 5px 2px #aaaaaa, 0 1px 0 0 #eeeeee;\n  -moz-box-shadow: inset 0 0 5px 2px #aaaaaa, 0 1px 0 0 #eeeeee;\n  -ms-box-shadow: inset 0 0 5px 2px #aaaaaa, 0 1px 0 0 #eeeeee;\n  -o-box-shadow: inset 0 0 5px 2px #aaaaaa, 0 1px 0 0 #eeeeee;\n  box-shadow: inset 0 0 5px 2px #aaaaaa, 0 1px 0 0 #eeeeee;\n}\n.sp-cancel {\n  font-size: 11px;\n  color: #d93f3f !important;\n  margin: 0;\n  padding: 2px;\n  margin-right: 5px;\n  vertical-align: middle;\n  text-decoration: none;\n}\n.sp-cancel:hover {\n  color: #d93f3f !important;\n  text-decoration: underline;\n}\n.sp-palette span:hover,\n.sp-palette span.sp-thumb-active {\n  border-color: #000;\n}\n.sp-preview,\n.sp-alpha,\n.sp-thumb-el {\n  position: relative;\n  background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAIAAADZF8uwAAAAGUlEQVQYV2M4gwH+YwCGIasIUwhT25BVBADtzYNYrHvv4gAAAABJRU5ErkJggg==);\n}\n.sp-preview-inner,\n.sp-alpha-inner,\n.sp-thumb-inner {\n  display: block;\n  position: absolute;\n  top: 0;\n  left: 0;\n  bottom: 0;\n  right: 0;\n}\n.sp-palette .sp-thumb-inner {\n  background-position: 50% 50%;\n  background-repeat: no-repeat;\n}\n.sp-palette .sp-thumb-light.sp-thumb-active .sp-thumb-inner {\n  background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAIVJREFUeNpiYBhsgJFMffxAXABlN5JruT4Q3wfi/0DsT64h8UD8HmpIPCWG/KemIfOJCUB+Aoacx6EGBZyHBqI+WsDCwuQ9mhxeg2A210Ntfo8klk9sOMijaURm7yc1UP2RNCMbKE9ODK1HM6iegYLkfx8pligC9lCD7KmRof0ZhjQACDAAceovrtpVBRkAAAAASUVORK5CYII=);\n}\n.sp-palette .sp-thumb-dark.sp-thumb-active .sp-thumb-inner {\n  background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAadEVYdFNvZnR3YXJlAFBhaW50Lk5FVCB2My41LjEwMPRyoQAAAMdJREFUOE+tkgsNwzAMRMugEAahEAahEAZhEAqlEAZhEAohEAYh81X2dIm8fKpEspLGvudPOsUYpxE2BIJCroJmEW9qJ+MKaBFhEMNabSy9oIcIPwrB+afvAUFoK4H0tMaQ3XtlrggDhOVVMuT4E5MMG0FBbCEYzjYT7OxLEvIHQLY2zWwQ3D+9luyOQTfKDiFD3iUIfPk8VqrKjgAiSfGFPecrg6HN6m/iBcwiDAo7WiBeawa+Kwh7tZoSCGLMqwlSAzVDhoK+6vH4G0P5wdkAAAAASUVORK5CYII=);\n}\n.sp-clear-display {\n  background-repeat: no-repeat;\n  background-position: center;\n  background-image: url(data:image/gif;base64,R0lGODlhFAAUAPcAAAAAAJmZmZ2dnZ6enqKioqOjo6SkpKWlpaampqenp6ioqKmpqaqqqqurq/Hx8fLy8vT09PX19ff39/j4+Pn5+fr6+vv7+wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAEAAP8ALAAAAAAUABQAAAihAP9FoPCvoMGDBy08+EdhQAIJCCMybCDAAYUEARBAlFiQQoMABQhKUJBxY0SPICEYHBnggEmDKAuoPMjS5cGYMxHW3IiT478JJA8M/CjTZ0GgLRekNGpwAsYABHIypcAgQMsITDtWJYBR6NSqMico9cqR6tKfY7GeBCuVwlipDNmefAtTrkSzB1RaIAoXodsABiZAEFB06gIBWC1mLVgBa0AAOw==);\n}\n/* ConfigurationPane */\n.ConfigurationPaneClass {\n  display: inline-block;\n  height: 100%;\n  width: 100%;\n  max-height: 100%;\n  max-width: 100%;\n}\n.ConfigurationPaneClass label {\n  font-size: small;\n}\n.ConfigurationPaneClass table {\n  width: 100%;\n}\n.ConfigurationPaneClass div,\n.ConfigurationPaneClass .panel-body,\n.ConfigurationPaneClass .panel-heading,\n.ConfigurationPaneClass table,\n.ConfigurationPaneClass td > label,\n.ConfigurationPaneClass th,\n.ConfigurationPaneClass td,\n.ConfigurationPaneClass h1,\n.ConfigurationPaneClass h2,\n.ConfigurationPaneClass h3,\n.ConfigurationPaneClass h4,\n.ConfigurationPaneClass h5 {\n  padding: 1px !important;\n  margin: 0px !important;\n}\n.ConfigurationPaneClass h1 {\n  font-size: 3em !important;\n  font-weight: normal !important;\n  color: white;\n  background-color: #878787;\n  text-align: center;\n}\n.ConfigurationPaneClass h2 {\n  font-size: 2.5em !important;\n  font-weight: normal !important;\n  color: white;\n  background-color: #3288bd;\n  text-align: center;\n}\n.ConfigurationPaneClass h3 {\n  font-size: 2.25em !important;\n  font-weight: normal !important;\n  color: white;\n  background-color: #1a9850;\n  text-align: center;\n}\n.ConfigurationPaneClass h4 {\n  font-size: 2em !important;\n  font-weight: normal !important;\n  color: white;\n  background-color: #d58512;\n  text-align: center;\n}\n.ConfigurationPaneClass h5 {\n  font-size: 1.5em !important;\n  font-weight: normal !important;\n  color: white;\n  background-color: #3e999f;\n  text-align: center;\n}\n.ConfigurationPaneClass h1:hover,\n.ConfigurationPaneClass h2:hover,\n.ConfigurationPaneClass h3:hover,\n.ConfigurationPaneClass h4:hover,\n.ConfigurationPaneClass h5:hover {\n  box-shadow: inset 0 0 100px 100px rgba(255, 255, 255, 0.1);\n  color: yellow;\n}\n.ConfigurationPaneClass .control-boolean label,\n.ConfigurationPaneClass .control-boolean input,\n.ConfigurationPaneClass .control-string label,\n.ConfigurationPaneClass .control-string input {\n  padding: 1px !important;\n  margin: 0px !important;\n}\n.ConfigurationPaneClass .control-float {\n  margin: 10px;\n}\n.ConfigurationPaneClass .slider {\n  margin-left: 5px !important;\n  margin-bottom: 15px !important;\n  margin-top: 0px !important;\n}\n.ConfigurationPaneClass .slider-handle {\n  top: 5px !important;\n}\n/* DataFilterPane */\n.DataFilterPaneClass {\n  display: inline-block;\n  width: 100%;\n  height: 100%;\n  max-width: 100%;\n  max-height: 100%;\n}\n.DataFilterPaneClass h4 {\n  text-align: center;\n  width: 100%;\n  background: #428bca;\n  color: white;\n  padding: 0px;\n  margin-right: 0px;\n  margin-top: 5px;\n  margin-bottom: 5px;\n  margin-left: 0px;\n}\n.DataFilterPaneClass h5 {\n  width: 100%;\n  color: black;\n  padding: 0px;\n  text-align: center;\n  margin-right: 0px;\n  margin-top: 10px;\n  margin-bottom: 0px;\n  margin-left: 0px;\n}\n/* Trigger button */\n.DataFilterPaneClass .btn-group {\n  width: 100%;\n}\n.DataFilterPaneClass #ColumnSelector {\n  height: 160px;\n  margin-bottom: 5px;\n  width: 100%;\n}\n.DataFilterPaneClass .slider {\n  width: 95% !important;\n  margin-left: 5px;\n}\n.DataFilterPaneClass .multiselect {\n  width: 100%;\n  max-width: 100%;\n  max-height: 100%;\n}\n/* GuiPane */\n/** Treemap **/\n.TreemapClass text {\n  pointer-events: none;\n}\n.TreemapClass .grandparent text {\n  font-weight: bold;\n}\n.TreemapClass rect {\n  fill: none;\n  stroke: #fff;\n}\n.TreemapClass rect.parent,\n.grandparent rect {\n  stroke-width: 2px;\n}\n.TreemapClass .grandparent rect {\n  fill: steelblue;\n}\n.grandparent:hover rect {\n  fill: #ee9700;\n}\n.TreemapClass .children rect.parent,\n.grandparent rect {\n  cursor: pointer;\n}\n.TreemapClass .children rect.parent {\n  fill-opacity: .1;\n}\n.TreemapClass .children:hover rect.child {\n  fill-opacity: .8;\n}\n/** Treemap Bar Chart **/\n.TreemapBarChartClass label {\n  font-family: sans-serif;\n  font-size: 14px;\n  position: absolute;\n  left: 92px;\n  top: 26px;\n}\n.TreemapBarChartClass .axis .domain {\n  display: none;\n}\n.TreemapBarChartClass .axis line {\n  stroke: #ccc;\n}\n.TreemapBarChartClass .axis.x0 text {\n  font-weight: 700;\n}\n.TreemapBarChartClass .hover-active rect {\n  opacity: .75;\n}\n.TreemapBarChartClass .hover-active rect.hover {\n  opacity: 1;\n}\n.BumpChartClass .x.axis path,\n.BumpChartClass .x.axis line {\n  fill: none;\n  stroke: #000;\n  shape-rendering: crispEdges;\n}\n.BumpChartClass .y.axis path {\n  fill: none;\n}\n.BumpChartClass .y.axis line {\n  fill: none;\n  stroke: #eeeeee;\n  shape-rendering: crispEdges;\n}\n"; (require("browserify-css").createStyle(css, { "href": "css\\dex.css" }, { "insertAt": "bottom" })); module.exports = css;
 },{"browserify-css":11}],2:[function(require,module,exports){
 /**
  * Bootstrap Multiselect (https://github.com/davidstutz/bootstrap-multiselect)
@@ -24281,8 +24281,6 @@ var c3chart = function (userConfig) {
       "type": "group",
       "name": "C3 Settings",
       "contents": [
-        dex.config.gui.general(),
-        dex.config.gui.dimensions(),
         {
           "type": "group",
           "name": "Miscellaneous",
@@ -25179,7 +25177,7 @@ var chord = function (userConfig) {
       "bottom": 50
     },
     "transform": "",
-    "draggable" : false,
+    "draggable": false,
     "padding": 0.05,
     "nodes": {
       "mouseout": dex.config.link({
@@ -25236,7 +25234,7 @@ var chord = function (userConfig) {
       }),
     },
     "color": d3.scale.category20c(),
-    "autoRadius" : true,
+    "autoRadius": true,
     "innerRadius": 350,
     "outerRadius": 400,
     "tick.start.x": 1,
@@ -25314,6 +25312,14 @@ var chord = function (userConfig) {
     dex.config.gui.sync(chart, guiDef);
     return guiDef;
   };
+
+  chart.subscribe(chart, "attr", function (msg) {
+    dex.console.log("MSG", msg);
+    if (msg.attr == "draggable") {
+      $(chart.config.parent).draggable();
+      $(chart.config.parent).draggable((msg.value === true) ? 'enable' : 'disable');
+    }
+  });
 
   chart.render = function render() {
     d3 = dex.charts.d3.d3v3;
@@ -25428,7 +25434,7 @@ var chord = function (userConfig) {
       .call(dex.config.configureLine, config.tick);
 
     ticks.append("text")
-      //.call(dex.config.configureText, config.label)
+    //.call(dex.config.configureText, config.label)
       .attr("x", +config.tick.padding + (+config.tick.padding / 4))
       .attr("dy", ".35em")
       .attr("font-size", config.label.font.size)
@@ -25480,9 +25486,9 @@ var chord = function (userConfig) {
     return chart;
   };
 
-    chart.clone = function clone(override) {
-        return chord(dex.config.expandAndOverlay(override, userConfig));
-    };
+  chart.clone = function clone(override) {
+    return chord(dex.config.expandAndOverlay(override, userConfig));
+  };
 
   $(document).ready(function () {
     // Make the entire chart draggable.
@@ -31465,656 +31471,661 @@ d3plus.RingNetwork = require("./RingNetwork");
 module.exports = d3plus;
 },{"./RingNetwork":43}],45:[function(require,module,exports){
 var echart = function (userConfig) {
-    var chart;
-    var internalChart = undefined;
-    var effectiveOptions;
+  var chart;
+  var internalChart = undefined;
+  var effectiveOptions;
 
-    var defaults = {
-      'parent': '#EChartParent',
-      'id': 'EChartId',
-      'class': 'EChartClass',
-      'resizable': true,
-      'csv': {
-        'header': [],
-        'data': []
-      },
-      'palette': "ECharts",
-      'series': {},
-      'width': "100%",
-      'height': "100%",
-    };
+  var defaults = {
+    'parent': '#EChartParent',
+    'id': 'EChartId',
+    'class': 'EChartClass',
+    'resizable': true,
+    'csv': {
+      'header': [],
+      'data': []
+    },
+    'palette': "ECharts",
+    'series': {},
+    'width': "100%",
+    'height': "100%",
+  };
 
-    chart = new dex.component(userConfig, defaults);
+  chart = new dex.component(userConfig, defaults);
 
-    chart.render = function render() {
-      var config = chart.config;
-      var csv = config.csv;
+  chart.render = function render() {
+    var config = chart.config;
+    var csv = config.csv;
 
+    echarts.dispose(d3.select(config.parent)[0][0]);
+    d3.select(config.parent).selectAll("*").remove();
+
+    dex.console.log("PARENT: '" + config.parent + "'");
+    internalChart = echarts.init(
+      d3.select(config.parent)[0][0]);
+
+    // Calls update automatically.
+    chart.resize();
+
+    return chart;
+  };
+
+  chart.update = function () {
+    var config = chart.config;
+    var csv = config.csv;
+
+    if (config.categorizationMethod) {
+      config.categories = dex.csv.getCategorizationMethod(csv,
+        config.categorizationMethod);
+    }
+
+    var dataOptions = chart.getOptions(csv);
+
+    if (chart.spec.valid == false) {
       echarts.dispose(d3.select(config.parent)[0][0]);
       d3.select(config.parent).selectAll("*").remove();
-
-      dex.console.log("PARENT: '" + config.parent + "'");
-      //if (internalChart !== undefined) {
-      //  internalChart.dispose();
-      //}
-      internalChart = echarts.init(
-        d3.select(config.parent)[0][0]);
-
-      // Calls update automatically.
-      chart.resize();
-
-      return chart;
-    };
-
-    chart.update = function () {
-      var config = chart.config;
-      var csv = config.csv;
-
-      if (config.categorizationMethod) {
-        config.categories = dex.csv.getCategorizationMethod(csv,
-          config.categorizationMethod);
-      }
-
-      var dataOptions = getOptions(csv);
-      effectiveOptions = dex.config.expandAndOverlay(config.options, dataOptions);
+      $(config.parent).append($("<h2></h2>").text(
+        chart.spec.errorMessage));
+    }
+    else {
+      effectiveOptions = dex.config.expandAndOverlay(dataOptions, config.options);
       internalChart.setOption(effectiveOptions);
       internalChart.resize();
+    }
+  };
+
+  chart.getCommonOptions = function () {
+    return {
+      color: dex.color.palette[chart.config.palette]
     };
+  };
 
-    function getOptions(csv) {
-      var commonOptions = {
-        color: dex.color.palette[chart.config.palette]
-      };
-      var chartType = dex.object.getValue(chart.config, "type", "line");
-      switch (chartType) {
-        case "force" :
-        case "circular" :
-        case "graph" :
-          return getGraphOptions(commonOptions, csv);
-        case "timeline":
-          return getTimelineOptions(commonOptions, csv);
-        case "radar":
-          return getRadarOptions(commonOptions, csv);
-        case "steam":
-          return getSteamOptions(commonOptions, csv);
-        case "heatmap":
-          return getHeatmapOptions(commonOptions, csv);
-        case "polar":
-          return getPolarOptions(commonOptions, csv);
-        case "linechart":
-        case "areachart":
-        case "bar":
-          return getCartesianOptions(commonOptions, csv);
-        case "pie":
-          return getPieOptions(commonOptions, csv);
-        case 'single-axis':
-          return getSingleAxisOptions(commonOptions, csv);
-        default:
-          return getCartesianOptions(commonOptions, csv);
-      }
+  chart.getOptions = function (csv) {
+    dex.console.log("CALLING COMMON GETOPTIONS");
+    var commonOptions = chart.getCommonOptions();
+    var chartType = dex.object.getValue(chart.config, "type", "line");
+    switch (chartType) {
+      case "force" :
+      case "circular" :
+      case "graph" :
+        return getGraphOptions(csv);
+      case "timeline":
+        return getTimelineOptions(csv);
+      case "radar":
+        return getRadarOptions(csv);
+      case "steam":
+        return getSteamOptions(csv);
+      default:
+        return {};
     }
+  };
 
-    function getPieOptions(commonOptions, csv) {
-      var config = chart.config;
-      var options = dex.config.expandAndOverlay({
-        tooltip: {
-          trigger: 'item',
-          formatter: "{a} <br/>{b}: {c} ({d}%)"
-        },
-        legend: {
-          orient: 'vertical',
-          x: 'left',
-          data: []
-        },
-        series: []
-      }, commonOptions);
-      var gtypes = dex.csv.guessTypes(csv);
-
-      // Get our indices:
-      var seriesIndex = dex.csv.getColumnNumber(csv, config.seriesIndex);
-      var nameIndex = dex.csv.getColumnNumber(csv, config.nameIndex);
-      var valueIndex = dex.csv.getColumnNumber(csv, config.valueIndex);
-      var aggregationFunction = chart.config.aggregationFunction;
-
-      var pieCsv = dex.csv.columnSlice(csv, [seriesIndex, nameIndex, valueIndex]);
-
-      var frames = dex.csv.getFramesByIndex(csv, seriesIndex);
-
-      //dex.console.log("FRAMES", frames);
-      var legendNames = {};
-
-      var maxPercent = chart.config.maxPercent || 80.0;
-      var maxPadding = chart.config.maxPadding || 10;
-      var availableRadius = chart.config.radius ||
-        Math.floor(maxPercent / (frames.frames.length + 2));
-      var padding = chart.config.padding ||
-        (Math.min((frames.frames.length <= 1) ? 0 :
-          Math.floor(maxPercent / (2 * frames.frames.length - 2)), maxPadding));
-
-      var startRadius = 0;
-      var endRadius = Math.floor(availableRadius * 2);
-
-      frames.frames.forEach(function (frame, fi) {
-        var nvp = {};
-        frame.data.forEach(function (row, ri) {
-            if (nvp[row[0]] === undefined) {
-              nvp[row[0]] = [];
-            }
-            nvp[row[0]].push(row[1]);
-          }
-        );
-        var data = [];
-        for (var name in nvp) {
-          legendNames[name] = 1;
-          data.push({"name": name, "value": aggregationFunction(nvp[name])});
-        }
-        var series = dex.config.expandAndOverlay(chart.config.series,
-          {
-            name: frames.frameIndices[fi],
-            radius: [startRadius + "%", endRadius + "%"],
-            data: data
-          });
-        options.series.push(series);
-        startRadius = padding + endRadius;
-        endRadius = startRadius + availableRadius;
-      });
-
-      options.legend.data = Object.keys(legendNames);
-
-      dex.console.log("OPTIONS", options);
-      return options;
+  $(document).ready(function () {
+    // Make the entire chart draggable.
+    if (chart.config.draggable) {
+      $(chart.config.parent).draggable();
     }
+  });
 
-    function getPolarOptions(commonOptions, csv) {
-      var config = chart.config;
-      var options = dex.config.expandAndOverlay({
-        legend: {data: []},
-        series: [],
-        polar: {}
-      }, commonOptions);
-      var gtypes = dex.csv.guessTypes(csv);
+  return chart;
+};
 
-      // Get our indices:
-      var angleIndex = dex.csv.getColumnNumber(csv, config.angleIndex);
-      var valueIndex = dex.csv.getColumnNumber(csv, config.valueIndex);
-      var seriesIndex = dex.csv.getColumnNumber(csv, config.seriesIndex);
-      var radiusIndex = dex.csv.getColumnNumber(csv, config.radiusIndex);
-
-      // Will contain required data indices for series.
-      var columns = [];
-
-      // We always need values.
-      columns.push(valueIndex);
-      //dex.console.log("ANGLE INDEX: ", config.angleIndex, angleIndex);
-
-      switch (config.series.type) {
-        case "line":
-        case "scatter":
-        case "bar" : {
-          if (angleIndex === undefined) {
-            options.angleAxis = {
-              type: 'value',
-              startAngle: 0
-            };
-          }
-          else {
-            if (gtypes[angleIndex] == "string" ||
-              chart.config.angleAxisType == "category") {
-              options.angleAxis = {
-                type: "category",
-                data: dex.csv.uniqueArray(csv, angleIndex)
-              }
-            }
-            else {
-              var extents = dex.csv.extent(csv, angleIndex);
-              //dex.console.log("EXTENT", extents);
-              options.angleAxis = {
-                type: "value",
-                min: "dataMin",
-                max: "dataMax",
-                boundaryGap: true
-              };
-              columns.push(angleIndex);
-            }
-          }
-
-          if (radiusIndex === undefined) {
-            options.radiusAxis = {};
-          }
-          else {
-            if (gtypes[radiusIndex] == "string" ||
-              chart.config.radiusAxisType == "category") {
-              options.radiusAxis = {
-                type: "category",
-                data: dex.csv.uniqueArray(csv, radiusIndex)
-              };
-            }
-            else {
-              options.radiusAxis = {};
-            }
-          }
-
-          break;
-        }
-      }
-
-      if (options.radiusAxis.type == "category" &&
-        options.angleAxis.type == "category") {
-        columns = [radiusIndex, angleIndex, valueIndex];
-      }
-      var seriesNames = [];
-
-      //dex.console.log("COLUMNS", columns);
-
-      if (seriesIndex !== undefined) {
-        seriesNames = dex.csv.uniqueArray(csv, seriesIndex);
-        //dex.console.log("SERIES-NAMES", seriesNames);
-        options.legend.data = seriesNames;
-
-        seriesNames.forEach(function (seriesName) {
-            var series = dex.config.expandAndOverlay(config.series,
-              {
-                name: seriesName,
-                coordinateSystem: 'polar',
-                type: 'line',
-                data: function (csv) {
-                  var selectedCsv = dex.csv.selectRows(csv, function (row) {
-                    return row[seriesIndex] == seriesName;
-                  });
-
-                  if (columns.length == 1) {
-                    return selectedCsv.data.map(function (row) {
-                      return row[columns[0]];
-                    });
-                  }
-                  else {
-                    return dex.csv.columnSlice(selectedCsv, columns).data;
-                  }
-                }(chart.config.csv)
-              });
-            options.series.push(series);
-          }
-        );
-      }
-      else {
-        var series = dex.config.expandAndOverlay(config.series,
-          {
-            name: 'Series',
-            coordinateSystem: 'polar',
-            type: 'line',
-            data: csv.data.map(function (row) {
-              return row[0];
-            })
-          });
-        options.series.push(series);
-      }
-
-      dex.console.log("OPTIONS", options);
-      return options;
-    }
-
-    function getCartesianOptions(commonOptions, csv) {
-      var options = dex.config.expandAndOverlay({}, commonOptions);
-      //var gtypes = dex.csv.guessTypes(csv);
-
-      var xyCsv = dex.csv.removeColumn(csv, 0);
-      options.legend = {data: xyCsv.remaining.header};
-
-      options.xAxis = {
-        type: 'category',
-        boundaryGap: false,
-        data: xyCsv.removed.data.map(function (row) {
-          return row[0]
-        })
-      };
-      options.yAxis = {type: 'value'};
-      options.series = [];
-
-      xyCsv.remaining.header.forEach(function (h) {
-        var series = dex.config.expandAndOverlay(chart.config.series,
-          {name: h, type: 'line', data: []});
-        options.series.push(series);
-      });
-
-      xyCsv.remaining.data.forEach(function (row, ri) {
-        row.forEach(function (col, ci) {
-          options.series[ci].data.push(col);
-        });
-      });
-
-      //dex.console.log("OPTIONS", options);
-      return options;
-    }
-
-    function getSingleAxisOptions(commonOptions, csv) {
-      var options = dex.config.expandAndOverlay({
-        tooltip: {
-          position: 'top'
-        },
-        title: [],
-        singleAxis: [],
-        series: []
-      }, commonOptions);
-
-      var frames = dex.csv.getFramesByIndex(csv, 0);
-
-      var scatterHeightPercent = 90;
-      var percentIncrement = scatterHeightPercent / frames.frameIndices.length;
-      var topOffset = 0;
-      var heightOffset = 0;
-
-      frames.frames.forEach(function (frame, fi) {
-
-        options.title.push({
-          textBaseline: 'middle',
-          top: "" + ((fi + .5) * scatterHeightPercent / frames.frameIndices.length) + "%",
-          text: frames.frameIndices[fi]
-        });
-
-        options.singleAxis.push({
-          left: 150,
-          type: 'category',
-          boundaryGap: true,
-          data: dex.matrix.slice(frame.data, [0]),
-          top: (fi * percentIncrement + topOffset) + '%',
-          height: (percentIncrement + heightOffset) + '%',
-          axisLabel: {interval: 2}
-        });
-
-        var series = dex.config.expandAndOverlay(chart.config.series, {
-          singleAxisIndex: fi,
-          coordinateSystem: 'singleAxis',
-          type: 'scatter',
-          data: dex.matrix.slice(frame.data, [0, 1]),
-          symbolSize: function (dataItem) {
-            return chart.config.sizeScale(dataItem[1]);
-          }
-        });
-        options.series.push(series);
-      });
-
-      //dex.console.log("OPTIONS", options);
-      return options;
-    }
-
-    function getSteamOptions(commonOptions, csv) {
-      dex.console.log("COMMON-OPTS", commonOptions, "CSV", csv);
-      var options = dex.config.expandAndOverlay({
-        tooltip: {
-          trigger: 'axis',
-          axisPointer: {
-            type: 'line',
-            lineStyle: {
-              color: 'rgba(0,0,0,0.2)',
-              width: 1,
-              type: 'solid'
-            }
-          }
-        },
-        title: [],
-        singleAxis: {
-          scale: true,
-          bottom: "10%",
-          axisPointer: {
-            animation: true,
-            label: {
-              show: true
-            }
-          },
-        },
-        series: [],
-        legend: {}
-      }, commonOptions);
-
-      var xIndex = dex.csv.getColumnNumber(csv, chart.config.xIndex);
-      var yIndex = dex.csv.getColumnNumber(csv, chart.config.yIndex);
-      var seriesIndex = dex.csv.getColumnNumber(csv, chart.config.seriesIndex);
-
-      // Will contain required data indices for series.
-      var columns = [xIndex, yIndex, seriesIndex];
-
-      var seriesData = dex.csv.include(csv, columns);
-
-      var columnTypes = dex.csv.guessTypes(seriesData);
-
-      switch (columnTypes[0]) {
-        case "string": {
-          options.singleAxis.type = "category";
-          break;
-        }
-        case "date": {
-          options.singleAxis.type = "time";
-          break;
-        }
-        default: {
-          options.singleAxis.type = "value";
-        }
-      }
-
-      options.legend.data = dex.csv.uniqueArray(seriesData, 2);
-
-      options.dataZoom = [
+module.exports = echart;
+},{}],46:[function(require,module,exports){
+/**
+ *
+ * This module provides a ECharts Line Chart.
+ *
+ * @name dex/charts/echarts/LineChart
+ *
+ * @param userConfig
+ * @returns LineChart
+ */
+var linechart = function (userConfig) {
+  var chart;
+  var defaults = {
+    'parent': '#ECharts_LineChart',
+    'id': 'ECharts_LineChart',
+    'class': 'ECharts_LineChart',
+    'resizable': true,
+    'width': "100%",
+    'height': "100%",
+    'type': 'linechart',
+    'palette': "ECharts",
+    'displayLegend': true,
+    'refreshType': "update",
+    'series.symbol': 'circle',
+    'series.symbolSize': 10,
+    'series.type': 'line',
+    'series.showSymbol': true,
+    'series.showAllSymbol': false,
+    'series.stack': false,
+    'series.clipOverflow': true,
+    'series.connectNulls': false,
+    'series.step': false,
+    "options": {
+      dataZoom: [
         {
+          orient: 'horizontal',
           show: true,
           realtime: true,
           start: 0,
           end: 100,
-          singleAxisIndex: 0
-        }
-      ];
-
-      //dex.console.log("LEGEND", options.legend, "SERIES-DATA", seriesData);
-
-      var series = dex.config.expandAndOverlay(chart.config.series, {
-        type: 'themeRiver',
-        itemStyle: {
-          emphasis: {
-            shadowBlur: 20,
-            shadowColor: 'rgba(0, 0, 0, 0.8)'
-          }
+          xAxisIndex: 0
         },
-        data: seriesData.data
-      });
+        {
+          orient: 'vertical',
+          show: true,
+          realtime: true,
+          start: 0,
+          end: 100,
+          yAxisIndex: 0
+        }
+      ],
+      tooltip: {
+        trigger: 'item',
+        formatter: function (d) {
+          //dex.console.log("FORMATTER", d);
+          var str = "<table class='table table-condensed'>";
 
-      options.series.push(series);
-
-      dex.console.log("OPTIONS", options);
-      return options;
-    }
-
-    function getHeatmapOptions(commonOptions, csv) {
-      var options = dex.config.expandAndOverlay({
-        tooltip: {
-          trigger: 'axis',
-          axisPointer: {
-            type: 'line',
-            lineStyle: {
-              color: 'rgba(0,0,0,0.2)',
-              width: 1,
-              type: 'solid'
+          d.data.forEach(function (value) {
+            if (typeof value === "string") {
+              var parts = value.split(":::");
+              if (parts.length == 2) {
+                str += "<tr><td>" + parts[0] + "</td><td>" + parts[1] + "</td></tr>";
+              }
             }
-          }
-        },
-        title: [],
-        singleAxis: {
-          max: 'dataMax',
-          axisPointer: {
-            animation: true,
-            label: {
-              show: true
-            }
-          },
-        },
-        series: [],
-        legend: {}
-      }, commonOptions);
-
-      var xIndex = dex.csv.getColumnNumber(csv, chart.config.xIndex);
-      var yIndex = dex.csv.getColumnNumber(csv, chart.config.yIndex);
-      var seriesIndex = dex.csv.getColumnNumber(csv, chart.config.seriesIndex);
-
-      // Will contain required data indices for series.
-      var columns = [xIndex, yIndex, seriesIndex];
-
-      var seriesData = dex.csv.include(csv, columns);
-
-      var columnTypes = dex.csv.guessTypes(seriesData);
-
-      switch (columnTypes[0]) {
-        case "string": {
-          options.singleAxis.type = "category";
-          break;
-        }
-        case "date": {
-          options.singleAxis.type = "time";
-          break;
-        }
-        default: {
-          options.singleAxis.type = "value";
+          });
+          str += "</table>";
+          return str;
         }
       }
+    }
+  };
 
-      options.legend.data = dex.csv.uniqueArray(seriesData, 2);
+  var combinedConfig = dex.config.expandAndOverlay(userConfig, defaults);
+  chart = dex.charts.echarts.EChart(combinedConfig);
 
-      dex.console.log("LEGEND", options.legend, "SERIES-DATA", seriesData);
-
-      var series = dex.config.expandAndOverlay(chart.config.series, {
-        type: 'themeRiver',
-        itemStyle: {
-          emphasis: {
-            shadowBlur: 20,
-            shadowColor: 'rgba(0, 0, 0, 0.8)'
-          }
+  chart.getGuiDefinition = function getGuiDefinition(config) {
+    var defaults = {
+      "type": "group",
+      "name": "EChart Line Chart Settings",
+      "contents": [
+        {
+          "type": "group",
+          "name": "General Options",
+          "contents": [
+            dex.config.gui.echartsTitle({}, "options.title"),
+            dex.config.gui.echartsGrid({}, "options.grid"),
+            dex.config.gui.echartsTooltip({}, "options.tooltip"),
+            dex.config.gui.echartsSymbol({}, "series"),
+            {
+              "name": "Color Scheme",
+              "description": "The color scheme.",
+              "target": "palette",
+              "type": "choice",
+              "choices": dex.color.colormaps({shortlist: true}),
+              "initialValue": "category10"
+            },
+            {
+              "name": "Display Legend",
+              "description": "Determines whether or not to draw the legend or not.",
+              "type": "boolean",
+              "target": "displayLegend",
+              "initialValue": true
+            },
+            {
+              "name": "Background Color",
+              "description": "The color of the background.",
+              "target": "options.backgroundColor",
+              "type": "color",
+              "initialValue": "#ffffff"
+            },
+            {
+              "name": "Series Type",
+              "description": "The series type",
+              "type": "choice",
+              "target": "series.type",
+              "choices": ["line", "scatter", "effectScatter", "bar"]
+            },
+            {
+              "name": "Stack Series",
+              "description": "Stack the series or not.",
+              "type": "boolean",
+              "target": "series.stack",
+              "initialValue": false
+            },
+            {
+              "name": "Clip Overflow",
+              "description": "Clip overflow.",
+              "type": "boolean",
+              "target": "series.clipOverflow",
+              "initialValue": true
+            },
+            {
+              "name": "Connect Nulls",
+              "description": "Connect nulls.",
+              "type": "boolean",
+              "target": "series.connectNulls",
+              "initialValue": false
+            },
+            {
+              "name": "Step",
+              "description": "Stack the series or not.",
+              "type": "boolean",
+              "target": "series.step",
+              "initialValue": false
+            }
+          ]
         },
-        data: seriesData.data
-      });
+        {
+          "type": "group",
+          "name": "Labels",
+          "contents": [
+            dex.config.gui.echartsLabel({name: "Normal"}, "series.label.normal"),
+            dex.config.gui.echartsLabel({name: "Emphasis"}, "series.label.emphasis")
+          ]
+        },
+        {
+          "type": "group",
+          "name": "Axis",
+          "contents": [
+            dex.config.gui.echartsAxis({name: "X Axis"}, "options.xAxis"),
+            dex.config.gui.echartsDataZoom({name: "X Axis Data Zoom"}, "xAxisDataZoom"),
+            dex.config.gui.echartsAxis({name: "Y Axis"}, "options.yAxis"),
+            dex.config.gui.echartsDataZoom({name: "Y Axis Data Zoom"}, "yAxisDataZoom"),
+          ]
+        }
+      ]
+    };
 
-      options.series.push(series);
+    var guiDef = dex.config.expandAndOverlay(config, defaults);
+    dex.config.gui.sync(chart, guiDef);
+    return guiDef;
+  };
 
-      dex.console.log("OPTIONS", options);
-      return options;
+  chart.getOptions = function (csv) {
+    var options, seriesNames, seriesInfo, xInfo, yInfo;
+    chart.spec = new dex.data.spec("lineChart", csv)
+      .string()
+      .any()
+      .any();
+    chart.spec.errorMessage = "Line Charts require data of the form: " +
+      "[ string:series, any:x, any:y ]";
+
+    // If the spec has not been met, we're done.
+    if (chart.spec.valid == false) {
+      return {};
     }
 
-    function getRadarOptions(commonOptions, csv) {
-      var options = dex.config.expandAndOverlay({
-        tooltip: {},
-        series: [],
-        legend: {},
-        radar: {}
-      }, commonOptions);
+    dex.console.log("CHART-CONFIG", chart.config);
 
-      var radiusIndex = dex.csv.getColumnNumber(csv, chart.config.radiusIndex);
-      var angleIndex = dex.csv.getColumnNumber(csv, chart.config.angleIndex);
-      var seriesIndex = dex.csv.getColumnNumber(csv, chart.config.seriesIndex);
+    // Override precedence on options: chart, local defs, common defs.
+    options = dex.config.expandAndOverlay(
+      chart.config.options,
+      {series: []},
+      chart.getCommonOptions());
 
-      var maxRadius = dex.csv.extent(csv, [radiusIndex])[1];
-      var minRadius = dex.csv.extent(csv, [radiusIndex])[0];
+    if (chart.config.xAxisDataZoom !== undefined) {
+      options.dataZoom[0] = dex.config.expandAndOverlay(chart.config.xAxisDataZoom, options.dataZoom[0]);
+    }
 
-      options.radar.indicator = dex.csv.uniqueArray(csv, angleIndex)
-        .reverse().map(function (value) {
-          return {text: "" + value, max: maxRadius, min: minRadius};
-        });
+    if (chart.config.yAxisDataZoom !== undefined) {
+      options.dataZoom[1] = dex.config.expandAndOverlay(chart.config.yAxisDataZoom, options.dataZoom[1]);
+    }
 
-      // Per-series max.
-      /**
-       options.radar.indicator.forEach(function(indicator) {
-        var maxRadius = dex.csv.extent(dex.csv.selectRows(csv, function(row) {
-          //dex.console.log("ROW", row, row[angleIndex], indicator, row[radiusIndex]);
-          return indicator.text === ("" + row[angleIndex]);
-        }), [radiusIndex])[1];
-        indicator.max = maxRadius;
-      });
-       **/
+    [seriesInfo, xInfo, yInfo] = chart.spec.visible;
+    [chart.config.seriesInfo, chart.config.xInfo, chart.config.yInfo] = chart.spec.visible;
 
-      //dex.console.log("INDICATOR: " + JSON.stringify(options.radar.indicator));
+    seriesNames = dex.csv.uniqueArray(csv, seriesInfo.position);
+    if (chart.config.displayLegend) {
+      options.legend = {data: seriesNames};
+    }
 
-      options.legend.data = dex.csv.uniqueArray(csv, seriesIndex);
+    if (xInfo.type == "string") {
+      options.xAxis = dex.config.expandAndOverlay({
+        type: "category",
+        data: dex.csv.uniqueArray(csv, xInfo.position)
+      }, options.xAxis);
+    }
+    else {
+      options.xAxis = dex.config.expandAndOverlay({
+        type: "value"
+      }, options.xAxis);
+      options.xAxis.data = undefined;
+    }
 
+    if (yInfo.type == "string") {
+      options.yAxis = dex.config.expandAndOverlay({
+        type: "category",
+        data: dex.csv.uniqueArray(csv, yInfo.position)
+      }, options.yAxis);
+    }
+    else {
+      options.yAxis = dex.config.expandAndOverlay({
+        type: "value"
+      }, options.yAxis);
+      options.yAxis.data = undefined;
+    }
+
+    seriesNames.forEach(function (seriesName) {
       var series = dex.config.expandAndOverlay(chart.config.series, {
-        type: 'radar',
-        name: "Series Name",
-        data: options.legend.data.map(function (seriesName) {
-          return {
-            name: seriesName,
-            value: dex.csv.selectRows(csv, function (row) {
-              return row[seriesIndex] === seriesName;
-            }).data.map(function (row) {
-              return row[radiusIndex]
-            })
-          }
-        })
+        name: seriesName,
+        type: 'line',
+        data: function (csv) {
+          var selectedCsv = dex.csv.selectRows(csv, function (row) {
+            return row[seriesInfo.position] == seriesName;
+          });
+
+          return selectedCsv.data.map(function (row, ri) {
+            var newRow = [row[xInfo.position], row[yInfo.position]];
+            row.forEach(function (col, ci) {
+              newRow.push(selectedCsv.header[ci] + ":::" + col);
+            });
+            return newRow;
+          });
+        }(chart.config.csv)
       });
-
       options.series.push(series);
+    });
+    //dex.console.log("OPTIONS", JSON.stringify(options));
+    return options;
+  };
 
-      dex.console.log("OPTIONS", options);
-      return options;
+  return chart;
+};
+module.exports = linechart;
+},{}],47:[function(require,module,exports){
+/**
+ *
+ * This module provides a ECharts Network.
+ *
+ * @name dex/charts/echarts/network
+ *
+ * @param userConfig
+ * @returns Network
+ */
+var network = function (userConfig) {
+  var chart;
+  var defaults = {
+    'parent': '#ECharts_Network',
+    'id': 'ECharts_Network',
+    'class': 'ECharts_Network',
+    'refreshType' : "update",
+    'resizable': true,
+    'width': "100%",
+    'height': "100%",
+    'type': 'force',
+    'displayLegend': false,
+    // Each node is a unique category
+    'categories': dex.csv.getCsvFunction(),
+    'palette': "ECharts",
+    'connectionIncrement': 1,
+    'series.circular': {},
+    'series.type': 'graph',
+    'series.layout': 'force',
+    'series.force': {
+      repulsion: 100,
+      gravity: .1,
+      edgeLength: 100,
+      layoutAnimation: true,
+    },
+    'series.lineStyle.normal.curveness': 0,
+    'series.focusNodeAdjacency': true,
+    "options": {
+      title: {
+        text: 'Title',
+        subtext: 'Subtext',
+        bottom: true,
+        left: true
+      },
+      tooltip: {}
+    }
+  };
+
+  var combinedConfig = dex.config.expandAndOverlay(userConfig, defaults);
+  chart = dex.charts.echarts.EChart(combinedConfig);
+
+  chart.getGuiDefinition = function getGuiDefinition(config) {
+    var defaults = {
+      "type": "group",
+      "name": "EChart Network Settings",
+      "contents": [
+        {
+          "type": "group",
+          "name": "General Options",
+          "contents": [
+            dex.config.gui.echartsTitle({}, "options.title"),
+            dex.config.gui.echartsGrid({}, "options.grid"),
+            dex.config.gui.echartsSymbol({}, "series"),
+            dex.config.gui.echartsTooltip({}, "options.tooltip"),
+            {
+              "name": "Layout",
+              "description": "The layout of the network.",
+              "type": "choice",
+              "choices": ["force", "circular", "none"],
+              "target": "series.layout",
+              "initialValue": "force"
+            },
+            {
+              "name": "Color Scheme",
+              "description": "The color scheme.",
+              "target": "palette",
+              "type": "choice",
+              "choices": dex.color.colormaps({shortlist: true}),
+              "initialValue": "category10"
+            },
+            {
+              "name": "Categorize",
+              "description": "Categorization Methods",
+              "type": "choice",
+              "choices": Object.keys(dex.csv.getCategorizationMethods(csv)),
+              "target": "categorizationMethod"
+            },
+            {
+              "name": "Display Legend",
+              "description": "Determines whether or not to draw the legend or not.",
+              "type": "boolean",
+              "target": "displayLegend",
+              "initialValue": true
+            },
+            {
+              "name": "Background Color",
+              "description": "The color of the background.",
+              "target": "options.backgroundColor",
+              "type": "color",
+              "initialValue": "#ffffff"
+            },
+            {
+              "name": "Connection Increment",
+              "description": "The size increase per additional connection.",
+              "type": "int",
+              "target": "connectionIncrement",
+              "minValue": 0,
+              "maxValue": 10,
+              "initialValue": 1
+            },
+            {
+              "name": "Node Scale Ratio",
+              "description": "Affects mouse zoom increment.",
+              "type": "float",
+              "target": "series.nodeScaleZoom",
+              "minValue": 0,
+              "maxValue": 2,
+              "initialValue": .6
+            },
+            {
+              "name": "Focus Node Adjacency",
+              "description": "Highlight node connections on hover.",
+              "type": "boolean",
+              "target": "series.focusNodeAdjacency",
+              "initialValue": true
+            },
+            {
+              "name": "Draggable",
+              "description": "Allow the network diagram to be dragged or not.",
+              "type": "boolean",
+              "target": "series.draggable",
+              "initialValue": false
+            }
+          ]
+        },
+        {
+          "type": "group",
+          "name": "Physics",
+          "contents": [
+            {
+              "name": "Initial Layout",
+              "description": "Initial layout.",
+              "type": "choice",
+              "choices": ["circular", "random"],
+              "target": "series.force.initLayout",
+              "initialValue": "circular"
+            },
+            {
+              "name": "Gravity",
+              "description": "The gravitational factor.",
+              "type": "float",
+              "target": "series.force.gravity",
+              "minValue": -.1,
+              "maxValue": 2,
+              "initialValue": .1
+            },
+            {
+              "name": "Repulsion",
+              "description": "The repulsive force between nodes.",
+              "type": "int",
+              "target": "series.force.repulsion",
+              "minValue": -100,
+              "maxValue": 1000,
+              "initialValue": 50
+            },
+            {
+              "name": "Edge Length",
+              "description": "The distance between nodes before repulsion and gravity are applied.",
+              "type": "int",
+              "target": "series.force.edgeLength",
+              "minValue": 0,
+              "maxValue": 1000,
+              "initialValue": 30
+            },
+            {
+              "name": "Layout Animation",
+              "description": "Show the iteration layout or not.",
+              "type": "boolean",
+              "target": "series.force.layoutAnimation",
+              "initialValue": true
+            }
+          ]
+        },
+        {
+          "type": "group",
+          "name": "Nodes",
+          "contents": [
+            dex.config.gui.echartsItemStyle({name: "Nodes: Normal"}, "series.itemStyle.normal"),
+            dex.config.gui.echartsItemStyle({name: "Nodes: Emphasis"}, "series.itemStyle.emphasis")
+          ]
+        },
+        {
+          "type": "group",
+          "name": "Edges",
+          "contents": [
+            dex.config.gui.echartsLineStyle({name: "Edges: Normal"}, "series.lineStyle.normal"),
+            dex.config.gui.echartsLineStyle({name: "Edges: Emphasis"}, "series.lineStyle.emphasis"),
+            dex.config.gui.echartsLabel({name: "Edge Labels: Normal"}, "series.edgeLabel.normal"),
+            dex.config.gui.echartsLabel({name: "Edge Labels: Emphasis"}, "series.edgeLabel.emphasis")
+          ]
+        },
+        {
+          "type": "group",
+          "name": "Labels",
+          "contents": [
+            dex.config.gui.echartsLabel({name: "Label: Normal"}, "series.label.normal"),
+            dex.config.gui.echartsLabel({name: "Label: Emphasis"}, "series.label.emphasis")
+          ]
+        }
+      ]
+    };
+
+    var guiDef = dex.config.expandAndOverlay(config, defaults);
+    dex.config.gui.sync(chart, guiDef);
+    return guiDef;
+  };
+
+  chart.getOptions = function (csv) {
+    chart.spec = new dex.data.spec("graph", csv)
+      .selectAll();
+
+    chart.spec.errorMessage = "Graphs accept all types of input.";
+
+    // If the spec has not been met, we're done.
+    if (chart.spec.valid == false) {
+      return {};
     }
 
-    function getGraphOptions(commonOptions, csv) {
-      var options = dex.config.expandAndOverlay({}, commonOptions);
+    var options = dex.config.expandAndOverlay({}, chart.getCommonOptions());
 
-      var nodes = {};
-      var nodeId = 0;
+    var nodes = {};
+    var nodeId = 0;
 
-      // Dynamically determine our categorization function:
-      var categorize = dex.csv.getCsvFunction(csv, chart.config.categories);
+    // Dynamically determine our categorization function:
+    var categorize = dex.csv.getCsvFunction(csv, chart.config.categories);
 
-      // Cateorize all data in csv.
-      var catMap = {};
-      var catNum = 0;
+    // Cateorize all data in csv.
+    var catMap = {};
+    var catNum = 0;
 
-      csv.data.forEach(function (row, ri) {
-        row.forEach(function (col, ci) {
-          var category = categorize(csv, ri, ci);
-          if (typeof catMap[category] == "undefined") {
-            catMap[category] = catNum;
-            catNum++;
-          }
-        });
+    csv.data.forEach(function (row, ri) {
+      row.forEach(function (col, ci) {
+        var category = categorize(csv, ri, ci);
+        if (typeof catMap[category] == "undefined") {
+          catMap[category] = catNum;
+          catNum++;
+        }
       });
-      var categories = Object.keys(catMap).map(function (key) {
-        return {name: key};
+    });
+    var categories = Object.keys(catMap).map(function (key) {
+      return {name: key};
+    });
+
+    csv.data.forEach(function (row, ri) {
+      row.forEach(function (col, ci) {
+        var category = catMap[categorize(csv, ri, ci)];
+        var key = col + "::" + category;
+        nodes[key] = nodes[key] || {
+          id: nodeId++,
+          name: col,
+          symbolSize: 10,
+          itemStyle: null,
+          category: category,
+          value: 0,
+          draggable: true,
+          label: {normal: {show: true}}
+        };
+        nodes[key].value++;
+        nodes[key].symbolSize += chart.config.connectionIncrement;
       });
+    });
 
-      csv.data.forEach(function (row, ri) {
-        row.forEach(function (col, ci) {
-          var category = catMap[categorize(csv, ri, ci)];
-          var key = col + "::" + category;
-          nodes[key] = nodes[key] || {
-              id: nodeId++,
-              name: col,
-              symbolSize: 10,
-              itemStyle: null,
-              category: category,
-              value: 0,
-              draggable: true,
-              label: {normal: {show: true}}
-            };
-          nodes[key].value++;
-          nodes[key].symbolSize += 5;
-        });
+    var links = [];
+
+    var linkId = 0;
+    csv.data.forEach(function (row, ri) {
+      row.forEach(function (col, ci) {
+        if (ci < (row.length - 1)) {
+          var sourceCat = catMap[categorize(csv, ri, ci)];
+          var targetCat = catMap[categorize(csv, ri, ci + 1)];
+
+          links.push({
+            id: linkId,
+            source: nodes[row[ci] + "::" + sourceCat]["id"],
+            target: nodes[row[ci + 1] + "::" + targetCat]["id"]
+          });
+          linkId++;
+        }
       });
+    });
 
-      var links = [];
-
-      var linkId = 0;
-      csv.data.forEach(function (row, ri) {
-        row.forEach(function (col, ci) {
-          if (ci < (row.length - 1)) {
-            var sourceCat = catMap[categorize(csv, ri, ci)];
-            var targetCat = catMap[categorize(csv, ri, ci + 1)];
-
-            links.push({
-              id: linkId,
-              source: nodes[row[ci] + "::" + sourceCat]["id"],
-              target: nodes[row[ci + 1] + "::" + targetCat]["id"]
-            });
-            linkId++;
-          }
-        });
-      });
-
+    if (chart.config.displayLegend) {
       options.legend = {
         //selectedMode: 'single',
         orient: 'vertical',
@@ -32123,38 +32134,1393 @@ var echart = function (userConfig) {
         show: true,
         data: categories
       };
-
-      options.series = dex.config.expandAndOverlay(chart.config.series,
-        {
-          name: "series",
-          type: 'graph',
-          layout: 'circular',
-
-          lineStyle: {
-            normal: {
-              color: 'source',
-              curveness: 0.3
-            }
-          },
-          links: links,
-          data: Object.keys(nodes).map(function (key) {
-            return nodes[key];
-          }),
-          categories: categories,
-          roam: true,
-          label: {
-            normal: {
-              position: 'right',
-              formatter: '{b}'
-            }
-          }
-        });
-
-      //dex.console.log("OPTIONS", options);
-      return options;
     }
 
-    function getTimelineOptions(commonOptions, csv) {
+    options.series = dex.config.expandAndOverlay(chart.config.series,
+      {
+        name: "series",
+        type: 'graph',
+        layout: 'circular',
+
+        lineStyle: {
+          normal: {
+            color: 'source',
+            curveness: 0.3
+          }
+        },
+        links: links,
+        data: Object.keys(nodes).map(function (key) {
+          return nodes[key];
+        }),
+        categories: categories,
+        roam: true,
+        label: {
+          normal: {
+            position: 'right',
+            formatter: '{b}'
+          }
+        }
+      });
+
+    if (options.series.layout == "circular") {
+      options.series.circular = {rotateLabel: true};
+    }
+
+    //dex.console.log("OPTIONS", options);
+    return options;
+  };
+
+  return chart;
+};
+module.exports = network;
+},{}],48:[function(require,module,exports){
+/**
+ *
+ * This module provides a ECharts Pie Chart
+ *
+ * @name dex/charts/echarts/PieChart
+ *
+ * @param userConfig
+ * @returns PieChart
+ */
+var piechart = function (userConfig) {
+  var chart;
+  var internalChart = undefined;
+  var sizeScale = undefined;
+  var defaults = {
+    'parent': '#ECharts_PieChart',
+    'id': 'ECharts_PieChart',
+    'class': 'ECharts_PieChart',
+    'resizable': true,
+    'width': "100%",
+    'height': "100%",
+    'type': 'pie',
+    'palette': 'ECharts',
+    'aggregationMethod': "Sum",
+    'aggregationFunction': function (values) {
+      return values.reduce(function (acc, value) {
+        return acc + value;
+      }, 0);
+    },
+    // Dynamic but can be overriden.
+    maxPadding: undefined,
+    maxPercent: undefined,
+    radius: undefined,
+    padding: undefined,
+    'series.type': 'pie',
+    'series.selectedMode': 'single',
+    'series.label.normal.position': 'inner',
+    "options": {
+      tooltip: {
+        trigger: 'item',
+        formatter: function (d) {
+          var str = "<table class='table table-condensed'>";
+          dex.console.log("D", d);
+          str += "<th colspan='2'><center><h4>" + d.seriesName + "</h4></center></th>";
+          Object.keys(d.data.csv).forEach(function (key) {
+            str += "<tr><td>" + key + "</td><td>" + d.data.csv[key] + "</td></tr>"
+          });
+          str += "</table>";
+          return str;
+        }
+      },
+    }
+  };
+
+  var combinedConfig = dex.config.expandAndOverlay(userConfig, defaults);
+  chart = dex.charts.echarts.EChart(combinedConfig);
+
+  chart.subscribe(chart, "attr", function (event) {
+    if (event.attr == "aggregationMethod") {
+      switch (event.value) {
+        case "Average": {
+          chart.config.aggregationFunction = function (values) {
+            var sum = values.reduce(function (acc, value) {
+              return acc + value;
+            }, 0);
+            return sum / values.length;
+          }
+        }
+        case "Count": {
+          chart.config.aggregationFunction = function (values) {
+            return values.length;
+          }
+        }
+        case "Count Distinct": {
+          chart.config.aggregationFunction = function (values) {
+            return dex.array.unique(values).length;
+          }
+        }
+        case "Sum":
+        default: {
+          chart.config.aggregationFunction = function (values) {
+            return values.reduce(function (acc, value) {
+              return acc + value;
+            }, 0);
+          }
+        }
+      }
+    }
+  });
+
+  chart.getGuiDefinition = function getGuiDefinition(config) {
+    var defaults = {
+      "type": "group",
+      "name": "EChart Pie Chart Settings",
+      "contents": [
+        {
+          "type": "group",
+          "name": "General",
+          "contents": [
+            dex.config.gui.echartsTitle({}, "options.title"),
+            dex.config.gui.echartsGrid({}, "options.grid"),
+            dex.config.gui.echartsTooltip({}, "options.tooltip"),
+            {
+              "name": "Color Scheme",
+              "description": "The color scheme.",
+              "target": "palette",
+              "type": "choice",
+              "choices": dex.color.colormaps({shortlist: true}),
+              "initialValue": "category10"
+            },
+            {
+              "name": "Rose Chart",
+              "description": "Render the pie in Nightinggale Rose style.",
+              "target": "series.roseType",
+              "type": "boolean",
+              "initialValue": false
+            },
+            {
+              "name": "Background Color",
+              "description": "The color of the background.",
+              "target": "options.backgroundColor",
+              "type": "color",
+              "initialValue": "#ffffff"
+            },
+            {
+              "name": "Aggregation Method",
+              "description": "The aggregation method",
+              "type": "choice",
+              "choices": ["Sum", "Average", "Count", "Count Distinct"],
+              "target": "aggregationMethod",
+              "initialValue": "Sum"
+            },
+            {
+              "name": "Show Zero Sum",
+              "description": "Whether to show sector when all data are zero.",
+              "target": "series.stillShowZeroSum",
+              "type": "boolean",
+              "initialValue": true
+            }
+          ]
+        },
+        {
+          "type": "group",
+          "name": "Labels",
+          "contents": [
+            dex.config.gui.echartsLabel({name: "Labels: Normal"}, "series.label.normal"),
+            dex.config.gui.echartsLabel({name: "Labels: Emphasis"}, "series.label.emphasis"),
+            {
+              "name": "Show Label Lines",
+              "description": "Whether to show label lines or not.",
+              "target": "series.labelLine.show",
+              "type": "boolean",
+              "initialValue": true
+            },
+            {
+              "name": "Avoid Label Overlap",
+              "description": "Whether to enable the strategy to avoid labels overlap.",
+              "target": "series.avoidLabelOverlap",
+              "type": "boolean",
+              "initialValue": true
+            }
+          ]
+        },
+        {
+          "type": "group",
+          "name": "Label Lines",
+          "contents": [
+            dex.config.gui.echartsLineStyle({name: "Label Line: Normal"}, "series.labelLine.normal.lineStyle"),
+            dex.config.gui.echartsLineStyle({name: "Label Line: Emphasis"}, "series.labelLine.emphasis.lineStyle"),
+            {
+              "name": "Show Label Lines",
+              "description": "Whether to show label lines or not.",
+              "target": "series.labelLine.normal.show",
+              "type": "boolean",
+              "initialValue": true
+            },
+            {
+              "name": "Smooth",
+              "description": "Whether to smooth label lines.",
+              "target": "series.labelLine.normal.smooth",
+              "type": "boolean",
+              "initialValue": false
+            }
+          ]
+        },
+        {
+          "type": "group",
+          "name": "Items",
+          "contents": [
+            dex.config.gui.echartsItemStyle({name: "Item: Normal"}, "series.itemStyle.normal"),
+            dex.config.gui.echartsItemStyle({name: "Item: Emphasis"}, "series.itemStyle.emphasis")
+          ]
+        }
+      ]
+    };
+
+    var guiDef = dex.config.expandAndOverlay(config, defaults);
+    dex.config.gui.sync(chart, guiDef);
+    return guiDef;
+  };
+
+  chart.getOptions = function (csv) {
+    var options, seriesNames, seriesInfo, valueInfo, categoryInfo;
+    chart.spec = new dex.data.spec("pie", csv)
+      .string()
+      .string()
+      .number();
+    chart.spec.errorMessage = "Pie Charts require data of the form: " +
+      "[ string:series, any:category, number:value ]";
+
+    // If the spec has not been met, we're done.
+    if (chart.spec.valid == false) {
+      return {};
+    }
+
+    options = dex.config.expandAndOverlay({
+      tooltip: {
+        trigger: 'item',
+        formatter: "{a} <br/>{b}: {c} ({d}%)"
+      },
+      legend: {
+        orient: 'vertical',
+        x: 'left',
+        data: []
+      },
+      series: []
+    }, chart.getCommonOptions());
+
+    [seriesInfo, categoryInfo, valueInfo] = chart.spec.visible;
+    [chart.config.seriesInfo, chart.config.categoryInfo, chart.config.valueInfo] = chart.spec.visible;
+
+    seriesNames = dex.csv.uniqueArray(csv, seriesInfo.position);
+    categoryNames = dex.csv.uniqueArray(csv, categoryInfo.position);
+    options.legend.data = categoryNames;
+
+    var maxPercent = chart.config.maxPercent || 80.0;
+    var maxPadding = chart.config.maxPadding || 10;
+    var availableRadius = chart.config.radius ||
+      Math.floor(maxPercent / (seriesNames.length + 2));
+    var padding = chart.config.padding ||
+      (Math.min((seriesNames.length <= 1) ? 0 :
+        Math.floor(maxPercent / (2 * seriesNames.length - 2)), maxPadding));
+
+    var startRadius = 0;
+    var endRadius = Math.floor(availableRadius * 2);
+
+    //dex.console.log("CONFIG-SERIES", chart.config.series);
+    seriesNames.forEach(function (seriesName) {
+      var seriesCsv = dex.csv.selectRows(csv, function (row) {
+        return row[seriesInfo.position] == seriesName;
+      });
+
+      var series = dex.config.expandAndOverlay(chart.config.series, {
+        type: 'pie',
+        name: seriesName,
+        radius: [startRadius + "%", endRadius + "%"],
+        data: seriesCsv.data.map(function (row, ri) {
+          var obj = {};
+          row.forEach(function (col, ci) {
+            obj[csv.header[ci]] = col;
+          });
+          var newRow = {
+            name: row[categoryInfo.position],
+            value: row[valueInfo.position],
+            csv: obj
+          };
+          return newRow;
+        })
+      });
+
+      options.series.push(series);
+      startRadius = padding + endRadius;
+      endRadius = startRadius + availableRadius;
+    });
+
+    //dex.console.log("OPTIONS", JSON.stringify(options));
+    return options;
+  };
+
+  return chart;
+};
+module.exports = piechart;
+},{}],49:[function(require,module,exports){
+/**
+ *
+ * This module provides a ECharts Polar Plot
+ *
+ * @name dex/charts/echarts/PolarPlot
+ *
+ * @param userConfig
+ * @returns PolarPlot
+ */
+var polarplot = function (userConfig) {
+  var chart;
+  var internalChart = undefined;
+  var effectiveOptions;
+  var sizeScale = undefined;
+  var defaults = {
+    'parent': '#ECharts_PolarPlot',
+    'id': 'ECharts_PolarPlot',
+    'class': 'ECharts_PolarPlot',
+    'resizable': true,
+    'width': "100%",
+    'height': "100%",
+    'type': 'polar',
+    'palette': 'ECharts',
+    'refreshType': "update",
+    'displayLegend': true,
+    'radius': {'min': 5, 'max': 20},
+    'sizeMethod': 'linear',
+    'sizeScale': function (value) {
+      // No size scale exists, so let's establish one.
+      if (sizeScale === undefined) {
+        // We have a value index to size upon.
+        if (chart.config.scaleInfo !== undefined) {
+          //dex.console.log("SCALING(value,scaleIndex,extents)", value, chart.config.scaleIndex,
+          //  dex.csv.extent(chart.config.csv, [chart.config.scaleIndex]));
+          sizeScale = dex.csv.getScalingMethod(
+            chart.config.csv, chart.config.sizeMethod,
+            dex.csv.extent(chart.config.csv, [chart.config.scaleInfo.position]),
+            [chart.config.radius.min, chart.config.radius.max]);
+        }
+        // There is no value index to size upon, just return radius.min for
+        // every item.
+        else {
+          sizeScale = function (d) {
+            //dex.console.log("MIN-SCALE", chart.config.radius.min);
+            return chart.config.radius.min;
+          }
+        }
+      }
+      // If an array, value index is always first.
+      if (chart.config.scaleInfo !== undefined) {
+        return sizeScale(value[2]);
+      }
+      // If a simple value, size on it.  IE: Polar Bar Chart
+      return chart.config.radius.min;
+    },
+    'series.coordinateSystem': 'polar',
+    'series.type': 'line',
+    'series.itemStyle.normal.opacity': .6,
+    'series.itemStyle.emphasis.opacity': .9,
+    "series.symbolSize": function (d) {
+      //dex.console.log("SIZING D", d);
+      return chart.config.sizeScale(d);
+    },
+    "options": {
+      tooltip: {
+        trigger: 'item',
+        formatter: function (d) {
+          //dex.console.log("FORMATTER", d);
+          var str = "<table class='table table-condensed'>";
+
+          str += "<th colspan='2'><center><h4>" + d.seriesName + "</h4></center></th>";
+          d.data.forEach(function (value) {
+            if (typeof value === "string") {
+              var parts = value.split(":::");
+              if (parts.length == 2) {
+                str += "<tr><td>" + parts[0] + "</td><td>" + parts[1] + "</td></tr>";
+              }
+            }
+          });
+          str += "</table>";
+          return str;
+        }
+      },
+      dataZoom: [
+        {
+          orient: 'vertical',
+          show: true,
+          realtime: true,
+          start: 0,
+          end: 100,
+          angleAxisIndex: 0
+        },
+        {
+          show: true,
+          realtime: true,
+          start: 0,
+          end: 100,
+          radiusAxisIndex: 0
+        }
+      ]
+    }
+  };
+
+  var combinedConfig = dex.config.expandAndOverlay(userConfig, defaults);
+  chart = dex.charts.echarts.EChart(combinedConfig);
+
+  chart.subscribe(chart, "attr", function (event) {
+    if (event.attr == "radius" || event.attr == "sizeMethod" ||
+      event.attr == "radius.min" || event.attr == "radius.max") {
+      // Causes next call to sizeScale to recreate it.
+      sizeScale = undefined;
+    }
+  });
+
+  chart.getGuiDefinition = function getGuiDefinition(config) {
+    var defaults = {
+      "type": "group",
+      "name": "EChart Polar Plot Settings",
+      "contents": [
+        {
+          "type": "group",
+          "name": "General",
+          "contents": [
+            {
+              "name": "Chart Type",
+              "description": "The chart type.",
+              "type": "choice",
+              "choices": ["line", "bar", "scatter"],
+              "target": "series.type"
+            },
+            {
+              "name": "Color Scheme",
+              "description": "The color scheme.",
+              "target": "palette",
+              "type": "choice",
+              "choices": dex.color.colormaps({shortlist: true}),
+              "initialValue": "category10"
+            },
+            {
+              "name": "Display Legend",
+              "description": "Determines whether or not to draw the legend or not.",
+              "type": "boolean",
+              "target": "displayLegend",
+              "initialValue": true
+            },
+            {
+              "name": "Background Color",
+              "description": "The color of the background.",
+              "target": "options.backgroundColor",
+              "type": "color",
+              "initialValue": "#ffffff"
+            },
+            {
+              "name": "Symbol Shape",
+              "description": "The shape of the symbol.",
+              "type": "choice",
+              "choices": ["emptyCircle", "circle", "rect", "roundRect", "triangle", "diamond", "pin", "arrow"],
+              "target": "series.symbol",
+              "initialValue": "emptyCircle"
+            },
+            dex.config.gui.echartsTitle({}, "options.title"),
+            dex.config.gui.echartsLabel({name: "Normal Label"}, "series.label.normal"),
+            dex.config.gui.echartsLabel({name: "Emphasis Label"}, "series.label.emphasis")
+          ]
+        },
+        {
+          "type": "group",
+          "name": "Scaling",
+          "contents": [
+            {
+              "name": "Minimum Radius",
+              "description": "The minimum radius.",
+              "type": "int",
+              "minValue": 0,
+              "maxValue": 200,
+              "target": "radius.min",
+              "initialValue": 5
+            },
+            {
+              "name": "Maximum Radius",
+              "description": "The maximum radius.",
+              "type": "int",
+              "minValue": 0,
+              "maxValue": 200,
+              "target": "radius.max",
+              "initialValue": 5
+            },
+            {
+              "name": "Size Scaling Method",
+              "description": "The type of scaling method",
+              "type": "choice",
+              "target": "sizeMethod",
+              "choices": ["linear", "pow", "log", "sqrt", "time"],
+              "initialValue": "linear"
+            }
+          ]
+        },
+        {
+          "type": "group",
+          "name": "Series and Axis",
+          "contents": [
+            {
+              "name": "Stack Series",
+              "description": "To stack or not to stack, that is the question.",
+              "type": "boolean",
+              "target": "series.stack"
+            },
+            {
+              "name": "Angle Axis Data Type",
+              "description": "Angle axis data type.",
+              "type": "choice",
+              "choices": ["dynamic", "category"],
+              "target": "angleAxisType"
+            },
+            {
+              "name": "Radius Axis Data Type",
+              "description": "Radius axis data type.",
+              "type": "choice",
+              "choices": ["dynamic", "category"],
+              "target": "radiusAxisType"
+            }
+          ]
+        }
+      ]
+    };
+
+    var guiDef = dex.config.expandAndOverlay(config, defaults);
+    dex.config.gui.sync(chart, guiDef);
+    return guiDef;
+  };
+
+  chart.getOptions = function (csv) {
+    var i;
+    var specs = [
+      {
+        name: "scaledPolar",
+        spec: new dex.data.spec("scaledPolar", csv)
+          .string()
+          .any()
+          .any()
+          .number(),
+        options: polarOptions({scale: true})
+      },
+      {
+        name: "polar",
+        spec: new dex.data.spec("polar", csv)
+          .string()
+          .any()
+          .any(),
+        options: polarOptions({scale: false})
+      }
+    ];
+
+    for (i = 0; i < specs.length; i++) {
+      if (specs[i].spec.valid) {
+        chart.spec = specs[i];
+        return specs[i].options(csv, specs[i].spec);
+      }
+    }
+
+    // There were no valid specs if we got here.
+    chart.spec = {
+      valid: false,
+      errorMessage: "Polar Plot expects data of the form: " +
+      "[ string:series, any:angle, (any:radius), number:value ]" +
+      " where options enclosed in parenthesis are optional."
+    };
+    return {};
+  };
+
+  function polarOptions(opts) {
+    var opts = opts || {};
+    var scaling = opts.scale || false;
+
+    return function (csv, spec) {
+      var seriesInfo, radiusInfo, angleInfo, scaleInfo;
+
+      var options = dex.config.expandAndOverlay({
+        series: [],
+        polar: {}
+      }, chart.getCommonOptions());
+      var config = chart.config;
+      var seriesNames;
+      //dex.console.log("MATCHING SPEC: ", spec);
+
+      [ seriesInfo, radiusInfo, angleInfo ] = spec.visible;
+      [ chart.config.seriesInfo, chart.config.radiusInfo, chart.config.angleInfo ] = spec.visible;
+
+      if (scaling) {
+        chart.config.scaleInfo = spec.visible[3];
+        sizeScale = undefined;
+      }
+
+      seriesNames = dex.csv.uniqueArray(csv, seriesInfo.position);
+      if (chart.config.displayLegend) {
+        options.legend = { data: seriesNames };
+      }
+
+      if (angleInfo.type == "string" || chart.config.angleAxisType == "category") {
+        options.angleAxis = {
+          type: "category",
+          data: dex.csv.uniqueArray(csv, angleInfo.position)
+        }
+      }
+      else {
+        options.angleAxis = {type: "value"};
+      }
+
+      if (radiusInfo.type == "string" || chart.config.radiusAxisType == "category") {
+        options.radiusAxis = {
+          type: "category",
+          data: dex.csv.uniqueArray(csv, radiusInfo.position)
+        }
+      }
+      else {
+        options.radiusAxis = {type: "value"};
+      }
+
+      seriesNames.forEach(function (seriesName) {
+        var series = dex.config.expandAndOverlay(config.series, {
+          name: seriesName,
+          coordinateSystem: 'polar',
+          type: 'line',
+          data: function (csv) {
+            var selectedCsv = dex.csv.selectRows(csv, function (row) {
+              return row[seriesInfo.position] == seriesName;
+            });
+
+            return selectedCsv.data.map(function (row, ri) {
+              var newRow = [row[radiusInfo.position], row[angleInfo.position]];
+
+              if (radiusInfo.type == "string" || chart.config.radiusAxisType == "category") {
+                newRow[0] = options.radiusAxis.data.findIndex(function (val) {
+                  return val == row[radiusInfo.position];
+                });
+              }
+
+              if (angleInfo.type == "string" || chart.config.angleAxisType == "category") {
+                newRow[1] = options.angleAxis.data.findIndex(function (val) {
+                  return val == row[angleInfo.position];
+                });
+              }
+
+              if (scaling) {
+                newRow.push(row[chart.config.scaleInfo.position]);
+              }
+              row.forEach(function (col, ci) {
+                newRow.push(selectedCsv.header[ci] + ":::" + col);
+              });
+              return newRow;
+            });
+          }(chart.config.csv)
+        });
+        options.series.push(series);
+      });
+      //dex.console.log("OPTIONS", JSON.stringify(options));
+      return options;
+    };
+  }
+
+  return chart;
+};
+module.exports = polarplot;
+},{}],50:[function(require,module,exports){
+/**
+ *
+ * This module provides a ECharts Steam Graph.
+ *
+ * @name dex/charts/echarts/RadarChart
+ *
+ * @param userConfig
+ * @returns RadarChart
+ */
+var radarchart = function (userConfig) {
+  var chart;
+  var defaults = {
+    'parent': '#ECharts_RadarChart',
+    'id': 'ECharts_RadarChart',
+    'class': 'ECharts_RadarChart',
+    'resizable': true,
+    'refreshType': "update",
+    'width': "100%",
+    'height': "100%",
+    'palette': 'ECharts',
+    'type': 'radar',
+    'series.itemStyle': {
+      normal: {
+        lineStyle: {
+          width: 1,
+          opacity: .8
+        }
+      },
+      emphasis: {
+        lineStyle: {width: 5, opacity: 1},
+        areaStyle: "solid"
+      }
+    },
+    "options": {}
+  };
+
+  var combinedConfig = dex.config.expandAndOverlay(userConfig, defaults);
+  chart = dex.charts.echarts.EChart(combinedConfig);
+
+  chart.getGuiDefinition = function getGuiDefinition(config) {
+    var defaults = {
+      "type": "group",
+      "name": "EChart Radar Chart Settings",
+      "contents": [
+
+        {
+          "type": "group",
+          "name": "General Options",
+          "contents": [
+            dex.config.gui.echartsTitle({}, "options.title"),
+            dex.config.gui.echartsGrid({}, "options.grid"),
+            dex.config.gui.echartsSymbol({}, "series"),
+            {
+              "name": "Color Scheme",
+              "description": "The color scheme.",
+              "target": "palette",
+              "type": "choice",
+              "choices": dex.color.colormaps({shortlist: true}),
+              "initialValue": "category10"
+            },
+            {
+              "name": "Background Color",
+              "description": "The color of the background.",
+              "target": "options.backgroundColor",
+              "type": "color",
+              "initialValue": "#ffffff"
+            }
+          ]
+        },
+        dex.config.gui.echartsLabel({name: "Normal Label"}, "series.label.normal"),
+        dex.config.gui.echartsLabel({name: "Emphasis Label"}, "series.label.emphasis")
+      ]
+    };
+
+    var guiDef = dex.config.expandAndOverlay(config, defaults);
+    dex.config.gui.sync(chart, guiDef);
+    return guiDef;
+  };
+
+  chart.getOptions = function (csv) {
+    var options, seriesNames, seriesInfo, angleInfo, radiusInfo, maxRadius, minRadius;
+    chart.spec = new dex.data.spec("radar", csv)
+      .string()
+      .any()
+      .match("number|boolean")
+    chart.spec.errorMessage = "Radar charts require input of the following form:" +
+      "[ string:series, any:angle, number|boolean:radius ]";
+
+    // If the spec has not been met, we're done.
+    if (chart.spec.valid == false) {
+      return {};
+    }
+
+    options = dex.config.expandAndOverlay({
+      tooltip: {},
+      series: [],
+      legend: {},
+      radar: {}
+    }, chart.getCommonOptions());
+
+    [seriesInfo, angleInfo, radiusInfo] = chart.spec.visible;
+    [chart.config.seriesInfo, chart.config.angleInfo, chart.config.radiusInfo] = chart.spec.visible;
+
+    [minRadius, maxRadius] = dex.csv.extent(csv, [radiusInfo.position]);
+
+    options.radar.indicator = dex.csv.uniqueArray(csv, angleInfo.position)
+      .reverse().map(function (value) {
+        return {text: "" + value, max: maxRadius, min: minRadius};
+      });
+
+    options.legend.data = dex.csv.uniqueArray(csv, seriesInfo.position);
+
+    var series = dex.config.expandAndOverlay(chart.config.series, {
+      type: 'radar',
+      name: "Series Name",
+      data: options.legend.data.map(function (seriesName) {
+        return {
+          name: seriesName,
+          value: dex.csv.selectRows(csv, function (row) {
+            return row[seriesInfo.position] === seriesName;
+          }).data.map(function (row) {
+            return row[radiusInfo.position]
+          })
+        }
+      })
+    });
+
+    options.series.push(series);
+
+    dex.console.log("OPTIONS", JSON.stringify(options));
+    return options;
+  };
+
+  return chart;
+};
+module.exports = radarchart;
+},{}],51:[function(require,module,exports){
+/**
+ *
+ * This module provides a ECharts Single Axis ScatterPlot.
+ *
+ * @name dex/charts/echarts/SingleAxisScatterPlot
+ *
+ * @param userConfig
+ * @returns SingleAxisScatterPlot
+ */
+var singleaxisscatterplot = function (userConfig) {
+  var chart;
+  var sizeScale = undefined;
+
+  var defaults = {
+    'parent': '#ECharts_SingleAxisScatterPlot',
+    'id': 'ECharts_LineChart',
+    'class': 'ECharts_LineChart',
+    'resizable': true,
+    'width': "100%",
+    'height': "100%",
+    'type': 'single-axis',
+    'radius': {'min': 1, 'max': 50},
+    'sizeMethod': 'linear',
+    'sizeScale': function (value) {
+      if (typeof sizeScale == "undefined") {
+        dex.console.log("EXTENT", dex.csv.extent(chart.config.csv,
+          [chart.config.valueInfo.position]));
+        sizeScale = dex.csv.getScalingMethod(
+          chart.config.csv, chart.config.sizeMethod,
+          dex.csv.extent(chart.config.csv, [chart.config.valueInfo.position]),
+          [chart.config.radius.min, chart.config.radius.max]);
+      }
+      return sizeScale(value);
+    },
+    'palette': 'category10',
+    'series.coordinateSystem': 'singleAxis',
+    'series.symbol': 'circle',
+    'series.type': 'scatter',
+    'series.itemStyle': {
+      normal: {
+        shadowBlur: 10,
+        shadowColor: 'rgba(150, 36, 50, 0.5)',
+        shadowOffsetY: 5,
+        color: function (item) {
+          return new echarts.graphic.RadialGradient(0.7, 0.5, 1, [{
+            offset: .3,
+            color: dex.color.palette[chart.config.palette][
+            item.seriesIndex % dex.color.palette[
+              chart.config.palette].length],
+          }, {
+            offset: 1,
+            color: 'black'
+          }])
+        }
+      }
+    },
+    "options": {
+      tooltip: {
+        formatter: function (d) {
+          return "<table><tr><td><b>" + csv.header[1] + ":</b></td><td>" +
+            d.data[0] + "</td></tr><tr><td><b>" + csv.header[2] +
+            ":</b></td><td>" + d.data[1] + "</td></tr></table>";
+        }
+      }
+    }
+  };
+
+  var combinedConfig = dex.config.expandAndOverlay(userConfig, defaults);
+  chart = dex.charts.echarts.EChart(combinedConfig);
+
+  chart.getGuiDefinition = function getGuiDefinition(config) {
+    var defaults = {
+      "type": "group",
+      "name": "Single Axis ScatterPlot Settings",
+      "contents": [
+        {
+          "type": "group",
+          "name": "Miscellaneous",
+          "contents": [
+            dex.config.gui.echartsTitle({}, "options.title"),
+            dex.config.gui.echartsGrid({}, "options.grid"),
+            dex.config.gui.echartsTooltip({}, "options.tooltip"),
+            dex.config.gui.echartsSymbol({}, "series"),
+            {
+              "name": "Color Scheme",
+              "description": "The color scheme.",
+              "target": "palette",
+              "type": "choice",
+              "choices": dex.color.colormaps({shortlist: true}),
+              "initialValue": "category10"
+            },
+            {
+              "name": "Display Legend",
+              "description": "Determines whether or not to draw the legend or not.",
+              "type": "boolean",
+              "target": "displayLegend",
+              "initialValue": true
+            },
+            {
+              "name": "Background Color",
+              "description": "The color of the background.",
+              "target": "options.backgroundColor",
+              "type": "color",
+              "initialValue": "#ffffff"
+            },
+            {
+              "name": "Size Scaling Method",
+              "description": "The type of scaling method",
+              "type": "choice",
+              "target": "sizeMethod",
+              "choices": ["linear", "pow", "log", "sqrt", "time"],
+              "initialValue": "linear"
+            },
+            {
+              "name": "Series Type",
+              "description": "The series type",
+              "type": "choice",
+              "target": "series.type",
+              "choices": ["scatter", "effectScatter"]
+            }
+          ]
+        },
+        {
+          "type": "group",
+          "name": "Items",
+          "contents": [
+            dex.config.gui.echartsItemStyle({name: "Items: Normal"}, "series.itemStyle.normal"),
+            dex.config.gui.echartsItemStyle({name: "Items: Emphasis"}, "series.itemStyle.emphasis")
+          ]
+        },
+        {
+          "type": "group",
+          "name": "Labels",
+          "contents": [
+            dex.config.gui.echartsLabel({name: "Labels: Normal"}, "series.label.normal"),
+            dex.config.gui.echartsLabel({name: "Labels: Emphasis"}, "series.label.emphasis")
+          ]
+        },
+        {
+          "type": "group",
+          "name": "Axis",
+          "contents": [
+            dex.config.gui.echartsAxis({name: "X Axis"}, "singleAxis"),
+            dex.config.gui.echartsDataZoom({name: "Data Zoom"}, "dataZoom")
+          ]
+        }
+      ]
+    };
+
+    var guiDef = dex.config.expandAndOverlay(config, defaults);
+    dex.config.gui.sync(chart, guiDef);
+    return guiDef;
+  };
+
+  chart.getOptions = function (csv) {
+    var options, seriesNames, seriesInfo, xInfo;
+    chart.spec = new dex.data.spec("singleAxisScatterPlot", csv)
+      .string()
+      .any()
+      .number();
+
+    chart.spec.errorMessage = "Single Axis ScatterPlot requires data of the form: " +
+      "[ string:series, any:x, number:value ]";
+
+    // If the spec has not been met, we're done.
+    if (chart.spec.valid == false) {
+      return {};
+    }
+
+    options = dex.config.expandAndOverlay(
+      chart.config.options,
+      {
+        title: [],
+        singleAxis: [],
+        series: [],
+        dataZoom: [
+          {
+            handleSize: '100%',
+            filterMode: 'empty',
+          }
+        ],
+      }, chart.getCommonOptions());
+
+    [seriesInfo, xInfo, valueInfo] = chart.spec.visible;
+    [chart.config.seriesInfo, chart.config.xInfo, chart.config.valueInfo] = chart.spec.visible;
+
+    seriesNames = dex.csv.uniqueArray(csv, seriesInfo.position);
+    options.dataZoom[0].singleAxisIndex = dex.range(0, seriesNames.length);
+
+    if (chart.config.dataZoom !== undefined) {
+      options.dataZoom[0] = dex.config.expandAndOverlay(chart.config.dataZoom, options.dataZoom[0]);
+    }
+
+    var scatterHeightPercent = 90;
+    var percentIncrement = scatterHeightPercent / seriesNames.length;
+    var topOffset = 0;
+    var heightOffset = 0;
+
+    seriesNames.forEach(function (seriesName, si) {
+
+      var seriesCsv = dex.csv.selectRows(csv, function (row) {
+        return row[seriesInfo.position] == seriesName;
+      });
+
+      options.title.push({
+        textBaseline: 'middle',
+        top: "" + ((si + .5) * scatterHeightPercent / seriesNames.length) + "%",
+        text: seriesName
+      });
+
+      var singleAxis = dex.config.expandAndOverlay(chart.config.singleAxis, {
+        left: 150,
+        type: 'category',
+        data: dex.csv.include(seriesCsv, [xInfo.position]).data,
+        top: (si * percentIncrement + topOffset) + '%',
+        height: (percentIncrement + heightOffset) + '%',
+        axisLabel: {interval: 2}
+      });
+
+      dex.console.log("AXIS", singleAxis, chart.config.singleAxis);
+
+      if (xInfo.type == "string") {
+        singleAxis.type = "category";
+      }
+      else {
+        singleAxis.type = "value";
+      }
+
+      options.singleAxis.push(singleAxis);
+
+      var series = dex.config.expandAndOverlay(chart.config.series, {
+        singleAxisIndex: si,
+        coordinateSystem: 'singleAxis',
+        type: 'scatter',
+        data: function (csv) {
+          //dex.console.log("CSV", csv);
+          return csv.data.map(function (row, ri) {
+            var newRow;
+            if (xInfo.type == "string") {
+              newRow = [
+                singleAxis.data.findIndex(function (val) {
+                  return val == row[xInfo.position];
+                }), row[valueInfo.position]];
+            }
+            else {
+              newRow = [row[xInfo.position], row[valueInfo.position]];
+            }
+            return newRow;
+          });
+        }(seriesCsv),
+        symbolSize: function (dataItem) {
+          return chart.config.sizeScale(dataItem[1]);
+        }
+      });
+      options.series.push(series);
+    });
+    //dex.console.log("OPTIONS", JSON.stringify(options));
+    return options;
+  };
+
+  return chart;
+};
+module.exports = singleaxisscatterplot;
+},{}],52:[function(require,module,exports){
+/**
+ *
+ * This module provides a ECharts Steam Graph.
+ *
+ * @name dex/charts/echarts/SteamGraph
+ *
+ * @param userConfig
+ * @returns SteamGraph
+ */
+var steamgraph = function (userConfig) {
+  var chart;
+  var defaults = {
+    'parent': '#ECharts_SteamGraph',
+    'id': 'ECharts_SteamGraph',
+    'class': 'ECharts_SteamGraph',
+    'resizable': true,
+    'width': "100%",
+    'height': "100%",
+    'type': 'steam',
+    "options": {}
+  };
+
+  var combinedConfig = dex.config.expandAndOverlay(userConfig, defaults);
+  chart = dex.charts.echarts.EChart(combinedConfig);
+
+  chart.getGuiDefinition = function getGuiDefinition(config) {
+    var defaults = {
+      "type": "group",
+      "name": "EChart Steam Graph Settings",
+      "contents": [
+        {
+          "type": "group",
+          "name": "Miscellaneous",
+          "contents": [
+            {
+              "name": "Color Scheme",
+              "description": "The color scheme.",
+              "target": "palette",
+              "type": "choice",
+              "choices": dex.color.colormaps({shortlist: true}),
+              "initialValue": "category10"
+            },
+            {
+              "name": "Background Color",
+              "description": "The color of the background.",
+              "target": "options.backgroundColor",
+              "type": "color",
+              "initialValue": "#ffffff"
+            },
+          ]
+        },
+        dex.config.gui.echartsLabel({name: "Normal Label"}, "series.label.normal"),
+        dex.config.gui.echartsLabel({name: "Emphasis Label"}, "series.label.emphasis")
+      ]
+    };
+
+    var guiDef = dex.config.expandAndOverlay(config, defaults);
+    dex.config.gui.sync(chart, guiDef);
+    return guiDef;
+  };
+
+  chart.getOptions = function (csv) {
+    var options, seriesNames, seriesInfo, xInfo, valueInfo;
+    chart.spec = new dex.data.spec("steamGraph", csv)
+      .string()
+      .any()
+      .number();
+
+    chart.spec.errorMessage = "SteamGraph requires data of the form: " +
+      "[ string:series, any:x, number:value ]";
+
+    // If the spec has not been met, we're done.
+    if (chart.spec.valid == false) {
+      return {};
+    }
+
+    options = dex.config.expandAndOverlay({
+      tooltip: {
+        trigger: 'axis',
+        axisPointer: {
+          type: 'line',
+          lineStyle: {
+            color: 'rgba(0,0,0,0.2)',
+            width: 1,
+            type: 'solid'
+          }
+        }
+      },
+      title: [],
+      singleAxis: {
+        scale: true,
+        bottom: "10%",
+        axisPointer: {
+          animation: true,
+          label: {
+            show: true
+          }
+        },
+      },
+      series: [],
+      legend: {},
+      dataZoom: {
+        show: true,
+        realtime: true,
+        start: 0,
+        end: 100,
+        singleAxisIndex: 0
+      }
+    }, chart.getCommonOptions());
+
+    [seriesInfo, xInfo, valueInfo] = chart.spec.visible;
+    [chart.config.seriesInfo, chart.config.xInfo, chart.config.valueInfo] = chart.spec.visible;
+
+    seriesNames = dex.csv.uniqueArray(csv, seriesInfo.position);
+    options.legend.data = seriesNames;
+
+    switch (xInfo.type) {
+      case "string": {
+        options.singleAxis.type = "category";
+        options.singleAxis.data = dex.csv.uniqueArray(csv, xInfo.position);
+        break;
+      }
+      case "date": {
+        options.singleAxis.type = "time";
+        break;
+      }
+      default: {
+        options.singleAxis.type = "value";
+      }
+    }
+
+    var dataColumns = [xInfo.position, valueInfo.position, seriesInfo.position];
+
+    var series = dex.config.expandAndOverlay(chart.config.series, {
+      type: 'themeRiver',
+      itemStyle: {
+        emphasis: {
+          shadowBlur: 20,
+          shadowColor: 'rgba(0, 0, 0, 0.8)'
+        }
+      },
+      data: function (csv) {
+        return csv.data.map(function (row, ri) {
+          var newRow = [row[xInfo.position], row[valueInfo.position], row[seriesInfo.position]];
+          if (xInfo.type == "string") {
+            newRow[0] = options.singleAxis.data.findIndex(function (val) {
+              return val == row[xInfo.position];
+            });
+          }
+          return newRow;
+        });
+      }(csv)
+    });
+
+    options.series.push(series);
+
+    //dex.console.log("OPTIONS", JSON.stringify(options));
+    return options;
+  };
+
+  return chart;
+};
+module.exports = steamgraph;
+},{}],53:[function(require,module,exports){
+/**
+ *
+ * This module provides a ECharts Timeline.
+ *
+ * @name dex/charts/echarts/Timeline
+ *
+ * @param userConfig
+ * @returns Timeline
+ */
+var timeline = function (userConfig) {
+  var chart;
+  var sizeScale = d3.scale.linear();
+
+  var defaults = {
+    'parent': '#ECharts_Timeline',
+    'id': 'ECharts_Timeline',
+    'class': 'ECharts_Timeline',
+    'resizable': true,
+    'width': "100%",
+    'height': "100%",
+    'type': 'timeline',
+    'palette': 'ECharts',
+    'radius' : { min: 5, max: 50 },
+    categories: function (row) {
+      return row[3];
+    },
+    sequences: function (row) {
+      return +row[4];
+    },
+    sizes: function (row) {
+      //dex.console.log("SIZING ROW: ", row);
+      return chart.config.sizeScale(+row[2]);
+    },
+    'series.type': 'timeline',
+    "options": {
+    }
+  };
+
+  var combinedConfig = dex.config.expandAndOverlay(userConfig, defaults);
+  chart = dex.charts.echarts.EChart(combinedConfig);
+
+  var sizeExtents = dex.csv.extent(chart.config.csv, [2]);
+
+  sizeScale.domain(sizeExtents)
+    .range([+chart.config.radius.min, +chart.config.radius.max]);
+
+  chart.config.sizeScale = sizeScale;
+
+  chart.getGuiDefinition = function getGuiDefinition(config) {
+    var defaults = {
+      "type": "group",
+      "name": "EChart Timeline Settings",
+      "contents": [
+        {
+          "type": "group",
+          "name": "General Options",
+          "contents": [
+            {
+              "name": "Color Scheme",
+              "description": "The color scheme.",
+              "target": "palette",
+              "type": "choice",
+              "choices": dex.color.colormaps({shortlist:true}),
+              "initialValue": "category10"
+            },
+            {
+              "name": "Background Color",
+              "description": "The color of the background.",
+              "target": "options.backgroundColor",
+              "type": "color",
+              "initialValue": "#ffffff"
+            },
+            {
+              "name": "Symbol Shape",
+              "description": "The shape of the symbol.",
+              "type": "choice",
+              "choices": ["emptyCircle", "circle", "rect", "roundRect", "triangle", "diamond", "pin", "arrow"],
+              "target": "series.symbol",
+              "initialValue": "emptyCircle"
+            },
+            {
+              "name": "Symbol Size",
+              "description": "The size of the symbols",
+              "type": "int",
+              "target": "series.symbolSize",
+              "minValue": 0,
+              "maxValue": 50,
+              "initialValue": 5
+            }
+          ]
+        },
+        dex.config.gui.echartsLabel({name: "Normal Label"}, "series.label.normal"),
+        dex.config.gui.echartsLabel({name: "Emphasis Label"}, "series.label.emphasis")
+      ]
+    };
+
+    var guiDef = dex.config.expandAndOverlay(config, defaults);
+    dex.config.gui.sync(chart, guiDef);
+    return guiDef;
+  };
+
+  chart.getOptions = function (csv) {
+    var i;
+    var specs = [
+      {
+        name: "timeline",
+        spec: new dex.data.spec("timeline", csv)
+          .number()
+          .number()
+          .number()
+          .string()
+          .number(),
+        options: timelineOptions()
+      }
+    ];
+
+    for (i = 0; i < specs.length; i++) {
+      if (specs[i].spec.valid) {
+        chart.config.spec = specs[i];
+        return specs[i].options(csv, specs[i].spec);
+      }
+    }
+
+    // There were no valid specs if we got here.
+    chart.config.spec = {
+      valid: false,
+      errorMessage: "Timelines require data of the form: " +
+      "[ number:x, number:y, number:size, string:category, number|date:sequence ]"
+    };
+    return {};
+  };
+
+  function timelineOptions(opts) {
+    var opts = opts || {};
+
+    return function (csv, spec) {
 
       // Dynamically determine our categorization function:
       var getCategory = dex.csv.getRowFunction(csv, chart.config.categories);
@@ -32271,7 +33637,7 @@ var echart = function (userConfig) {
             "borderWidth": 1,
             formatter: function (obj) {
               //dex.console.log("OBJECT", obj);
-              return "<table>" +
+              return "<table class='table table-condensed'>" +
                 "<tr><td>" + csv.header[3] + ": </td><td>" + obj.data[3] + "</td></tr>" +
                 "<tr><td>" + csv.header[4] + ": </td><td>" + obj.data[4] + "</td></tr>" +
                 "<tr><td>" + csv.header[0] + ": </td><td>" + obj.data[0] + "</td></tr>" +
@@ -32332,7 +33698,7 @@ var echart = function (userConfig) {
           "animationEasingUpdate": "quinticInOut"
         },
         options: []
-      }, commonOptions);
+      }, chart.getCommonOptions());
 
       sequences.forEach(function (seq) {
         var option = {
@@ -32370,1181 +33736,9 @@ var echart = function (userConfig) {
       });
 
       return options;
-    }
-
-    $(document).ready(function () {
-      // Make the entire chart draggable.
-      if (chart.config.draggable) {
-        $(chart.config.parent).draggable();
-      }
-    });
-
-    return chart;
+    };
   }
-;
 
-module.exports = echart;
-},{}],46:[function(require,module,exports){
-/**
- *
- * This module provides a ECharts Line Chart.
- *
- * @name dex/charts/echarts/LineChart
- *
- * @param userConfig
- * @returns LineChart
- */
-var linechart = function (userConfig) {
-  var chart;
-  var defaults = {
-    'parent': '#ECharts_LineChart',
-    'id': 'ECharts_LineChart',
-    'class': 'ECharts_LineChart',
-    'resizable': true,
-    'width': "100%",
-    'height': "100%",
-    'type': 'linechart',
-    'palette': "ECharts",
-    'series.symbol': 'circle',
-    'series.symbolSize': 10,
-    'series.type': 'line',
-    'series.showSymbol': true,
-    'series.showAllSymbol': false,
-    'series.stack': false,
-    'series.clipOverflow': true,
-    'series.connectNulls': false,
-    'series.step': false,
-    "options": {
-      dataZoom: [
-        {
-          orient: 'horizontal',
-          show: true,
-          realtime: true,
-          start: 0,
-          end: 100,
-          xAxisIndex: 0
-        },
-        {
-          orient: 'vertical',
-          show: true,
-          realtime: true,
-          start: 0,
-          end: 100,
-          yAxisIndex: 0
-        }
-      ],
-      tooltip: {
-        formatter: 'Group {a}: ({c})'
-      }
-    }
-  };
-
-  var combinedConfig = dex.config.expandAndOverlay(userConfig, defaults);
-  chart = dex.charts.echarts.EChart(combinedConfig);
-
-  chart.getGuiDefinition = function getGuiDefinition(config) {
-    var defaults = {
-      "type": "group",
-      "name": "EChart Line Chart Settings",
-      "contents": [
-        dex.config.gui.dimensions(),
-        dex.config.gui.general(),
-        {
-          "type": "group",
-          "name": "Miscellaneous",
-          "contents": [
-            {
-              "name": "Color Scheme",
-              "description": "The color scheme.",
-              "target": "palette",
-              "type": "choice",
-              "choices": dex.color.colormaps({shortlist: true}),
-              "initialValue": "category10"
-            },
-            {
-              "name": "Background Color",
-              "description": "The color of the background.",
-              "target": "options.backgroundColor",
-              "type": "color",
-              "initialValue": "#ffffff"
-            },
-            {
-              "name": "Symbol Shape",
-              "description": "The shape of the symbol.",
-              "type": "choice",
-              "choices": ["circle", "rect", "roundRect", "triangle", "diamond", "pin", "arrow"],
-              "target": "series.symbol"
-            },
-            {
-              "name": "Symbol Size",
-              "description": "The size of the symbols",
-              "type": "int",
-              "target": "series.symbolSize",
-              "minValue": 0,
-              "maxValue": 50,
-              "initialValue": 5
-            },
-            {
-              "name": "Series Type",
-              "description": "The series type",
-              "type": "choice",
-              "target": "series.type",
-              "choices": ["line", "scatter", "effectScatter", "bar"]
-            },
-            {
-              "name": "Stack Series",
-              "description": "Stack the series or not.",
-              "type": "boolean",
-              "target": "series.stack",
-              "initialValue": false
-            },
-            {
-              "name": "Clip Overflow",
-              "description": "Clip overflow.",
-              "type": "boolean",
-              "target": "series.clipOverflow",
-              "initialValue": true
-            },
-            {
-              "name": "Connect Nulls",
-              "description": "Connect nulls.",
-              "type": "boolean",
-              "target": "series.connectNulls",
-              "initialValue": false
-            },
-            {
-              "name": "Step",
-              "description": "Stack the series or not.",
-              "type": "boolean",
-              "target": "series.step",
-              "initialValue": false
-            }
-          ]
-        },
-        dex.config.gui.echartsLabel({name: "Normal Label"}, "series.label.normal"),
-        dex.config.gui.echartsLabel({name: "Emphasis Label"}, "series.label.emphasis")
-      ]
-    };
-
-    var guiDef = dex.config.expandAndOverlay(config, defaults);
-    dex.config.gui.sync(chart, guiDef);
-    return guiDef;
-  };
-
-  return chart;
-};
-module.exports = linechart;
-},{}],47:[function(require,module,exports){
-/**
- *
- * This module provides a ECharts Network.
- *
- * @name dex/charts/echarts/network
- *
- * @param userConfig
- * @returns Network
- */
-var network = function (userConfig) {
-  var chart;
-  var defaults = {
-    'parent': '#ECharts_Network',
-    'id': 'ECharts_Network',
-    'class': 'ECharts_Network',
-    'resizable': true,
-    'width': "100%",
-    'height': "100%",
-    'type': 'force',
-    // Each node is a unique category
-    'categories' : dex.csv.getCsvFunction(),
-    'palette': "ECharts",
-    'series.circular' : {},
-    'series.type': 'graph',
-    'series.layout': 'force',
-    'series.force' : {
-      repulsion: 50,
-      gravity: .1,
-      edgeLength: 100,
-      layoutAnimation: true
-    },
-    "options": {
-      'series.lineStyle.normal.curveness' : 0,
-      title: {
-        text: 'Title',
-        subtext: 'Subtext',
-        bottom: true,
-        left: true
-      },
-      tooltip: {}
-    }
-  };
-
-  var combinedConfig = dex.config.expandAndOverlay(userConfig, defaults);
-  chart = dex.charts.echarts.EChart(combinedConfig);
-
-  chart.getGuiDefinition = function getGuiDefinition(config) {
-    var defaults = {
-      "type": "group",
-      "name": "EChart Network Settings",
-      "contents": [
-        dex.config.gui.dimensions(),
-        dex.config.gui.general(),
-        {
-          "type": "group",
-          "name": "Miscellaneous",
-          "contents": [
-            {
-              "name": "Color Scheme",
-              "description": "The color scheme.",
-              "target": "palette",
-              "type": "choice",
-              "choices": dex.color.colormaps({shortlist:true}),
-              "initialValue": "category10"
-            },
-            {
-              "name": "Background Color",
-              "description": "The color of the background.",
-              "target": "options.backgroundColor",
-              "type": "color",
-              "initialValue": "#ffffff"
-            },
-            {
-              "name": "Layout",
-              "description": "The shape of the symbol.",
-              "type": "choice",
-              "choices": ["force", "circular", "none"],
-              "target": "series.layout",
-              "initialValue": "force"
-            },
-            {
-              "name": "Categorize",
-              "description": "Categorization Methods",
-              "type": "choice",
-              "choices": Object.keys(dex.csv.getCategorizationMethods(csv)),
-              "target": "categorizationMethod"
-            },
-            {
-              "name": "Symbol Shape",
-              "description": "The shape of the symbol.",
-              "type": "choice",
-              "choices": ["circle", "rect", "roundRect", "triangle", "diamond", "pin", "arrow"],
-              "target": "series.symbol"
-            },
-            {
-              "name": "Symbol Size",
-              "description": "The size of the symbols",
-              "type": "int",
-              "target": "series.symbolSize",
-              "minValue": 0,
-              "maxValue": 50,
-              "initialValue": 5
-            },
-            {
-              "name": "Node Scale Ratio",
-              "description": "Affects mouse zoom increment.",
-              "type": "float",
-              "target": "series.nodeScaleZoom",
-              "minValue": 0,
-              "maxValue": 2,
-              "initialValue": .6
-            },
-            {
-              "name": "Draggable",
-              "description": "Allow the network diagram to be dragged or not.",
-              "type": "boolean",
-              "target": "series.draggable",
-              "initialValue": false
-            }
-          ]
-        },
-        {
-          "type": "group",
-          "name": "Force Layout",
-          "contents": [
-            {
-              "name": "Initial Layout",
-              "description": "Initial layout.",
-              "type": "choice",
-              "choices": ["circular", "random"],
-              "target": "series.force.initLayout",
-              "initialValue": "circular"
-            },
-            {
-              "name": "Gravity",
-              "description": "The gravitational factor.",
-              "type": "float",
-              "target": "series.force.gravity",
-              "minValue": -10,
-              "maxValue": 10,
-              "initialValue": .1
-            },
-            {
-              "name": "Repulsion",
-              "description": "The repulsive force between nodes.",
-              "type": "int",
-              "target": "series.force.repulsion",
-              "minValue": -1000,
-              "maxValue": 1000,
-              "initialValue": 50
-            },
-            {
-              "name": "Edge Length",
-              "description": "The distance between nodes before repulsion and gravity are applied.",
-              "type": "int",
-              "target": "series.force.edgeLength",
-              "minValue": 0,
-              "maxValue": 1000,
-              "initialValue": 30
-            },
-            {
-              "name": "Layout Animation",
-              "description": "Show the iteration layout or not.",
-              "type": "boolean",
-              "target": "series.force.layoutAnimation",
-              "initialValue": true
-            }
-          ]
-        },
-        dex.config.gui.echartsLineStyle({name: "Line Style"}, "series.lineStyle.normal"),
-        dex.config.gui.echartsLineStyle({name: "Line Style (Emphasis)"}, "series.lineStyle.emphasis"),
-        dex.config.gui.echartsLabel({name: "Normal Label"}, "series.label.normal"),
-        dex.config.gui.echartsLabel({name: "Emphasis Label"}, "series.label.emphasis")
-      ]
-    };
-
-    var guiDef = dex.config.expandAndOverlay(config, defaults);
-    dex.config.gui.sync(chart, guiDef);
-    return guiDef;
-  };
-
-  return chart;
-};
-module.exports = network;
-},{}],48:[function(require,module,exports){
-/**
- *
- * This module provides a ECharts Pie Chart
- *
- * @name dex/charts/echarts/PieChart
- *
- * @param userConfig
- * @returns PieChart
- */
-var piechart = function (userConfig) {
-  var chart;
-  var sizeScale = undefined;
-  var defaults = {
-    'parent': '#ECharts_PieChart',
-    'id': 'ECharts_PieChart',
-    'class': 'ECharts_PieChart',
-    'resizable': true,
-    'width': "100%",
-    'height': "100%",
-    'type': 'pie',
-    'palette': 'ECharts',
-    'seriesIndex': 0,
-    'nameIndex': 1,
-    'valueIndex': 2,
-    'aggregationMethod': "Sum",
-    'aggregationFunction': function (values) {
-      return values.reduce(function (acc, value) {
-        return acc + value;
-      }, 0);
-    },
-    // Dynamic but can be overriden.
-    maxPadding: undefined,
-    maxPercent: undefined,
-    radius: undefined,
-    padding: undefined,
-    'series.type': 'pie',
-    'series.selectedMode': 'single',
-    'series.label.normal.position': 'inner'
-  };
-
-  var combinedConfig = dex.config.expandAndOverlay(userConfig, defaults);
-  chart = dex.charts.echarts.EChart(combinedConfig);
-
-  chart.subscribe(chart, "attr", function (event) {
-    if (event.attr == "aggregationMethod") {
-      switch (event.value) {
-        case "Average": {
-          chart.config.aggregationFunction = function (values) {
-            var sum = values.reduce(function (acc, value) {
-              return acc + value;
-            }, 0);
-            return sum / values.length;
-          }
-        }
-        case "Count": {
-          chart.config.aggregationFunction = function (values) {
-            return values.length;
-          }
-        }
-        case "Count Distinct": {
-          chart.config.aggregationFunction = function (values) {
-            return dex.array.unique(values).length;
-          }
-        }
-        case "Sum":
-        default: {
-          chart.config.aggregationFunction = function (values) {
-            return values.reduce(function (acc, value) {
-              return acc + value;
-            }, 0);
-          }
-        }
-      }
-    }
-  });
-
-  chart.getGuiDefinition = function getGuiDefinition(config) {
-    var defaults = {
-      "type": "group",
-      "name": "EChart Pie Chart Settings",
-      "contents": [
-        {
-          "type": "group",
-          "name": "General",
-          "contents": [
-            {
-              "name": "Color Scheme",
-              "description": "The color scheme.",
-              "target": "palette",
-              "type": "choice",
-              "choices": dex.color.colormaps({shortlist:true}),
-              "initialValue": "category10"
-            },
-            {
-              "name": "Background Color",
-              "description": "The color of the background.",
-              "target": "options.backgroundColor",
-              "type": "color",
-              "initialValue": "#ffffff"
-            },
-            dex.config.gui.echartsTitle({}, "options.title"),
-            {
-              "name": "Aggregation Method",
-              "description": "The aggregation method",
-              "type": "choice",
-              "choices": ["Sum", "Average", "Count", "Count Distinct"],
-              "target": "aggregationMethod",
-              "initialValue": "Sum"
-            }
-          ]
-        },
-        {
-          "type": "group",
-          "name": "Series and Axis",
-          "contents": [
-            {
-              "name": "Series Index",
-              "description": "The series index.",
-              "type": "choice",
-              "choices": chart.config.csv.header,
-              "target": "seriesIndex"
-            },
-            {
-              "name": "Name Index",
-              "description": "The radius index.",
-              "type": "choice",
-              "choices": chart.config.csv.header,
-              "target": "nameIndex"
-            },
-            {
-              "name": "Value Index",
-              "description": "The value index.",
-              "type": "choice",
-              "choices": chart.config.csv.header,
-              "target": "valueIndex"
-            }
-          ]
-        }
-      ]
-    };
-
-    var guiDef = dex.config.expandAndOverlay(config, defaults);
-    dex.config.gui.sync(chart, guiDef);
-    return guiDef;
-  };
-
-  return chart;
-};
-module.exports = piechart;
-},{}],49:[function(require,module,exports){
-/**
- *
- * This module provides a ECharts Polar Plot
- *
- * @name dex/charts/echarts/PolarPlot
- *
- * @param userConfig
- * @returns PolarPlot
- */
-var polarplot = function (userConfig) {
-  var chart;
-  var sizeScale = undefined;
-  var defaults = {
-    'parent': '#ECharts_PolarPlot',
-    'id': 'ECharts_PolarPlot',
-    'class': 'ECharts_PolarPlot',
-    'resizable': true,
-    'width': "100%",
-    'height': "100%",
-    'type': 'polar',
-    'palette': 'ECharts',
-    'seriesIndex': 0,
-    'angleIndex': 1,
-    'valueIndex': 2,
-    'radiusIndex': undefined,
-    'radius': {'min': 1, 'max': 20},
-    'sizeMethod': 'linear',
-    'sizeScale': function (value) {
-      // No size scale exists, so let's establish one.
-      if (typeof sizeScale == "undefined") {
-        // We have a value index to size upon.
-        if (chart.config.valueIndex !== undefined) {
-          sizeScale = dex.csv.getScalingMethod(
-            chart.config.csv, chart.config.sizeMethod,
-            dex.csv.extent(chart.config.csv,
-              [dex.csv.getColumnNumber(chart.config.csv, chart.config.valueIndex)]),
-            [chart.config.radius.min, chart.config.radius.max]);
-        }
-        // There is no value index to size upon. so we will try another
-        // approach:
-        //
-        // 1. Create a csv which omits radius and angle indices from consideration
-        // 2. Omit non-numerics as well.
-        // 3. Get the extents from the remaining columns.
-        // 4. Map these extents to a scale based on radius min/max range.
-        else {
-          var excludes = [];
-          if (chart.config.radiusIndex != undefined) {
-            excludes.push(dex.csv.getColumnNumber(chart.config.radiusIndex));
-          }
-          if (chart.config.angleIndex !== undefined) {
-            excludes.push(dex.csv.getColumnNumber(chart.config.angleIndex));
-          }
-          var sizeCsv;
-          if (excludes.length == 0) {
-            sizeCsv = chart.config.csv;
-          }
-          else {
-            sizeCsv = dex.csv.exclude(chart.config.csv, excludes);
-          }
-          var ncols = dex.csv.getNumericIndices(sizeCsv);
-          var extents = dex.csv.extent(sizeCsv, ncols);
-          dex.console.log("EXTENTS", extents);
-          sizeScale = dex.csv.getScalingMethod(
-            chart.config.csv, chart.config.sizeMethod, extents,
-            [chart.config.radius.min, chart.config.radius.max]);
-        }
-      }
-      // If an array, value index is always first.
-      if (Array.isArray(value)) {
-        return sizeScale(value[2] || value[0]);
-      }
-      // If a simple value, size on it.  IE: Polar Bar Chart
-      return sizeScale(value);
-    },
-    'series.coordinateSystem': 'polar',
-    'series.type': 'line',
-    'series.itemStyle.normal.opacity': .6,
-    'series.itemStyle.emphasis.opacity': .9,
-    "series.symbolSize": function (d) {
-      //dex.console.log("SIZING D", d);
-      if (typeof chart.config.sizeScale != "undefined") {
-        //dex.console.log("SIZING D", d, chart.config.sizeScale(+d[2]));
-        return chart.config.sizeScale(d);
-      }
-      return 5;
-    },
-    "options": {
-      tooltip: {
-        formatter: 'Group {a}: ({c})'
-      },
-      dataZoom: [
-        {
-          orient: 'vertical',
-          show: true,
-          realtime: true,
-          start: 0,
-          end: 100,
-          angleAxisIndex: 0
-        },
-        {
-          show: true,
-          realtime: true,
-          start: 0,
-          end: 100,
-          radiusAxisIndex: 0
-        }
-      ]
-    }
-  };
-
-  var combinedConfig = dex.config.expandAndOverlay(userConfig, defaults);
-  chart = dex.charts.echarts.EChart(combinedConfig);
-
-  chart.subscribe(chart, "attr", function (event) {
-    if (event.attr == "radius" || event.attr == "sizeMethod" ||
-      event.attr == "radius.min" || event.attr == "radius.max") {
-      // Causes next call to sizeScale to recreate it.
-      sizeScale = undefined;
-    }
-
-    if (event.attr == "valueIndex" && event.value == "none") {
-      sizeScale = undefined;
-    }
-  });
-
-  chart.getGuiDefinition = function getGuiDefinition(config) {
-    var defaults = {
-      "type": "group",
-      "name": "EChart Polar Plot Settings",
-      "contents": [
-        {
-          "type": "group",
-          "name": "General",
-          "contents": [
-            {
-              "name": "Chart Type",
-              "description": "The chart type.",
-              "type": "choice",
-              "choices": ["line", "bar", "scatter"],
-              "target": "series.type"
-            },
-            {
-              "name": "Color Scheme",
-              "description": "The color scheme.",
-              "target": "palette",
-              "type": "choice",
-              "choices": dex.color.colormaps({shortlist:true}),
-              "initialValue": "category10"
-            },
-            {
-              "name": "Background Color",
-              "description": "The color of the background.",
-              "target": "options.backgroundColor",
-              "type": "color",
-              "initialValue": "#ffffff"
-            },
-            dex.config.gui.echartsTitle({}, "options.title")
-          ]
-        },
-        {
-          "type": "group",
-          "name": "Scaling",
-          "contents": [
-            {
-              "name": "Minimum Radius",
-              "description": "The minimum radius.",
-              "type": "int",
-              "minValue": 0,
-              "maxValue": 200,
-              "target": "radius.min",
-              "initialValue": 5
-            },
-            {
-              "name": "Maximum Radius",
-              "description": "The maximum radius.",
-              "type": "int",
-              "minValue": 0,
-              "maxValue": 200,
-              "target": "radius.max",
-              "initialValue": 5
-            },
-            {
-              "name": "Size Scaling Method",
-              "description": "The type of scaling method",
-              "type": "choice",
-              "target": "sizeMethod",
-              "choices": ["linear", "pow", "log", "sqrt", "time"],
-              "initialValue": "linear"
-            }
-          ]
-        },
-        {
-          "type": "group",
-          "name": "Series and Axis",
-          "contents": [
-            {
-              "name": "Stack Series",
-              "description": "To stack or not to stack, that is the question.",
-              "type": "boolean",
-              "target": "series.stack"
-            },
-            {
-              "name": "Angle Axis Data Type",
-              "description": "Angle axis data type.",
-              "type": "choice",
-              "choices": ["dynamic", "category"],
-              "target": "angleAxisType"
-            },
-            {
-              "name": "Radius Axis Data Type",
-              "description": "Radius axis data type.",
-              "type": "choice",
-              "choices": ["dynamic", "category"],
-              "target": "radiusAxisType"
-            },
-            {
-              "name": "Value Index",
-              "description": "The value index.",
-              "type": "choice",
-              "choices": dex.array.combine(["none"], chart.config.csv.header),
-              "target": "valueIndex"
-            },
-            {
-              "name": "Radius Index",
-              "description": "The radius index.",
-              "type": "choice",
-              "choices": dex.array.combine(["none"], chart.config.csv.header),
-              "target": "radiusIndex"
-            },
-            {
-              "name": "Angle Index",
-              "description": "The angle index.",
-              "type": "choice",
-              "choices": dex.array.combine(["none"], chart.config.csv.header),
-              "target": "angleIndex"
-            },
-            {
-              "name": "Series Index",
-              "description": "The series index.",
-              "type": "choice",
-              "choices": dex.array.combine(["none"], chart.config.csv.header),
-              "target": "seriesIndex"
-            }
-          ]
-        }
-      ]
-    };
-
-    var guiDef = dex.config.expandAndOverlay(config, defaults);
-    dex.config.gui.sync(chart, guiDef);
-    return guiDef;
-  };
-
-  return chart;
-};
-module.exports = polarplot;
-},{}],50:[function(require,module,exports){
-/**
- *
- * This module provides a ECharts Steam Graph.
- *
- * @name dex/charts/echarts/RadarChart
- *
- * @param userConfig
- * @returns RadarChart
- */
-var radarchart = function (userConfig) {
-  var chart;
-  var defaults = {
-    'parent': '#ECharts_RadarChart',
-    'id': 'ECharts_RadarChart',
-    'class': 'ECharts_RadarChart',
-    'resizable': true,
-    'width': "100%",
-    'height': "100%",
-    'palette': 'ECharts',
-    'seriesIndex': 0,
-    'angleIndex': 1,
-    'radiusIndex': 2,
-    'type': 'radar',
-    'series.itemStyle': {
-      normal: {
-        lineStyle: {
-          width: 1,
-          opacity: .8
-        }
-      },
-      emphasis: {
-        lineStyle: { width: 5, opacity: 1 },
-        areaStyle: "solid"
-      }
-    },
-    "options": {
-    }
-  };
-
-  var combinedConfig = dex.config.expandAndOverlay(userConfig, defaults);
-  chart = dex.charts.echarts.EChart(combinedConfig);
-
-  chart.getGuiDefinition = function getGuiDefinition(config) {
-    var defaults = {
-      "type": "group",
-      "name": "EChart Radar Chart Settings",
-      "contents": [
-        dex.config.gui.dimensions(),
-        dex.config.gui.general(),
-        {
-          "type": "group",
-          "name": "Miscellaneous",
-          "contents": [
-            {
-              "name": "Color Scheme",
-              "description": "The color scheme.",
-              "target": "palette",
-              "type": "choice",
-              "choices": dex.color.colormaps({shortlist:true}),
-              "initialValue": "category10"
-            },
-            {
-              "name": "Background Color",
-              "description": "The color of the background.",
-              "target": "options.backgroundColor",
-              "type": "color",
-              "initialValue": "#ffffff"
-            }
-          ]
-        },
-        dex.config.gui.echartsLabel({name: "Normal Label"}, "series.label.normal"),
-        dex.config.gui.echartsLabel({name: "Emphasis Label"}, "series.label.emphasis")
-      ]
-    };
-
-    var guiDef = dex.config.expandAndOverlay(config, defaults);
-    dex.config.gui.sync(chart, guiDef);
-    return guiDef;
-  };
-
-  return chart;
-};
-module.exports = radarchart;
-},{}],51:[function(require,module,exports){
-/**
- *
- * This module provides a ECharts Single Axis ScatterPlot.
- *
- * @name dex/charts/echarts/SingleAxisScatterPlot
- *
- * @param userConfig
- * @returns SingleAxisScatterPlot
- */
-var singleaxisscatterplot = function (userConfig) {
-  var chart;
-  var sizeScale = undefined;
-
-  var defaults = {
-    'parent': '#ECharts_SingleAxisScatterPlot',
-    'id': 'ECharts_LineChart',
-    'class': 'ECharts_LineChart',
-    'resizable': true,
-    'width': "100%",
-    'height': "100%",
-    'type': 'single-axis',
-    'radius': {'min': 1, 'max': 50},
-    'sizeMethod': 'linear',
-    'sizeScale': function (value) {
-      if (typeof sizeScale == "undefined") {
-        dex.console.log("EXTENT", dex.csv.extent(chart.config.csv, [2]));
-        sizeScale = dex.csv.getScalingMethod(
-          chart.config.csv, chart.config.sizeMethod,
-          dex.csv.extent(chart.config.csv, [2]),
-          [chart.config.radius.min, chart.config.radius.max]);
-      }
-      return sizeScale(value);
-    },
-    'palette': 'category10',
-    'series.coordinateSystem': 'singleAxis',
-    'series.symbol': 'circle',
-    'series.type': 'scatter',
-    'series.itemStyle': {
-      normal: {
-        shadowBlur: 10,
-        shadowColor: 'rgba(150, 36, 50, 0.5)',
-        shadowOffsetY: 5,
-        color: function (item) {
-          return new echarts.graphic.RadialGradient(0.7, 0.5, 1, [{
-            offset: .3,
-            color: dex.color.palette[chart.config.palette][
-            item.seriesIndex % dex.color.palette[
-              chart.config.palette].length],
-          }, {
-            offset: 1,
-            color: 'black'
-          }])
-        }
-      }
-    },
-    "options": {
-      dataZoom: [
-        {
-          handleSize: '100%',
-          filterMode: 'empty',
-          singleAxisIndex: dex.range(0, dex.csv.uniqueArray(csv, 0).length)
-        }
-      ],
-      tooltip: {
-        formatter: function(d) {
-          return "<table><tr><td><b>" + csv.header[1] + ":</b></td><td>" +
-              d.data[0] + "</td></tr><tr><td><b>" + csv.header[2] +
-              ":</b></td><td>" + d.data[1] + "</td></tr></table>";
-        }
-      }
-    }
-  };
-
-  var combinedConfig = dex.config.expandAndOverlay(userConfig, defaults);
-  chart = dex.charts.echarts.EChart(combinedConfig);
-
-  chart.getGuiDefinition = function getGuiDefinition(config) {
-    var defaults = {
-      "type": "group",
-      "name": "EChart Single Axis ScatterPlot Settings",
-      "contents": [
-        dex.config.gui.dimensions(),
-        dex.config.gui.general(),
-        {
-          "type": "group",
-          "name": "Miscellaneous",
-          "contents": [
-            {
-              "name": "Background Color",
-              "description": "The color of the background.",
-              "target": "options.backgroundColor",
-              "type": "color",
-              "initialValue": "#ffffff"
-            },
-            {
-              "name": "Symbol Shape",
-              "description": "The shape of the symbol.",
-              "type": "choice",
-              "choices": ["circle", "rect", "roundRect", "triangle", "diamond", "pin", "arrow"],
-              "target": "series.symbol"
-            },
-            {
-              "name": "Minimum Symbol Size",
-              "description": "The minimum size of the symbols",
-              "type": "int",
-              "target": "radius.min",
-              "minValue": 0,
-              "maxValue": 100,
-              "initialValue": 5
-            },
-            {
-              "name": "Maximum Symbol Size",
-              "description": "The maximum size of the symbols",
-              "type": "int",
-              "target": "radius.max",
-              "minValue": 0,
-              "maxValue": 100,
-              "initialValue": 50
-            },
-            {
-              "name": "Size Scaling Method",
-              "description": "The type of scaling method",
-              "type": "choice",
-              "target": "sizeMethod",
-              "choices" : [ "linear", "pow", "log", "sqrt", "time" ],
-              "initialValue": "linear"
-            },
-            {
-              "name": "Color Scheme",
-              "description": "The color scheme.",
-              "target": "palette",
-              "type": "choice",
-              "choices": dex.color.colormaps({shortlist:true}),
-              "initialValue": "category10"
-            },
-            {
-              "name": "Series Type",
-              "description": "The series type",
-              "type": "choice",
-              "target": "series.type",
-              "choices": [ "scatter", "effectScatter" ]
-            }
-          ]
-        },
-        dex.config.gui.echartsItemStyle({name: "Item Style"}, "series.itemStyle.normal"),
-        dex.config.gui.echartsItemStyle({name: "Item Style (Emphasis)"}, "series.itemStyle.emphasis"),
-        dex.config.gui.echartsLabel({name: "Label"}, "series.label.normal"),
-        dex.config.gui.echartsLabel({name: "Label (Emphasis)"}, "series.label.emphasis")
-      ]
-    };
-
-    var guiDef = dex.config.expandAndOverlay(config, defaults);
-    dex.config.gui.sync(chart, guiDef);
-    return guiDef;
-  };
-
-  return chart;
-};
-module.exports = singleaxisscatterplot;
-},{}],52:[function(require,module,exports){
-/**
- *
- * This module provides a ECharts Steam Graph.
- *
- * @name dex/charts/echarts/SteamGraph
- *
- * @param userConfig
- * @returns SteamGraph
- */
-var steamgraph = function (userConfig) {
-  var chart;
-  var defaults = {
-    'parent': '#ECharts_SteamGraph',
-    'id': 'ECharts_SteamGraph',
-    'class': 'ECharts_SteamGraph',
-    'resizable': true,
-    'width': "100%",
-    'height': "100%",
-    'xIndex': 1,
-    'yIndex': 2,
-    'seriesIndex': 0,
-    'type': 'steam',
-    "options": {
-    }
-  };
-
-  var combinedConfig = dex.config.expandAndOverlay(userConfig, defaults);
-  chart = dex.charts.echarts.EChart(combinedConfig);
-
-  chart.getGuiDefinition = function getGuiDefinition(config) {
-    var defaults = {
-      "type": "group",
-      "name": "EChart Steam Graph Settings",
-      "contents": [
-        dex.config.gui.dimensions(),
-        dex.config.gui.general(),
-        {
-          "type": "group",
-          "name": "Miscellaneous",
-          "contents": [
-            {
-              "name": "Color Scheme",
-              "description": "The color scheme.",
-              "target": "palette",
-              "type": "choice",
-              "choices": dex.color.colormaps({shortlist:true}),
-              "initialValue": "category10"
-            },
-            {
-              "name": "Background Color",
-              "description": "The color of the background.",
-              "target": "options.backgroundColor",
-              "type": "color",
-              "initialValue": "#ffffff"
-            },
-          ]
-        },
-        dex.config.gui.echartsLabel({name: "Normal Label"}, "series.label.normal"),
-        dex.config.gui.echartsLabel({name: "Emphasis Label"}, "series.label.emphasis")
-      ]
-    };
-
-    var guiDef = dex.config.expandAndOverlay(config, defaults);
-    dex.config.gui.sync(chart, guiDef);
-    return guiDef;
-  };
-
-  return chart;
-};
-module.exports = steamgraph;
-},{}],53:[function(require,module,exports){
-/**
- *
- * This module provides a ECharts Timeline.
- *
- * @name dex/charts/echarts/Timeline
- *
- * @param userConfig
- * @returns Timeline
- */
-var timeline = function (userConfig) {
-  var chart;
-  var sizeScale = d3.scale.linear();
-
-  var defaults = {
-    'parent': '#ECharts_Timeline',
-    'id': 'ECharts_Timeline',
-    'class': 'ECharts_Timeline',
-    'resizable': true,
-    'width': "100%",
-    'height': "100%",
-    'type': 'timeline',
-    'palette': 'ECharts',
-    'radius' : { min: 5, max: 50 },
-    categories: function (row) {
-      return row[3];
-    },
-    sequences: function (row) {
-      return +row[4];
-    },
-    sizes: function (row) {
-      //dex.console.log("SIZING ROW: ", row);
-      return chart.config.sizeScale(+row[2]);
-    },
-    'series.type': 'timeline',
-    "options": {
-    }
-  };
-
-  var combinedConfig = dex.config.expandAndOverlay(userConfig, defaults);
-  chart = dex.charts.echarts.EChart(combinedConfig);
-
-  var sizeExtents = dex.csv.extent(chart.config.csv, [2]);
-
-  sizeScale.domain(sizeExtents)
-    .range([+chart.config.radius.min, +chart.config.radius.max]);
-
-  chart.config.sizeScale = sizeScale;
-
-  chart.getGuiDefinition = function getGuiDefinition(config) {
-    var defaults = {
-      "type": "group",
-      "name": "EChart Timeline Settings",
-      "contents": [
-        dex.config.gui.dimensions(),
-        dex.config.gui.general(),
-        {
-          "type": "group",
-          "name": "Miscellaneous",
-          "contents": [
-            {
-              "name": "Color Scheme",
-              "description": "The color scheme.",
-              "target": "palette",
-              "type": "choice",
-              "choices": dex.color.colormaps({shortlist:true}),
-              "initialValue": "category10"
-            },
-            {
-              "name": "Background Color",
-              "description": "The color of the background.",
-              "target": "options.backgroundColor",
-              "type": "color",
-              "initialValue": "#ffffff"
-            },
-            {
-              "name": "Symbol Shape",
-              "description": "The shape of the symbol.",
-              "type": "choice",
-              "choices": ["emptyCircle", "circle", "rect", "roundRect", "triangle", "diamond", "pin", "arrow"],
-              "target": "series.symbol",
-              "initialValue": "emptyCircle"
-            },
-            {
-              "name": "Symbol Size",
-              "description": "The size of the symbols",
-              "type": "int",
-              "target": "series.symbolSize",
-              "minValue": 0,
-              "maxValue": 50,
-              "initialValue": 5
-            }
-          ]
-        },
-        dex.config.gui.echartsLabel({name: "Normal Label"}, "series.label.normal"),
-        dex.config.gui.echartsLabel({name: "Emphasis Label"}, "series.label.emphasis")
-      ]
-    };
-
-    var guiDef = dex.config.expandAndOverlay(config, defaults);
-    dex.config.gui.sync(chart, guiDef);
-    return guiDef;
-  };
 
   return chart;
 };
@@ -36195,23 +36389,38 @@ module.exports = function (dex) {
           (cmp.config.id || "unknown-id");
       }
 
-      cmp.attr = function (name, value) {
-        //dex.console.log("SETTING-ATTR: '" + name + "'='" + value + "'", cmp.config);
+      cmp.refresh = function () {
+        if (cmp.config.refreshType == "update") {
+          return cmp.update();
+        }
+        else {
+          return cmp.render();
+        }
+      },
 
-        if (arguments.length == 0) {
-          return cmp.config;
-        }
-        else if (arguments.length == 1) {
-          // REM: Need to getHierarchical
-          //dex.console.log("HIERARCHY=" + dex.object.getHierarchical(cmp.config, name));
-          return dex.object.getHierarchical(cmp.config, name);
-        }
-        else if (arguments.length == 2) {
-          // This will handle the setting of a single attribute
-          dex.object.setHierarchical(cmp.config, name, value, '.');
-          cmp.publish({type: "attr", attr: name, value: value});
-        }
-        //dex.console.log("UPDATED CONFIG", cmp.config);
+        cmp.attr = function (name, value) {
+          //dex.console.log("SETTING-ATTR: '" + name + "'='" + value + "'", cmp.config);
+
+          if (arguments.length == 0) {
+            return cmp.config;
+          }
+          else if (arguments.length == 1) {
+            // REM: Need to getHierarchical
+            //dex.console.log("HIERARCHY=" + dex.object.getHierarchical(cmp.config, name));
+            return dex.object.getHierarchical(cmp.config, name);
+          }
+          else if (arguments.length == 2) {
+            // This will handle the setting of a single attribute
+            dex.object.setHierarchical(cmp.config, name, value, '.');
+            cmp.publish({type: "attr", attr: name, value: value});
+          }
+          //dex.console.log("UPDATED CONFIG", cmp.config);
+          return cmp;
+        };
+
+      cmp.attrNoEvent = function (name, value) {
+        // This will handle the setting of a single attribute
+        dex.object.setHierarchical(cmp.config, name, value, '.');
         return cmp;
       };
 
@@ -36369,9 +36578,16 @@ module.exports = function (dex) {
       cmp.load = function () {
         dex.console.log("Loading Chart: " + cmp.config.id);
         $("body #dexjs-config div[chart-id=" + cmp.config.id + "]").each(function (i, obj) {
+          var value = obj.getAttribute("value");
+          if (value === "true") {
+            value = true;
+          }
+          else if (value == "false") {
+            value = false;
+          }
           dex.console.log("  Setting: '" + obj.getAttribute("name") + "'='" +
-            obj.getAttribute("value") + "'");
-          cmp.attrSave(obj.getAttribute("name"), obj.getAttribute("value"));
+            value + "'");
+          cmp.attrSave(obj.getAttribute("name"), value);
         });
         dex.console.log("Loading completed for " + cmp.config.id);
         return cmp;
@@ -36413,7 +36629,6 @@ module.exports = function (dex) {
     };
   };
 };
-
 
 },{}],77:[function(require,module,exports){
 /**
@@ -36525,16 +36740,48 @@ module.exports = function config(dex) {
      * hierarchy overlaid on top of the expanded bottom object hierarchy.
      *
      */
-    'expandAndOverlay': function expandAndOverlay(top, bottom) {
+    'expandAndOverlay': function expandAndOverlay() {
       //dex.console.log(
       //dex.config.getCallerString(arguments.callee.caller),
       //"TOP", top,
       //"BOTTOM", bottom,
       //"EXPANDED TOP", dex.config.expand(top),
       //"EXPANDED BOTTOM", dex.config.expand(bottom));
-      return dex.object.overlay(dex.config.expand(top),
-        dex.config.expand(bottom));
+      //return dex.object.overlay(dex.config.expand(top),
+      //  dex.config.expand(bottom));
+
+      switch (arguments.length) {
+        case 0: {
+          return {};
+        }
+        case 1: {
+          if (arguments[0] === undefined) {
+            return {};
+          }
+          return expand(arguments[0]);
+        }
+        default: {
+          var expanded = [];
+          var i;
+          for (i = 0; i < arguments.length; i++) {
+            if (arguments[i] === undefined) {
+              expanded.push({});
+            }
+            else {
+              expanded.push(dex.config.expand(arguments[i]));
+            }
+          }
+          var overlay = dex.object.overlay(expanded[expanded.length - 2],
+            expanded[expanded.length - 1]);
+
+          for (i = arguments.length - 3; i >= 0; i--) {
+            overlay = dex.object.overlay(expanded[i], overlay);
+          }
+          return overlay;
+        }
+      }
     },
+
 
     'apply': function apply(chart) {
       var config = chart.config;
@@ -36633,7 +36880,7 @@ module.exports = function config(dex) {
           'anchor': 'start',
           'fill': dex.config.fill(),
           'stroke': dex.config.stroke({
-            'width' : 0
+            'width': 0
           }),
           'format': undefined,
           'events': dex.config.events()
@@ -36739,7 +36986,7 @@ module.exports = function config(dex) {
         {
           'fillColor': "grey",
           'fillOpacity': 1,
-          'fillRule' : "nonzero"
+          'fillRule': "nonzero"
         };
 
       var config = dex.config.expandAndOverlay(custom, defaults);
@@ -37813,7 +38060,7 @@ module.exports = function gui(dex) {
                 "target": ns + "textLength",
                 "type": "int",
                 "minValue": 1,
-                "maxValue": 2000,
+                "maxValue": 500,
                 "initialValue": ""
               },
               {
@@ -37833,7 +38080,7 @@ module.exports = function gui(dex) {
       };
       return dex.config.expandAndOverlay(userConfig, defaults);
     },
-    'editableText': function text(config, prefix) {
+    'editableText': function editableText(config, prefix) {
       var config = dex.config.gui.text(config, prefix);
       var ns = (typeof prefix !== 'undefined') ? (prefix + ".") : "";
       config.contents[0].contents.unshift(
@@ -37911,7 +38158,7 @@ module.exports = function gui(dex) {
             "target": ns + "width",
             "type": "float",
             "minValue": 0.0,
-            "maxValue": 10.0,
+            "maxValue": 20.0,
             "initialValue": 1.0
           },
           {
@@ -38055,7 +38302,7 @@ module.exports = function gui(dex) {
       };
       return dex.config.expandAndOverlay(userConfig, defaults);
     },
-    'brush': function path(config, prefix) {
+    'brush': function brush(config, prefix) {
       var ns = (typeof prefix !== 'undefined') ? (prefix + ".") : "";
       var userConfig = config || {};
       var defaults = {
@@ -38107,7 +38354,7 @@ module.exports = function gui(dex) {
       };
       return dex.config.expandAndOverlay(userConfig, defaults);
     },
-    'rectangle': function circle(config, prefix) {
+    'rectangle': function rectangle(config, prefix) {
       var ns = (typeof prefix !== 'undefined') ? (prefix + ".") : "";
       var userConfig = config || {};
       var defaults = {
@@ -38171,7 +38418,84 @@ module.exports = function gui(dex) {
       return dex.config.expandAndOverlay(userConfig, defaults);
     },
     // ECharts configuration:
-    'echartsTextStyle': function fill(config, prefix) {
+    'echartsGrid': function echartsGrid(config, prefix) {
+      var ns = (typeof prefix !== 'undefined') ? (prefix + ".") : "";
+      var userConfig = config || {};
+      var defaults = {
+        "type": "group",
+        "name": "Grid",
+        "contents": [
+          {
+            "name": "Show Grid",
+            "description": "Show or hide grid lines.",
+            "target": ns + "show",
+            "type": "boolean",
+            "initialValue": false
+          },
+          {
+            "name": "Left Margin",
+            "description": "Gap between axis name and axis line.",
+            "target": ns + "left",
+            "type": "int",
+            "minValue": 0,
+            "maxValue": 200,
+            "initialValue": 0
+          },
+          {
+            "name": "Right Margin",
+            "description": "Gap between axis name and axis line.",
+            "target": ns + "right",
+            "type": "int",
+            "minValue": 0,
+            "maxValue": 200,
+            "initialValue": 0
+          },
+          {
+            "name": "Top Margin",
+            "description": "Gap between axis name and axis line.",
+            "target": ns + "top",
+            "type": "int",
+            "minValue": 0,
+            "maxValue": 200,
+            "initialValue": 0
+          },
+          {
+            "name": "Bottom",
+            "description": "Gap between axis name and axis line.",
+            "target": ns + "bottom",
+            "type": "int",
+            "minValue": 0,
+            "maxValue": 200,
+            "initialValue": 0
+          },
+          {
+            "name": "Background Color",
+            "description": "The color of the background.",
+            "target": ns + "backgroundColor",
+            "type": "color",
+            "initialValue": "#000000"
+          },
+          {
+            "name": "Border Color",
+            "description": "The color of the border.",
+            "target": ns + "borderColor",
+            "type": "color",
+            "initialValue": "#000000"
+          },
+          {
+            "name": "Border Width",
+            "description": "The border width (in pixels).",
+            "target": ns + "borderWidth",
+            "type": "int",
+            "minValue": 0,
+            "maxValue": 200,
+            "initialValue": 0
+          },
+        ]
+      };
+      return dex.config.expandAndOverlay(userConfig, defaults);
+    },
+    'echartsTextStyle': function echartsTextStyle(config, prefix) {
       var ns = (typeof prefix !== 'undefined') ? (prefix + ".") : "";
       var userConfig = config || {};
       var defaults = {
@@ -38228,7 +38552,58 @@ module.exports = function gui(dex) {
       };
       return dex.config.expandAndOverlay(userConfig, defaults);
     },
-    'echartsLabel': function fill(config, prefix) {
+    'echartsTooltip': function echartsTooltip(config, prefix) {
+      var ns = (typeof prefix !== 'undefined') ? (prefix + ".") : "";
+      var userConfig = config || {};
+      var defaults = {
+        "type": "group",
+        "name": "Tooltips",
+        "contents": [
+          dex.config.gui.echartsTextStyle(config.textStyle || {}, ns + "textStyle"),
+          {
+            "name": "Formatter",
+            "description": "The text format variables {a}-{d}.",
+            "target": ns + "formatter",
+            "type": "string",
+            "initialValue": ""
+          },
+          {
+            "name": "Background Color",
+            "description": "The background color of the tooltip.",
+            "target": ns + "backgroundColor",
+            "type": "color",
+            "initialValue": "#ffffff"
+          },
+          {
+            "name": "Border Color",
+            "description": "The border color of the tooltip.",
+            "target": ns + "borderColor",
+            "type": "color",
+            "initialValue": "#ffffff"
+          },
+          {
+            "name": "Border Width",
+            "description": "The border width.",
+            "target": ns + "borderWidth",
+            "type": "int",
+            "minValue": 0,
+            "maxValue": 100,
+            "initialValue": 0
+          },
+          {
+            "name": "Padding",
+            "description": "The border width.",
+            "target": ns + "borderWidth",
+            "type": "int",
+            "minValue": 0,
+            "maxValue": 200,
+            "initialValue": 5
+          }
+        ]
+      };
+      return dex.config.expandAndOverlay(userConfig, defaults);
+    },
+    'echartsLabel': function echartsLabel(config, prefix) {
       var ns = (typeof prefix !== 'undefined') ? (prefix + ".") : "";
       var userConfig = config || {};
       var defaults = {
@@ -38266,7 +38641,7 @@ module.exports = function gui(dex) {
       };
       return dex.config.expandAndOverlay(userConfig, defaults);
     },
-    'echartsItemStyle': function fill(config, prefix) {
+    'echartsItemStyle': function echartsItemStyle(config, prefix) {
       var ns = (typeof prefix !== 'undefined') ? (prefix + ".") : "";
       var userConfig = config || {};
       var defaults = {
@@ -38278,14 +38653,22 @@ module.exports = function gui(dex) {
             "description": "Color.",
             "target": ns + "color",
             "type": "color",
-            "initialValue": "#aaa"
+            "initialValue": "#aaaaaa"
           },
           {
             "name": "Border Color",
             "description": "Border color.",
             "target": ns + "borderColor",
             "type": "color",
-            "initialValue": "#aaa"
+            "initialValue": "#aaaaaa"
+          },
+          {
+            "name": "Border Type",
+            "description": "Border type.",
+            "target": ns + "borderType",
+            "type": "choice",
+            "choices": ["solid", "dashed", "dotted"],
+            "initialValue": "solid"
           },
           {
             "name": "Border Width",
@@ -38293,7 +38676,7 @@ module.exports = function gui(dex) {
             "target": ns + "borderWidth",
             "type": "float",
             "minValue": 0,
-            "maxValue": 10,
+            "maxValue": 20,
             "initialValue": 1
           },
           {
@@ -38310,7 +38693,25 @@ module.exports = function gui(dex) {
             "description": "Shadow color.",
             "target": ns + "shadowColor",
             "type": "color",
-            "initialValue": "#aaa"
+            "initialValue": "#ffffff"
+          },
+          {
+            "name": "Shadow Offset X",
+            "description": "Offset distance on the horizontal direction of shadow.",
+            "target": ns + "shadowOffsetX",
+            "type": "float",
+            "minValue": -20,
+            "maxValue": 20,
+            "initialValue": 0
+          },
+          {
+            "name": "Shadow Offset X",
+            "description": "Offset distance on the vertical direction of shadow.",
+            "target": ns + "shadowOffsetX",
+            "type": "float",
+            "minValue": -20,
+            "maxValue": 20,
+            "initialValue": 0
           },
           {
             "name": "Opacity",
@@ -38320,20 +38721,62 @@ module.exports = function gui(dex) {
             "minValue": 0,
             "maxValue": 1,
             "initialValue": 1
-          },
-          {
-            "name": "Border Type",
-            "description": "Border type.",
-            "target": ns + "borderType",
-            "type": "choice",
-            "choices": ["solid", "dashed", "dotted"],
-            "initialValue": "solid"
           }
         ]
       };
       return dex.config.expandAndOverlay(userConfig, defaults);
     },
-    'echartsLineStyle': function fill(config, prefix) {
+    'echartsSymbol': function echartsSymbol(config, prefix) {
+      var ns = (typeof prefix !== 'undefined') ? (prefix + ".") : "";
+      var userConfig = config || {};
+      var defaults = {
+        "type": "group",
+        "name": "Symbols",
+        "contents": [
+          {
+            "name": "Show Symbols",
+            "description": "Determines whether or not to symbols.",
+            "type": "boolean",
+            "target": ns + "showSymbol",
+            "initialValue": true
+          },
+          {
+            "name": "Symbol Shape",
+            "description": "The shape of the symbol.",
+            "type": "choice",
+            "choices": ["circle", "rect", "roundRect", "triangle", "diamond", "pin", "arrow"],
+            "target": ns + "symbol"
+          },
+          {
+            "name": "Symbol Size",
+            "description": "The size of the symbols",
+            "type": "int",
+            "target": ns + "symbolSize",
+            "minValue": 0,
+            "maxValue": 50,
+            "initialValue": 5
+          },
+          {
+            "name": "Show All Symbols",
+            "description": "Determines whether or not to show all symbols.",
+            "type": "boolean",
+            "target": ns + "showAllSymbol",
+            "initialValue": false
+          },
+          {
+            "name": "Symbol Rotate",
+            "description": "The rotation of the symbols",
+            "type": "int",
+            "target": ns + "symbolRotate",
+            "minValue": 0,
+            "maxValue": 360,
+            "initialValue": 0
+          }
+        ]
+      };
+      return dex.config.expandAndOverlay(userConfig, defaults);
+    },
+    'echartsLineStyle': function echartsLineStyle(config, prefix) {
       var ns = (typeof prefix !== 'undefined') ? (prefix + ".") : "";
       var userConfig = config || {};
       var defaults = {
@@ -38394,7 +38837,7 @@ module.exports = function gui(dex) {
       };
       return dex.config.expandAndOverlay(userConfig, defaults);
     },
-    'echartsTitle': function fill(config, prefix) {
+    'echartsTitle': function echartsTitle(config, prefix) {
       var ns = (typeof prefix !== 'undefined') ? (prefix + ".") : "";
       var userConfig = config || {};
       var defaults = {
@@ -38416,6 +38859,15 @@ module.exports = function gui(dex) {
             "initialValue": ""
           },
           {
+            "name": "Item Gap",
+            "description": "The gap between the Text and Subtext.",
+            "target": ns + "itemGap",
+            "type": "int",
+            "minValue": 0,
+            "maxValue": 200,
+            "initialValue": 10
+          },
+          {
             "name": "Link",
             "description": "An optional hyperlink.",
             "target": ns + "link",
@@ -38428,22 +38880,6 @@ module.exports = function gui(dex) {
             "target": ns + "target",
             "type": "string",
             "initialValue": ""
-          },
-          {
-            "name": "Horizontal Alignment",
-            "description": "Text alignment.",
-            "target": ns + "textAlign",
-            "type": "choice",
-            "choices": ["left", "center", "right"],
-            "initialValue": "center"
-          },
-          {
-            "name": "Vertical Alignment",
-            "description": "Vertical alignment of title.",
-            "target": ns + "textBaseline",
-            "type": "choice",
-            "choices": ["top", "middle", "bottom"],
-            "initialValue": "top"
           },
           {
             "name": "Sub Link",
@@ -38459,10 +38895,351 @@ module.exports = function gui(dex) {
             "type": "string",
             "initialValue": ""
           },
-          dex.config.gui.echartsTextStyle(config.textStyle || {}, ns + "textStyle"),
-          dex.config.gui.echartsTextStyle(config.subtextStyle || {}, ns + "subtextStyle")
+          {
+            "name": "Text Alignment",
+            "description": "Setting the title text align horizontally, supporting 'left','center','right', the default value is based on the title position.",
+            "target": ns + "textAlign",
+            "type": "choice",
+            "choices": ["left", "center", "right"],
+            "initialValue": "center"
+          },
+          {
+            "name": "Text Baseline",
+            "description": "Setting the title text align vertically, supporting 'top','middle','bottom', the default value is based on the title position.",
+            "target": ns + "textBaseline",
+            "type": "choice",
+            "choices": ["top", "middle", "bottom"],
+            "initialValue": "top"
+          },
+          {
+            "name": "Padding",
+            "description": "The padding around the title.",
+            "target": ns + "padding",
+            "type": "int",
+            "minValue": 0,
+            "maxValue": 50,
+            "initialValue": 5
+          },
+          {
+            "name": "Left",
+            "description": "Left offset of the title.",
+            "target": ns + "left",
+            "type": "int",
+            "minValue": 0,
+            "maxValue": 1000,
+            "initialValue": 20
+          },
+          {
+            "name": "Right",
+            "description": "Right offset of the title.",
+            "target": ns + "right",
+            "type": "int",
+            "minValue": 0,
+            "maxValue": 1000,
+            "initialValue": 20
+          },
+          {
+            "name": "Top",
+            "description": "Top offset of the title.",
+            "target": ns + "top",
+            "type": "int",
+            "minValue": 0,
+            "maxValue": 1000,
+            "initialValue": 20
+          },
+          {
+            "name": "Bottom",
+            "description": "Bottom offset of the title.",
+            "target": ns + "bottom",
+            "type": "int",
+            "minValue": 0,
+            "maxValue": 1000,
+            "initialValue": 20
+          },
+          // Does not descend a level
+          dex.config.gui.echartsItemStyle(config, prefix),
+          dex.config.gui.echartsTextStyle(
+            dex.config.expandAndOverlay({name: "Text Style"}, config.textStyle),
+            ns + "textStyle"),
+          dex.config.gui.echartsTextStyle(
+            dex.config.expandAndOverlay({name: "Subtext Style"}, config.subtextStyle),
+              ns + "subtextStyle")
         ]
 
+      };
+      return dex.config.expandAndOverlay(userConfig, defaults);
+    },
+    'echartsAxisLine': function echartsAxisLine(config, prefix) {
+      var ns = (typeof prefix !== 'undefined') ? (prefix + ".") : "";
+      var userConfig = config || {};
+      var defaults = {
+        "type": "group",
+        "name": "Axis Line",
+        "contents": [
+          {
+            "name": "Show Line",
+            "description": "Show or hide the axis line.",
+            "target": ns + "show",
+            "type": "boolean",
+            "initialValue": true
+          },
+          {
+            "name": "On Zero",
+            "description": "Specifies whether X or Y axis lies on the other's origin position, where value is 0 on axis.",
+            "target": ns + "onZero",
+            "type": "boolean",
+            "initialValue": true
+          },
+          dex.config.gui.echartsLineStyle(config.lineStyle || {}, ns + "lineStyle")
+        ]
+      };
+      return dex.config.expandAndOverlay(userConfig, defaults);
+    },
+    'echartsAxisLabel': function echartsAxisLine(config, prefix) {
+      var ns = (typeof prefix !== 'undefined') ? (prefix + ".") : "";
+      var userConfig = config || {};
+      var defaults = {
+        "type": "group",
+        "name": "Axis Label",
+        "contents": [
+          dex.config.gui.echartsLabel(config, prefix),
+          {
+            "name": "Interval",
+            "description": "Interval at which to label ticks.",
+            "target": ns + "interval",
+            "type": "int",
+            "minValue": 0,
+            "maxValue": 50,
+            "initialValue": 1
+          },
+          {
+            "name": "Inside",
+            "description": "Specifies whether the axis label faces Inside.",
+            "target": ns + "inside",
+            "type": "boolean",
+            "initialValue": false
+          },
+          {
+            "name": "Name Rotate",
+            "description": "Rotation of labels.",
+            "target": ns + "rotate",
+            "type": "int",
+            "minValue": 0,
+            "maxValue": 360,
+            "initialValue": 0
+          },
+          {
+            "name": "Margin",
+            "description": "The margin of the labels.",
+            "target": ns + "margin",
+            "type": "int",
+            "minValue": 0,
+            "maxValue": 200,
+            "initialValue": 8
+          },
+          {
+            "name": "Show Min Label",
+            "description": "Show the minimum label?",
+            "target": ns + "showMinLabel",
+            "type": "boolean",
+            "initialValue": false
+          },
+          {
+            "name": "Show Max Label",
+            "description": "Show the maximum label?",
+            "target": ns + "showMaxLabel",
+            "type": "boolean",
+            "initialValue": false
+          },
+        ]
+      };
+      return dex.config.expandAndOverlay(userConfig, defaults);
+    },
+    'echartsAxisTicks': function echartsAxisTicks(config, prefix) {
+      var ns = (typeof prefix !== 'undefined') ? (prefix + ".") : "";
+      var userConfig = config || {};
+      var defaults = {
+        "type": "group",
+        "name": "Axis Ticks",
+        "contents": [
+          {
+            "name": "Show Ticks",
+            "description": "Show or hide the axis ticks.",
+            "target": ns + "show",
+            "type": "boolean",
+            "initialValue": true
+          },
+          {
+            "name": "Align With Label",
+            "description": "Align the tick with the label?",
+            "target": ns + "alignWithLabel",
+            "type": "boolean",
+            "initialValue": false
+          },
+          {
+            "name": "Inside",
+            "description": "Specifies whether the axis label faces Inside.",
+            "target": ns + "inside",
+            "type": "boolean",
+            "initialValue": false
+          },
+          {
+            "name": "Length",
+            "description": "The length (in pixels) of the ticks.",
+            "target": ns + "length",
+            "type": "int",
+            "minValue": 0,
+            "maxValue": 50,
+            "initialValue": 5
+          },
+          dex.config.gui.echartsLineStyle(config.lineStyle || {}, ns + "lineStyle")
+        ]
+      };
+      return dex.config.expandAndOverlay(userConfig, defaults);
+    },
+    'echartsAxis': function echartsAxis(config, prefix) {
+      var ns = (typeof prefix !== 'undefined') ? (prefix + ".") : "";
+      var userConfig = config || {};
+      var defaults = {
+        "type": "group",
+        "name": "Title",
+        "contents": [
+          {
+            "name": "Show Axis",
+            "description": "Show or hide the axis.",
+            "target": ns + "show",
+            "type": "boolean",
+            "initialValue": true
+          },
+          {
+            "name": "Data Min",
+            "description": "Set axis minimum boundary to the minimum data value.",
+            "target": ns + "min",
+            "type": "boolean",
+            "initialValue": false,
+            "filter": function (value) {
+              if (value === true) {
+                return "dataMin";
+              }
+              return undefined;
+            }
+          },
+          {
+            "name": "Data Max",
+            "description": "Set axis maximum boundary to the maximum data value.",
+            "target": ns + "max",
+            "type": "boolean",
+            "initialValue": false,
+            "filter": function (value) {
+              if (value === true) {
+                return "dataMax";
+              }
+              return undefined;
+            }
+          },
+          {
+            "name": "Scale",
+            "description": "It specifies whether not to contain zero position of axis compulsively.",
+            "target": ns + "scale",
+            "type": "boolean",
+            "initialValue": false
+          },
+          {
+            "name": "Name",
+            "description": "The name of the axis.",
+            "target": ns + "name",
+            "type": "string",
+            "initialValue": ""
+          },
+          {
+            "name": "Name Location",
+            "description": "The location of the axis name.",
+            "target": ns + "nameLocation",
+            "type": "choice",
+            "choices": ["start", "middle", "end"],
+            "initialValue": "end"
+          },
+          {
+            "name": "Name Gap",
+            "description": "Gap between axis name and axis line.",
+            "target": ns + "nameGap",
+            "type": "int",
+            "minValue": 0,
+            "maxValue": 200,
+            "initialValue": 15
+          },
+          {
+            "name": "Name Rotate",
+            "description": "Rotation of axis name.",
+            "target": ns + "nameRotate",
+            "type": "int",
+            "minValue": 0,
+            "maxValue": 360,
+            "initialValue": 0
+          },
+          {
+            "name": "Name Inverse",
+            "description": "Whether to inverse the name or not.",
+            "target": ns + "nameInverse",
+            "type": "boolean",
+            "initialValue": false
+          },
+          {
+            "name": "Split Number",
+            "description": "The suggested number of segments that the axis is split into.",
+            "target": ns + "splitNumber",
+            "type": "int",
+            "minValue": 0,
+            "maxValue": 50,
+            "initialValue": 600
+          },
+          {
+            "name": "Boundary Gap",
+            "description": "The boundary gap on both sides of a coordinate axis.",
+            "target": ns + "boundaryGap",
+            "type": "boolean",
+            "initialValue": false
+          },
+          {
+            "name": "Interactive",
+            "description": "Set axis to silent (non-interactive) or not.",
+            "target": ns + "silent",
+            "type": "boolean",
+            "initialValue": false
+          },
+          dex.config.gui.echartsTextStyle(config.textStyle || {}, ns + "nameTextStyle"),
+          dex.config.gui.echartsAxisLine(config.axisLine || {}, ns + "axisLine"),
+          dex.config.gui.echartsAxisTicks(config.axisTick || {}, ns + "axisTick"),
+          dex.config.gui.echartsAxisLabel(
+            dex.config.expandAndOverlay({name: "Label"}, config.axisLabel), ns + "axisLabel")
+        ]
+      };
+      return dex.config.expandAndOverlay(userConfig, defaults);
+    },
+    'echartsDataZoom': function echartsDataZoom(config, prefix) {
+      var ns = (typeof prefix !== 'undefined') ? (prefix + ".") : "";
+      var userConfig = config || {};
+      var defaults = {
+        "type": "group",
+        "name": "Title",
+        "contents": [
+          dex.config.gui.echartsTextStyle(config.textStyle || {}, ns + "nameTextStyle"),
+          {
+            "name": "Show Data Zoom",
+            "description": "Show or hide the data zoom.",
+            "target": ns + "show",
+            "type": "boolean",
+            "initialValue": true
+          },
+          {
+            "name": "Zoom Type",
+            "description": "The type of data zoom.",
+            "target": ns + "type",
+            "type": "choice",
+            "choices": ["inside", "slider"],
+            "initialValue": "slider"
+          }
+        ]
       };
       return dex.config.expandAndOverlay(userConfig, defaults);
     },
@@ -38492,10 +39269,9 @@ module.exports = function gui(dex) {
         var valueType = typeof value;
         if (valueType != "undefined" && valueType != "function") {
           guiDef.initialValue = value;
-          //dex.console.log(guiDef.target + "=" + chart.attr(guiDef.target));
+          dex.console.debug("SYNC: " + guiDef.target + "=" + chart.attr(guiDef.target));
         }
       }
-
       return guiDef;
     }
   };
@@ -38740,14 +39516,14 @@ module.exports = function csv(dex) {
       return connectionMatrix;
     },
 
-    'limitRows' : function(csv, limit) {
+    'limitRows': function (csv, limit) {
       var newCsv = {
         header: dex.array.copy(csv.header),
         data: []
       }
 
       var i = 0;
-      for (i=0; i < csv.data.length && i < limit; i++) {
+      for (i = 0; i < csv.data.length && i < limit; i++) {
         newCsv.data.push(dex.array.copy(csv.data[i]));
       }
 
@@ -38896,12 +39672,12 @@ module.exports = function csv(dex) {
       return jsonData;
     },
 
-    'toStrictJson': function(csv) {
+    'toStrictJson': function (csv) {
       var gtypes = dex.csv.guessTypes(csv);
       var jsonData = [];
-      csv.data.forEach(function(row, ri) {
+      csv.data.forEach(function (row, ri) {
         var jsonRow = {};
-        csv.header.forEach(function(header, hi) {
+        csv.header.forEach(function (header, hi) {
           switch (gtypes[hi]) {
             case "number": {
               jsonRow[header] = +(row[hi]);
@@ -39329,7 +40105,7 @@ module.exports = function csv(dex) {
       var guessedTypes = [];
       var i = 0;
       var testResults = [];
-      dex.console.log("GUESSING TYPES OF ", csv);
+
       csv.header.forEach(function (hdr) {
         testResults.push({"notNumber": false, "notDate": false})
       });
@@ -39403,6 +40179,14 @@ module.exports = function csv(dex) {
       return csv;
     },
 
+    'getColumnNumbers': function (csv, exclusions) {
+      var exclude = exclusions || [];
+      var columnNumbers = dex.range(0, csv.header.length);
+      return columnNumbers.filter(function (el) {
+        return exclude.indexOf(el) < 0;
+      });
+    },
+
     'getRankedCsv': function (csv, nameIndex, sequenceIndex, valueIndex, options) {
       var rankedCsv = dex.csv.copy(csv);
       var opts = options || {};
@@ -39470,7 +40254,7 @@ module.exports = function csv(dex) {
       var subset = [];
       csv.data.forEach(function (row) {
         if (fn(row)) {
-          subset.push(row);
+          subset.push(dex.array.copy(row));
         }
       });
 
@@ -39513,8 +40297,8 @@ module.exports = function csv(dex) {
       // If there are no series.
       if (seriesCsv.header.length == 0) {
         return {
-          frameIndices: [ axisCsv.header.join(" vs ") ],
-          frames: [ axisCsv ]
+          frameIndices: [axisCsv.header.join(" vs ")],
+          frames: [axisCsv]
         }
       }
 
@@ -40096,6 +40880,151 @@ module.exports = function csv(dex) {
   };
 };
 },{}],81:[function(require,module,exports){
+module.exports = function (dex) {
+  return function (name, csv) {
+    function spec(name, csv) {
+      var spec = this;
+      spec.name = name;
+      spec.csv = csv;
+      spec.valid = true;
+      spec.types = dex.csv.guessTypes(csv);
+      spec.hidden = spec.csv.header.map(function (hdr, hi) {
+        return {header: hdr, position: hi, type: spec.types[hi]};
+      });
+      spec.visible = [];
+      // divide into shown and visible.
+
+      /////
+      // METHOD CHAINED ROUTINES
+      /////
+      spec.first = function (num) {
+        if (spec.hidden.length >= num) {
+          return spec.show(0, num);
+        }
+        return spec.invalid();
+      };
+
+      spec.select = function (typePattern) {
+        if (!spec.valid) {
+          return spec;
+        }
+        var regex = new RegExp(typePattern);
+        var foundIndex = spec.hidden.findIndex(function (item) {
+          return item.type.match(regex);
+        });
+
+        if (foundIndex >= 0) {
+          return spec.show(foundIndex);
+        }
+
+        return spec.invalid();
+      };
+
+      spec.match = function (typePattern) {
+        if (!spec.valid) {
+          return spec;
+        }
+        var regex = new RegExp(typePattern);
+        if (spec.hidden.length > 0 && spec.hidden[0].type.match(regex)) {
+          return spec.show(0);
+        }
+
+        return spec.invalid();
+      };
+
+      spec.string = function () {
+        if (!spec.valid) {
+          return spec;
+        }
+        return spec.match("string");
+      };
+
+      spec.number = function () {
+        if (!spec.valid) {
+          return spec;
+        }
+        return spec.match("number");
+      };
+
+      spec.date = function () {
+        if (!spec.valid) {
+          return spec;
+        }
+        return spec.match("date");
+      };
+
+      spec.any = function () {
+        if (!spec.valid) {
+          return spec;
+        }
+        if (spec.hidden.length > 0) {
+          return spec.show(0);
+        }
+        return spec.invalid();
+      }
+
+      spec.invalid = function () {
+        spec.valid = false;
+        spec.hidden = spec.csv.header.map(function (hdr, hi) {
+          return {header: hdr, position: hi, type: spec.types[hi]};
+        });
+        spec.visible = [];
+        return spec;
+      };
+
+      spec.selectAll = function (typePattern) {
+        if (!spec.valid) {
+          return spec;
+        }
+
+        // default is to select all.
+        if (typePattern === undefined) {
+          spec.hidden.forEach(function (item) {
+            spec.visible.push(item);
+          });
+          spec.hidden = [];
+        }
+        // select everything matching the pattern.
+        else {
+          var regex = new RegExp(typePattern);
+          spec.hidden.forEach(function (item) {
+
+            if (spec.hidden.length > 0) {
+              spec.hidden[0].type.match(regex);
+
+              var matchingIndexes = [], i;
+              for(i = spec.hidden.length -1; i >= 0; i--) {
+                if (spec.hidden[i].type.match(regex)) {
+                  spec.show(i);
+                }
+              }
+            }
+          });
+        }
+
+        return spec;
+      };
+
+      spec.show = function (hiddenIndex, numFields) {
+        var num = numFields || 1;
+        if (!spec.valid) {
+          return spec;
+        }
+        var items = spec.hidden.splice(hiddenIndex, num);
+        items.forEach(function (item) {
+          spec.visible.push(item);
+        });
+        return spec;
+      }
+
+      return spec;
+    }
+
+    return new spec(name, csv);
+  }
+};
+
+},{}],82:[function(require,module,exports){
 /**
  *
  * This module provides support for creating various datasets.
@@ -40514,7 +41443,7 @@ module.exports = function datagen(dex) {
   };
 };
 
-},{}],82:[function(require,module,exports){
+},{}],83:[function(require,module,exports){
 // Allow user to override, but define this by default:
 
 /**
@@ -40775,8 +41704,11 @@ dex.geometry = require("./geometry/geometry")(dex);
  * @type {module:component}
  *
  */
-//dex.component = require("./component/component")(dex);
-dex.component = require("./component/component2")(dex);
+dex.component = require("./component/component")(dex);
+//dex.component = require("./component/component2")(dex);
+
+dex.data = {};
+dex.data.spec = require("./data/spec")(dex);
 
 /**
  *
@@ -40796,7 +41728,7 @@ if ($.fn.button.noConflict != undefined) {
 }
 
 module.exports = dex;
-},{"../css/dex.css":1,"../lib/bootstrap-multiselect/bootstrap-multiselect":2,"../lib/bootstrap-toggle/bootstrap-toggle":4,"../lib/jquery-layout/jquery-layout":7,"../lib/pubsub":8,"../lib/spectrum/spectrum":9,"../lib/uix-multiselect/uix.multiselect":10,"./array/array":13,"./charts/charts":24,"./color/color":75,"./component/component2":76,"./config/config":77,"./console/console":79,"./csv/csv":80,"./datagen/datagen":81,"./geometry/geometry":83,"./json/json":84,"./matrix/matrix":85,"./object/object":86,"./ui/ui":93,"./util/util":94}],83:[function(require,module,exports){
+},{"../css/dex.css":1,"../lib/bootstrap-multiselect/bootstrap-multiselect":2,"../lib/bootstrap-toggle/bootstrap-toggle":4,"../lib/jquery-layout/jquery-layout":7,"../lib/pubsub":8,"../lib/spectrum/spectrum":9,"../lib/uix-multiselect/uix.multiselect":10,"./array/array":13,"./charts/charts":24,"./color/color":75,"./component/component":76,"./config/config":77,"./console/console":79,"./csv/csv":80,"./data/spec":81,"./datagen/datagen":82,"./geometry/geometry":84,"./json/json":85,"./matrix/matrix":86,"./object/object":87,"./ui/ui":94,"./util/util":95}],84:[function(require,module,exports){
 /**
  *
  * This module provides routines dealing with geometry.
@@ -41041,7 +41973,7 @@ module.exports = function geometry(dex) {
   };
 };
 
-},{}],84:[function(require,module,exports){
+},{}],85:[function(require,module,exports){
 /**
  *
  * This module provides routines dealing with json data.
@@ -41144,7 +42076,7 @@ module.exports = function json(dex) {
   };
 };
 
-},{}],85:[function(require,module,exports){
+},{}],86:[function(require,module,exports){
 /**
  *
  * This module provides routines dealing with matrices.
@@ -41459,7 +42391,7 @@ module.exports = function matrix(dex) {
   };
 };
 
-},{}],86:[function(require,module,exports){
+},{}],87:[function(require,module,exports){
 /**
  *
  * This module provides routines dealing with javascript objects.
@@ -41781,7 +42713,7 @@ module.exports = function object(dex) {
 };
 
 
-},{}],87:[function(require,module,exports){
+},{}],88:[function(require,module,exports){
 var configurationpane = function (userConfig) {
   var pane;
   var componentMap = {};
@@ -41892,7 +42824,7 @@ var configurationpane = function (userConfig) {
 };
 
 module.exports = configurationpane;
-},{}],88:[function(require,module,exports){
+},{}],89:[function(require,module,exports){
 var datafilterpane = function (userConfig) {
   var chart;
   var selectedCategories = {};
@@ -42172,7 +43104,7 @@ var datafilterpane = function (userConfig) {
 };
 
 module.exports = datafilterpane;
-},{}],89:[function(require,module,exports){
+},{}],90:[function(require,module,exports){
 var guipane = function (userConfig) {
   var pane;
   var componentMap = {};
@@ -42209,29 +43141,47 @@ var guipane = function (userConfig) {
     //dex.console.log("PICKERS", $pickers);
 
     $pickers.spectrum({
+      color: tinycolor,
+      showPalette: true,
+      palette: [
+        ["rgb(0, 0, 0)", "rgb(67, 67, 67)", "rgb(102, 102, 102)", /*"rgb(153, 153, 153)","rgb(183, 183, 183)",*/
+          "rgb(204, 204, 204)", "rgb(217, 217, 217)", /*"rgb(239, 239, 239)", "rgb(243, 243, 243)",*/ "rgb(255, 255, 255)"],
+        ["rgb(152, 0, 0)", "rgb(255, 0, 0)", "rgb(255, 153, 0)", "rgb(255, 255, 0)", "rgb(0, 255, 0)",
+          "rgb(0, 255, 255)", "rgb(74, 134, 232)", "rgb(0, 0, 255)", "rgb(153, 0, 255)", "rgb(255, 0, 255)"],
+        ["rgb(230, 184, 175)", "rgb(244, 204, 204)", "rgb(252, 229, 205)", "rgb(255, 242, 204)", "rgb(217, 234, 211)",
+          "rgb(208, 224, 227)", "rgb(201, 218, 248)", "rgb(207, 226, 243)", "rgb(217, 210, 233)", "rgb(234, 209, 220)",
+          "rgb(221, 126, 107)", "rgb(234, 153, 153)", "rgb(249, 203, 156)", "rgb(255, 229, 153)", "rgb(182, 215, 168)",
+          "rgb(162, 196, 201)", "rgb(164, 194, 244)", "rgb(159, 197, 232)", "rgb(180, 167, 214)", "rgb(213, 166, 189)",
+          "rgb(204, 65, 37)", "rgb(224, 102, 102)", "rgb(246, 178, 107)", "rgb(255, 217, 102)", "rgb(147, 196, 125)",
+          "rgb(118, 165, 175)", "rgb(109, 158, 235)", "rgb(111, 168, 220)", "rgb(142, 124, 195)", "rgb(194, 123, 160)",
+          "rgb(166, 28, 0)", "rgb(204, 0, 0)", "rgb(230, 145, 56)", "rgb(241, 194, 50)", "rgb(106, 168, 79)",
+          "rgb(69, 129, 142)", "rgb(60, 120, 216)", "rgb(61, 133, 198)", "rgb(103, 78, 167)", "rgb(166, 77, 121)",
+          /*"rgb(133, 32, 12)", "rgb(153, 0, 0)", "rgb(180, 95, 6)", "rgb(191, 144, 0)", "rgb(56, 118, 29)",
+          "rgb(19, 79, 92)", "rgb(17, 85, 204)", "rgb(11, 83, 148)", "rgb(53, 28, 117)", "rgb(116, 27, 71)",*/
+          "rgb(91, 15, 0)", "rgb(102, 0, 0)", "rgb(120, 63, 4)", "rgb(127, 96, 0)", "rgb(39, 78, 19)",
+          "rgb(12, 52, 61)", "rgb(28, 69, 135)", "rgb(7, 55, 99)", "rgb(32, 18, 77)", "rgb(76, 17, 48)"]
+      ],
+      showSelectionPalette: true,
+      clickoutFiresChange: true,
+      showInitial: false,
+      //palette: dex.color.palette['crayola120'],
       change: function (color) {
         //dex.console.log("COLOR-CHANGE", color, this);
         //$("#basic-log").text("change called: " + color.toHexString());
         var cmp = componentMap[this.getAttribute("targetComponent")];
         var attName = this.getAttribute("targetAttribute");
         var value = color.toHexString();
-        cmp.attrSave(attName, value).render()();
+        cmp.attrSave(attName, value).refresh();
       }
     });
 
 
     // Enable toggles:
+
     var $toggles = $(config.parent + ' .control-boolean input');
     $toggles.bootstrapToggle();
-
-    $toggles.change(function () {
-      var obj = $(this);
-      //dex.console.log("TOGGLE CHANGE:", obj);
-      var cmp = componentMap[obj[0].getAttribute("targetComponent")];
-      var attName = obj[0].getAttribute("targetAttribute");
-      var value = obj.prop('checked');
-      cmp.attrSave(attName, value).render()();
-    });
+    $(config.parent + " .control-boolean input[initialValue=true]")
+      .bootstrapToggle('on');
 
     var $choices = $(config.parent + ' .control-choice select');
     $choices.multiselect({
@@ -42244,7 +43194,7 @@ var guipane = function (userConfig) {
         if (checked) {
           var cmp = componentMap[option[0].getAttribute("targetComponent")];
           var attName = option[0].getAttribute("targetAttribute");
-          cmp.attrSave(attName, option[0].getAttribute("value")).render()();
+          cmp.attrSave(attName, option[0].getAttribute("value")).refresh();
         }
       }
     });
@@ -42257,7 +43207,7 @@ var guipane = function (userConfig) {
       stringInputs.on('input', function (event) {
         var cmp = componentMap[event.target.getAttribute("targetComponent")];
         var attName = event.target.getAttribute("targetAttribute");
-        cmp.attr(attName, event.target.value).render()();
+        cmp.attrSave(attName, event.target.value).refresh();
       });
     }
 
@@ -42270,7 +43220,7 @@ var guipane = function (userConfig) {
           //dex.console.log("TARGET", obj.getAttribute("targetComponent"), componentMap);
           var targetComponent = componentMap[obj.getAttribute("targetComponent")];
           var targetAttribute = obj.getAttribute("targetAttribute");
-          targetComponent.attr(targetAttribute, +value).render()();
+          targetComponent.attr(targetAttribute, +value).refresh();
           //dex.console.log("FLOAT-SLIDER", targetComponent, targetAttribute, value);
         });
       });
@@ -42285,7 +43235,7 @@ var guipane = function (userConfig) {
           //dex.console.log("TARGET", obj.getAttribute("targetComponent"), componentMap);
           var targetComponent = componentMap[obj.getAttribute("targetComponent")];
           var targetAttribute = obj.getAttribute("targetAttribute");
-          targetComponent.attr(targetAttribute, +value).render()();
+          targetComponent.attr(targetAttribute, +value).refresh();
           //dex.console.log("FLOAT-SLIDER", targetComponent, targetAttribute, value);
         });
       });
@@ -42299,7 +43249,7 @@ var guipane = function (userConfig) {
   };
 
   function getTargetName(name) {
-    var targetName = name.replace(/[\. #:]/g, '-');
+    var targetName = name.replace(/[\. \(\)#:]/g, '-');
 
     //dex.console.log("NAME(" + name + ")->" + targetName);
 
@@ -42340,12 +43290,15 @@ var guipane = function (userConfig) {
     var $panelBody = $("<div></div>")
       .addClass("panel-body");
 
+    var $table = $("<table></table>");
+
     components.forEach(function (component) {
       var targetComponent = component.config.parent + " #" +
         component.config["id"] + "." + component.config["class"];
-      addControl(targetComponent, $panelBody, component.getGuiDefinition(), 0);
+      addControl(targetComponent, $table, component.getGuiDefinition(), 0);
     });
 
+    $panelBody.append($table);
     $panelCollapser.append($panelBody);
     $panel.append($panelHeading);
     $panel.append($panelCollapser);
@@ -42377,7 +43330,7 @@ var guipane = function (userConfig) {
 
     switch (guiDef.type) {
       case "group" :
-        addGroup(targetComponent, $targetElt, guiDef, depth+1);
+        addGroup(targetComponent, $targetElt, guiDef, depth + 1);
         break;
       case "string" :
         addString(targetComponent, $targetElt, guiDef, depth);
@@ -42410,6 +43363,9 @@ var guipane = function (userConfig) {
     var groupTarget = getTargetName(
       targetComponent + ":" + guiDef.name);
 
+    var $row = $("<tr></tr>");
+    var $cell = $("<td colspan='2'></td>");
+
     var $panelGroup = $("<div></div>")
       .addClass("panel-group")
       .addClass("control-group");
@@ -42433,42 +43389,55 @@ var guipane = function (userConfig) {
     var $panelBody = $("<div></div>")
       .addClass("panel-body");
 
+    var $table = $("<table></table>");
+
     guiDef.contents.forEach(function (contentDef) {
-      addControl(targetComponent, $panelBody, contentDef, depth);
+      addControl(targetComponent, $table, contentDef, depth);
     });
 
+    $panelBody.append($table);
     $panelCollapser.append($panelBody);
     $panel.append($panelHeading);
     $panel.append($panelCollapser);
     $panelGroup.append($panel);
 
-    $targetElt.append($panelGroup);
+    $cell.append($panelGroup);
+    $row.append($cell);
+
+    $targetElt.append($row);
   }
 
   function addColor(targetComponent, $targetElt, guiDef, depth) {
 
-    $container = $("<div></div>")
+    $container = $("<tr></tr>")
       .addClass("control-color");
 
+    $leftCell = $("<td></td>");
     $label = $("<label></label>")
       .attr("title", guiDef.description)
       .html("<strong>" + guiDef.name + ": </strong>");
+    $rightCell = $("<td></td>");
     $picker = $("<input></input>")
       .attr("type", "color")
       .attr("value", guiDef.initialValue)
       .attr("targetAttribute", guiDef.target)
       .attr("targetComponent", targetComponent);
 
-    $container.append($label);
-    $container.append($picker);
+    $leftCell.append($label);
+    $rightCell.append($picker);
+
+    $container.append($leftCell);
+    $container.append($rightCell);
 
     //dex.console.log("COLOR", guiDef);
     $targetElt.append($container);
   }
 
   function addChoice(targetComponent, $targetElt, guiDef, depth) {
-    var $container = $("<div></div>")
+    var $row = $("<tr></tr>")
       .addClass("control-choice");
+    $leftCell = $("<td></td>");
+    $rightCell = $("<td></td>");
     var $label = $("<label></label>")
       .attr("title", guiDef.description)
       .html("<strong>" + guiDef.name + ": </strong>")
@@ -42490,18 +43459,25 @@ var guipane = function (userConfig) {
       $select.append($option);
     });
 
-    $container.append($label);
-    $container.append($select)
+    $leftCell.append($label);
+    $rightCell.append($select);
+    $row.append($leftCell);
+    $row.append($rightCell);
 
     //dex.console.log("CHOICE", guiDef);
-    $targetElt.append($container);
+    $targetElt.append($row);
   }
 
   function addBoolean(targetComponent, $targetElt, guiDef, depth) {
 
-    $checkbox = $("<div></div>")
-      .addClass("checkbox")
+    $row = $("<tr></tr>")
       .addClass("control-boolean");
+
+    $leftCell = $("<td></td>");
+    $rightCell = $("<td></td>");
+
+    $checkbox = $("<div></div>")
+      .addClass("checkbox");
 
     $label = $("<label></label>")
       .attr("title", guiDef.description)
@@ -42509,31 +43485,47 @@ var guipane = function (userConfig) {
     $input = $("<input></input>")
       .attr("type", "checkbox")
       .attr("data-toggle", "toggle")
-      .attr("targetAttribute", guiDef.target)
-      .attr("targetComponent", targetComponent);
+      .attr("data-onstyle", "success")
+      .attr("data-offstyle", "danger")
+      .attr("data-size", "mini");
 
-    if (guiDef.initialValue == "true") {
-      $input.attr("checked");
+    if (guiDef.initialValue !== undefined) {
+      $input.attr("initialValue", guiDef.initialValue);
     }
 
-    $checkbox.append($label);
     $checkbox.append($input);
+    $leftCell.append($label);
+    $rightCell.append($checkbox);
+    $row.append($leftCell);
+    $row.append($rightCell);
+
+    $targetElt.append($row);
+
+    var handler = function (cmp, guiDef) {
+      return function () {
+        var obj = $(this);
+        var value = obj.prop('checked');
+        if (typeof guiDef.filter === "function") {
+          dex.console.log("Found a handler...");
+          value = guiDef.filter(value);
+        }
+        cmp.attrSave(guiDef.target, value).refresh();
+      }
+    }(componentMap[targetComponent], guiDef);
+
+    $input.change(handler);
 
     //dex.console.log("BOOLEAN", guiDef);
-    $targetElt.append($checkbox);
   }
 
   function addString(targetComponent, $targetElt, guiDef, depth) {
 
-    $form = $("<div></div>")
-      .addClass("form")
-      .addClass("form-inline")
-      .addClass("form-horizontal")
+    $row = $("<tr></tr>")
       .addClass("control-string");
 
-    $formGroup = $("<div></div>")
-      .addClass("form-group")
-      .addClass("control-string");
+    $leftCell = $("<td></td>");
+    $rightCell = $("<td></td>");
+
     $label = $("<label></label>")
       .attr("title", guiDef.description)
       .attr("for", guiDef.target)
@@ -42547,18 +43539,22 @@ var guipane = function (userConfig) {
       .addClass("form-control")
       .attr("id", guiDef.target);
 
-    $formGroup.append($label);
-    $formGroup.append($input);
-    $form.append($formGroup);
+    $leftCell.append($label);
+    $rightCell.append($input);
+    $row.append($leftCell);
+    $row.append($rightCell);
 
     //dex.console.log("STRING", guiDef);
-    $targetElt.append($form);
+    $targetElt.append($row);
   }
 
   function addFloat(targetComponent, $targetElt, guiDef, depth) {
     //dex.console.log("AddFloat", guiDef);
-    $sliderContainer = $("<div></div>")
+    $row = $("<tr></tr>")
       .addClass("control-float");
+
+    $leftCell = $("<td></td>");
+    $rightCell = $("<td></td>");
 
     // Determine an appropriate step
     var step = Math.min(Math.abs(+(guiDef.minValue) - (guiDef.maxValue)) * .01, 1);
@@ -42579,20 +43575,25 @@ var guipane = function (userConfig) {
       .attr("targetComponent", targetComponent)
       .attr("data-slider-step", step);
 
-      if (dex.object.isNumeric(guiDef.initialValue)) {
-        $slider.attr("data-slider-value", guiDef.initialValue);
-      }
+    if (dex.object.isNumeric(guiDef.initialValue)) {
+      $slider.attr("data-slider-value", guiDef.initialValue);
+    }
 
-    $sliderContainer.append($label);
-    $sliderContainer.append($slider);
+    $leftCell.append($label);
+    $rightCell.append($slider);
+    $row.append($leftCell);
+    $row.append($rightCell);
 
-    $targetElt.append($sliderContainer);
+    $targetElt.append($row);
   }
 
   function addInt(targetComponent, $targetElt, guiDef, depth) {
     //dex.console.log("AddInt", guiDef);
-    $sliderContainer = $("<div></div>")
+    $row = $("<tr></tr>")
       .addClass("control-int");
+
+    $leftCell = $("<td></td>");
+    $rightCell = $("<td></td>");
 
     // Determine an appropriate step
     var step = 1;
@@ -42614,10 +43615,12 @@ var guipane = function (userConfig) {
       $slider.attr("data-slider-value", guiDef.initialValue);
     }
 
-    $sliderContainer.append($label);
-    $sliderContainer.append($slider);
+    $leftCell.append($label);
+    $rightCell.append($slider);
+    $row.append($leftCell);
+    $row.append($rightCell);
 
-    $targetElt.append($sliderContainer);
+    $targetElt.append($row);
   }
 
   $(document).ready(function () {
@@ -42629,7 +43632,7 @@ var guipane = function (userConfig) {
 };
 
 module.exports = guipane;
-},{}],90:[function(require,module,exports){
+},{}],91:[function(require,module,exports){
 var player = function (userConfig) {
 
   var defaults = {
@@ -42827,7 +43830,7 @@ var player = function (userConfig) {
 };
 
 module.exports = player;
-},{}],91:[function(require,module,exports){
+},{}],92:[function(require,module,exports){
 /**
  *
  * This class creates and attaches a SqlQuery user interface onto the
@@ -42926,7 +43929,7 @@ var sqlquery = function (userConfig) {
 };
 
 module.exports = sqlquery;
-},{}],92:[function(require,module,exports){
+},{}],93:[function(require,module,exports){
 /**
  *
  * @constructor
@@ -43026,7 +44029,7 @@ var table = function (userConfig) {
 };
 
 module.exports = table;
-},{}],93:[function(require,module,exports){
+},{}],94:[function(require,module,exports){
 /**
  *
  * This module provides ui components from a variety of sources.
@@ -43055,7 +44058,7 @@ module.exports = function ui(dex) {
     'BootstrapSlider': require("../../lib/bootstrap-slider/bootstrap-slider")
   };
 };
-},{"../../lib/bootstrap-slider/bootstrap-slider":3,"./ConfigurationPane":87,"./DataFilterPane":88,"./GuiPane":89,"./Player":90,"./SqlQuery":91,"./Table":92}],94:[function(require,module,exports){
+},{"../../lib/bootstrap-slider/bootstrap-slider":3,"./ConfigurationPane":88,"./DataFilterPane":89,"./GuiPane":90,"./Player":91,"./SqlQuery":92,"./Table":93}],95:[function(require,module,exports){
 /**
  *
  * This module provides utility routines.
@@ -43128,5 +44131,5 @@ module.exports = function util(dex) {
     }
   };
 };
-},{}]},{},[82])(82)
+},{}]},{},[83])(83)
 });
