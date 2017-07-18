@@ -1,4 +1,4 @@
-package com.dexvis.javafx.scene.control;
+package com.dexvis.util;
 
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -14,6 +14,8 @@ import javax.json.JsonReader;
 import javax.json.JsonString;
 import javax.json.JsonStructure;
 import javax.json.JsonValue;
+
+import com.dexvis.datastruct.NVP;
 
 /**
  * 
@@ -49,6 +51,43 @@ public class JsonUtil
       ex.printStackTrace();
       Object empty[] = new Object[0];
       return empty;
+    }
+  }
+  
+  public static List<NVP> parseNVPList(String rootName, String jsonStr)
+  {
+    ArrayList<NVP> nvpList = new ArrayList<NVP>();
+    if (jsonStr != null)
+    {
+      Object jsonObj = parseJsonString(jsonStr);
+      parseNVPList(rootName, nvpList, jsonObj);
+    }
+    return nvpList;
+  }
+  
+  private static void parseNVPList(String name, List<NVP> nvpList,
+      Object jsonObj)
+  {
+    if (jsonObj instanceof Map)
+    {
+      Map<String, Object> map = (Map<String, Object>) jsonObj;
+      for (Object key : map.keySet())
+      {
+        parseNVPList(name + "." + key, nvpList, map.get(key));
+      }
+    }
+    else if (jsonObj instanceof List)
+    {
+      List<Object> list = (List<Object>) jsonObj;
+      for (Object obj : list)
+      {
+        parseNVPList(name, nvpList, obj);
+      }
+    }
+    // Primitives
+    else
+    {
+      nvpList.add(new NVP(name, jsonObj.toString()));
     }
   }
   
