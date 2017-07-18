@@ -68,6 +68,11 @@ public class JsonUtil
   private static void parseNVPList(String name, List<NVP> nvpList,
       Object jsonObj)
   {
+    if (name == null || name.trim().length() <= 0 || jsonObj == null)
+    {
+      return;
+    }
+    
     if (jsonObj instanceof Map)
     {
       Map<String, Object> map = (Map<String, Object>) jsonObj;
