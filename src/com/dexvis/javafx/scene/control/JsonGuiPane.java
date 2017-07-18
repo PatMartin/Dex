@@ -22,6 +22,8 @@ import javafx.scene.paint.Color;
 
 import org.tbee.javafx.scene.layout.MigPane;
 
+import com.dexvis.util.JsonUtil;
+
 public class JsonGuiPane extends MigPane
 {
   private MigPane mainPane;

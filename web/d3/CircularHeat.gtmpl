@@ -2,8 +2,8 @@
 <% import com.dexvis.util.DexUtil %>
 <style>
 <%
-   println new File("javascript/jquery-ui/latest/jquery-ui.css").text
-   println new File("javascript/jquery-ui/latest/jquery-ui.theme.css").text
+   println new File("javascript/jquery-ui/latest/jquery-ui.min.css").text
+   println new File("javascript/jquery-ui/latest/jquery-ui.theme.min.css").text
    println new File("javascript/d3-ext/circular-heat/css/svg.css").text
 %>
 div.ui-tooltip {
