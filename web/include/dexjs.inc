@@ -58,7 +58,8 @@ src="https://getfirebug.com/firebug-lite.js">
     enableTrace: true
 }
 </script>
-    -->
+-->
+
 <script>
 function save()
 {
@@ -90,10 +91,11 @@ function getGuiDefinition()
 <%
   println dexData.toCsvString();
 %>
+
 // Limit initial view to 100 rows for performance.
 var chart = ${context.chart}({
     parent : "#ChartArea",
-    csv : dex.csv.limitRows(csv, 100)
+    csv : csv.limitRows(100)
   });
 
 \$(document).ready(function () {

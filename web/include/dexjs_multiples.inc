@@ -80,7 +80,7 @@ var multiples = dex.charts.multiples.GridsterMultiples({
 
 function save()
 {
-  //multiples.save();
+  multiples.save();
   //base.save();
 }
 

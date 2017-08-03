@@ -61,8 +61,10 @@ src="https://getfirebug.com/firebug-lite.js">
     enableTrace: true
 }
 </script>
-    -->
+-->
 <script>
+var chart1, chart2;
+
 function save()
 {
   chart1.save();
@@ -100,15 +102,19 @@ function getGuiDefinition()
 <%
   println dexData.toCsvString();
 %>
+
+dex.console.log("CSV", csv);
+
 // Limit initial view to 100 rows for performance.
-var chart1 = ${context.charts[0]}({
-    parent : "#ChartArea1",
-    csv : dex.csv.limitRows(csv, 100)
-  });
-var chart2 = ${context.charts[1]}({
-    parent : "#ChartArea2",
-    csv : dex.csv.limitRows(csv, 100)
-  });
+chart1 = ${context.charts[0]}({
+  parent : "#ChartArea1",
+  csv : csv.limitRows(100)
+});
+
+chart2 = ${context.charts[1]}({
+  parent : "#ChartArea2",
+  csv : csv.limitRows(100)
+});
   
 \$(document).ready(function () {
 
