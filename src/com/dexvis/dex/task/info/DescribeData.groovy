@@ -1,5 +1,7 @@
 package com.dexvis.dex.task.info
 
+import java.text.NumberFormat
+
 import javafx.beans.property.SimpleStringProperty
 import javafx.beans.value.ObservableValue
 import javafx.collections.FXCollections
@@ -13,6 +15,9 @@ import javafx.scene.control.TableView
 import javafx.scene.control.TableColumn.CellDataFeatures
 import javafx.scene.input.KeyCode
 import javafx.scene.input.KeyEvent
+import javafx.scene.paint.Color
+import javafx.scene.text.Font
+import javafx.scene.text.FontWeight
 import javafx.util.Callback
 
 import org.simpleframework.xml.Root
@@ -21,6 +26,7 @@ import org.tbee.javafx.scene.layout.MigPane
 import com.dexvis.dex.exception.DexException
 import com.dexvis.dex.wf.DexTask
 import com.dexvis.dex.wf.DexTaskState
+import com.dexvis.util.DateUtil
 
 @Root
 class DescribeData extends DexTask {
@@ -31,6 +37,7 @@ class DescribeData extends DexTask {
   private MigPane configPane = null
   private TableView tableView = new TableView()
   private Label headerLabel = new Label("0 Rows of 0 Columns")
+  private commaFmt = NumberFormat.getNumberInstance(Locale.US)
   
   public DexTaskState execute(DexTaskState state) throws DexException {
     ObservableList<ObservableList<String>> data = FXCollections.observableArrayList()
@@ -50,7 +57,7 @@ class DescribeData extends DexTask {
     
     //println "Viewing: ${state.dexData}"
     
-    List<String> dheader = ["Column", "Column Name", "Distinct", "Trimmed Distinct", "String", "Double", "Integer"]
+    List<String> dheader = ["Column", "Column Name", "Distinct", "Trimmed Distinct", "String", "Double", "Integer", "Date"]
     List<String, List<String>> ddata = new ArrayList<String, List<String>> ()
     
     for (int i=0; i<state.dexData.header.size(); i++)
@@ -60,7 +67,8 @@ class DescribeData extends DexTask {
       def possibleStrings = 0
       def possibleDoubles = 0
       def possibleIntegers = 0
-      def possibleDates = 0
+      def possibleDates = 0;
+      
       def tmp
       
       for (int j=0; j<state.dexData.data.size(); j++)
@@ -84,13 +92,14 @@ class DescribeData extends DexTask {
         catch (Exception ex)
         {
         }
+        if (DateUtil.createDate(state.dexData.data[j][i]) != null)
+        {
+          possibleDates++;
+        }
       }
       
-      ddata << ["$i", state.dexData.header[i], "${valMap.keySet().size()}",
-        "${trimValMap.keySet().size()}", "$possibleStrings", "$possibleDoubles", "$possibleIntegers", "$possibleDates"]
+      ddata << ["$i", state.dexData.header[i], "${valMap.keySet().size()}", "${trimValMap.keySet().size()}", "$possibleStrings", "$possibleDoubles", "$possibleIntegers", "$possibleDates"]
     }
-    
-    println "DHEADER $dheader, DDATA: $ddata"
     
     for (int i = 0; i < dheader.size(); i++)
     {
@@ -130,8 +139,9 @@ class DescribeData extends DexTask {
       cols.add(col)
     }
     
-    headerLabel.setText(ddata.size() + " Rows of " +
-        dheader.size() + " Columns");
+    headerLabel.setText(commaFmt.format(ddata.size()) + " Rows of " +
+      commaFmt.format(dheader.size()) + " Columns = " +
+      commaFmt.format(ddata.size() * dheader.size()) + " Items");
     
     tableView.getColumns().addAll(cols)
     
@@ -155,6 +165,9 @@ class DescribeData extends DexTask {
   {
     if (configPane == null)
     {
+      headerLabel.setTextFill(Color.web("ffffff"))
+      headerLabel.setFont(Font.font(null, FontWeight.BOLD, 24));
+      
       configPane = new MigPane("", "[grow]", "[][grow][]")
       
       Button clearButton = new Button("Clear")
@@ -170,15 +183,15 @@ class DescribeData extends DexTask {
   
   public void keyPress(KeyEvent evt)
   {
-    System.out.println("*** keypress: " + evt)
+    //System.out.println("*** keypress: " + evt)
     
     if (evt.getCode().equals(KeyCode.DELETE))
     {
-      System.out.println("DELETING...")
+      //System.out.println("DELETING...")
     }
     else
     {
-      System.out.println("Ignoring keypress")
+      //System.out.println("Ignoring keypress")
     }
   }
   
