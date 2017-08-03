@@ -624,7 +624,9 @@ public class DexData {
       row, ri ->
       csvData << "[" + row.collect { return "\"$it\"" }.join(',') + "]"
     }
-    return "var " + name + " = { 'header' : $csvHeader,\n 'data' : [" + csvData.join(',\n') + "] };";
+    def csvStr = "var " + name + " = new dex.csv($csvHeader,\n[" + csvData.join(',\n') + "]);";
+
+    return csvStr;
   }
   
   static main(args)
@@ -632,16 +634,8 @@ public class DexData {
     def dexData = new DexData(["COUNTRY", "2000", "2001"],
     [["US", "1", "2"], ["BRAZIL", "3", "4"]])
     def groupedData = dexData.groupByName("YEAR", "VALUE", ["2000", "2001"])
-    println "Result: ${groupedData}"
-    println "TYPES: ${dexData.guessTypes()}"
     
-    //def a = [ "a", "b", "c" ].eachWithIndex { it, i -> "$i $it" }.join(",")
-    //println a
-
     println dexData.getMaxLengths();
-    
     println dexData.getMapList()
-    
-    //println dexData.addColumn("NA", dexData.normalize("A", 1, 10))
   }
 }
