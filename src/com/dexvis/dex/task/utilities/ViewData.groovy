@@ -1,5 +1,7 @@
 package com.dexvis.dex.task.utilities
 
+import java.text.NumberFormat
+
 import javafx.beans.property.SimpleStringProperty
 import javafx.beans.value.ObservableValue
 import javafx.collections.FXCollections
@@ -13,6 +15,9 @@ import javafx.scene.control.TableView
 import javafx.scene.control.TableColumn.CellDataFeatures
 import javafx.scene.input.KeyCode
 import javafx.scene.input.KeyEvent
+import javafx.scene.paint.Color
+import javafx.scene.text.Font
+import javafx.scene.text.FontWeight
 import javafx.util.Callback
 
 import org.simpleframework.xml.Root
@@ -32,6 +37,7 @@ class ViewData extends DexTask {
   private MigPane configPane = null
   private TableView tableView = new TableView()
   private Label headerLabel = new Label("0 Rows of 0 Columns")
+  private commaFmt = NumberFormat.getNumberInstance(Locale.US)
   
   public DexTaskState execute(DexTaskState state) throws DexException {
     ObservableList<ObservableList<String>> data = FXCollections.observableArrayList()
@@ -92,8 +98,9 @@ class ViewData extends DexTask {
       cols.add(col)
     }
     
-    headerLabel.setText(dex.data.size() + " Rows of " +
-        dex.header.size() + " Columns");
+    headerLabel.setText(commaFmt.format(dex.data.size()) + " Rows of " +
+        commaFmt.format(dex.header.size()) + " Columns = " +
+        commaFmt.format(dex.data.size() * dex.header.size()) + " Items");
     
     tableView.getColumns().addAll(cols)
     
@@ -117,6 +124,9 @@ class ViewData extends DexTask {
   {
     if (configPane == null)
     {
+      headerLabel.setTextFill(Color.web("ffffff"))
+      headerLabel.setFont(Font.font(null, FontWeight.BOLD, 24));
+      
       configPane = new MigPane("", "[grow]", "[][grow][]")
       
       Button clearButton = new Button("Clear")
