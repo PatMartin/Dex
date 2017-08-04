@@ -7,7 +7,7 @@ import com.dexvis.dex.task.base.WebTask
 @Root
 class C3StackedAreaChartMultiples extends WebTask {
   public C3StackedAreaChartMultiples() {
-    super("Visualization: Dex JS", "C3 Stacked Area Chart Multiples",
+    super("Visualization: Multiples", "C3 Stacked Area Chart Multiples",
       "visualization/dexjs/multiples/c3/StackedAreaChartMultiples.html",
       "web/dexjs/multiples/c3/StackedAreaChartMultiples.gtmpl")
     

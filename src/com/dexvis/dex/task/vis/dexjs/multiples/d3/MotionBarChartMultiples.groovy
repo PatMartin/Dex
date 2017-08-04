@@ -7,7 +7,7 @@ import com.dexvis.dex.task.base.WebTask
 @Root
 class MotionBarChartMultiples extends WebTask {
   public MotionBarChartMultiples() {
-    super("Visualization: Dex JS", "Motion Bar Chart Multiples",
+    super("Visualization: Multiples", "D3 Motion Bar Chart Multiples",
       "visualization/dexjs/multiples/d3/MotionBarChartMultiples.html",
       "web/dexjs/d3/d3/MotionBarChartMultiples.gtmpl")
     

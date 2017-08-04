@@ -11,7 +11,7 @@ class TreemapBarChartMultiples extends WebTask
 {
   public TreemapBarChartMultiples()
   {
-    super("Visualization: Dex JS", "Treemap Bar Chart Multiples",
+    super("Visualization: Multiples", "D3 Treemap Bar Chart Multiples",
       "visualization/dexjs/multiples/d3/TreemapBarChartMultiples.html",
       "web/dexjs/multiples/d3/TreemapBarChartMultiples.gtmpl")
     setSaveDynamic(true)

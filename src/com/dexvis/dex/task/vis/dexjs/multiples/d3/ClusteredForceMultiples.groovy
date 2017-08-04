@@ -11,7 +11,7 @@ class ClusteredForceMultiples extends WebTask
 {
   public ClusteredForceMultiples()
   {
-    super("Visualization: Dex JS", "Clustered Force Multiples",
+    super("Visualization: Multiples", "D3 Clustered Force Multiples",
       "visualization/dexjs/multiples/d3/ClusteredForceMultiples.html",
       "web/dexjs/multiples/d3/ClusteredForceMultiples.gtmpl")
     setSaveDynamic(true)

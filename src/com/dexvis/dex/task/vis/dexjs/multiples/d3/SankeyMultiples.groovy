@@ -7,7 +7,7 @@ import com.dexvis.dex.task.base.WebTask
 @Root
 class SankeyMultiples extends WebTask {
   public SankeyMultiples() {
-    super("Visualization: Dex JS", "Sankey Multiples",
+    super("Visualization: Multiples", "D3 Sankey Multiples",
       "visualization/dexjs/multiples/d3/SankeyMultiples.html",
       "web/dexjs/multiples/d3/SankeyMultiples.gtmpl")
 

@@ -7,7 +7,7 @@ import com.dexvis.dex.task.base.WebTask
 @Root
 class C3ScatterPlotMultiples extends WebTask {
   public C3ScatterPlotMultiples() {
-    super("Visualization: Dex JS", "C3 Scatter Plot Multiples",
+    super("Visualization: Multiples", "C3 Scatter Plot Multiples",
       "visualization/dexjs/multiples/c3/ScatterPlotMultiples.html",
       "web/dexjs/multiples/c3/ScatterPlotMultiples.gtmpl")
     

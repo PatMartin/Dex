@@ -7,7 +7,7 @@ import com.dexvis.dex.task.base.WebTask
 @Root
 class OrbitalLayoutMultiples extends WebTask {
   public OrbitalLayoutMultiples() {
-    super("Visualization: Dex JS", "Orbital Layout Multiples",
+    super("Visualization: Multiples", "D3 Orbital Layout Multiples",
       "visualization/dexjs/multiples/d3/OrbitalLayoutMultiples.html",
       "web/dexjs/multiples/d3/OrbitalLayoutMultiples.gtmpl")
     

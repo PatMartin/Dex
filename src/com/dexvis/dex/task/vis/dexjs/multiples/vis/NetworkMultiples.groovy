@@ -8,7 +8,7 @@ import com.dexvis.dex.task.base.WebTask
 class NetworkMultiples extends WebTask {
   
   public NetworkMultiples() {
-    super('Visualization: Dex JS', 'Network Multiples',
+    super('Visualization: Multiples', 'Network Multiples',
     "visualization/dexjs/multiples/vis/NetworkMultiples.html",
     'web/dexjs/multiples/vis/NetworkMultiples.gtmpl')
     

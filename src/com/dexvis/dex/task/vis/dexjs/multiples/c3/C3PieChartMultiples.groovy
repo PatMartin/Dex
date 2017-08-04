@@ -7,7 +7,7 @@ import com.dexvis.dex.task.base.WebTask
 @Root
 class C3PieChartMultiples extends WebTask {
   public C3PieChartMultiples() {
-    super("Visualization: Dex JS", "C3 Pie Chart Multiples",
+    super("Visualization: Multiples", "C3 Pie Chart Multiples",
       "visualization/dexjs/multiples/c3/PieChartMultiples.html",
       "web/dexjs/multiples/c3/PieChartMultiples.gtmpl")
     

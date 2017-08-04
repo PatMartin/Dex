@@ -7,7 +7,7 @@ import com.dexvis.dex.task.base.WebTask
 @Root
 class SunburstMultiples extends WebTask {
   public SunburstMultiples() {
-    super("Visualization: Dex JS", "Sunburst Multiples",
+    super("Visualization: Multiples", "D3 Sunburst Multiples",
     "visualization/dexjs/multiples/d3/SunburstMultiples.html",
     "web/dexjs/multiples/d3/SunburstMultiples.gtmpl")
     
