@@ -1929,6 +1929,7 @@ module.exports = Chord;
  */
 var ClusteredForce = function (userConfig) {
   var chart;
+  var categories;
   d3 = dex.charts.d3.d3v3;
   var defaults = {
     'parent': '#ClusteredForceParent',
@@ -1936,6 +1937,7 @@ var ClusteredForce = function (userConfig) {
     'class': "ClusteredForceClass",
     'height': "100%",
     'width': "100%",
+    'refreshType': "update",
     'resizable': true,
     'margin': {
       'left': 0,
@@ -1946,13 +1948,19 @@ var ClusteredForce = function (userConfig) {
     'csv': undefined,
     'transform': '',
     'colorScheme': 'ECharts',
-    'radius': {min: 5, max: 20}
+    'radius': {min: 5, max: 20},
+    'nodePadding': 5,
+    'clusterPadding': 5,
+    'gravity': .01,
+    'charge': 0,
+    'friction': .2
   };
 
   chart = new dex.component(userConfig, defaults);
 
   chart.spec = new dex.data.spec("Clustered Force")
     .any("category")
+    .any("label")
     .number("size");
 
   chart.subscribe(chart, "attr", function (msg) {
@@ -1977,13 +1985,13 @@ var ClusteredForce = function (userConfig) {
               "name": "Color Scheme",
               "description": "Color Scheme",
               "type": "choice",
-              "choices": dex.color.colormaps(),
+              "choices": dex.color.colormaps({shortlist: true}),
               "target": "colorScheme"
             },
             {
               "name": "Minimum Radius",
               "description": "The minimum radius of nodes.",
-              "target": "minRadius",
+              "target": "radius.min",
               "type": "int",
               "minValue": 1,
               "maxValue": 100,
@@ -1992,7 +2000,7 @@ var ClusteredForce = function (userConfig) {
             {
               "name": "Maximum Radius",
               "description": "The maximum radius of nodes.",
-              "target": "maxRadius",
+              "target": "radius.max",
               "type": "int",
               "minValue": 1,
               "maxValue": 100,
@@ -2002,35 +2010,46 @@ var ClusteredForce = function (userConfig) {
               "name": "Gravity",
               "description": "The gravity.",
               "target": "gravity",
-              "type": "int",
+              "type": "float",
               "minValue": 0,
-              "maxValue": 10,
-              "initialValue": 2
+              "maxValue": 1,
+              "initialValue": .01
             },
             {
               "name": "Charge",
               "description": "The charge of nodes.",
               "target": "charge",
               "type": "int",
-              "minValue": 1,
-              "maxValue": 100,
-              "initialValue": 1
+              "minValue": -50,
+              "maxValue": 50,
+              "initialValue": 0
             },
             {
-              "name": "Scale Columns",
-              "description": "Scale columns or not.",
-              "target": "scaleColumns",
-              "type": "boolean",
-              "initialValue": true
+              "name": "Friction",
+              "description": "The friction. 1:friction-less to 0:static.",
+              "target": "gravity",
+              "type": "float",
+              "minValue": 0,
+              "maxValue": 1,
+              "initialValue": .2
             },
             {
-              "name": "Padding",
+              "name": "Node Padding",
               "description": "Padding between nodes.",
-              "target": "padding",
+              "target": "nodePadding",
               "type": "int",
               "minValue": 0,
               "maxValue": 100,
-              "initialValue": 1
+              "initialValue": 5
+            },
+            {
+              "name": "Cluster Padding",
+              "description": "Padding between clusters.",
+              "target": "clusterPadding",
+              "type": "int",
+              "minValue": 0,
+              "maxValue": 100,
+              "initialValue": 5
             }
           ]
         },
@@ -2071,7 +2090,8 @@ var ClusteredForce = function (userConfig) {
     }
 
     var catInfo = csvSpec.specified[0];
-    var sizeInfo = csvSpec.specified[1];
+    var labelInfo = csvSpec.specified[1];
+    var sizeInfo = csvSpec.specified[2];
 
     var svg = d3.select(config.parent)
       .append("svg")
@@ -2084,14 +2104,7 @@ var ClusteredForce = function (userConfig) {
       .attr("transform", "translate(" + margin.left + "," +
         margin.top + ") " + config.transform);
 
-    var padding = 1.5, // separation between same-color nodes
-      clusterPadding = 6, // separation between different-color nodes
-      maxRadius = 12;
-
-    //var color = d3.scale.category10()
-    //  .domain(d3.range(m));
-
-    var categories = csv.uniqueArray([catInfo.position]);
+    categories = csv.uniqueArray([catInfo.position]);
 
     var color = d3.scale.ordinal()
       .domain(categories)
@@ -2114,7 +2127,16 @@ var ClusteredForce = function (userConfig) {
       var size = row[sizeInfo.position];
       var radius = radiusScale(size);
       var cluster = categories.indexOf(category);
-      var node = {cluster: cluster, radius: radius};
+      var label = row[labelInfo.position];
+      var node = {
+        cluster: cluster,
+        radius: radius,
+        label: label,
+        tooltip: "<table class='dex-tooltip-table'>" +
+        "<tr><td>Category:</td><td>" + category + "</td></tr>" +
+        "<tr><td>Label:</td><td>" + label + "</td></tr>" +
+        "<tr><td>Value:</td><td>" + size + "</td></tr></table>"
+      };
       nodes.push(node);
       if (clusters[cluster] == undefined || clusters[cluster].radius < radius) {
         clusters[cluster] = node;
@@ -2142,8 +2164,9 @@ var ClusteredForce = function (userConfig) {
     var force = d3.layout.force()
       .nodes(nodes)
       .size([width, height])
-      .gravity(.02)
-      .charge(0)
+      .gravity(config.gravity)
+      .charge(config.charge)
+      .friction(config.friction)
       .on("tick", tick)
       .start();
 
@@ -2172,44 +2195,83 @@ var ClusteredForce = function (userConfig) {
     var node = rootG.selectAll("circle")
       .data(nodes)
       .enter()
-      .append("circle")
-      .style("fill", function (d, i) {
-        return "url(#grad" + i + ")";
-      })
+      .append("g")
       .attr("cluster-id", function (d) {
         return d.cluster;
       })
-       //.style("fill", function(d) { return color(categories[d.cluster]); })
-      .call(force.drag)
+      .call(force.drag);
+
+    var circle = node.append("circle")
+      .style("fill", function (d, i) {
+        return "url(#grad" + i + ")";
+      })
+      .attr("r", function(d) { return d.radius; })
       .on("mouseover", function (d, i) {
-        d3.selectAll("circle:not([cluster-id='" + d.cluster + "'])")
+        var hideNodes = d3.selectAll("g:not([cluster-id='" + d.cluster + "'])");
+        hideNodes
+          .select("circle")
+          .transition()
+          .duration(1000)
+          .attr("fill-opacity", .1);
+        hideNodes
+          .select("text")
           .transition()
           .duration(1000)
           .attr("fill-opacity", .1);
       })
       .on("mouseout", function (d, i) {
-        d3.selectAll("circle:not([cluster-id='" + d.cluster + "'])")
+        var hideNodes = d3.selectAll("g:not([cluster-id='" + d.cluster + "'])");
+        hideNodes
+          .select("circle")
+          .transition()
+          .duration(1000)
+          .attr("fill-opacity", 1);
+        hideNodes
+          .select("text")
           .transition()
           .duration(1000)
           .attr("fill-opacity", 1);
       });
 
-    node.transition()
-      .duration(750)
-      .delay(function (d, i) {
-        return i * 5;
+    // TODO: Not sure I care, but interferes with text sizing.
+    // Kinda nice effect, but adds nothing to the quality of the
+    // visual itself.
+    //circle.transition()
+      //.duration(0)
+      //.delay(function (d, i) {
+      //  return i * 5;
+      //})
+      //.attrTween("r", function (d) {
+      //  var i = d3.interpolate(0, d.radius);
+      //  return function (t) {
+      //    return d.radius = i(t);
+      //  };
+      //});
+
+    node.append("text")
+      .attr("id", "node-label")
+      .text(function(d) { return d.label; })
+      .style("pointer-events", "none")
+      .style("font-size", "1px")
+      .each(dex.util.d3.getBounds)
+      .style("font-size", function(d) {
+        return d.bounds.scale + "px";
       })
-      .attrTween("r", function (d) {
-        var i = d3.interpolate(0, d.radius);
-        return function (t) {
-          return d.radius = i(t);
-        };
-      });
+      .attr("dy", ".3em")
+      .style("text-anchor", "middle");
+
+    circle.append("text")
+      .text(function(d) { return d.tooltip; });
 
     function tick(e) {
+      d3 = dex.charts.d3.d3v3;
       node
         .each(cluster(10 * e.alpha * e.alpha))
         .each(collide(.5))
+        .attr("transform", function (d) {
+          return "translate(" + d.x + "," + d.y + ")";
+        });
+        /**
         .attr("radius", function (d) {
           return (dex.object.isNumeric(d.radius) ? d.radius : 1);
         })
@@ -2219,10 +2281,12 @@ var ClusteredForce = function (userConfig) {
         .attr("cy", function (d) {
           return (dex.object.isNumeric(d.y) ? d.y : 0);
         });
+         **/
     }
 
     // Move d to be adjacent to the cluster node.
     function cluster(alpha) {
+      d3 = dex.charts.d3.d3v3;
       return function (d) {
         var cluster = clusters[d.cluster];
         //dex.console.log("CLUSTER-D", d, "CLUSTER-NODES", nodes);
@@ -2243,10 +2307,12 @@ var ClusteredForce = function (userConfig) {
 
     // Resolves collisions between d and all other circles.
     function collide(alpha) {
+      d3 = dex.charts.d3.d3v3;
       var quadtree = d3.geom.quadtree(nodes);
       return function (d) {
         //dex.console.log("COLLIDE-D", d, nodes);
-        var r = d.radius + config.radius.max + Math.max(padding, clusterPadding),
+        var r = d.radius + config.radius.max + Math.max(
+          config.nodePadding, config.clusterPadding),
           nx1 = d.x - r,
           nx2 = d.x + r,
           ny1 = d.y - r,
@@ -2257,7 +2323,8 @@ var ClusteredForce = function (userConfig) {
               y = d.y - quad.point.y,
               l = Math.sqrt(x * x + y * y),
               r = d.radius + quad.point.radius +
-                (d.cluster === quad.point.cluster ? padding : clusterPadding);
+                (d.cluster === quad.point.cluster ?
+                  config.nodePadding : config.clusterPadding);
             if (l < r) {
               l = (l - r) / l * alpha;
               d.x -= x *= l;
@@ -2271,6 +2338,18 @@ var ClusteredForce = function (userConfig) {
       };
     }
 
+    var legendMsg = {
+      type: "set-legend",
+      csv: chart.csv,
+      categories: [{
+        name: catInfo.header,
+        values: categories.map(function (cat) {
+          return {value: cat, color: color(cat)}
+        })
+      }]
+    };
+    chart.publish(legendMsg);
+
     return chart;
   };
 
@@ -2278,11 +2357,40 @@ var ClusteredForce = function (userConfig) {
     return ClusteredForce(dex.config.expandAndOverlay(override, userConfig));
   };
 
+  chart.highlight = function(categoryName) {
+    if (categoryName === undefined || categories.indexOf(categoryName) < 0) {
+
+      d3.selectAll("g circle")
+        .transition()
+        .duration(1000)
+        .attr("fill-opacity", 1);
+
+      d3.selectAll("g text")
+        .transition()
+        .duration(1000)
+        .attr("fill-opacity", 1);
+    }
+    else {
+      var clusterId = categories.indexOf(categoryName);
+      var hideNodes = d3.selectAll("g:not([cluster-id='" + clusterId + "'])");
+      hideNodes
+        .select("circle")
+        .transition()
+        .duration(1000)
+        .attr("fill-opacity", .1);
+      hideNodes
+        .select("text")
+        .transition()
+        .duration(1000)
+        .attr("fill-opacity", .1);
+    }
+  };
+
   $(document).ready(function () {
     $(chart.config.parent).uitooltip({
       items: "circle",
       position: {
-        my: "right bottom+50"
+        my: "right bottom-50"
       },
       content: function () {
         return $(this).find("text").text();
@@ -2918,7 +3026,6 @@ var Legend = function (userConfig) {
   chart.config.eventSources.forEach(function(cmp) {
     // Legend updates.
     chart.subscribe(cmp, "set-legend", function(event) {
-      dex.console.log("SET-LEGEND", event);
       chart.attrNoEvent("categories", event.categories)
         .refresh();
     });
@@ -21526,19 +21633,18 @@ module.exports = function util(dex) {
 
   d3util.getBounds = function (d) {
     var bbox = this.getBBox();
-    var cbbox = this.parentNode.getBBox();
-    var hMargin = Math.min(30, cbbox.height * .1);
-    var wMargin = Math.min(30, cbbox.width * .1);
-    var wscale = Math.min((cbbox.width - wMargin) / bbox.width);
-    var hscale = Math.min((cbbox.height - hMargin) / bbox.height);
+    var parentBBox = this.parentNode.getBBox();
+    var wscale = parentBBox.width / bbox.width;
+    var hscale = parentBBox.height / bbox.height;
 
-    return {
-      'container-bounds': cbbox,
+    d.bounds = {
+      'container-bounds': parentBBox,
       'bounds': bbox,
       'scale': Math.min(wscale, hscale),
       'height-scale': hscale,
       'width-scale': wscale
     };
+    return d.bounds;
   };
 
   d3util.addRadialGradients = function (svg, id, data, colorScheme) {
