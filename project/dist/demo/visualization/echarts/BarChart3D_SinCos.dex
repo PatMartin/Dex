@@ -1,0 +1,66 @@
+<dex-project version="0.8">
+   <tasks class="java.util.ArrayList">
+      <task-item name="Groovy Script" active="true">
+         <task class="com.dexvis.dex.task.prg.GroovyScript">
+            <config-def>[ { &quot;type&quot; : &quot;label&quot;, &quot;initialValue&quot;: &quot;No configuration is available&quot; } ]</config-def>
+            <processbytable>&lt;map&gt;
+  &lt;entry&gt;
+    &lt;string&gt;text&lt;/string&gt;
+    &lt;string&gt;Table&lt;/string&gt;
+  &lt;/entry&gt;
+  &lt;entry&gt;
+    &lt;string&gt;selected&lt;/string&gt;
+    &lt;boolean&gt;true&lt;/boolean&gt;
+  &lt;/entry&gt;
+&lt;/map&gt;</processbytable>
+            <processbyrow>&lt;map&gt;
+  &lt;entry&gt;
+    &lt;string&gt;text&lt;/string&gt;
+    &lt;string&gt;Row&lt;/string&gt;
+  &lt;/entry&gt;
+&lt;/map&gt;</processbyrow>
+            <processbycolumn>&lt;map&gt;
+  &lt;entry&gt;
+    &lt;string&gt;text&lt;/string&gt;
+    &lt;string&gt;Column&lt;/string&gt;
+  &lt;/entry&gt;
+&lt;/map&gt;</processbycolumn>
+            <groovyCode class="javafx.beans.property.SimpleStringProperty">header = [ &quot;SERIES&quot;, &quot;ANGLE&quot;, &quot;VALUE&quot; ]
+(-360..360).each {
+  data &lt;&lt; [ &quot;Sin&quot;, it, Math.sin(it*Math.PI/180.0) ]
+  data &lt;&lt; [ &quot;Cos&quot;, it, Math.cos(it*Math.PI/180.0) ]
+}
+
+</groovyCode>
+         </task>
+      </task-item>
+      <task-item name="View Data" active="true">
+         <task class="com.dexvis.dex.task.utilities.ViewData">
+            <config-def>[ { &quot;type&quot; : &quot;label&quot;, &quot;initialValue&quot;: &quot;No configuration is available&quot; } ]</config-def>
+         </task>
+      </task-item>
+      <task-item name="Web Driver" active="true">
+         <task class="com.dexvis.dex.task.base.WebDriverTask">
+            <config-def>[ { &quot;type&quot; : &quot;label&quot;, &quot;initialValue&quot;: &quot;No configuration is available&quot; } ]</config-def>
+            <templateText>web\dexjs\echarts\BarChart3D.gtmpl</templateText>
+            <outputFileText>output\test.html</outputFileText>
+            <firefoxBrowser>&lt;map&gt;
+  &lt;entry&gt;
+    &lt;string&gt;text&lt;/string&gt;
+    &lt;string&gt;Firefox&lt;/string&gt;
+  &lt;/entry&gt;
+&lt;/map&gt;</firefoxBrowser>
+            <chromeBrowser>&lt;map&gt;
+  &lt;entry&gt;
+    &lt;string&gt;text&lt;/string&gt;
+    &lt;string&gt;Chrome&lt;/string&gt;
+  &lt;/entry&gt;
+  &lt;entry&gt;
+    &lt;string&gt;selected&lt;/string&gt;
+    &lt;boolean&gt;true&lt;/boolean&gt;
+  &lt;/entry&gt;
+&lt;/map&gt;</chromeBrowser>
+         </task>
+      </task-item>
+   </tasks>
+</dex-project>
