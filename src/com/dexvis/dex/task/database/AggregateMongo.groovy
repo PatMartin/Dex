@@ -78,39 +78,46 @@ class AggregateMongo extends DexTask {
     def slurper = new groovy.json.JsonSlurper()
     def gson = slurper.parseText(mongoQuery);
     
-    gson.eachWithIndex {
-      row, ri ->
-
+    gson.eachWithIndex { row, ri ->
+      
       def op = row.keySet().toArray()[0]
       def agg = JsonOutput.toJson(row[op]);
       println "OP: '${op}', AGG: '${agg}'"
-      pipeline.add(new Document(op, Document.parse(agg)))
+      try {
+        Document aggDoc = Document.parse(agg);
+        pipeline.add(new Document(op, aggDoc))
+      }
+      catch (Exception ex) {
+        if (op == '$limit') {
+          println ("DOING THE LIMIT...")
+          pipeline.add(new Document(op, agg as Integer));
+        }
+        else {
+          pipeline.add(new Document(op, agg));
+        }
+      }
     }
     
     AggregateIterable<Document> results = collection.aggregate(pipeline);
     
     def header = results[0].keySet() as List;
     def data = []
-
-    results.eachWithIndex {
-        result, ri ->
-        def jsonStr = result.toJson();
-        gson = slurper.parseText(jsonStr)
-        def row = header.collect {
-          key ->
-            return ((result[key] as String).replaceAll(/^\[?(.*?)\]?$/) { all, text -> text })
-        }      
-        data << row
+    
+    results.eachWithIndex { result, ri ->
+      def jsonStr = result.toJson();
+      gson = slurper.parseText(jsonStr)
+      def row = header.collect { key ->
+        return ((result[key] as String).replaceAll(/^\[?(.*?)\]?$/) { all, text -> text })
       }
+      data << row
+    }
     state.dexData.header = header;
     state.dexData.data = data;
     return state
   }
   
-  public javafx.scene.Node getConfig()
-  {
-    if (configPane == null)
-    {
+  public javafx.scene.Node getConfig() {
+    if (configPane == null) {
       def bindings = [
         'mode'     : 'JavaScript',
         'mime'     : 'text/javascript',
@@ -128,7 +135,7 @@ class AggregateMongo extends DexTask {
       saveButton.setOnAction({ event -> save(event)})
       
       configPane.add(NodeFactory.createTitle("Aggregate Mongo"), "grow,span")
-
+      
       configPane.add(urlLabel)
       configPane.add(urlText, "grow,span")
       
@@ -144,37 +151,29 @@ class AggregateMongo extends DexTask {
     return configPane
   }
   
-  public load(ActionEvent evt)
-  {
-    try
-    {
+  public load(ActionEvent evt) {
+    try {
       File loadFile = mongoChooser.load(evt)
       
-      if (loadFile != null)
-      {
+      if (loadFile != null) {
         // Automatically updates mongoScript
         editor.setEditorContent(FileUtils.readFileToString(loadFile))
       }
     }
-    catch(Exception ex)
-    {
+    catch(Exception ex) {
       ex.printStackTrace()
     }
   }
   
-  public save(ActionEvent evt)
-  {
-    try
-    {
+  public save(ActionEvent evt) {
+    try {
       File saveFile = mongoChooser.save(evt)
       
-      if (saveFile != null)
-      {
+      if (saveFile != null) {
         FileUtils.writeStringToFile(saveFile, mongoScript.getValue())
       }
     }
-    catch(Exception ex)
-    {
+    catch(Exception ex) {
       ex.printStackTrace()
     }
   }
