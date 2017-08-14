@@ -2463,18 +2463,17 @@ var Dendrogram = function Dendrogram(options) {
       'right': 10
     },
     'transform': '',
-    // diagonal, elbow
-    'connectionType': 'diagonal',
     // Our data...
     'csv': new dex.csv(["X", "Y"], [[0, 0], [1, 1], [2, 4], [3, 9], [4, 16]]),
     // width and height of our chart.
     'width': "100%",
     'height': "100%",
+
     'connection': {
-      'length': 180
-//      'style': {
-//        'stroke': dex.config.stroke()
-//      }
+      'length': "fit-text",
+      // diagonal, elbow
+      'type': 'diagonal',
+      'textPadding': 40
     },
     'root': {
       'name': "ROOT",
@@ -2553,19 +2552,48 @@ var Dendrogram = function Dendrogram(options) {
               "initialValue": chart.config.root.name || "ROOT"
             },
             {
+              "name": "Connection Type",
+              "description": "This controls the type of the connections.",
+              "target": "connection.type",
+              "type": "choice",
+              "choices": ["diagonal", "elbow", "extended-elbow"],
+              "initialValue": "diagonal"
+            },
+            {
               "name": "Connection Length",
               "description": "This controls the length of the connections.",
               "target": "connection.length",
               "type": "choice",
               "choices": ["fit-text", "10", "50", "100", "150", "200", "250", "300"],
               "initialValue": "fit-text"
-            }
+            },
+            {
+              "name": "Connection Text Padding",
+              "description": "The number of pixels to pad node text with.",
+              "target": "connection.textPadding",
+              "type": "int",
+              "minValue": 0,
+              "maxValue": 100,
+              "initialValue": 40
+            },
           ]
         },
-        dex.config.gui.text({name: "Expanded Label"}, "node.expanded.label"),
-        dex.config.gui.circle({name: "Expanded Circle"}, "node.expanded.circle"),
-        dex.config.gui.text({name: "Collapsed Label"}, "node.collapsed.label"),
-        dex.config.gui.circle({name: "Collapsed Circle"}, "node.collapsed.circle"),
+        {
+          "type": "group",
+          "name": "Nodes",
+          "contents": [
+            dex.config.gui.circle({name: "Node: Expanded"}, "node.expanded.circle"),
+            dex.config.gui.circle({name: "Node: Collapsed"}, "node.collapsed.circle")
+          ]
+        },
+        {
+          "type": "group",
+          "name": "Labels",
+          "contents": [
+            dex.config.gui.text({name: "Label: Expanded"}, "node.expanded.label"),
+            dex.config.gui.text({name: "Label: Collapsed"}, "node.collapsed.label")
+          ]
+        },
         dex.config.gui.link({}, "link")
       ]
     };
@@ -2604,14 +2632,14 @@ var Dendrogram = function Dendrogram(options) {
 
     var connectionType;
 
-    if (config.connectionType == "extended-elbow") {
+    if (config.connection.type == "extended-elbow") {
       connectionType = function extendedElbow(d, i) {
         return "M" + d.source.y + "," + d.source.x
-          + "H" + (d.source.y + 50)
+          + "H" + (d.source.y + config.connection.textPadding)
           + "V" + d.target.x + "H" + d.target.y;
       }
     }
-    else if (config.connectionType == "elbow") {
+    else if (config.connection.type == "elbow") {
       connectionType = function elbow(d, i) {
         return "M" + d.source.y + "," + d.source.x
           + "V" + d.target.x + "H" + d.target.y;
@@ -2636,11 +2664,11 @@ var Dendrogram = function Dendrogram(options) {
         margin.left + ',' + margin.top + ') ' +
         config.transform);
 
-    json =     {
-        "name": config.root.name,
-        "category": config.root.category,
-        "children": csv.toHierarchicalJson()
-      };
+    json = {
+      "name": config.root.name,
+      "category": config.root.category,
+      "children": csv.toHierarchicalJson()
+    };
 
     root = json;
     root.x0 = height / 2;
@@ -2700,11 +2728,10 @@ var Dendrogram = function Dendrogram(options) {
         });
         //dex.console.log("LENGTHS", depthMap);
         depthY = [0];
-        var textPadding = 40;
-        var textOffset = textPadding;
+        var textOffset = config.connection.textPadding;
         for (i = 0; depthMap[i]; i++) {
           depthY.push(depthMap[i] + textOffset);
-          textOffset += depthMap[i] + textPadding;
+          textOffset += depthMap[i] + config.connection.textPadding;
         }
         preText.remove();
       }
@@ -8015,8 +8042,26 @@ var BarChart3D = function (userConfig) {
     'width': "100%",
     'height': "100%",
     'palette': "ECharts",
-    'refreshType': "update",
-    "options": {}
+    'refreshType': "render",
+    radius: { min: 5, max: 25 },
+    "options": {
+      grid3D: {
+        boxWidth: 200,
+        boxDepth: 80,
+        viewControl: {
+          // projection: 'orthographic'
+        },
+        light: {
+          main: {
+            intensity: 1.2,
+            shadow: true
+          },
+          ambient: {
+            intensity: 0.3
+          }
+        }
+      }
+    }
   };
 
   var combinedConfig = dex.config.expandAndOverlay(userConfig, defaults);
@@ -8037,7 +8082,7 @@ var BarChart3D = function (userConfig) {
           "name": "General Options",
           "contents": [
             dex.config.gui.echartsTitle({}, "options.title"),
-            dex.config.gui.echartsGrid({}, "options.grid"),
+            dex.config.gui.echartsGrid({}, "options.grid3D"),
             dex.config.gui.echartsTooltip({}, "options.tooltip"),
             {
               "name": "Color Scheme",
@@ -8060,7 +8105,7 @@ var BarChart3D = function (userConfig) {
               "description": "The shading.",
               "target": "series.shading",
               "type": "choice",
-              "choices": [ "color", "lambert", "realistic" ],
+              "choices": ["color", "lambert", "realistic"],
               "initialValue": "color"
             },
             {
@@ -8069,6 +8114,24 @@ var BarChart3D = function (userConfig) {
               "target": "options.backgroundColor",
               "type": "color",
               "initialValue": "#000000"
+            },
+            {
+              "name": "Symbol Size Minimum",
+              "description": "The minimum size of the symbols",
+              "type": "int",
+              "target": "radius.min",
+              "minValue": 0,
+              "maxValue": 50,
+              "initialValue": 5
+            },
+            {
+              "name": "Symbol Size Maximum",
+              "description": "The maximum size of the symbols",
+              "type": "int",
+              "target": "radius.max",
+              "minValue": 0,
+              "maxValue": 50,
+              "initialValue": 20
             }
           ]
         },
@@ -8127,6 +8190,7 @@ var BarChart3D = function (userConfig) {
         },
         visualMap: {
           max: 200,
+          calculable: true,
           inRange: {
             color: dex.color.palette[chart.config.colorScheme]
           }
@@ -8139,7 +8203,7 @@ var BarChart3D = function (userConfig) {
     yInfo = csvSpec.specified[1];
     zInfos = [];
     zColumns = [];
-    for (i=2; i<csvSpec.specified.length; i++) {
+    for (i = 2; i < csvSpec.specified.length; i++) {
       zInfos.push(csvSpec.specified[i]);
       zColumns.push(csvSpec.specified[i].position);
     }
@@ -8181,7 +8245,18 @@ var BarChart3D = function (userConfig) {
     options.zAxis3D.data = undefined;
     options.visualMap.max = csv.extent(zColumns)[1];
 
-    zInfos.forEach(function(zInfo, i) {
+    // Use the last dimension in a scatter3D as a size parameter.
+    var sizeInfo = undefined;
+    var sizeScale = undefined;
+    if (chart.config.series.type == "scatter3D" && zInfos.length > 1) {
+      sizeInfo = zInfos.pop();
+      sizeScale = d3.scale.linear()
+        .domain(csv.extent([sizeInfo.position]))
+        .range([chart.config.radius.min, chart.config.radius.max]);
+    }
+
+
+    zInfos.forEach(function (zInfo, i) {
       var series = dex.config.expandAndOverlay(chart.config.series, {
         shading: 'color',
         stack: 'stack',
@@ -8197,6 +8272,14 @@ var BarChart3D = function (userConfig) {
           },
           itemStyle: {
             opacity: 1
+          }
+        },
+        symbolSize: function (d, obj) {
+          if (chart.config.series.type == "scatter3D" && sizeInfo !== undefined) {
+            return sizeScale(csv.data[obj.dataIndex][sizeInfo.position]);
+          }
+          else {
+            return chart.config.radius.min;
           }
         },
         data: function (csv) {
