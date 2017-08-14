@@ -1,0 +1,17 @@
+<%
+import static com.dexvis.util.GroovyUtil.renderTemplate as render;
+
+println render("web/include/dexjs.inc", [
+      "state"     : state,
+      "dexData"   : dexData,
+      "data"      : data,
+      "header"    : header,
+      "basedir"   : basedir,
+      "context"   : [
+        "title"   : "dex.js : ECharts BarChart 3D",
+        "chart"   : "dex.charts.echarts.BarChart3D",
+        "type"    : "echartsbarchart3d",
+        "scripts" : [ "javascript/echarts/latest/echarts.min.js", "javascript/echarts/latest/echarts-gl.min.js" ]
+      ]
+    ])
+%>

@@ -1,5 +1,7 @@
 package com.dexvis.dex.task.base
 
+import java.util.Map;
+
 import groovy.text.SimpleTemplateEngine
 import javafx.scene.Node
 import javafx.scene.control.Button
@@ -81,7 +83,7 @@ class WebDriverTask extends DexTask {
     {
       driver = getDriver()
       def templateCode = new File(templateText.getText()).text
-      def binding = [ "state":state, "dexData":state.dexData, "data":state.dexData.data, "header":state.dexData.header]
+      def binding = getBinding(state);
       
       def engine = new SimpleTemplateEngine()
       def template = engine.createTemplate(templateCode).make(binding)
@@ -135,6 +137,19 @@ class WebDriverTask extends DexTask {
     }
     
     return state
+  }
+  
+  private Map getBinding(DexTaskState state)
+  {
+    def curDir = new File(".")
+    
+    return [
+      "state":state,
+      "dexData":state.dexData,
+      "data":state.dexData.data,
+      "header":state.dexData.header,
+      "basedir" : curDir.toURI().toURL().toExternalForm()
+    ]
   }
   
   private WebDriver getDriver()
