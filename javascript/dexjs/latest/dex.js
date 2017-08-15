@@ -2477,11 +2477,7 @@ var Dendrogram = function Dendrogram(options) {
     },
     'root': {
       'name': "ROOT",
-      // Used?
-      //'category': "ROOT"
     },
-    // REM: Used?
-    //'color': d3.scale.category20(),
     'node': {
       'expanded': {
         'label': dex.config.text({
@@ -2518,17 +2514,28 @@ var Dendrogram = function Dendrogram(options) {
         })
       }
     },
-    'link': dex.config.link({
-      'fill': {
-        'fillColor': 'none'
-      },
-      'stroke': dex.config.stroke({
-        'color': 'green',
-        'width': 1,
-        'opacity': .3,
-        'dasharray': "5 5"
+    'link': {
+      "normal": dex.config.link({
+        'fill': {
+          'fillColor': 'none'
+        },
+        'stroke': dex.config.stroke({
+          'color': 'grey',
+          'width': 1,
+          'opacity': .5
+        })
+      }),
+      "emphasis": dex.config.link({
+        'fill': {
+          'fillColor': 'none'
+        },
+        'stroke': dex.config.stroke({
+          'color': 'red',
+          'width': 1.5,
+          'opacity': .6
+        })
       })
-    })
+    }
   };
 
   chart = new dex.component(options, defaults);
@@ -2575,7 +2582,7 @@ var Dendrogram = function Dendrogram(options) {
               "minValue": 0,
               "maxValue": 100,
               "initialValue": 40
-            },
+            }
           ]
         },
         {
@@ -2594,7 +2601,7 @@ var Dendrogram = function Dendrogram(options) {
             dex.config.gui.text({name: "Label: Collapsed"}, "node.collapsed.label")
           ]
         },
-        dex.config.gui.link({}, "link")
+        dex.config.gui.linkGroup({}, "link")
       ]
     };
 
@@ -2612,7 +2619,7 @@ var Dendrogram = function Dendrogram(options) {
     d3 = dex.charts.d3.d3v3;
     var chart = this;
     var config = chart.config;
-    var margin = config.margin;
+    var margin = chart.getMargins();
     var csv = config.csv;
     var json;
     var width = config.width - margin.left - margin.right;
@@ -2623,10 +2630,9 @@ var Dendrogram = function Dendrogram(options) {
     var i = 0, root;
 
     var tree = d3.layout.tree()
-      .size([height, width]);
-
-    var cluster = d3.layout.cluster()
-      .size([height, width]);
+      .size([height, width]).separation(function (a, b) {
+        return (a.parent == b.parent) ? 1 : 1;
+      });
 
     var layout = tree;
 
@@ -2705,9 +2711,8 @@ var Dendrogram = function Dendrogram(options) {
         depthY = String(config.connection.length).split(",")
       }
       else if (String(config.connection.length) === "fit-text") {
-        //dex.console.log("COMPACT");
-        var preText = d3.select(config.parent + " g").append("text");
-        //var charWidth = charText.node().getBBox().width;
+        var preText = d3.select(config.parent + " g")
+          .append("text");
 
         //charText.call(dex.config.configureText);
         fixedLength = false;
@@ -2715,7 +2720,8 @@ var Dendrogram = function Dendrogram(options) {
         nodes.forEach(function (d) {
           preText.text(d.name);
           // Find start for each connection.
-          var textLen = preText.node().getBBox().width;
+          var textLen = preText.node()
+            .getBBox().width;
           //dex.console.log("D", d, textLen);
           if (depthMap[d.depth]) {
             if (depthMap[d.depth] < textLen) {
@@ -2726,7 +2732,6 @@ var Dendrogram = function Dendrogram(options) {
             depthMap[d.depth] = textLen;
           }
         });
-        //dex.console.log("LENGTHS", depthMap);
         depthY = [0];
         var textOffset = config.connection.textPadding;
         for (i = 0; depthMap[i]; i++) {
@@ -2746,11 +2751,28 @@ var Dendrogram = function Dendrogram(options) {
         }
       });
 
+      function getRootPathId(d) {
+        if (d == null || d === undefined || d.depth == 0) {
+          return undefined;
+        }
+        else if (d.depth == 1) {
+          return d.id;
+        }
+        else if (d.depth > 1) {
+          return getRootPathId(d.parent);
+        }
+      }
+
       // Update the nodes…
       var node = rootG.selectAll("g.node")
         .data(nodes, function (d) {
           return d.id || (d.id = ++i);
         });
+
+      // Append with a path to the root.
+      nodes.forEach(function (d) {
+        d.rootPathId = getRootPathId(d);
+      });
 
       // Enter any new nodes at the parent's previous position.
       var nodeEnter = node.enter().append("svg:g")
@@ -2771,7 +2793,15 @@ var Dendrogram = function Dendrogram(options) {
             config.node.collapsed.circle : config.node.expanded.circle;
           d3.select(this).call(dex.config.configureCircle, nodeConfig);
         })
-        .attr("r", 1e-6);
+        .attr("r", 1e-6)
+        .on("mouseover", function (d) {
+          d3.selectAll("path.link[rootPathId='" + d.rootPathId + "']")
+            .call(dex.config.configureLink, config.link.emphasis);
+        })
+        .on("mouseout", function (d) {
+          d3.selectAll("path.link[rootPathId='" + d.rootPathId + "']")
+            .call(dex.config.configureLink, config.link.normal);
+        });
 
       // Add text nodes configured like we want them.
       nodeEnter.append("text")
@@ -2780,8 +2810,15 @@ var Dendrogram = function Dendrogram(options) {
             config.node.collapsed.label : config.node.expanded.label;
           d3.select(this).call(dex.config.configureText, nodeConfig);
         })
-        //.text(function(d) { return (d.name) ? d.name : d.category;})
-        .style("fill-opacity", 1e-6);
+        .style("fill-opacity", 1e-6)
+        .on("mouseover", function (d) {
+          d3.selectAll("path.link[rootPathId='" + d.rootPathId + "']")
+            .call(dex.config.configureLink, config.link.emphasis);
+        })
+        .on("mouseout", function (d) {
+          d3.selectAll("path.link[rootPathId='" + d.rootPathId + "']")
+            .call(dex.config.configureLink, config.link.normal);
+        });
 
       // Transition nodes to their new position.
       var nodeUpdate = node.transition()
@@ -2830,17 +2867,17 @@ var Dendrogram = function Dendrogram(options) {
       // Enter any new links at the parent's previous position.
       link.enter().insert("svg:path", "g")
         .attr("class", "link")
-        .call(dex.config.configureLink, config.link)
-        //.style("fill", config.link.fill)
-        //.style("fill-opacity", config.link.fillOpacity)
+        .attr("rootPathId", function (d) {
+          return d.source.rootPathId || d.target.rootPathId;
+        })
+        .call(dex.config.configureLink, config.link.normal)
         .attr("d", function (d) {
           var o = {x: source.x0, y: source.y0};
           return connectionType({source: o, target: o});
         })
         .transition()
         .duration(duration)
-        .attr("d", connectionType)
-      ;
+        .attr("d", connectionType);
 
       // Transition links to their new position.
       link.transition()
