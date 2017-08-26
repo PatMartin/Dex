@@ -327,6 +327,22 @@
     font: bold 14px "Helvetica Neue", Sans-Serif;
     text-transform: uppercase;
     box-shadow: 0 0 7px black;
+}
+
+.dex-multiples-cell {
+    float: left;
+    padding: 2px;
+}
+
+.dex-multiples-cell-title {
+    background: #337ab7;
+
+    text-align: center;
+    font-size: 1em;
+    font-family: "Segoe UI";
+    font-weight: normal;
+
+    color: #ffffff;
 }/* GuiPane */
 /** Treemap **/
 .TreemapClass text {
