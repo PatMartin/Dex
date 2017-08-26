@@ -1,0 +1,16 @@
+<%
+import static com.dexvis.util.GroovyUtil.renderTemplate as render;
+
+println render("web/include/dexjs.inc", [
+      "state"    : state,
+      "dexData"  : dexData,
+      "data"     : data,
+      "header"   : header,
+      "basedir"  : basedir,
+      "context"  : [
+        "title"  : "dex.js : Icicle Chart",
+        "chart"  : "dex.charts.d3.IcicleChart",
+        "type"   : "icicle"
+      ]
+    ])
+%>
