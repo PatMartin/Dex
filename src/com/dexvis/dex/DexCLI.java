@@ -18,16 +18,13 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 import org.tbee.javafx.scene.layout.MigPane;
 
-import com.dexvis.dex.exception.DexException;
-import com.dexvis.dex.wf.DexJob;
-import com.dexvis.dex.wf.DexJobScheduler;
+import com.dexvis.dex.wf.DexEnvironment;
 import com.dexvis.dex.wf.DexTaskState;
-import com.dexvis.dex.wf.SerialJob;
 import com.dexvis.javafx.scene.control.DexTaskItem;
-import com.dexvis.util.ThreadUtil;
 
 public class DexCLI extends Application
 {
@@ -84,9 +81,29 @@ public class DexCLI extends Application
     stage.show();
     Options options = new Options();
     options.addOption("p", "project", true, "The project to be run.");
+    options.addOption("e", "env", true, "The project environment.");
+    
     CommandLineParser parser = new DefaultParser();
     CommandLine cmd = parser.parse(options, arguments);
     System.out.println("Running: " + cmd.getOptionValue("project"));
+    if (cmd.hasOption("e"))
+    {
+      DexEnvironment env = DexEnvironment.getInstance();
+      String envStr = cmd.getOptionValue("env");
+      String envVars[] = StringUtils.split(envStr, ';');
+      if (envVars != null) {
+        for (String envVar: envVars) {
+          if (envVar != null && envVar.indexOf('=') > -1) {
+            int ei = envVar.indexOf('=');
+            env.setVariable(envVar.substring(0, ei), envVar.substring(ei+1));
+            System.out.println("Setting Env Var: '" + envVar.substring(0, ei) + "'='" +
+                envVar.substring(ei+1) + "'");
+          }
+        }
+      }
+      // Split by semicolon.
+      // Split by equals.
+    }
     DexProject project = DexProject.readProject(stage,
         new File(cmd.getOptionValue("project")));
     List<DexTaskItem> tasks = project.getTaskItems();
