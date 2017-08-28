@@ -68,9 +68,13 @@ src="https://getfirebug.com/firebug-lite.js">
 var base = ${context.base}({});
 base.load();
 
-var multiples = dex.charts.multiples.Multiples({
+var multiples = dex.charts.multiples.GridsterMultiples({
     'parent': '#ChartArea',
     'csv': csv,
+    'gridsterConfig.widget_base_dimensions' : [ 50, 50 ],
+    'gridsterConfig.widget_margins' : [ 1, 1 ],
+    'cell.width' : 8,
+    'cell.height' : 8,
     'baseChart': base
   }); 
 
@@ -103,7 +107,7 @@ function getGuiDefinition()
 {
   var guiDef = {
     'multiples': multiples.getGuiDefinition(),
-    //'basechart': multiples.attr("charts")[0].getGuiDefinition()
+    'basechart': multiples.attr("charts")[0].getGuiDefinition()
   };
 
   return JSON.stringify(guiDef);
