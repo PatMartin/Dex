@@ -41,7 +41,6 @@ if (context.postscripts) {
 </head>
 <body>
   <div class='layout-container'>
-    <div id="basechart" style="display: none;"></div>
     <div class='ui-layout-west'>
       <div id='ConfigurationPane'></div>
     </div>
@@ -66,7 +65,7 @@ src="https://getfirebug.com/firebug-lite.js">
 
 <% println dexData.toCsvString(); %>
 
-var base = ${context.base}({ 'parent': '#basechart' });
+var base = ${context.base}({});
 base.load();
 
 var multiples = dex.charts.multiples.Multiples({
@@ -78,7 +77,7 @@ var multiples = dex.charts.multiples.Multiples({
 function save()
 {
   multiples.save();
-  base.save();
+  //base.save();
 }
 
 function setValues(values)
@@ -104,7 +103,7 @@ function getGuiDefinition()
 {
   var guiDef = {
     'multiples': multiples.getGuiDefinition(),
-    'basechart': base.getGuiDefinition()
+    //'basechart': multiples.attr("charts")[0].getGuiDefinition()
   };
 
   return JSON.stringify(guiDef);
@@ -128,10 +127,8 @@ function getGuiDefinition()
   configPane = dex.ui.ConfigurationPane({
     "parent": "#ConfigurationPane",
     "csv": csv,
-    "components": [ multiples, base ]
+    "components": [ multiples ]
   }).render();
-  
-  multiples.subscribe(base, "attr", function() { multiples.render(); });
 });
 </script>
 </body>
