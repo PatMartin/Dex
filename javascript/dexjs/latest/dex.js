@@ -11112,7 +11112,14 @@ var GridsterMultiples = function (userConfig) {
     });
 
     chart.config.charts = cells;
+
     return chart;
+  };
+
+  chart.refresh = function () {
+    cells.forEach(function (cell) {
+      cell.refresh();
+    })
   };
 
   chart.update = function () {
@@ -12215,6 +12222,10 @@ var TauChart = function (userConfig) {
       $(chart.config.parent).draggable();
     }
   });
+
+  chart.clone = function clone(override) {
+    return TauChart(dex.config.expandAndOverlay(override, userConfig));
+  };
 
   return chart;
 };
