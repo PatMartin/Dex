@@ -6,13 +6,13 @@ import javafx.scene.control.Button
 import javafx.scene.control.Label
 import javafx.scene.control.TextField
 
-import org.antlr.v4.codegen.model.OutputFile;
 import org.apache.commons.io.FileUtils
 import org.simpleframework.xml.Element
 import org.simpleframework.xml.Root
 import org.tbee.javafx.scene.layout.MigPane
 
 import com.dexvis.dex.exception.DexException
+import com.dexvis.dex.wf.DexEnvironment
 import com.dexvis.dex.wf.DexTask
 import com.dexvis.dex.wf.DexTaskState
 import com.dexvis.javafx.scene.control.DexFileChooser
@@ -62,14 +62,15 @@ class GroovyTemplate extends DexTask {
   {
     try
     {
+      DexEnvironment env = DexEnvironment.getInstance()
       def templateCode = new File(templateText.getText()).text
-      def binding = [ "state":state, "dexData":state.dexData, "data":state.dexData.data, "header":state.dexData.header]
+      def binding = getBinding(state)
       
       def engine = new SimpleTemplateEngine()
       def template = engine.createTemplate(templateCode).make(binding)
       output = template.toString()
       
-      String outputPath = outputFileText.getText()
+      String outputPath = env.interpolate(outputFileText.getText())
       if (outputPath == null || outputPath.length() <= 0)
       {
         outputPath = "output.html"
@@ -86,6 +87,19 @@ class GroovyTemplate extends DexTask {
     }
     
     return state
+  }
+  
+  public Map getBinding(DexTaskState state)
+  {
+    def curDir = new File(".")
+    
+    return [
+      "state":state,
+      "dexData":state.dexData,
+      "data":state.dexData.data,
+      "header":state.dexData.header,
+      "basedir" : curDir.toURI().toURL().toExternalForm()
+    ]
   }
   
   public Node getConfig()
