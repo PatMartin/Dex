@@ -1,0 +1,17 @@
+<%
+import static com.dexvis.util.GroovyUtil.renderTemplate as render;
+
+println render("web/include/dexjs_multiples.inc", [
+      "state"     : state,
+      "dexData"   : dexData,
+      "data"      : data,
+      "header"    : header,
+      "basedir"   : basedir,
+      "context"   : [
+        "title"   : "dex.js : ECharts Timeline Multiples",
+        "base"   : "dex.charts.echarts.Timeline",
+        "styles"  : [ ],
+        "scripts" : [ "javascript/echarts/latest/echarts.min.js" ]
+      ]
+    ])
+%>
