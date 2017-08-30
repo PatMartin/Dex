@@ -3316,7 +3316,7 @@ var IcicleChart = function (userConfig) {
   };
 
   chart.clone = function clone(override) {
-    return Chord(dex.config.expandAndOverlay(override, userConfig));
+    return IcicleChart(dex.config.expandAndOverlay(override, userConfig));
   };
 
   $(document).ready(function () {
@@ -8634,6 +8634,10 @@ var BarChart3D = function (userConfig) {
     return options;
   };
 
+  chart.clone = function clone(override) {
+    return BarChart3D(dex.config.expandAndOverlay(override, userConfig));
+  };
+
   return chart;
 };
 module.exports = BarChart3D;
@@ -8713,6 +8717,10 @@ var EChart = function (userConfig) {
     return {
       color: dex.color.palette[chart.config.palette]
     };
+  };
+
+  chart.clone = function clone(override) {
+    return EChart(dex.config.expandAndOverlay(override, userConfig));
   };
 
   $(document).ready(function () {
@@ -8981,6 +8989,10 @@ var LineChart = function (userConfig) {
     });
     //dex.console.log("OPTIONS", JSON.stringify(options));
     return options;
+  };
+
+  chart.clone = function clone(override) {
+    return LineChart(dex.config.expandAndOverlay(override, userConfig));
   };
 
   return chart;
@@ -9318,6 +9330,10 @@ var Network = function (userConfig) {
     return options;
   };
 
+  chart.clone = function clone(override) {
+    return Network(dex.config.expandAndOverlay(override, userConfig));
+  };
+
   return chart;
 };
 module.exports = Network;
@@ -9601,6 +9617,10 @@ var PieChart = function (userConfig) {
 
     //dex.console.log("OPTIONS", JSON.stringify(options));
     return options;
+  };
+
+  chart.clone = function clone(override) {
+    return PieChart(dex.config.expandAndOverlay(override, userConfig));
   };
 
   return chart;
@@ -9919,6 +9939,10 @@ var PolarPlot = function (userConfig) {
     return options;
   };
 
+  chart.clone = function clone(override) {
+    return PolarPlot(dex.config.expandAndOverlay(override, userConfig));
+  };
+
   return chart;
 };
 module.exports = PolarPlot;
@@ -10071,6 +10095,10 @@ var RadarChart = function (userConfig) {
 
     dex.console.log("OPTIONS", JSON.stringify(options));
     return options;
+  };
+
+  chart.clone = function clone(override) {
+    return RadarChart(dex.config.expandAndOverlay(override, userConfig));
   };
 
   return chart;
@@ -10313,6 +10341,10 @@ var SingleAxisScatterPlot = function (userConfig) {
     return options;
   };
 
+  chart.clone = function clone(override) {
+    return SingleAxisScatterPlot(dex.config.expandAndOverlay(override, userConfig));
+  };
+
   return chart;
 };
 module.exports = SingleAxisScatterPlot;
@@ -10489,6 +10521,10 @@ var SteamGraph = function (userConfig) {
 
     //dex.console.log("OPTIONS", JSON.stringify(options));
     return options;
+  };
+
+  chart.clone = function clone(override) {
+    return SteamGraph(dex.config.expandAndOverlay(override, userConfig));
   };
 
   return chart;
@@ -10793,6 +10829,10 @@ var Timeline = function (userConfig) {
 
     //dex.console.log(JSON.stringify(options));
     return options;
+  };
+
+  chart.clone = function clone(override) {
+    return Timeline(dex.config.expandAndOverlay(override, userConfig));
   };
 
   return chart;
