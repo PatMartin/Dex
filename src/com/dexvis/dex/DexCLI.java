@@ -89,6 +89,7 @@ public class DexCLI extends Application
     if (cmd.hasOption("e"))
     {
       DexEnvironment env = DexEnvironment.getInstance();
+      env.setVariable("HEADLESS", "true");
       String envStr = cmd.getOptionValue("env");
       String envVars[] = StringUtils.split(envStr, ';');
       if (envVars != null) {
