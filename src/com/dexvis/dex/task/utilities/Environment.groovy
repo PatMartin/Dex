@@ -41,7 +41,7 @@ class Environment extends DexTask {
   .observableArrayList()
   TableView<NameValuePair> envTable = new TableView<NameValuePair>()
   DexEnvironment env = DexEnvironment.getInstance()
-
+  
   /**
    * 
    * Override the default constructor to provide this component's name, category and help file.
@@ -51,16 +51,29 @@ class Environment extends DexTask {
   public Environment()
   {
     super("Utilities", "Environment", "utilities/Environment.html")
+    
+    // Are we running in headless mode?
+    boolean headless = env.getVariable("HEADLESS").equalsIgnoreCase("true");
 
-
+    env.setVariable("DEX_TIMESTAMP_MS", "" + System.currentTimeMillis());
+    
     // Set at initialization
     envData.each
     {
       println "ENVIRONMENT: ${it.name}=${it.value}"
-      env.setVariable(it.name, it.value)
+      if (headless && env.isDefined(it.name))
+      {
+        // Headless definitions take precedence.
+        System.out.println("*** Environment override of: '" + it.name + "'='" + it.value +
+          "' ignored due to headless mode.");
+      }
+      else
+      {
+        env.setVariable(it.name, it.value)
+      }
     }
   }
-
+  
   public DexTaskState initialize(DexTaskState state) throws DexException
   {
     envData.each
@@ -69,7 +82,7 @@ class Environment extends DexTask {
       env.setVariable(it.name, it.value)
     }
   }
-
+  
   public DexTaskState execute(DexTaskState state) throws DexException
   {
     try
@@ -87,17 +100,17 @@ class Environment extends DexTask {
       ModalDialog dialog = new ModalDialog(stage, "Error", sw.toString(), "Ok")
       ex.printStackTrace()
     }
-
+    
     return state
   }
-
+  
   public Node getConfig()
   {
     if (configPane == null)
     {
       configPane = new MigPane("", "[grow]", "[grow][]")
       configPane.setStyle("-fx-background-color: white;")
-
+      
       TableColumn nameCol = new TableColumn("Name")
       nameCol.setCellValueFactory(
           new PropertyValueFactory<NameValuePair,String>("name")
@@ -108,21 +121,21 @@ class Environment extends DexTask {
           new PropertyValueFactory<NameValuePair,String>("value")
           )
       valueCol.setMinWidth(400)
-
+      
       Callback<TableColumn, TableCell> cellFactory =
           new Callback<TableColumn, TableCell>() {
             public TableCell call(TableColumn p) {
               return new EnvironmentEditingCell()
             }
           }
-
+      
       nameCol.setCellFactory(cellFactory)
       valueCol.setCellFactory(cellFactory)
       envTable.setItems(envData)
       envTable.getColumns().addAll(nameCol, valueCol)
-
+      
       envTable.setEditable(true)
-
+      
       //Modifying the name property
       nameCol.setOnEditCommit(new EventHandler<CellEditEvent<NameValuePair, String>>() {
             @Override public void handle(CellEditEvent<NameValuePair, String> t) {
@@ -130,17 +143,17 @@ class Environment extends DexTask {
                   t.getTablePosition().getRow())).setName(t.getNewValue())
             }
           })
-
+      
       valueCol.setOnEditCommit(new EventHandler<CellEditEvent<NameValuePair, String>>() {
             @Override public void handle(CellEditEvent<NameValuePair, String> t) {
               ((NameValuePair)t.getTableView().getItems().get(
                   t.getTablePosition().getRow())).setValue(t.getNewValue())
             }
           })
-
+      
       Button addButton = new Button("Add")
       addButton.setOnAction({ event -> add(event) })
-
+      
       Button removeButton = new Button("Remove")
       removeButton.setOnAction({ event -> remove(event) })
       
@@ -148,12 +161,12 @@ class Environment extends DexTask {
       configPane.add(addButton, "grow")
       configPane.add(removeButton, "span, grow");
     }
-
+    
     return configPane
   }
-
+  
   public void add(ActionEvent evt)
-  { 
+  {
     envData.add(new NameValuePair("NAME", "VALUE"))
   }
   
