@@ -53,7 +53,8 @@ class Environment extends DexTask {
     super("Utilities", "Environment", "utilities/Environment.html")
     
     // Are we running in headless mode?
-    boolean headless = env.getVariable("HEADLESS").equalsIgnoreCase("true");
+    boolean headless = (env.getVariable("HEADLESS") != null) ?
+      env.getVariable("HEADLESS").equalsIgnoreCase("true") : false;
 
     env.setVariable("DEX_TIMESTAMP_MS", "" + System.currentTimeMillis());
     
