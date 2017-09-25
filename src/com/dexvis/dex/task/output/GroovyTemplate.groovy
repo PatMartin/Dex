@@ -63,7 +63,7 @@ class GroovyTemplate extends DexTask {
     try
     {
       DexEnvironment env = DexEnvironment.getInstance()
-      def templateCode = new File(templateText.getText()).text
+      def templateCode = new File(env.interpolate(templateText.getText())).text
       def binding = getBinding(state)
       
       def engine = new SimpleTemplateEngine()
