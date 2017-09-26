@@ -61,15 +61,16 @@ class Environment extends DexTask {
     // Set at initialization
     envData.each
     {
-      println "ENVIRONMENT: ${it.name}=${it.value}"
       if (headless && env.isDefined(it.name))
       {
         // Headless definitions take precedence.
         System.out.println("*** Environment override of: '" + it.name + "'='" + it.value +
           "' ignored due to headless mode.");
+        println "ENVIRONMENT: ${it.name}=${env.getVariable(it.name)}"
       }
       else
       {
+        println "ENVIRONMENT: ${it.name}=${it.value}"
         env.setVariable(it.name, it.value)
       }
     }

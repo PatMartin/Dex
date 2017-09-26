@@ -86,8 +86,9 @@ public class DexCLI extends Application
     CommandLineParser parser = new DefaultParser();
     CommandLine cmd = parser.parse(options, arguments);
     System.out.println("Running: " + cmd.getOptionValue("project"));
-    if (cmd.hasOption("e"))
+    if (cmd.hasOption("e") || cmd.hasOption("env"))
     {
+      System.out.println("*** ENABLING HEADLESS MODE ***");
       DexEnvironment env = DexEnvironment.getInstance();
       env.setVariable("HEADLESS", "true");
       String envStr = cmd.getOptionValue("env");
