@@ -4926,7 +4926,7 @@ var Dendrogram = function Dendrogram(options) {
 
   chart.render = function render() {
     d3 = dex.charts.d3.d3v3;
-    return chart.resize();
+    return chart.resize().update();
   };
 
   chart.update = function update() {
@@ -24600,7 +24600,6 @@ var datafilterpane = function (userConfig) {
 
       function updateCsv() {
         // Ignore spurious events until we have completed initialization.
-        dex.console.log("INTIALIZING", INITIALIZING)
         var config = chart.config;
         var csv = config.csv;
 
