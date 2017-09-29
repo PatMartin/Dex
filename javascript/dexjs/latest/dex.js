@@ -24467,24 +24467,30 @@ var datafilterpane = function (userConfig) {
       var dateFilters = $(config.parent + ' .' + config["class"] + "_date");
 
       function createDateRangeSlider(selection, columnName, columnNumber, extents) {
-        return dex.ui.RangeSlider.create(selection, {
-          start: [extents[0].getTime(), extents[1].getTime()],
-          range: {
-            min: extents[0].getTime(),
-            max: extents[1].getTime()
-          },
-          format: {
-            to: function (value) {
-              //dex.console.log("MOMENT", dex.moment(value).format('MM/DD/YYYY HH:mm'));
-              //dex.console.log("TO", to);
-              return dex.moment(value).format('MM/DD/YYYY HH:mm');
+        try {
+          var slider = dex.ui.RangeSlider.create(selection, {
+            start: [extents[0].getTime(), extents[1].getTime()],
+            range: {
+              min: extents[0].getTime(),
+              max: extents[1].getTime()
             },
-            from: Number
-          },
-          tooltips: true,
-          behaviour: 'drag',
-          connect: true
-        });
+            format: {
+              to: function (value) {
+                //dex.console.log("MOMENT", dex.moment(value).format('MM/DD/YYYY HH:mm'));
+                //dex.console.log("TO", to);
+                return dex.moment(value).format('MM/DD/YYYY HH:mm');
+              },
+              from: Number
+            },
+            tooltips: true,
+            behaviour: 'drag',
+            connect: true
+          });
+          return slider;
+        }
+        catch (ex) {
+          return null;
+        }
       }
 
       function getStep(extents) {
@@ -24551,7 +24557,6 @@ var datafilterpane = function (userConfig) {
           var extents = csv.extent([columnNumber]);
           var minValue = extents[0];
           var maxValue = extents[1];
-
 
           var slider = createDateRangeSlider(dateFilter, columnName, columnNumber, extents);
 
