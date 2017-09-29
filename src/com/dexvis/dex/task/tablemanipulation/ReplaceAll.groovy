@@ -51,12 +51,12 @@ class ReplaceAll extends DexTask
     def replaceStr = env.interpolate(replaceText.getText())
     def withStr = env.interpolate(withText.getText())
     
-    state.dexData.header = state.dexData.header.collect
+    state.dexData.header = state.dexData.header?.collect
     { header ->
       header.replaceAll(replaceStr, withStr)
     }
 
-    state.dexData.data = state.dexData.data.collect
+    state.dexData.data = state.dexData.data?.collect
     { row ->
       row.collect
       { col -> col.replaceAll(replaceStr, withStr) }
