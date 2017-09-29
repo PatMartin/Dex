@@ -53,13 +53,13 @@ class ReplaceAll extends DexTask
     
     state.dexData.header = state.dexData.header?.collect
     { header ->
-      header.replaceAll(replaceStr, withStr)
+      header?.replaceAll(replaceStr, withStr)
     }
 
     state.dexData.data = state.dexData.data?.collect
     { row ->
       row.collect
-      { col -> col.replaceAll(replaceStr, withStr) }
+      { col -> col?.replaceAll(replaceStr, withStr) }
     }
 
     return state
