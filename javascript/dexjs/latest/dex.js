@@ -3328,7 +3328,7 @@ module.exports = function charts() {
     'vis'      : require("./vis/vis")
   };
 };
-},{"./c3/c3":14,"./d3/d3":36,"./d3plus/d3plus":38,"./echarts/echarts":49,"./elegans/elegans":51,"./multiples/multiples":54,"./nvd3/nvd3":57,"./taucharts/taucharts":66,"./threejs/threejs":68,"./vis/vis":70}],16:[function(require,module,exports){
+},{"./c3/c3":14,"./d3/d3":36,"./d3plus/d3plus":38,"./echarts/echarts":49,"./elegans/elegans":51,"./multiples/multiples":54,"./nvd3/nvd3":57,"./taucharts/taucharts":66,"./threejs/threejs":68,"./vis/vis":71}],16:[function(require,module,exports){
 /**
  *
  * This is the base constructor for a D3 BumpChart component.
@@ -4013,7 +4013,7 @@ var Chord = function (userConfig) {
 
   chart.render = function render() {
     d3 = dex.charts.d3.d3v3;
-    chart.resize();
+    chart.resize().update();
     return chart;
   };
 
@@ -8036,7 +8036,7 @@ var Sankey = function (userConfig) {
 
   chart.render = function render() {
     d3 = dex.charts.d3.d3v4;
-    return chart.resize();
+    return chart.resize().update();
   };
 
   chart.update = function () {
@@ -15723,63 +15723,62 @@ module.exports = threejs;
 var Network = function (userConfig) {
   var chart;
 
-  var defaults =
-    {
-      // The parent container of this chart.
-      'parent': '#Network',
-      // Set these when you need to CSS style components independently.
-      'id': 'Network',
-      'class': 'Network',
-      'resizable': true,
-      'csv': {
-        'header': [],
-        'data': []
-      },
-      'dataModel': 'default',
-      'width': "100%",
-      'height': "100%",
-      'options': {
-        nodes: {
-          shape: 'dot',
-          scaling: {
-            label: {
-              min: 8,
-              max: 64
-            }
-          },
-          'font': {
-            'color': '#C04D3B'
+  var defaults = {
+    // The parent container of this chart.
+    'parent': '#Network',
+    // Set these when you need to CSS style components independently.
+    'id': 'Network',
+    'class': 'Network',
+    'resizable': true,
+    'csv': {
+      'header': [],
+      'data': []
+    },
+    'dataModel': 'default',
+    'width': "100%",
+    'height': "100%",
+    'options': {
+      nodes: {
+        shape: 'dot',
+        scaling: {
+          label: {
+            min: 8,
+            max: 64
           }
         },
-        'edges': {
-          //'arrows' : 'from',
-          'shadow': true
+        'font': {
+          'color': '#C04D3B'
+        }
+      },
+      'edges': {
+        //'arrows' : 'from',
+        'shadow': true
+      },
+      'physics': {
+        'solver': 'forceAtlas2Based',
+        //'solver' : 'hierarchicalRepulsion',
+        //'solver' : 'repulsion',
+        //'solver' : 'barnesHut',
+        'forceAtlas2Based': {
+          'gravitationalConstant': -50,
+          'springConstant': .08,
+          'centralGravity': .02,
+          'damping': .1,
+          'avoidOverlap': .0,
+          'springLength': 100
         },
-        'physics': {
-          'solver': 'forceAtlas2Based',
-          //'solver' : 'hierarchicalRepulsion',
-          //'solver' : 'repulsion',
-          //'solver' : 'barnesHut',
-          'forceAtlas2Based': {
-            'gravitationalConstant': -50,
-            'springConstant': .08,
-            'centralGravity': .02,
-            'damping': .1,
-            'avoidOverlap': .0,
-            'springLength': 100
-          },
-          maxVelocity: 50,
-          minVelocity: 0.2,
-          stabilization: {
-            enabled: true,
-            iterations: 200,
-            updateInterval: 100,
-            onlyDynamicEdges: false,
-            fit: true
-          },
+        maxVelocity: 50,
+        minVelocity: 0.2,
+        stabilization: {
+          enabled: true,
+          iterations: 200,
+          updateInterval: 100,
+          onlyDynamicEdges: false,
+          fit: true
         },
-      }
-    };
+      },
+    }
+  };
 
   var chart = new dex.component(userConfig, defaults);
 
@@ -16111,6 +16110,151 @@ module.exports = Network;
 },{}],70:[function(require,module,exports){
 /**
  *
+ * This is the base constructor for a VisJS Timeline component.
+ *
+ * @param userConfig The chart's configuration.
+ *
+ * @returns {Timeline}
+ *
+ * @memberof dex/charts/vis
+ *
+ */
+var Network = function (userConfig) {
+  var chart;
+
+  var defaults = {
+    // The parent container of this chart.
+    'parent': '#TimelineParent',
+    // Set these when you need to CSS style components independently.
+    'id': 'TimelineId',
+    'class': 'TimelineClass',
+    'resizable': true,
+    'csv': {
+      'header': [],
+      'data': []
+    },
+    'dataModel': 'default',
+    'width': "100%",
+    'height': "100%",
+    'options': {
+      nodes: {
+        shape: 'dot',
+        scaling: {
+          label: {
+            min: 8,
+            max: 64
+          }
+        },
+        'font': {
+          'color': '#C04D3B'
+        }
+      },
+      'edges': {
+        //'arrows' : 'from',
+        'shadow': true
+      }
+    }
+  };
+
+  var chart = new dex.component(userConfig, defaults);
+
+  chart.getGuiDefinition = function getGuiDefinition(config) {
+    var defaults = {
+      "type": "group",
+      "name": "Timeline Settings",
+      "contents": [
+        dex.config.gui.dimensions()
+      ]
+    };
+    var guiDef = dex.config.expandAndOverlay(config, defaults);
+    dex.config.gui.sync(chart, guiDef);
+    return guiDef;
+  };
+
+  chart.resize = function resize() {
+    if (chart.config.resizable) {
+      var width = $("" + chart.config.parent).width();
+      var height = $("" + chart.config.parent).height();
+      //dex.console.log("RESIZE: " + width + "x" + height);
+      chart.attr("width", width)
+        .attr("height", height)
+        .update();
+    }
+    else {
+      chart.update();
+    }
+  };
+
+  chart.render = function render() {
+
+    //var chart = this;
+    var config = chart.config;
+    var csv = config.csv;
+    window.onresize = this.resize;
+
+    d3.select(config.parent).selectAll("*").remove();
+    var target = (config.parent && config.parent[0] == '#') ?
+      config.parent.substring(1) : config.parent;
+    var container = document.getElementById(target);
+
+    var options = {};
+    var network = new vis.Timeline(container, chart.createData(), config.options);
+    return chart;
+  };
+
+  chart.update = function () {
+    var chart = this;
+    var config = chart.config;
+    var csv = config.csv;
+    chart.render();
+    return chart;
+  };
+
+  chart.clone = function clone(override) {
+    return Timeline(dex.config.expandAndOverlay(override, userConfig));
+  };
+
+  chart.createData = function () {
+    var csv = chart.config.csv;
+
+    var types = dex.csv.guessTypes(csv);
+    dex.console.log("TYPES", types);
+    var firstDateIndex = types.indexOf("date");
+    var lastDateIndex = types.lastIndexOf("date");
+    var firstStringIndex = types.indexOf("string");
+
+    var itemData = [
+      {id: 1, content: 'Invalid Data, at least 1 date and 1 string required.', start: '2014-04-20'}];
+
+    var id = 1;
+
+    if (firstDateIndex >= 0 && firstStringIndex >= 0)
+    {
+      itemData = [];
+      csv.data.map(function(row, ri) {
+        itemData.push({
+          'id' : id,
+          'content' : row[firstStringIndex],
+          'start' : row[firstDateIndex],
+          'end' : (firstDateIndex != lastDateIndex) ? row[lastDateIndex] : undefined});
+        id++;
+      });
+    }
+
+    // Create a DataSet (allows two way data-binding)
+    var items = new vis.DataSet(itemData);
+
+    // Configuration for the Timeline
+    var options = {};
+  };
+
+  return chart;
+};
+
+module.exports = Network;
+},{}],71:[function(require,module,exports){
+/**
+ *
  * This module provides VisJS based visualizations.
  *
  * @module dex/charts/vis
@@ -16119,9 +16263,10 @@ module.exports = Network;
 var vis = {};
 
 vis.Network = require("./Network");
+vis.Timeline = require("./Timeline");
 
 module.exports = vis;
-},{"./Network":69}],71:[function(require,module,exports){
+},{"./Network":69,"./Timeline":70}],72:[function(require,module,exports){
 module.exports = function (dex) {
   /**
    *
@@ -16704,7 +16849,7 @@ module.exports = function (dex) {
   return color;
 };
 
-},{}],72:[function(require,module,exports){
+},{}],73:[function(require,module,exports){
 module.exports = function (dex) {
   /**
    *
@@ -17244,7 +17389,7 @@ module.exports = function (dex) {
   return component;
 };
 
-},{}],73:[function(require,module,exports){
+},{}],74:[function(require,module,exports){
 module.exports = function (dex) {
   /**
    *
@@ -18507,7 +18652,7 @@ module.exports = function (dex) {
 
   return config;
 };
-},{"./gui":74}],74:[function(require,module,exports){
+},{"./gui":75}],75:[function(require,module,exports){
 module.exports = function (dex) {
   /**
    *
@@ -20402,7 +20547,7 @@ module.exports = function (dex) {
 
   return gui;
 };
-},{}],75:[function(require,module,exports){
+},{}],76:[function(require,module,exports){
 module.exports = function (dex) {
   /**
    *
@@ -20615,7 +20760,7 @@ module.exports = function (dex) {
 
   return dexConsole;
 };
-},{}],76:[function(require,module,exports){
+},{}],77:[function(require,module,exports){
 /**
  *
  * Construct a csv from the supplied header and data.
@@ -22241,7 +22386,7 @@ csv.prototype.getConnectionMap = function () {
 };
 
 module.exports = csv;
-},{}],77:[function(require,module,exports){
+},{}],78:[function(require,module,exports){
 module.exports = function (dex) {
   return function (name) {
     function spec(name) {
@@ -22460,7 +22605,7 @@ module.exports = function (dex) {
     return new spec(name);
   }
 };
-},{}],78:[function(require,module,exports){
+},{}],79:[function(require,module,exports){
 module.exports = function (dex) {
   /**
    *
@@ -22888,7 +23033,7 @@ module.exports = function (dex) {
   return datagen;
 };
 
-},{}],79:[function(require,module,exports){
+},{}],80:[function(require,module,exports){
 /**
  *
  * @type {dex}
@@ -23062,7 +23207,7 @@ if ($.fn.button.noConflict != undefined) {
 }
 
 module.exports = dex;
-},{"../lib/noUiSlider/noUiSlider":3,"./array/array":4,"./charts/charts":15,"./color/color":71,"./component/component":72,"./config/config":73,"./console/console":75,"./csv/csv":76,"./data/spec":77,"./datagen/datagen":78,"./geometry/geometry":80,"./json/json":81,"./matrix/matrix":82,"./object/object":83,"./ui/ui":90,"./util/util":92}],80:[function(require,module,exports){
+},{"../lib/noUiSlider/noUiSlider":3,"./array/array":4,"./charts/charts":15,"./color/color":72,"./component/component":73,"./config/config":74,"./console/console":76,"./csv/csv":77,"./data/spec":78,"./datagen/datagen":79,"./geometry/geometry":81,"./json/json":82,"./matrix/matrix":83,"./object/object":84,"./ui/ui":91,"./util/util":93}],81:[function(require,module,exports){
 module.exports = function (dex) {
   /**
    *
@@ -23318,7 +23463,7 @@ module.exports = function (dex) {
   return geometry;
 };
 
-},{}],81:[function(require,module,exports){
+},{}],82:[function(require,module,exports){
 module.exports = function (dex) {
   /**
    *
@@ -23440,7 +23585,7 @@ module.exports = function (dex) {
   return json;
 };
 
-},{}],82:[function(require,module,exports){
+},{}],83:[function(require,module,exports){
 module.exports = function (dex) {
   /**
    *
@@ -23777,7 +23922,7 @@ module.exports = function (dex) {
   return matrix;
 };
 
-},{}],83:[function(require,module,exports){
+},{}],84:[function(require,module,exports){
 module.exports = function (dex) {
   /**
    *
@@ -24158,7 +24303,7 @@ module.exports = function (dex) {
 };
 
 
-},{}],84:[function(require,module,exports){
+},{}],85:[function(require,module,exports){
 /**
  *
  * Creates a ConfigurationPane component.
@@ -24282,7 +24427,7 @@ var ConfigurationPane = function (userConfig) {
 };
 
 module.exports = ConfigurationPane;
-},{}],85:[function(require,module,exports){
+},{}],86:[function(require,module,exports){
 var datafilterpane = function (userConfig) {
     var chart;
     var INITIALIZING = false;
@@ -24725,7 +24870,7 @@ var datafilterpane = function (userConfig) {
 ;
 
 module.exports = datafilterpane;
-},{}],86:[function(require,module,exports){
+},{}],87:[function(require,module,exports){
 var guipane = function (userConfig) {
   var pane;
   var componentMap = {};
@@ -25330,7 +25475,7 @@ var guipane = function (userConfig) {
 };
 
 module.exports = guipane;
-},{}],87:[function(require,module,exports){
+},{}],88:[function(require,module,exports){
 /**
  *
  * Construct a player component.
@@ -25539,7 +25684,7 @@ var Player = function (userConfig) {
 };
 
 module.exports = Player;
-},{}],88:[function(require,module,exports){
+},{}],89:[function(require,module,exports){
 /**
  *
  * This creates a SqlQuery component which provides a SQL
@@ -25634,7 +25779,7 @@ var SqlQuery = function (userConfig) {
 };
 
 module.exports = SqlQuery;
-},{}],89:[function(require,module,exports){
+},{}],90:[function(require,module,exports){
 /**
  *
  * Creates a Table component for visualizing tabular data.
@@ -25730,7 +25875,7 @@ var Table = function (userConfig) {
 };
 
 module.exports = Table;
-},{}],90:[function(require,module,exports){
+},{}],91:[function(require,module,exports){
 module.exports = function (dex) {
   /**
    *
@@ -25750,7 +25895,7 @@ module.exports = function (dex) {
 
   return ui;
 };
-},{"./ConfigurationPane":84,"./DataFilterPane":85,"./GuiPane":86,"./Player":87,"./SqlQuery":88,"./Table":89}],91:[function(require,module,exports){
+},{"./ConfigurationPane":85,"./DataFilterPane":86,"./GuiPane":87,"./Player":88,"./SqlQuery":89,"./Table":90}],92:[function(require,module,exports){
 module.exports = function util(dex) {
   /**
    *
@@ -25835,7 +25980,7 @@ module.exports = function util(dex) {
 
   return d3util;
 };
-},{}],92:[function(require,module,exports){
+},{}],93:[function(require,module,exports){
 module.exports = function (dex) {
 
   var util = {};
@@ -25844,5 +25989,5 @@ module.exports = function (dex) {
 
   return util;
 };
-},{"./d3":91}]},{},[79])(79)
+},{"./d3":92}]},{},[80])(80)
 });
