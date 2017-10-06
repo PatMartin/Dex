@@ -4377,7 +4377,7 @@ var ClusteredForce = function (userConfig) {
 
   chart.render = function () {
     d3 = dex.charts.d3.d3v3;
-    return chart.resize();
+    return chart.resize().update();
   };
 
   chart.update = function () {
@@ -5473,7 +5473,7 @@ var IcicleChart = function (userConfig) {
 
   chart.render = function render() {
     d3 = dex.charts.d3.d3v3;
-    chart.resize();
+    chart.resize().update();
     return chart;
   };
 
@@ -6813,7 +6813,7 @@ var ParallelCoordinates = function (userConfig) {
 
   chart.render = function render() {
     d3 = dex.charts.d3.d3v3;
-    return chart.resize();
+    return chart.resize().update();
   };
 
   chart.update = function update() {
@@ -7251,7 +7251,7 @@ var RadarChart = function (userConfig) {
 
   chart.render = function render() {
     d3 = dex.charts.d3.d3v3;
-    return chart.resize();
+    return chart.resize().update();
   };
 
   chart.update = function () {
@@ -7759,7 +7759,7 @@ var RadialTree = function (userConfig) {
 
   chart.render = function render() {
     d3 = dex.charts.d3.d3v4;
-    return chart.resize();
+    return chart.resize().update();
   };
 
   chart.update = function () {
@@ -9288,7 +9288,7 @@ var ScatterPlot = function (userConfig) {
   chart.render = function () {
     d3 = dex.charts.d3.d3v3;
     window.onresize = this.resize;
-    chart.resize();
+    return chart.resize().update();
   };
 
   chart.resize = function () {
@@ -9546,7 +9546,7 @@ var Sunburst = function (userConfig) {
 
   chart.render = function render() {
     d3 = dex.charts.d3.d3v3;
-    return chart.resize();
+    return chart.resize().update();
   };
 
   chart.update = function () {
@@ -9828,7 +9828,7 @@ var TopoJsonMap = function (userConfig) {
 
   chart.render = function render() {
     d3 = dex.charts.d3.d3v3;
-    return chart.resize();
+    return chart.resize().update();
   };
 
   chart.update = function () {
@@ -10139,11 +10139,10 @@ var Treemap = function (userConfig) {
   };
 
   chart = new dex.component(userConfig, defaults);
-dex.console.log("CHART", chart);
 
   chart.render = function render() {
     d3 = dex.charts.d3.d3v3;
-    return chart.resize();
+    return chart.resize().update();
   };
 
   chart.update = function update() {
@@ -10537,7 +10536,7 @@ var TreemapBarChart = function (userConfig) {
 
   chart.render = function render() {
     d3 = dex.charts.d3.d3v3;
-    return chart.resize();
+    return chart.resize().update();
   };
 
   chart.update = function update() {
