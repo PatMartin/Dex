@@ -11648,18 +11648,18 @@ var EChart = function (userConfig) {
   var IS_DISPOSED = true;
 
   var defaults = {
-    'parent': '#EChartParent',
-    'id': 'EChartId',
-    'class': 'EChartClass',
-    'resizable': true,
-    'csv': {
-      'header': [],
-      'data': []
+    "parent": "#EChartParent",
+    "id": "EChartId",
+    "class": "EChartClass",
+    "resizable": true,
+    "csv": {
+      "header": [],
+      "data": []
     },
-    'palette': "ECharts",
-    'series': {},
-    'width': "100%",
-    'height': "100%",
+    "palette": "ECharts",
+    "series": {},
+    "width": "100%",
+    "height": "100%",
   };
 
   chart = new dex.component(userConfig, defaults);

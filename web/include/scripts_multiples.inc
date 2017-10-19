@@ -8,7 +8,7 @@
   println new File("javascript/dexjs/latest/dex-bootstrap.js").text
   println new File("javascript/underscore/latest/underscore-min.js").text
   println new File("javascript/gridster/latest/jquery.gridster.min.js").text
-  println new File("javascript/dexjs/latest/dex-libs.js").text
-  println new File("javascript/dexjs/latest/dex.js").text
+  println new File("javascript/dexjs/latest/dex-libs.min.js").text
+  println new File("javascript/dexjs/latest/dex.min.js").text
 %>
 </script>
