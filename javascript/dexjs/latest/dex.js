@@ -14218,19 +14218,18 @@ module.exports = GridsterMultiples;
  */
 var Multiples = function (userConfig) {
   var chart;
-  var gridster;
   var cells = [];
 
   var defaults = {
-    'parent': '#MultiplesParent',
-    'id': 'MultiplesId',
-    'class': 'MultiplesClass',
-    'resizable': true,
-    'width': "100%",
-    'height': "100%",
-    'baseChart': dex.charts.d3.Dendrogram({}),
-    'cell.height': 300,
-    'cell.width': 400,
+    "parent": "#MultiplesParent",
+    "id": "MultiplesId",
+    "class": "MultiplesClass",
+    "resizable": true,
+    "width": "100%",
+    "height": "100%",
+    "baseChart": dex.charts.d3.Dendrogram({}),
+    "cell.height": 300,
+    "cell.width": 400
   };
 
   chart = new dex.component(userConfig, defaults);
@@ -14285,13 +14284,9 @@ var Multiples = function (userConfig) {
       // Unregisters any window resize handlers.
       config.charts.forEach(function (oldChart) {
         oldChart.deleteChart();
-      })
+      });
     }
     d3.selectAll(config.parent).selectAll("*").remove();
-
-    //dex.console.log("FRAMES", frames);
-
-    var numFrames = frames.frames.length;
 
     var $container = $(config.parent).append("<div></div>")
       .addClass("dex-multiples")
@@ -14306,12 +14301,12 @@ var Multiples = function (userConfig) {
         .attr("id", cellId);
 
       var title = frames.frameIndices[i];
-      $title = $("<div></div>")
+      var $title = $("<div></div>")
         .addClass("dex-multiples-cell-title")
         .text(title);
       $cell.append($title);
 
-      $cellContents = $("<div></div>")
+      var $cellContents = $("<div></div>")
         .addClass("dex-multiples-cell-contents")
         .css("width", config.cell.width)
         .css("height", config.cell.height);
@@ -14336,11 +14331,11 @@ var Multiples = function (userConfig) {
   chart.update = function () {
     cells.forEach(function (cell) {
       cell.update();
-    })
+    });
   };
 
   $(document).ready(function () {
-    var config = chart.config;
+    //var config = chart.config;
   });
 
   return chart;
@@ -17208,11 +17203,6 @@ module.exports = function (dex) {
           return cmp.attr("width", width)
             .attr("height", height)
             .update();
-          //}
-          //else {
-          //  dex.console.log("Same or 0 size, short circuiting");
-          //  return cmp;
-          //}
         }
         else {
           return cmp.update();
@@ -17275,6 +17265,10 @@ module.exports = function (dex) {
        *
        */
       cmp.deleteChart = function () {
+        // Zero out our data to help garbage collection
+        cmp.config.csv = undefined;
+        cmp.config = undefined;
+
         if (window.attachEvent) {
           window.detachEvent('onresize', cmp.resize);
         }
