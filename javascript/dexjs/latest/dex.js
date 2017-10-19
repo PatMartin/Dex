@@ -11645,7 +11645,6 @@ module.exports = BarChart3D;
 var EChart = function (userConfig) {
   var chart;
   var internalChart;
-  var effectiveOptions;
   var IS_DISPOSED = true;
 
   var defaults = {
@@ -11689,10 +11688,12 @@ var EChart = function (userConfig) {
         internalChart = echarts.init(d3.select(chart.config.parent)[0][0]);
       }
       var dataOptions = chart.getOptions(csv);
-      effectiveOptions = dex.config.expandAndOverlay(dataOptions, config.options);
+      var effectiveOptions = dex.config.expandAndOverlay(dataOptions, config.options);
       internalChart.clear();
       internalChart.setOption(effectiveOptions);
       internalChart.resize();
+      // GC Cleanup helper
+      dataOptions = effectiveOptions = null;
     }
     catch (ex) {
       dex.console.log("EXCEPTION", ex.stack);
@@ -11742,29 +11743,29 @@ module.exports = EChart;
 var LineChart = function (userConfig) {
   var chart;
   var defaults = {
-    'parent': '#ECharts_LineChart',
-    'id': 'ECharts_LineChart',
-    'class': 'ECharts_LineChart',
-    'resizable': true,
-    'width': "100%",
-    'height': "100%",
-    'type': 'linechart',
-    'palette': "ECharts",
-    'refreshType': "update",
-    'series.symbol': 'circle',
-    'series.symbolSize': 10,
-    'series.type': 'line',
-    'series.showSymbol': true,
-    'series.showAllSymbol': false,
-    'series.stack': false,
-    'series.clipOverflow': true,
-    'series.connectNulls': false,
-    'series.step': false,
+    "parent": "#ECharts_LineChart",
+    "id": "ECharts_LineChart",
+    "class": "ECharts_LineChart",
+    "resizable": true,
+    "width": "100%",
+    "height": "100%",
+    "type": "linechart",
+    "palette": "ECharts",
+    "refreshType": "update",
+    "series.symbol": "circle",
+    "series.symbolSize": 10,
+    "series.type": "line",
+    "series.showSymbol": true,
+    "series.showAllSymbol": false,
+    "series.stack": false,
+    "series.clipOverflow": true,
+    "series.connectNulls": false,
+    "series.step": false,
     "options": {
       legend: { show: true },
       dataZoom: [
         {
-          orient: 'horizontal',
+          orient: "horizontal",
           show: true,
           realtime: true,
           start: 0,
@@ -11772,7 +11773,7 @@ var LineChart = function (userConfig) {
           xAxisIndex: 0
         },
         {
-          orient: 'vertical',
+          orient: "vertical",
           show: true,
           realtime: true,
           start: 0,
@@ -11784,7 +11785,7 @@ var LineChart = function (userConfig) {
         backgroundColor: "#FFFFFF",
         borderColor: "#000000",
         borderWidth: 2,
-        trigger: 'item',
+        trigger: "item",
         formatter: function (d) {
           //dex.console.log("FORMATTER", d);
           var str = "<table class='dex-tooltip-table'>";
@@ -11792,7 +11793,7 @@ var LineChart = function (userConfig) {
           d.data.forEach(function (value) {
             if (typeof value === "string") {
               var parts = value.split(":::");
-              if (parts.length == 2) {
+              if (parts.length === 2) {
                 str += "<tr><td>" + parts[0] + "</td><td>" + parts[1] + "</td></tr>";
               }
             }
@@ -24435,12 +24436,12 @@ var datafilterpane = function (userConfig) {
     var selectedRanges = {};
     var defaults = {
       // The parent container of this chart.
-      'parent': null,
-      'id': 'DataFilterPaneId',
-      'class': 'DataFilterPaneClass',
-      'width': "30%",
-      'height': "30%",
-      'csv': undefined
+      "parent": null,
+      "id": "DataFilterPaneId",
+      "class": "DataFilterPaneClass",
+      "width": "30%",
+      "height": "30%",
+      "csv": undefined
     };
 
     chart = new dex.component(userConfig, defaults);

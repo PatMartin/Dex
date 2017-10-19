@@ -4476,7 +4476,6 @@
 
 /*global define, module*/
 (function (context) {
-
   /**
    * @private
    */
