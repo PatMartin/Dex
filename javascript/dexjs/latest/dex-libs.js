@@ -4482,7 +4482,7 @@
   function init() {
     //the channel subscription hash
     var channels = {},
-    //help minification
+      //help minification
       funcType = Function;
 
     return {
@@ -4506,30 +4506,40 @@
        */
       publish: function () {
         //help minification
-        var args = arguments,
+        var args = arguments;
         // args[0] is the channel
-          subs = channels[args[0]],
-          len,
-          params,
-          x;
+        var subs = channels[args[0]];
+        var len;
+        var params;
+        var x;
 
         if (subs) {
           len = subs.length;
           params = (args.length > 1) ?
             Array.prototype.splice.call(args, 1) : [];
 
+          //console.log("dex.bus.publish: this=");
+          //console.dir(this);
+
           //run the callbacks asynchronously,
           //do not block the main execution process
+          var that = this;
           setTimeout(
             function () {
               //executes callbacks in the order
               //in which they were registered
               for (x = 0; x < len; x += 1) {
-                subs[x].apply(context, params);
+                // Take on context of caller.
+                // REM: Seems to fix a memory leak; otherwise the scope of any subscribers
+                // is window by default due to dex.bus being in window context.
+                subs[x].apply(that, params);
+                //subs[x].apply(context, params);
               }
 
               //clear references to allow garbage collection
-              subs = context = params = null;
+              subs = undefined;
+              context = undefined;
+              params = undefined;
             },
             0
           );
@@ -4555,6 +4565,10 @@
        *			);
        */
       subscribe: function (channel, callback) {
+        //console.log("PUBSUB: SUBSCRIBE(CHANNEL, CALLBACK, THIS)");
+        //console.dir(channel);
+        //console.dir(callback);
+        //console.dir(this);
         if (typeof channel !== 'string') {
           throw "invalid or missing channel";
         }

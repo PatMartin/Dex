@@ -11807,9 +11807,13 @@ var LineChart = function (userConfig) {
 
   var combinedConfig = dex.config.expandAndOverlay(userConfig, defaults);
   chart = dex.charts.echarts.EChart(combinedConfig);
+  // Ensure that we're working with a copy of data.
+  if (chart.config.csv !== undefined) {
+    chart.config.csv = chart.config.csv.copy();
+  }
 
   chart.spec = new dex.data.spec("Line Chart")
-    .string("series")
+    .any("series")
     .any("x")
     .any("y");
 
@@ -16860,11 +16864,11 @@ module.exports = function (dex) {
     cmp.defaultConfig = defaultConfig || {};
     cmp.saved = {};
     cmp.debug = false;
-    cmp.dimensions = { height: 0, width: 0 };
+    cmp.dimensions = {height: 0, width: 0};
 
+    // Good idea? or not?  Causes closure memory leak?
     // Do this to curry the original component reference.
     return createComponent(cmp);
-
     function createComponent(cmp) {
       // Allows component construction from other components.
       if (cmp.userConfig.hasOwnProperty('config')) {
@@ -16911,7 +16915,7 @@ module.exports = function (dex) {
         }
       };
 
-      cmp.getSaved = function() {
+      cmp.getSaved = function () {
         return cmp.saved;
       };
 
@@ -17059,9 +17063,11 @@ module.exports = function (dex) {
 
           //dex.console.log("subscribe to " + channel);
           if (arguments.length < 3) {
-            dex.console.log("failed");
+            dex.console.log("cmp.subscribe: subscribe failed for source=" + source +
+              ", eventType=" + eventType);
             return false;
           }
+          //dex.console.log("SUBSCRIBING: CHANNEL", channel, "CALLBACK", callback, "THIS", this);
           return dex.bus.subscribe(channel, callback);
         }
         else {
@@ -17107,6 +17113,7 @@ module.exports = function (dex) {
        *
        */
       cmp.publish = function (event) {
+        //dex.console.log("cmp.publish(event): this", event, this);
         var channel;
 
         if (!event || !event.type) {
@@ -17176,14 +17183,12 @@ module.exports = function (dex) {
             return cmp;
           }
 
-          if (cmp.dimensions.width === width && cmp.dimensions.height === height)
-          {
+          if (cmp.dimensions.width === width && cmp.dimensions.height === height) {
             dex.console.log("SHORT-CIRCUITING RESIZE");
             return cmp;
           }
-          else
-          {
-            cmp.dimensions = { width: width, height: height };
+          else {
+            cmp.dimensions = {width: width, height: height};
           }
 
           //dex.console.log("Resizing: " + cmp.config.parent + ">" + cmp.config.id +
@@ -24313,15 +24318,18 @@ var ConfigurationPane = function (userConfig) {
 
   var defaults = {
     // The parent container of this pane.
-    'parent': null,
+    "parent": null,
     "renderType": "update",
-    'id': 'ConfigurationPaneId',
-    'class': 'ConfigurationPaneClass',
-    'components': []
+    "id": "ConfigurationPaneId",
+    "class": "ConfigurationPaneClass",
+    "components": []
   };
 
   pane = new dex.component(userConfig, defaults);
-
+  // Ensure that we're working with a copy of data.
+  if (pane.config.csv !== undefined) {
+    pane.config.csv = pane.config.csv.copy();
+  }
   pane.render = function () {
     var config = pane.config;
     d3.selectAll(config.parent).selectAll("*").remove();
@@ -24400,8 +24408,9 @@ var ConfigurationPane = function (userConfig) {
       component.subscribe(dataFilterPane, "select", function (msg) {
         dex.console.log("Component: " + component.config.id +
           " received select csv event from " +
-          dataFilterPane.config.id, msg);
-        component.attr('csv', msg.selected).refreshAsync();
+          dataFilterPane.config.id);
+        //dex.console.stacktrace();
+        component.attr("csv", msg.selected).refreshAsync();
       });
     });
 
@@ -24439,6 +24448,10 @@ var datafilterpane = function (userConfig) {
     };
 
     chart = new dex.component(userConfig, defaults);
+    // Ensure that we're working with a copy of data.
+    if (chart.config.csv !== undefined) {
+      chart.config.csv = chart.config.csv.copy();
+    }
 
     chart.render = function () {
       INITIALIZING = true;
@@ -24851,10 +24864,9 @@ var datafilterpane = function (userConfig) {
     $(document).ready(function () {
       // Make the entire chart draggable.
       //$(chart.config.parent).draggable();
-
     });
 
-// This fixes a JQueryUI/Bootstrap icon conflict.
+    // This fixes a JQueryUI/Bootstrap icon conflict.
     if ($.fn.button.noConflict != undefined) {
       $.fn.button.noConflict();
     }
@@ -24873,13 +24885,16 @@ var guipane = function (userConfig) {
 
   var defaults = {
     // The parent container of this pane.
-    'parent': null,
-    'id': 'GuiPaneId',
-    'class': 'GuiPaneClass',
-    'components': []
+    "parent": null,
+    "id": "GuiPaneId",
+    "class": "GuiPaneClass",
+    "components": []
   };
 
   pane = new dex.component(userConfig, defaults);
+  if (pane.config.csv !== undefined) {
+    pane.config.csv = pane.config.csv.copy();
+  }
 
   pane.render = function () {
     INITIALIZING = true;
