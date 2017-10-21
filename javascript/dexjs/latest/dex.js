@@ -14243,11 +14243,9 @@ var Multiples = function (userConfig) {
       "type": "group",
       "name": "Multiples Configuration",
       "contents": [
-        dex.config.gui.dimensions(),
-        dex.config.gui.general(),
         {
           "type": "group",
-          "name": "Miscellaneous",
+          "name": "Dimensions",
           "contents": [
             {
               "name": "Cell Height",
