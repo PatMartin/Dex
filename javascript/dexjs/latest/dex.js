@@ -11665,7 +11665,7 @@ var EChart = function (userConfig) {
   chart = new dex.component(userConfig, defaults);
 
   chart.render = function render() {
-    //dex.console.log("ECHART-RENDER");
+    //dex.console.log("echarts.render(): disposing of: " + chart.config.parent);
     echarts.dispose(d3.select(chart.config.parent)[0][0]);
     d3.select(chart.config.parent).selectAll("*").remove();
     IS_DISPOSED = true;
@@ -11684,7 +11684,9 @@ var EChart = function (userConfig) {
 
     try {
       if (IS_DISPOSED) {
-        //dex.console.log("PARENT: '" + chart.config.parent + "'");
+        IS_DISPOSED = false;
+        //dex.console.stacktrace();
+        //dex.console.log("DISPOSED PARENT: '" + chart.config.parent + "'");
         internalChart = echarts.init(d3.select(chart.config.parent)[0][0]);
       }
       var dataOptions = chart.getOptions(csv);
@@ -11718,10 +11720,6 @@ var EChart = function (userConfig) {
   };
 
   $(document).ready(function () {
-    // Make the entire chart draggable.
-    if (chart.config.draggable) {
-      $(chart.config.parent).draggable();
-    }
   });
 
   return chart;
@@ -11786,6 +11784,7 @@ var LineChart = function (userConfig) {
         borderColor: "#000000",
         borderWidth: 2,
         trigger: "item",
+
         formatter: function (d) {
           //dex.console.log("FORMATTER", d);
           var str = "<table class='dex-tooltip-table'>";
@@ -11993,7 +11992,7 @@ var LineChart = function (userConfig) {
             });
             return newRow;
           });
-        }(chart.config.csv)
+        }(chart.config.csv.copy())
       });
       options.series.push(series);
     });
@@ -14233,6 +14232,10 @@ var Multiples = function (userConfig) {
   };
 
   chart = new dex.component(userConfig, defaults);
+
+  if (chart.config.csv !== undefined) {
+    chart.config.csv = chart.config.csv.copy();
+  }
 
   chart.getGuiDefinition = function getGuiDefinition(config) {
     var defaults = {
@@ -16854,6 +16857,7 @@ module.exports = function (dex) {
   var component = function (userConfig, defaultConfig) {
 
     var cmp = this;
+
     cmp.userConfig = userConfig || {};
     cmp.defaultConfig = defaultConfig || {};
     cmp.saved = {};
@@ -16901,7 +16905,7 @@ module.exports = function (dex) {
        *
        */
       cmp.refresh = function () {
-        if (cmp.config.refreshType == "update") {
+        if (cmp.config.refreshType === "update") {
           return cmp.update();
         }
         else {
@@ -17243,6 +17247,8 @@ module.exports = function (dex) {
       cmp.refreshAsync = _.debounce(function () {
         cmp.refresh();
       }, 1000);
+
+      //cmp.refreshAsync = cmp.refresh;
 
       /**
        *
@@ -24437,6 +24443,10 @@ var datafilterpane = function (userConfig) {
       "height": "30%",
       "csv": undefined
     };
+
+    if (userConfig !== undefined && userConfig.csv !== undefined) {
+      userConfig.csv = userConfig.csv.copy();
+    }
 
     chart = new dex.component(userConfig, defaults);
 
