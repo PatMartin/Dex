@@ -11807,10 +11807,6 @@ var LineChart = function (userConfig) {
 
   var combinedConfig = dex.config.expandAndOverlay(userConfig, defaults);
   chart = dex.charts.echarts.EChart(combinedConfig);
-  // Ensure that we're working with a copy of data.
-  if (chart.config.csv !== undefined) {
-    chart.config.csv = chart.config.csv.copy();
-  }
 
   chart.spec = new dex.data.spec("Line Chart")
     .any("series")
@@ -24324,10 +24320,7 @@ var ConfigurationPane = function (userConfig) {
   };
 
   pane = new dex.component(userConfig, defaults);
-  // Ensure that we're working with a copy of data.
-  if (pane.config.csv !== undefined) {
-    pane.config.csv = pane.config.csv.copy();
-  }
+
   pane.render = function () {
     var config = pane.config;
     d3.selectAll(config.parent).selectAll("*").remove();
@@ -24446,10 +24439,6 @@ var datafilterpane = function (userConfig) {
     };
 
     chart = new dex.component(userConfig, defaults);
-    // Ensure that we're working with a copy of data.
-    if (chart.config.csv !== undefined) {
-      chart.config.csv = chart.config.csv.copy();
-    }
 
     chart.render = function () {
       INITIALIZING = true;
