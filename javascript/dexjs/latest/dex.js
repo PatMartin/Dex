@@ -11664,11 +11664,28 @@ var EChart = function (userConfig) {
 
   chart.render = function render() {
     //dex.console.log("echarts.render(): disposing of: " + chart.config.parent);
-    echarts.dispose(d3.select(chart.config.parent)[0][0]);
-    d3.select(chart.config.parent).selectAll("*").remove();
-    IS_DISPOSED = true;
+    try {
+      echarts.dispose(d3.select(chart.config.parent)[0][0]);
+      d3.select(chart.config.parent).selectAll("*").remove();
+      IS_DISPOSED = true;
+    }
+    catch (exception) {
+      dex.console.log("render(): Component already disposed.")
+    }
 
     return chart.update();
+  };
+
+  chart.deleteChart = function deleteChart() {
+    dex.console.log("*** Deleting EChart");
+    chart.deleteComponent();
+    try {
+      echarts.dispose(d3.select(chart.config.parent)[0][0]);
+      d3.select(chart.config.parent).selectAll("*").remove();
+    }
+    catch (exception) {
+      dex.console.log("deleteChart(): Component already disposed.");
+    }
   };
 
   chart.update = function () {
@@ -14274,9 +14291,7 @@ var Multiples = function (userConfig) {
   chart.render = function render() {
     var config = chart.config;
     var csv = config.csv;
-    var frames = csv.getFramesByIndex(0);
-    dex.console.stacktrace();
-    dex.console.log("SIMPLE-MULTIPLES-FRAMES", frames);
+
     if (config.charts) {
       // Unregisters any window resize handlers.
       config.charts.forEach(function (oldChart, i) {
@@ -14285,9 +14300,18 @@ var Multiples = function (userConfig) {
         oldChart = undefined;
       });
 
-      config.charts = undefined;
+      config.charts = [];
     }
     d3.selectAll(config.parent).selectAll("*").remove();
+
+    var frames = csv.getFramesByIndex(0);
+    if (frames.frameIndices.length > 10) {
+      d3.select(config.parent).selectAll("*").remove();
+      $(config.parent).append("Limit of 100 multiples imposed.  Attempted to chart " + frames.frameIndices.length + " multiples.");
+      return chart;
+    }
+    //dex.console.stacktrace();
+    //dex.console.log("SIMPLE-MULTIPLES-FRAMES", frames);
 
     var $container = $(config.parent).append("<div></div>")
       .addClass("dex-multiples")
@@ -17283,7 +17307,8 @@ module.exports = function (dex) {
        * @memberof dex/component
        *
        */
-      cmp.deleteChart = function () {
+      cmp.deleteComponent = function () {
+        dex.console.log("component delete chart...", cmp);
         // Zero out our data to help garbage collection
         cmp.config.csv = undefined;
         cmp.config = undefined;
@@ -23078,6 +23103,10 @@ dex.exception.SpecificationException = function (spec, assessment) {
   this.name = spec.name;
   this.expected = assessment.expected;
   this.received = assessment.received;
+};
+
+dex.exception.DexException = function (message) {
+  this.message = message;
 };
 
 /**
