@@ -24497,6 +24497,7 @@ var datafilterpane = function (userConfig) {
     "use strict";
     var chart;
     var INITIALIZING = false;
+    var CHANGED = false;
     var selectedCategories = {};
     var dateRanges = {};
     var selectedRanges = {};
@@ -24647,9 +24648,6 @@ var datafilterpane = function (userConfig) {
             allSelectedText: 'All',
             enableFiltering: true,
             enableFullValueFiltering: true,
-            onSelectAll: function selectAllHandler() {
-              updateCsv();
-            },
             buttonText: function buttonTextHandler(options, select) {
               //dex.console.log("OPTIONS", options, "SELECT", select[0]);
               if (options !== undefined && select !== undefined && select.length > 0) {
@@ -24665,9 +24663,20 @@ var datafilterpane = function (userConfig) {
                 return "Undefined";
               }
             },
+            onSelectAll: function selectAllHandler() {
+              CHANGED = true;
+              //updateCsv();
+            },
             onChange: function onChangeHandler() {
-              updateCsv();
-            }
+              CHANGED = true;
+              //updateCsv();
+            },
+            onDropdownHide: function onDropdownHideHandler() {
+              if (CHANGED) {
+                updateCsv();
+              }
+              CHANGED = false;
+            },
           }
         );
 
