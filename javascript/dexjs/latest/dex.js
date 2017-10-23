@@ -11666,7 +11666,8 @@ var EChart = function (userConfig) {
     //dex.console.log("echarts.render(): disposing of: " + chart.config.parent);
     try {
       echarts.dispose(d3.select(chart.config.parent)[0][0]);
-      d3.select(chart.config.parent).selectAll("*").remove();
+      $(config.parent).empty();
+      //d3.select(chart.config.parent).selectAll("*").remove();
       IS_DISPOSED = true;
     }
     catch (exception) {
@@ -11681,7 +11682,8 @@ var EChart = function (userConfig) {
     chart.deleteComponent();
     try {
       echarts.dispose(d3.select(chart.config.parent)[0][0]);
-      d3.select(chart.config.parent).selectAll("*").remove();
+      $(config.parent).empty();
+      //d3.select(chart.config.parent).selectAll("*").remove();
     }
     catch (exception) {
       dex.console.log("deleteChart(): Component already disposed.");
@@ -14244,7 +14246,8 @@ var Multiples = function (userConfig) {
     "height": "100%",
     "baseChart": dex.charts.d3.Dendrogram({}),
     "cell.height": 300,
-    "cell.width": 400
+    "cell.width": 400,
+    "limit" : 100
   };
 
   chart = new dex.component(userConfig, defaults);
@@ -14305,9 +14308,10 @@ var Multiples = function (userConfig) {
     d3.selectAll(config.parent).selectAll("*").remove();
 
     var frames = csv.getFramesByIndex(0);
-    if (frames.frameIndices.length > 10) {
+    if (frames.frameIndices.length > config.limit) {
       d3.select(config.parent).selectAll("*").remove();
-      $(config.parent).append("Limit of 100 multiples imposed.  Attempted to chart " + frames.frameIndices.length + " multiples.");
+      $(config.parent).append("<h3>Limit of " + config.limit + " multiples imposed.  Attempted to chart " +
+        frames.frameIndices.length + " multiples.</h3>");
       return chart;
     }
     //dex.console.stacktrace();
