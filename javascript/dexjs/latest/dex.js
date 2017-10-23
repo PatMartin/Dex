@@ -24494,7 +24494,6 @@ var ConfigurationPane = function (userConfig) {
 module.exports = ConfigurationPane;
 },{}],86:[function(require,module,exports){
 var datafilterpane = function (userConfig) {
-    "use strict";
     var chart;
     var INITIALIZING = false;
     var CHANGED = false;
