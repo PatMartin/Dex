@@ -2585,10 +2585,8 @@ module.exports = function (dex) {
    *
    */
   array.copy = function (array) {
-    // Shallow copy
-    return _.clone(array);
-    // Deep copy:
-    //return $.extend(true, {}, array);
+    // Deep copy
+    return $.extend(true, [], array);
   };
 
   array.combine = function (array1, array2) {
@@ -3851,7 +3849,7 @@ var Chord = function (userConfig) {
     "class": "ChordClass",
     "resizable": true,
     // Our data...
-    "csv": new dex.csv(["A", "B"], [["a", "b"]]),
+    "csv": undefined,
     "width": "100%",
     "height": "100%",
     "margin": {
@@ -11709,7 +11707,7 @@ var EChart = function (userConfig) {
     return chart;
   };
 
-  chart.getCommonOptions = function () {
+  chart.getCommonOptions = function getCommonOptions() {
     return {
       color: dex.color.palette[chart.config.palette]
     };
@@ -11760,7 +11758,7 @@ var LineChart = function (userConfig) {
     "series.connectNulls": false,
     "series.step": false,
     "options": {
-      legend: { show: true },
+      legend: {show: true},
       dataZoom: [
         {
           orient: "horizontal",
@@ -11786,7 +11784,7 @@ var LineChart = function (userConfig) {
         trigger: "item",
 
         formatter: function (d) {
-          //dex.console.log("FORMATTER", d);
+          dex.console.log("FORMATTER", d);
           var str = "<table class='dex-tooltip-table'>";
 
           d.data.forEach(function (value) {
@@ -11977,24 +11975,25 @@ var LineChart = function (userConfig) {
     }
 
     seriesNames.forEach(function (seriesName) {
+      var selectedCsv = csv.selectRows(function (row) {
+        return row[seriesInfo.position] == seriesName;
+      });
+
+      var seriesData = selectedCsv.data.map(function (row, ri) {
+        var newRow = [row[xInfo.position], row[yInfo.position]];
+        row.forEach(function (col, ci) {
+          newRow.push(selectedCsv.header[ci] + ":::" + col);
+        });
+        return newRow;
+      });
+
       var series = dex.config.expandAndOverlay(chart.config.series, {
         name: seriesName,
-        type: 'line',
-        data: function (csv) {
-          var selectedCsv = csv.selectRows(function (row) {
-            return row[seriesInfo.position] == seriesName;
-          });
-
-          return selectedCsv.data.map(function (row, ri) {
-            var newRow = [row[xInfo.position], row[yInfo.position]];
-            row.forEach(function (col, ci) {
-              newRow.push(selectedCsv.header[ci] + ":::" + col);
-            });
-            return newRow;
-          });
-        }(chart.config.csv.copy())
+        type: "line",
+        data: seriesData
       });
       options.series.push(series);
+      seriesData = undefined;
     });
     //dex.console.log("OPTIONS", JSON.stringify(options));
     return options;
@@ -14206,11 +14205,11 @@ module.exports = GridsterMultiples;
 },{}],53:[function(require,module,exports){
 /**
  *
- * This is the base constructor for Gridster base multiples.
+ * This is the base constructor for Simple HTML based multiples.
  *
  * @param userConfig The chart's configuration.
  *
- * @returns {GridsterMultiples}
+ * @returns {Multiples}
  *
  * @memberof dex/charts/multiples
  *
@@ -14232,10 +14231,6 @@ var Multiples = function (userConfig) {
   };
 
   chart = new dex.component(userConfig, defaults);
-
-  if (chart.config.csv !== undefined) {
-    chart.config.csv = chart.config.csv.copy();
-  }
 
   chart.getGuiDefinition = function getGuiDefinition(config) {
     var defaults = {
@@ -14280,12 +14275,17 @@ var Multiples = function (userConfig) {
     var config = chart.config;
     var csv = config.csv;
     var frames = csv.getFramesByIndex(0);
-
+    dex.console.stacktrace();
+    dex.console.log("SIMPLE-MULTIPLES-FRAMES", frames);
     if (config.charts) {
       // Unregisters any window resize handlers.
-      config.charts.forEach(function (oldChart) {
+      config.charts.forEach(function (oldChart, i) {
+        dex.console.log("-- REMOVING OLD CHART[" + i + "]=", oldChart);
         oldChart.deleteChart();
+        oldChart = undefined;
       });
+
+      config.charts = undefined;
     }
     d3.selectAll(config.parent).selectAll("*").remove();
 
@@ -14316,14 +14316,21 @@ var Multiples = function (userConfig) {
 
       $container.append($cell);
 
-      var cellChart = config.baseChart.clone(dex.config.expandAndOverlay({
+      var cellConfig = dex.config.expandAndOverlay({
         "parent": "#" + cellId + " .dex-multiples-cell-contents",
         "csv": frame
-      }, config.baseChart.getSaved()));
+      }, config.baseChart.getSaved());
+
+      var cellChart = config.baseChart.clone(cellConfig);
 
       cellChart.render();
       cells.push(cellChart);
     });
+
+    // Help GC collector out.
+    config = undefined;
+    csv = undefined;
+    frames = undefined;
 
     chart.config.charts = cells;
     return chart;
@@ -14331,7 +14338,7 @@ var Multiples = function (userConfig) {
 
   chart.update = function () {
     cells.forEach(function (cell) {
-      cell.update();
+      cell.refresh();
     });
   };
 
@@ -16858,23 +16865,22 @@ module.exports = function (dex) {
 
     var cmp = this;
 
-    cmp.userConfig = userConfig || {};
-    cmp.defaultConfig = defaultConfig || {};
     cmp.saved = {};
     cmp.debug = false;
     cmp.dimensions = {height: 0, width: 0};
+    cmp.listeners = [];
 
     // Good idea? or not?  Causes closure memory leak?
     // Do this to curry the original component reference.
-    return createComponent(cmp);
-    function createComponent(cmp) {
+    //return createComponent(cmp);
+    //function createComponent(cmp) {
       // Allows component construction from other components.
-      if (cmp.userConfig.hasOwnProperty('config')) {
-        cmp.config = dex.config.expandAndOverlay(cmp.userConfig, cmp.defaultConfig);
+      if (userConfig.hasOwnProperty('config')) {
+        cmp.config = dex.config.expandAndOverlay(userConfig, defaultConfig);
       }
       // Else, we have a configuration.
       else {
-        cmp.config = dex.config.expandAndOverlay(cmp.userConfig, cmp.defaultConfig);
+        cmp.config = dex.config.expandAndOverlay(userConfig, defaultConfig);
       }
 
       dex.console.debug("dex.component Configuration", cmp.config);
@@ -17066,7 +17072,10 @@ module.exports = function (dex) {
             return false;
           }
           //dex.console.log("SUBSCRIBING: CHANNEL", channel, "CALLBACK", callback, "THIS", this);
-          return dex.bus.subscribe(channel, callback);
+          var handle = dex.bus.subscribe(channel, callback);
+          cmp.listeners.push(handle);
+
+          return handle;
         }
         else {
           return false;
@@ -17096,6 +17105,11 @@ module.exports = function (dex) {
        */
       cmp.unsubscribe = function (handle) {
         dex.bus.unsubscribe(handle);
+
+        if (cmp.listeners.indexOf(handle) > -1) {
+          cmp.listeners.splice(cmp.listeners.indexOf(handle), 1)
+        }
+
         return cmp;
       };
 
@@ -17273,6 +17287,13 @@ module.exports = function (dex) {
         // Zero out our data to help garbage collection
         cmp.config.csv = undefined;
         cmp.config = undefined;
+        cmp.saved = undefined;
+
+        cmp.listeners.forEach(function(handle) {
+          dex.bus.unsubscribe(handle);
+        });
+
+        cmp.listeners = undefined;
 
         if (window.attachEvent) {
           window.detachEvent('onresize', cmp.resize);
@@ -17284,6 +17305,8 @@ module.exports = function (dex) {
         else {
           dex.console.log("window does not support event binding");
         }
+
+        cmp = undefined;
       };
 
       /**
@@ -17358,7 +17381,7 @@ module.exports = function (dex) {
         // Remove old contents.
         $("body #dexjs-config div[chart-id='" + cmp.config.id + "']").remove();
 
-        $config = $("body #dexjs-config");
+        var $config = $("body #dexjs-config");
         //dex.console.log("Saving chart to DOM...");
         Object.keys(cmp.saved).forEach(function (savedKey) {
           //dex.console.log("Saving: " + savedKey);
@@ -17382,7 +17405,7 @@ module.exports = function (dex) {
         dex.console.log("window does not support event binding");
       }
       return cmp;
-    };
+    //};
   };
 
   return component;
@@ -17429,20 +17452,21 @@ module.exports = function (dex) {
    * }
    *
    */
-  config.expand = function expand(config) {
+  config.expand = function expand(cfg) {
+    var ecfg= cfg;
     var name, ci;
     var expanded = {};
 
     // We have nothing, return nothing.
-    if (!config) {
-      return config;
+    if (!ecfg) {
+      return undefined;
     }
 
-    for (var name in config) {
-      if (config.hasOwnProperty(name)) {
+    for (var name in ecfg) {
+      if (ecfg.hasOwnProperty(name)) {
         // Name contains hierarchy:
         if (name && name.indexOf('.') > -1) {
-          expanded[name] = config[name];
+          expanded[name] = ecfg[name];
           dex.object.setHierarchical(expanded, name,
             dex.object.clone(expanded[name]), '.');
           delete expanded[name];
@@ -17450,10 +17474,10 @@ module.exports = function (dex) {
         // Simple name
         else {
           // If the target is an object with no children, clone it.
-          if (dex.object.isEmpty(config[name])) {
-            //dex.console.log("SET PRIMITIVE: " + name + "=" + config[name]);
-            expanded[name] = dex.object.clone(config[name]);
-            //expanded[name] = config[name];
+          if (dex.object.isEmpty(ecfg[name])) {
+            //dex.console.log("SET PRIMITIVE: " + name + "=" + ecfg[name]);
+            expanded[name] = dex.object.clone(ecfg[name]);
+            //expanded[name] = ecfg[name];
           }
           else {
             // CSV is a special case.  Older WebKit browsers such as
@@ -17461,22 +17485,28 @@ module.exports = function (dex) {
             // so i build in a special workaround for any attribute
             // named csv to be copied as-is.
             if (name == "csv") {
-              expanded[name] = config[name];
+              // Link to the old csv.
+              expanded[name] = ecfg[name];
+              // Allocate an entire new csv.
+              //expanded[name] = new dex.csv(ecfg[name]);
             }
-            else if (config[name].constructor !== undefined &&
-              config[name].constructor.name === "csv") {
-              expanded[name] = config[name];
+            else if (ecfg[name].constructor !== undefined &&
+              ecfg[name].constructor.name === "csv") {
+              // Link to old csv:
+              expanded[name] = ecfg[name];
+              //expanded[name] = new dex.csv(ecfg[name]);
             }
             else {
-              //dex.console.log("SET OBJECT: " + name + " to the expansion of", config[name]);
-              expanded[name] = dex.config.expand(config[name]);
+              //dex.console.log("SET OBJECT: " + name + " to the expansion of", ecfg[name]);
+              expanded[name] = dex.config.expand(ecfg[name]);
             }
           }
         }
       }
     }
 
-    //dex.console.log("CONFIG", config, "EXPANDED", expanded);
+    ecfg = undefined;
+    //dex.console.log("CONFIG", ecfg, "EXPANDED", expanded);
     return expanded;
   };
 
@@ -21782,13 +21812,13 @@ csv.prototype.getFramesByColumns = function (columns) {
  *
  */
 csv.prototype.getFramesByIndex = function (columnIndex, sort) {
-  var csv = this;
+  var self = this;
   var types = this.guessTypes();
   //dex.console.log("TYPES", types);
   var frameIndices;
 
   if (types[columnIndex] == "number") {
-    frameIndices = dex.array.orderedUnique(csv.data.map(function (row) {
+    frameIndices = dex.array.orderedUnique(self.data.map(function (row) {
       return row[columnIndex]
     }));
 
@@ -21799,7 +21829,7 @@ csv.prototype.getFramesByIndex = function (columnIndex, sort) {
     }
   }
   else if (types[columnIndex] == "date") {
-    frameIndices = dex.array.orderedUnique(csv.data.map(function (row) {
+    frameIndices = dex.array.orderedUnique(self.data.map(function (row) {
       return row[columnIndex]
     }));
 
@@ -21812,7 +21842,7 @@ csv.prototype.getFramesByIndex = function (columnIndex, sort) {
     }
   }
   else {
-    frameIndices = dex.array.orderedUnique(csv.data.map(function (row) {
+    frameIndices = dex.array.orderedUnique(self.data.map(function (row) {
       return row[columnIndex]
     }));
 
@@ -21821,7 +21851,7 @@ csv.prototype.getFramesByIndex = function (columnIndex, sort) {
     }
   }
   //dex.console.log("FRAME-INDICES", frameIndices)
-  var header = dex.array.copy(csv.header);
+  var header = dex.array.copy(self.header);
   var frameIndexName = header.splice(columnIndex, 1);
   var frames = [];
 
@@ -21829,20 +21859,20 @@ csv.prototype.getFramesByIndex = function (columnIndex, sort) {
     var frame = {header: header};
     var frameData = [];
 
-    for (var ri = 0; ri < csv.data.length; ri++) {
-      if (csv.data[ri][columnIndex] == frameIndices[fi]) {
-        var frameRow = dex.array.copy(csv.data[ri]);
+    for (var ri = 0; ri < self.data.length; ri++) {
+      if (self.data[ri][columnIndex] == frameIndices[fi]) {
+        var frameRow = dex.array.copy(self.data[ri]);
         frameRow.splice(columnIndex, 1);
         frameData.push(frameRow);
       }
     }
     frame["data"] = frameData;
-    frames.push(new dex.csv(frame));
+    frames.push(new csv(frame));
   }
 
   return {
-    'frameIndices': frameIndices,
-    'frames': frames
+    "frameIndices": frameIndices,
+    "frames": frames
   }
 };
 
@@ -23799,7 +23829,7 @@ module.exports = function (dex) {
    */
   matrix.copy = function (matrix) {
     return matrix.map(function (row) {
-      return _.clone(row);
+      return dex.array.copy(row);
     });
   };
 
@@ -24080,8 +24110,10 @@ module.exports = function (dex) {
       // Iterate over the props in top.
       for (prop in top) {
         // Arrays are special cases. [A] on top of [A,B] should give [A], not [A,B]
-        if (top[prop] instanceof Array ||
-          (top[prop] !== undefined && top[prop] != null &&
+        if (top[prop] instanceof Array) {
+          overlay[prop] = dex.array.copy(top[prop]);
+        }
+        else if ((top[prop] !== undefined && top[prop] != null &&
             top[prop].constructor !== undefined &&
             top[prop].constructor.name === "csv")) {
           overlay[prop] = top[prop];
@@ -24429,6 +24461,7 @@ var ConfigurationPane = function (userConfig) {
 module.exports = ConfigurationPane;
 },{}],86:[function(require,module,exports){
 var datafilterpane = function (userConfig) {
+    "use strict";
     var chart;
     var INITIALIZING = false;
     var selectedCategories = {};
@@ -24443,10 +24476,6 @@ var datafilterpane = function (userConfig) {
       "height": "30%",
       "csv": undefined
     };
-
-    if (userConfig !== undefined && userConfig.csv !== undefined) {
-      userConfig.csv = userConfig.csv.copy();
-    }
 
     chart = new dex.component(userConfig, defaults);
 
@@ -24585,10 +24614,10 @@ var datafilterpane = function (userConfig) {
             allSelectedText: 'All',
             enableFiltering: true,
             enableFullValueFiltering: true,
-            onSelectAll: function (option) {
+            onSelectAll: function selectAllHandler() {
               updateCsv();
             },
-            buttonText: function (options, select) {
+            buttonText: function buttonTextHandler(options, select) {
               //dex.console.log("OPTIONS", options, "SELECT", select[0]);
               if (options !== undefined && select !== undefined && select.length > 0) {
 
@@ -24603,7 +24632,7 @@ var datafilterpane = function (userConfig) {
                 return "Undefined";
               }
             },
-            onChange: function (option, checked, select) {
+            onChange: function onChangeHandler() {
               updateCsv();
             }
           }
@@ -24612,6 +24641,8 @@ var datafilterpane = function (userConfig) {
         categoryFilters.multiselect('selectAll', false);
         categoryFilters.multiselect('updateButtonText', false);
       }
+
+      categoryFilters = undefined;
 
       var dateFilters = $(config.parent + ' .' + config["class"] + "_date");
 
@@ -24698,7 +24729,6 @@ var datafilterpane = function (userConfig) {
         });
       }
 
-
       if (dateFilters.length > 0) {
         dateFilters.each(function (i, dateFilter) {
           var columnName = dateFilter.id;
@@ -24712,13 +24742,14 @@ var datafilterpane = function (userConfig) {
           if (minValue < maxValue) {
             dateRanges[columnName] = {min: minValue, max: maxValue};
 
-            slider.on("change", function (formattedValues, handle, values, tap, positions) {
+            slider.on("change", function () {
               dateRanges[columnName] = {min: values[0], max: values[1]};
               updateCsv();
             });
           }
         });
       }
+      dateFilters = undefined;
 
       // Enable sliders:
       var numericFilters = $(config.parent + ' .' + config["class"] + "_number");
@@ -24741,6 +24772,7 @@ var datafilterpane = function (userConfig) {
           }
         });
       }
+      numericFilters = undefined;
 
       var columnSelector = $(config.parent + ' #ColumnSelector').listSelectView({
         sortable: true,
@@ -24970,7 +25002,7 @@ var guipane = function (userConfig) {
       allSelectedText: 'All',
       enableFiltering: true,
       enableFullValueFiltering: true,
-      onChange: function (option, checked, select) {
+      onChange: function toggleOnChange(option, checked, select) {
         //dex.console.log("MULTISELECT-CHOICE-CHANGE", option, checked);
         if (checked) {
           var cmp = componentMap[option[0].getAttribute("targetComponent")];
@@ -25001,7 +25033,6 @@ var guipane = function (userConfig) {
           if (!INITIALIZING) {
             cmp.refreshAsync();
           }
-          ;
         }
       });
     }
@@ -25031,7 +25062,6 @@ var guipane = function (userConfig) {
             if (!INITIALIZING) {
               cmp.refreshAsync();
             }
-            ;
           }
         });
       });
@@ -25074,7 +25104,6 @@ var guipane = function (userConfig) {
             if (!INITIALIZING) {
               cmp.refreshAsync();
             }
-            ;
           }
         });
       });
@@ -25090,9 +25119,7 @@ var guipane = function (userConfig) {
 
   function getTargetName(name) {
     var targetName = name.replace(/[\. \(\)#:]/g, '-');
-
     //dex.console.log("NAME(" + name + ")->" + targetName);
-
     if (targetList[targetName] === undefined) {
       targetList[targetName] = 1;
     }

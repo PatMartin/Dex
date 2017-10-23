@@ -4475,7 +4475,7 @@
  */
 
 /*global define, module*/
-(function (context) {
+(function (pubsubContext) {
   /**
    * @private
    */
@@ -4529,16 +4529,16 @@
               //executes callbacks in the order
               //in which they were registered
               for (x = 0; x < len; x += 1) {
-                // Take on context of caller.
+                // Take on pubsubContext of caller.
                 // REM: Seems to fix a memory leak; otherwise the scope of any subscribers
-                // is window by default due to dex.bus being in window context.
+                // is window by default due to dex.bus being in window pubsubContext.
                 subs[x].apply(that, params);
-                //subs[x].apply(context, params);
+                //subs[x].apply(pubsubContext, params);
               }
 
               //clear references to allow garbage collection
               subs = undefined;
-              context = undefined;
+              pubsubContext = undefined;
               params = undefined;
             },
             0
@@ -4642,7 +4642,7 @@
     module.exports = init();
   } else {
     //traditional namespace
-    context.PubSub = init();
+    pubsubContext.PubSub = init();
   }
 }(this));
 },{}],3:[function(require,module,exports){
