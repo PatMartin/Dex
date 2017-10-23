@@ -14266,9 +14266,9 @@ var Multiples = function (userConfig) {
               "description": "Cell Height",
               "type": "int",
               "minValue": 50,
-              "maxValue": 800,
-              "step": 10,
-              "initialValue": 200,
+              "maxValue": 1600,
+              "step": 50,
+              "initialValue": 300,
               "target": "cell.height"
             },
             {
@@ -14276,9 +14276,9 @@ var Multiples = function (userConfig) {
               "description": "Cell Width",
               "type": "int",
               "minValue": 50,
-              "maxValue": 1000,
-              "step": 10,
-              "initialValue": 300,
+              "maxValue": 2000,
+              "step": 50,
+              "initialValue": 400,
               "target": "cell.width"
             }
           ]
