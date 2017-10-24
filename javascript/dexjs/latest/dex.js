@@ -17318,6 +17318,10 @@ module.exports = function (dex) {
         cmp.resize();
       }, 1000);
 
+      cmp.deleteChart = function() {
+        cmp.deleteComponent();
+      }
+
       /**
        *
        * Delete the chart.  Unregister listeners and delete it gracefully.
