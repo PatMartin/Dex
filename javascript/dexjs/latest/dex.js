@@ -11665,7 +11665,11 @@ var EChart = function (userConfig) {
   chart.render = function render() {
     //dex.console.log("echarts.render(): disposing of: " + chart.config.parent);
     try {
-      echarts.dispose(d3.select(chart.config.parent)[0][0]);
+      if (internalChart !== undefined) {
+        internalChart.dispose();
+        internalChart = undefined;
+      }
+      //echarts.dispose(d3.select(chart.config.parent)[0][0]);
       $(config.parent).empty();
       //d3.select(chart.config.parent).selectAll("*").remove();
       IS_DISPOSED = true;
@@ -11681,7 +11685,9 @@ var EChart = function (userConfig) {
     dex.console.log("*** Deleting EChart");
     chart.deleteComponent();
     try {
-      echarts.dispose(d3.select(chart.config.parent)[0][0]);
+      internalChart.dispose();
+      internalChart = undefined;
+      //echarts.dispose(d3.select(chart.config.parent)[0][0]);
       $(config.parent).empty();
       //d3.select(chart.config.parent).selectAll("*").remove();
     }
@@ -11704,6 +11710,10 @@ var EChart = function (userConfig) {
         IS_DISPOSED = false;
         //dex.console.stacktrace();
         //dex.console.log("DISPOSED PARENT: '" + chart.config.parent + "'");
+
+        if (internalChart !== undefined) {
+          internalChart.dispose();
+        }
         internalChart = echarts.init(d3.select(chart.config.parent)[0][0]);
       }
       var dataOptions = chart.getOptions(csv);
@@ -11716,8 +11726,9 @@ var EChart = function (userConfig) {
     }
     catch (ex) {
       dex.console.log("EXCEPTION", ex.stack);
-      echarts.dispose(d3.select(config.parent)[0][0]);
+      //echarts.dispose(d3.select(config.parent)[0][0]);
       IS_DISPOSED = true;
+      internalChart = undefined;
       d3.select(config.parent).selectAll("*").remove();
       if (ex instanceof dex.exception.SpecificationException) {
         $(config.parent).append(chart.spec.message(ex));
@@ -14244,7 +14255,7 @@ var Multiples = function (userConfig) {
     "resizable": true,
     "width": "100%",
     "height": "100%",
-    "baseChart": dex.charts.d3.Dendrogram({}),
+    "baseChart": undefined,
     "cell.height": 300,
     "cell.width": 400,
     "limit" : 100
@@ -14353,12 +14364,15 @@ var Multiples = function (userConfig) {
 
       cellChart.render();
       cells.push(cellChart);
+
+      cellChart = undefined;
     });
 
     // Help GC collector out.
     config = undefined;
     csv = undefined;
     frames = undefined;
+    $container = undefined;
 
     chart.config.charts = cells;
     return chart;
@@ -22581,7 +22595,8 @@ module.exports = function (dex) {
         return spec;
       };
 
-      spec.parse = function (csv) {
+      spec.parse = function (specCsv) {
+        var csv = new dex.csv(specCsv);
         // Initialize our assessment:
         var assessment = {
           csv: csv,
