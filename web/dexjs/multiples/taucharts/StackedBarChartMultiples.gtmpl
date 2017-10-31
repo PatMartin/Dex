@@ -9,7 +9,13 @@ println render("web/include/dexjs_multiples.inc", [
       "basedir"   : basedir,
       "context"   : [
         "title"   : "dex.js : TauCharts Bar Chart Multiples",
-        "base"    : "dex.charts.taucharts.BarChart",
+        "chartConstructor" : "dex.charts.taucharts.StackedBarChart",
+        "config" : [
+          "cell": [ "height": 300, "width": 300 ],
+          "model" : [
+            "attributes": [:]
+          ]
+        ],
         "styles"  : [ "javascript/taucharts/latest/tauCharts.min.css" ],
         "postscripts" : [ "javascript/taucharts/latest/tauCharts.min.js" ]
       ]

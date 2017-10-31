@@ -1,6 +1,24 @@
 <%
 import static com.dexvis.util.GroovyUtil.renderTemplate as render;
-
+/**
+            options: {
+              legend: {show: false},
+              backgroundColor: "#FFFFFD",
+              xAxis: { splitNumber: 2 },
+              yAxis: { splitNumber: 2,
+              axisLabel: {
+                margin: 8,
+                rotate: 45
+              }},
+              grid: {
+                left: 40,
+                top: 10,
+                right: 30,
+                bottom: 20
+              }
+            }
+          }
+          **/
 println render("web/include/dexjs_multiples.inc", [
       "state"     : state,
       "dexData"   : dexData,
@@ -8,8 +26,25 @@ println render("web/include/dexjs_multiples.inc", [
       "header"    : header,
       "basedir"   : basedir,
       "context"   : [
+        "chartConstructor" : "dex.charts.echarts.LineChart",
+        "config" : [
+          "cell": [ "height": 200, "width": 300 ],
+          "model" : [
+            "attributes": [
+              "xAxisDataZoom": [ "show": false ],
+              "yAxisDataZoom": [ show: false],
+              "options": [
+                legend: [show: false],
+                backgroundColor: "#FFFFFD",
+                xAxis: [splitNumber: 2 ],
+                yAxis: [ splitNumber: 2 ],
+                axisLabel: [ margin: 8, rotate: 45 ],
+                "grid": [ left: 40, top: 10, right: 30, bottom: 30 ]
+              ]
+            ]
+          ]
+        ],
         "title"   : "dex.js : ECharts Line Chart Multiples",
-        "base"   : "dex.charts.echarts.LineChart",
         "styles"  : [ ],
         "scripts" : [ "javascript/echarts/latest/echarts.min.js" ]
       ]

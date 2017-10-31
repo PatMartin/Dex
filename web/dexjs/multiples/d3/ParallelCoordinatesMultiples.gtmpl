@@ -9,7 +9,15 @@ println render("web/include/dexjs_multiples.inc", [
       "basedir"   : basedir,
       "context"   : [
         "title"   : "dex.js : Parallel Coordinate Multiples",
-        "base"   : "dex.charts.d3.ParallelCoordinates",
+        "chartConstructor" : "dex.charts.d3.ParallelCoordinates",
+        "config" : [
+          "cell": [ "height": 300, "width": 300 ],
+          "model" : [
+            "attributes": [
+              "margin": [ "top": 4, "bottom": 4, "right": 4, "left": 4 ]
+            ]
+          ]
+        ],
         "scripts" : [ ]
       ]
     ])

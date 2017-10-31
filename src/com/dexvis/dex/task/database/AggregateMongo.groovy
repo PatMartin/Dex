@@ -88,12 +88,19 @@ class AggregateMongo extends DexTask {
         pipeline.add(new Document(op, aggDoc))
       }
       catch (Exception ex) {
-        if (op == '$limit') {
-          println ("DOING THE LIMIT...")
-          pipeline.add(new Document(op, agg as Integer));
-        }
-        else {
-          pipeline.add(new Document(op, agg));
+        switch(agg) {
+          case '$limit':
+            println ("Limiting documents read to: %{limit} documents.")
+            pipeline.add(new Document(op, agg as Integer));
+            break;
+          default:
+            try {
+              pipeline.add(new Document(op, agg));
+            }
+            catch (Exception iEx) {
+              println "**** MONGO AGGREGATION FALLBACK: Document.parse(op=${op}, agg=${agg})"
+              pipeline.add(Document.parse("{${op}:\"${agg}\"}"))
+            }
         }
       }
     }
@@ -129,10 +136,10 @@ class AggregateMongo extends DexTask {
       configPane.setStyle("-fx-background-color: white;")
       
       Button loadButton = new Button("Load Mongo Script")
-      loadButton.setOnAction({ event -> load(event)})
+      loadButton.setOnAction({ event -> load(event) })
       
       Button saveButton = new Button("Save Mongo Script")
-      saveButton.setOnAction({ event -> save(event)})
+      saveButton.setOnAction({ event -> save(event) })
       
       configPane.add(NodeFactory.createTitle("Aggregate Mongo"), "grow,span")
       

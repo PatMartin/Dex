@@ -3,6 +3,7 @@ package com.dexvis.dex.wf;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -37,6 +38,10 @@ public class DexEnvironment
   public String getVariable(String name)
   {
     return env.get(name);
+  }
+  
+  public Set<String> keySet() {
+    return env.keySet();
   }
   
   public String singleInterpolate(String templateString)

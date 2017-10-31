@@ -8,9 +8,18 @@ println render("web/include/dexjs_multiples.inc", [
       "header"    : header,
       "basedir"   : basedir,
       "context"   : [
-        "title"   : "dex.js : Sunburst Multiples",
-        "base"   : "dex.charts.d3.Sunburst",
-        "scripts" : [ ]
+        "chartConstructor" : "dex.charts.d3.Sunburst",
+        "config" : [
+          "cell": [ "height": 300, "width": 300 ],
+          "model" : [
+            "attributes": [
+              "margin": [ "top": 4, "bottom": 4, "right": 4, "left": 4 ]
+            ]
+          ]
+        ],
+        "title"   : "dex.js : ECharts Line Chart Multiples",
+        "styles"  : [ ],
+        "scripts" : [ "javascript/echarts/latest/echarts.min.js" ]
       ]
     ])
 %>

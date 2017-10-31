@@ -9,7 +9,13 @@ println render("web/include/dexjs_multiples.inc", [
       "basedir"   : basedir,
       "context"   : [
         "title"   : "dex.js : ECharts Pie Chart Multiples",
-        "base"   : "dex.charts.echarts.PieChart",
+        "chartConstructor" : "dex.charts.echarts.PieChart",
+        "config" : [
+          "cell": [ "height": 300, "width": 300 ],
+          "model" : [
+            "attributes": [:]
+          ]
+        ],
         "styles"  : [ ],
         "scripts" : [ "javascript/echarts/latest/echarts.min.js" ]
       ]

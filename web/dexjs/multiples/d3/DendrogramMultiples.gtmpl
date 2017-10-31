@@ -9,7 +9,15 @@ println render("web/include/dexjs_multiples.inc", [
       "basedir"   : basedir,
       "context"   : [
         "title"   : "dex.js : Dendrogram Multiples",
-        "base"   : "dex.charts.d3.Dendrogram",
+        "chartConstructor" : "dex.charts.d3.Dendrogram",
+        "config" : [
+          "cell": [ "height": 400, "width": 400 ],
+          "model" : [
+            "attributes": [
+              "margin": [ "top": 4, "bottom": 4, "right": 4, "left": 4 ]
+            ]
+          ]
+        ],
         "scripts" : [ ]
       ]
     ])

@@ -9,7 +9,15 @@ println render("web/include/dexjs_multiples.inc", [
       "basedir"   : basedir,
       "context"   : [
         "title"   : "dex.js : C3 Pie Chart Multiples",
-        "base"   : "dex.charts.c3.PieChart",
+        "chartConstructor" : "dex.charts.c3.PieChart",
+        "config" : [
+          "cell": [ "height": 300, "width": 300 ],
+          "model" : [
+            "attributes": [
+              "margin": [ "top": 4, "bottom": 4, "right": 4, "left": 4 ]
+            ]
+          ]
+        ],
         "styles"  : [ "javascript/c3/latest/c3.min.css" ],
         "scripts" : [ "javascript/c3/latest/c3.min.js" ]
       ]

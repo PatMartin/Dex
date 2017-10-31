@@ -52,15 +52,28 @@ class Environment extends DexTask {
   {
     super("Utilities", "Environment", "utilities/Environment.html")
     
+    setEnvironment();
+  }
+  
+  public DexTaskState initialize(DexTaskState state) throws DexException
+  {
+    setEnvironment();
+  }
+  
+  private void setEnvironment()
+  {
     // Are we running in headless mode?
     boolean headless = (env.getVariable("HEADLESS") != null) ?
       env.getVariable("HEADLESS").equalsIgnoreCase("true") : false;
 
     env.setVariable("DEX_TIMESTAMP_MS", "" + System.currentTimeMillis());
     
+    println("HEADLESS: ${headless}")
+    
     // Set at initialization
     envData.each
     {
+      println "DEFINED(${it.name}) = ${env.isDefined(it.name)}"
       if (headless && env.isDefined(it.name))
       {
         // Headless definitions take precedence.
@@ -76,24 +89,11 @@ class Environment extends DexTask {
     }
   }
   
-  public DexTaskState initialize(DexTaskState state) throws DexException
-  {
-    envData.each
-    {
-      println "ENVIRONMENT: ${it.name}=${it.value}"
-      env.setVariable(it.name, it.value)
-    }
-  }
-  
   public DexTaskState execute(DexTaskState state) throws DexException
   {
     try
     {
-      envData.each
-      {
-        println "ENVIRONMENT: ${it.name}=${it.value}"
-        env.setVariable(it.name, it.value)
-      }
+      setEnvironment();
     }
     catch(Exception ex)
     {

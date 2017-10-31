@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <%
 import static com.dexvis.util.GroovyUtil.renderTemplate as render;
+import groovy.json.*
 
 println render("web/include/styles_multiples.inc", [:])
 
@@ -41,7 +42,6 @@ if (context.postscripts) {
 </head>
 <body>
   <div class='layout-container'>
-    <div id="basechart" style="display: none;"></div>
     <div class='ui-layout-west'>
       <div id='ConfigurationPane'></div>
     </div>
@@ -50,7 +50,7 @@ if (context.postscripts) {
     </div>
   </div>
 
-<!-- Enable Firebug 
+<!-- Enable Firebug
 <script type="text/javascript"
 src="https://getfirebug.com/firebug-lite.js">
 {
@@ -64,35 +64,37 @@ src="https://getfirebug.com/firebug-lite.js">
 
 <script>
 
-<% println dexData.toCsvString(); %>
+<%
+  println dexData.toCsvString();
+  if (context && context.config) {
+    println "var userConfig = " +
+      new JsonBuilder(context.config).toPrettyString() + ";";
+  }
+  else {
+    println "var userConfig = {};"
+  }
+%>
 
-var base = ${context.base}({ 'parent': '#basechart' });
-base.load();
+var multiples = dex.charts.multiples.Multiples(dex.config.expandAndOverlay(
+  {
+    parent: '#ChartArea',
+    csv: new dex.csv(),
+    limit: 500,
+    model: {
+      chartConstructor: <% print context.chartConstructor %>
+    }
+  }, userConfig));
 
-var multiples = dex.charts.multiples.Multiples({
-    'parent': '#ChartArea',
-    'csv': csv,
-    'baseChart': base
-  }); 
-
-function save()
-{
+function save() {
   multiples.save();
-  base.save();
 }
 
-function setValues(values)
-{
+function setValues(values) {
   values.forEach(function(config) {
     switch (config.chartName) {
       case "multiples":
       {
         multiples.attr(config.key, config.value);
-        break;
-      }
-      case "basechart":
-      {
-        base.attrSave(config.key, config.value);
         break;
       }
     }
@@ -103,8 +105,7 @@ function setValues(values)
 function getGuiDefinition()
 {
   var guiDef = {
-    'multiples': multiples.getGuiDefinition(),
-    'basechart': base.getGuiDefinition()
+    'multiples': multiples.getGuiDefinition()
   };
 
   return JSON.stringify(guiDef);
@@ -117,9 +118,7 @@ function getGuiDefinition()
     west: {
       size: 335
     },
-    onresize: function () {
-       multiples.render();
-    }
+    onresize: multiples.resizeAsynch
   });
 
   multiples.load();
@@ -128,10 +127,8 @@ function getGuiDefinition()
   configPane = dex.ui.ConfigurationPane({
     "parent": "#ConfigurationPane",
     "csv": csv,
-    "components": [ multiples, base ]
+    "components": [ multiples ]
   }).render();
-  
-  multiples.subscribe(base, "attr", function() { multiples.render(); });
 });
 </script>
 </body>
