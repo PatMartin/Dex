@@ -359,7 +359,12 @@
 
 .dex-multiples-cell {
     float: left;
-    padding: 2px;
+    padding: 3px;
+    border: 1px solid grey;
+}
+
+.dex-multiples-cell:hover {
+    border: 1px solid red;
 }
 
 .dex-multiples-cell-title {
