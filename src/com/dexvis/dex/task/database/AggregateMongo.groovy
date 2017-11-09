@@ -87,8 +87,15 @@ class AggregateMongo extends DexTask {
       def agg = JsonOutput.toJson(row[op]);
       println "OP: '${op}', AGG: '${agg}'"
       try {
-        Document aggDoc = Document.parse(agg);
-        pipeline.add(new Document(op, aggDoc))
+        switch(agg) {
+          case '$limit':
+            println ("Limiting documents read to: ${limit} documents.")
+            pipeline.add(new Document(op, agg as Integer));
+            break;
+          default:
+            Document aggDoc = Document.parse(agg);
+            pipeline.add(new Document(op, aggDoc))
+        }
       }
       catch (Exception ex) {
         switch(agg) {
@@ -109,17 +116,19 @@ class AggregateMongo extends DexTask {
     }
     
     AggregateIterable<Document> results = collection.aggregate(pipeline);
- 
+    
     println "Mongo ResultSet contains ${results.size()} items."
-       
+    
     def header = results[0].keySet() as List;
+    println "Header: '${header}'"
+    
     def data = []
     
     results.eachWithIndex { result, ri ->
       def jsonStr = result.toJson();
       gson = slurper.parseText(jsonStr)
       def row = header.collect { key ->
-        return ((result[key] as String).replaceAll(/^\[?(.*?)\]?$/) { all, text -> text })
+        return ((result[key] as String)?.replaceAll(/^\[?(.*?)\]?$/) { all, text -> text })
       }
       data << row
     }
