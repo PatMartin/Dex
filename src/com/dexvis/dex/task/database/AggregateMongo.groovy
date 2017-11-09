@@ -78,6 +78,9 @@ class AggregateMongo extends DexTask {
     def slurper = new groovy.json.JsonSlurper()
     def gson = slurper.parseText(mongoQuery);
     
+    println "Mongo Query: '${mongoQuery}'"
+    println "Mongo GSON : '${gson}'"
+    
     gson.eachWithIndex { row, ri ->
       
       def op = row.keySet().toArray()[0]
@@ -90,7 +93,7 @@ class AggregateMongo extends DexTask {
       catch (Exception ex) {
         switch(agg) {
           case '$limit':
-            println ("Limiting documents read to: %{limit} documents.")
+            println ("Limiting documents read to: ${limit} documents.")
             pipeline.add(new Document(op, agg as Integer));
             break;
           default:
@@ -106,7 +109,9 @@ class AggregateMongo extends DexTask {
     }
     
     AggregateIterable<Document> results = collection.aggregate(pipeline);
-    
+ 
+    println "Mongo ResultSet contains ${results.size()} items."
+       
     def header = results[0].keySet() as List;
     def data = []
     
