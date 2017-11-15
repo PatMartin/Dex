@@ -217,7 +217,7 @@ class CreateJdbcTable extends DexTask {
       "HyperSql" : [
         "integer" : "INTEGER",
         "double"  : "DOUBLE",
-        "date"    : "DATE",
+        "date"    : "TIMESTAMP",
         "string"  : "VARCHAR"
       ]
     ]
