@@ -14291,8 +14291,9 @@ module.exports = GridsterMultiples;
  */
 var Multiples = function (userConfig) {
   var chart;
-  var cells = undefined;
-  var baseInstance = undefined;
+  var cells;
+  var baseInstance;
+
   var defaults = {
     "parent": "#MultiplesParent",
     "id": "MultiplesId",
@@ -14313,9 +14314,10 @@ var Multiples = function (userConfig) {
 
   baseInstance = chart.config.model.chartConstructor(chart.config.model.attributes || {});
 
-  chart.subscribe(chart, "attr", function (evt) {
-    dex.console.log("Setting: '" + evt.attr + "'='" + evt.value + "'");
-  });
+  // Good for debugging
+  //chart.subscribe(chart, "attr", function (evt) {
+  //  dex.console.log("Setting: '" + evt.attr + "'='" + evt.value + "'");
+  //});
 
   chart.getGuiDefinition = function getGuiDefinition(config) {
     var defaults = {
@@ -14427,7 +14429,8 @@ var Multiples = function (userConfig) {
       var title = frames.frameIndices[i];
       var $title = $("<div></div>")
         .addClass("dex-multiples-cell-title")
-        .text(title);
+        .text(title)
+        .css("width", config.cell.width);
       $cell.append($title);
 
       var $cellContents = $("<div></div>")
@@ -23463,7 +23466,7 @@ if ($.fn.button.noConflict != undefined) {
 }
 
 module.exports = dex;
-},{"../lib/noUiSlider/noUiSlider":3,"./array/array":4,"./charts/charts":15,"./color/color":72,"./component/component":73,"./config/config":74,"./console/console":76,"./csv/csv":77,"./data/spec":78,"./datagen/datagen":79,"./geometry/geometry":81,"./json/json":82,"./matrix/matrix":83,"./object/object":84,"./ui/ui":91,"./util/util":93}],81:[function(require,module,exports){
+},{"../lib/noUiSlider/noUiSlider":3,"./array/array":4,"./charts/charts":15,"./color/color":72,"./component/component":73,"./config/config":74,"./console/console":76,"./csv/csv":77,"./data/spec":78,"./datagen/datagen":79,"./geometry/geometry":81,"./json/json":82,"./matrix/matrix":83,"./object/object":84,"./ui/ui":92,"./util/util":94}],81:[function(require,module,exports){
 module.exports = function (dex) {
   /**
    *
@@ -24595,6 +24598,86 @@ module.exports = function (dex) {
 },{}],85:[function(require,module,exports){
 /**
  *
+ * Creates a Table component for visualizing tabular data.
+ *
+ * @param {object} userConfig - A user supplied configuration object which
+ * will override the defaults.
+ *
+ * @example {@lang javascript}
+ * var myTable = new dex.ui.Table({
+ *   'parent' : "#MyTableContainer",
+ *   'id'     : "MyTableId"
+ *   'csv'    : { header : [ "X", "Y", "Z" ],
+ *                data   : [[ 1, 2, 3 ], [4, 5, 6], [7, 8, 9]]}
+ * });
+ *
+ * @returns {ColumnSelector}
+ * @memberof dex/ui
+ *
+ */
+var ColumnSelector = function (userConfig) {
+  var defaults = {
+    // The parent container of this chart.
+    "parent": "#ColumnSelectorParent",
+    // Set these when you need to CSS style components independently.
+    "id": "TableId",
+    "class": "TableClass",
+    "title": "title",
+    "sourceTitle": "Source",
+    "destinationTitle": "Destination",
+    // Our data...
+    "csv": {
+      // Give folks without data something to look at anyhow.
+      "header": ["X", "Y", "Z"],
+      "data": [
+        [0, 0, 0],
+        [1, 1, 1],
+        [2, 2, 2]
+      ]
+    }
+  };
+
+  var chart = new dex.component(userConfig, defaults);
+  var config = chart.config;
+
+  chart.update = function () {
+    return chart.render();
+  };
+
+  chart.render = function () {
+    var config = chart.config;
+    var csv = config.csv;
+
+    // Add choices.
+    var $parent = $(config.parent);
+    $parent.empty();
+
+    var $selector = $("<div class='dex-ui-columnselector'></div>");
+    var $wrapper = $("<div class='wrapper'></div>");
+
+    var $left  = $("<div id='left' class='container'></div>");
+    var $right = $("<div id='right' class='container'></div>");
+
+    csv.header.forEach(function (hdr) {
+      var $row = ("<div>" + hdr + "</div>");
+      $right.append($row);
+    });
+
+    $wrapper.append($left, $right);
+    $selector.append($wrapper);
+    $parent.append($selector);
+
+    dex.console.log($left, $right);
+    dragula([$right[0], $left[0]], {revertOnSpill: true});
+  };
+
+  return chart;
+};
+
+module.exports = ColumnSelector;
+},{}],86:[function(require,module,exports){
+/**
+ *
  * Creates a ConfigurationPane component.
  *
  * @param userConfig The component configuration.
@@ -24717,7 +24800,7 @@ var ConfigurationPane = function (userConfig) {
 };
 
 module.exports = ConfigurationPane;
-},{}],86:[function(require,module,exports){
+},{}],87:[function(require,module,exports){
 var datafilterpane = function (userConfig) {
   var chart;
   var INITIALIZING = false;
@@ -25170,7 +25253,7 @@ var datafilterpane = function (userConfig) {
 };
 
 module.exports = datafilterpane;
-},{}],87:[function(require,module,exports){
+},{}],88:[function(require,module,exports){
 var guipane = function (userConfig) {
   var pane;
   var componentMap = {};
@@ -25790,7 +25873,7 @@ var guipane = function (userConfig) {
 };
 
 module.exports = guipane;
-},{}],88:[function(require,module,exports){
+},{}],89:[function(require,module,exports){
 /**
  *
  * Construct a player component.
@@ -25999,7 +26082,7 @@ var Player = function (userConfig) {
 };
 
 module.exports = Player;
-},{}],89:[function(require,module,exports){
+},{}],90:[function(require,module,exports){
 /**
  *
  * This creates a SqlQuery component which provides a SQL
@@ -26094,7 +26177,7 @@ var SqlQuery = function (userConfig) {
 };
 
 module.exports = SqlQuery;
-},{}],90:[function(require,module,exports){
+},{}],91:[function(require,module,exports){
 /**
  *
  * Creates a Table component for visualizing tabular data.
@@ -26190,7 +26273,7 @@ var Table = function (userConfig) {
 };
 
 module.exports = Table;
-},{}],91:[function(require,module,exports){
+},{}],92:[function(require,module,exports){
 module.exports = function (dex) {
   /**
    *
@@ -26207,10 +26290,10 @@ module.exports = function (dex) {
   ui.ConfigurationPane = require("./ConfigurationPane");
   ui.DataFilterPane = require("./DataFilterPane");
   ui.GuiPane = require("./GuiPane");
-
+  ui.ColumnSelector = require("./ColumnSelector");
   return ui;
 };
-},{"./ConfigurationPane":85,"./DataFilterPane":86,"./GuiPane":87,"./Player":88,"./SqlQuery":89,"./Table":90}],92:[function(require,module,exports){
+},{"./ColumnSelector":85,"./ConfigurationPane":86,"./DataFilterPane":87,"./GuiPane":88,"./Player":89,"./SqlQuery":90,"./Table":91}],93:[function(require,module,exports){
 module.exports = function util(dex) {
   /**
    *
@@ -26295,7 +26378,7 @@ module.exports = function util(dex) {
 
   return d3util;
 };
-},{}],93:[function(require,module,exports){
+},{}],94:[function(require,module,exports){
 module.exports = function (dex) {
 
   var util = {};
@@ -26304,5 +26387,5 @@ module.exports = function (dex) {
 
   return util;
 };
-},{"./d3":92}]},{},[80])(80)
+},{"./d3":93}]},{},[80])(80)
 });

@@ -12,14 +12,14 @@ import javafx.scene.control.TableColumn
 import javafx.scene.control.TableView
 import javafx.scene.control.TextArea
 import javafx.scene.control.TableColumn.CellDataFeatures
-import javafx.scene.image.Image
 import javafx.util.Callback
 
 import org.simpleframework.xml.Element
 import org.simpleframework.xml.Root
 import org.tbee.javafx.scene.layout.MigPane
 
-import com.dexvis.dex.exception.DexException;
+import com.dexvis.dex.exception.DexException
+import com.dexvis.dex.wf.DexEnvironment
 import com.dexvis.dex.wf.DexTask
 import com.dexvis.dex.wf.DexTaskState
 import com.dexvis.javafx.scene.control.NodeFactory
@@ -77,12 +77,13 @@ rowMaps.eachWithIndex
 """
   
   public DexTaskState execute(DexTaskState state) throws DexException {
+    DexEnvironment env = DexEnvironment.getInstance()
     String groovyScript = groovyPreamble
     String op = operationCB.getValue()
     String cond = conditionCB.getValue()
     
     String regexFilter = "(?://.*)|(/\\*(?:.|[\\n\\r])*?\\*/)";
-    String expression = groovyExpText.getText().replaceAll(regexFilter, "");
+    String expression = env.interpolate(groovyExpText.getText()).replaceAll(regexFilter, "");
     
     if ((cond == "IF" && op == "EXCLUDE") || (cond == "UNLESS" && op == "INCLUDE")) {
       groovyScript += "!(" + expression + ")" + groovyProlog
@@ -90,7 +91,7 @@ rowMaps.eachWithIndex
     else {
       groovyScript += expression + groovyProlog
     }
-    println "SCRIPT: '$groovyScript'"
+    //println "SCRIPT: '$groovyScript'"
     
     // Run the script
     Binding binding = new Binding()

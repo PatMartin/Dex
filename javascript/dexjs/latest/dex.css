@@ -273,6 +273,7 @@
     -webkit-border-bottom-right-radius: 5px;
     border-bottom-right-radius: 5px;
 }
+
 /**
 <div style='height:100%;width:100%;display:flex;align-items:center;" +
 "justify-content:center;'><h1 style='text-align:center;width:100%;" +
@@ -303,11 +304,14 @@
 }
 
 /** Dex Legends **/
-.dex-legend {}
+.dex-legend {
+}
+
 .dex-legend-group-title {
-    clear:both;
+    clear: both;
     font-size: 1.4em;
 }
+
 .dex-legend-item {
     float: left;
     padding: 1px;
@@ -369,13 +373,44 @@
 
 .dex-multiples-cell-title {
     background: #337ab7;
-
     text-align: center;
-    font-size: 1em;
+    height: 24px;
+    font-size: .9vw;
     font-family: "Segoe UI";
     font-weight: normal;
-
     color: #ffffff;
+}
+
+/** Column Selector **/
+/* dragula-specific example page styles */
+.dex-ui-columnselector > .wrapper {
+    display: table;
+}
+
+.dex-ui-columnselector > .wrapper > .container {
+    display: table-cell;
+    background-color: rgba(255, 255, 0, 0.2);
+    width: 50%;
+}
+
+.dex-ui-columnselector > .wrapper > .container:nth-child(odd) {
+    background-color: rgba(0, 0, 0, 0.2);
+}
+/*
+ * note that styling gu-mirror directly is a bad practice because it's too generic.
+ * you're better off giving the draggable elements a unique class and styling that directly!
+ */
+.dex-ui-columnselector > .wrapper > .container > div,
+.dex-ui-columnselector > .gu-mirror {
+    margin: 1px;
+    padding: 1px;
+    background-color: lightgreen;
+    transition: opacity 0.4s ease-in-out;
+}
+
+.dex-ui-columnselector > .wrapper > .container > div {
+    text-align: center;
+    font-size: 1.5em;
 }/* GuiPane */
 /*! nouislider - 10.1.0 - 2017-07-28 13:09:54 */
 /* Functional styling;
