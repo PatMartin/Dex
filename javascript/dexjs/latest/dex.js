@@ -11853,9 +11853,15 @@ var LineChart = function (userConfig) {
         borderColor: "#000000",
         borderWidth: 2,
         trigger: "item",
-
+        position: function (pos, params, dom, rect, size) {
+          // tooltip will be fixed on the right if mouse hovering on the left,
+          // and on the left if hovering on the right.
+          var obj = {top: 60};
+          obj[['left', 'right'][+(pos[0] < size.viewSize[0] / 2)]] = 5;
+          return obj;
+        },
         formatter: function (d) {
-          dex.console.log("FORMATTER", d);
+          //dex.console.log("FORMATTER", d);
           var str = "<table class='dex-tooltip-table'>";
 
           d.data.forEach(function (value) {
