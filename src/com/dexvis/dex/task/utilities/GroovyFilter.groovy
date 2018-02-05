@@ -91,7 +91,7 @@ rowMaps.eachWithIndex
     else {
       groovyScript += expression + groovyProlog
     }
-    //println "SCRIPT: '$groovyScript'"
+    println "SCRIPT: '$groovyScript'"
     
     // Run the script
     Binding binding = new Binding()

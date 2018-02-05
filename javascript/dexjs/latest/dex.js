@@ -11854,17 +11854,7 @@ var LineChart = function (userConfig) {
         borderWidth: 2,
         trigger: "item",
         position: function (pos, params, dom, rect, size) {
-          // tooltip will be fixed on the right if mouse hovering on the left,
-          // and on the left if hovering on the right.
-          // pos: [x, y] of mouse
-          // rect: { height, width, x, y }
-          // size: contentSize: [width, height], viewSize: [translatedWidth, transHeight]
-          //dex.console.log("POS", pos, "PARAMS", params, "DOM", dom, "RECT", rect, "SIZE", size);
-          //var obj = {top: 60};
-          //obj[['left', 'right'][+(pos[0] < size.viewSize[0] / 2)]] = 5;
-          //return { top: 0, left: 0 };
           return [pos[0] + 10, pos[1] - 0];
-          //return obj;
         },
         confine: true,
         formatter: function (d) {

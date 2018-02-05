@@ -11,9 +11,9 @@ import static com.dexvis.util.GroovyUtil.renderTemplate as render;
                 rotate: 45
               }},
               grid: {
-                left: 40,
+                left: 50,
                 top: 10,
-                right: 30,
+                right: 25,
                 bottom: 20
               }
             }
