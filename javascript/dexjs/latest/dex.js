@@ -25027,7 +25027,7 @@ var datafilterpane = function (userConfig) {
 
     function getStep(extents) {
       try {
-        var delta = Math.abs(+extents[1] - extents[0]) / 100;
+        var delta = Math.abs(+extents[1] - extents[0]) / 1000;
         if (delta < 1) {
           return delta;
         }
