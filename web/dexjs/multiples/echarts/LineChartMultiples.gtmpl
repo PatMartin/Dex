@@ -1,24 +1,5 @@
 <%
 import static com.dexvis.util.GroovyUtil.renderTemplate as render;
-/**
-            options: {
-              legend: {show: false},
-              backgroundColor: "#FFFFFD",
-              xAxis: { splitNumber: 2 },
-              yAxis: { splitNumber: 2,
-              axisLabel: {
-                margin: 8,
-                rotate: 45
-              }},
-              grid: {
-                left: 50,
-                top: 10,
-                right: 25,
-                bottom: 20
-              }
-            }
-          }
-          **/
 println render("web/include/dexjs_multiples.inc", [
       "state"     : state,
       "dexData"   : dexData,
@@ -28,6 +9,7 @@ println render("web/include/dexjs_multiples.inc", [
       "context"   : [
         "chartConstructor" : "dex.charts.echarts.LineChart",
         "config" : [
+          "series" : [ "symbolSize": 5 ],
           "cell": [ "height": 200, "width": 300 ],
           "model" : [
             "attributes": [
@@ -39,7 +21,7 @@ println render("web/include/dexjs_multiples.inc", [
                 xAxis: [splitNumber: 2 ],
                 yAxis: [ splitNumber: 2 ],
                 axisLabel: [ margin: 8, rotate: 45 ],
-                "grid": [ left: 40, top: 10, right: 30, bottom: 30 ]
+                "grid": [ left: 50, top: 20, right: 15, bottom: 30 ]
               ]
             ]
           ]
