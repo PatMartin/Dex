@@ -25058,6 +25058,23 @@ var datafilterpane = function (userConfig) {
     }
 
     function createNumberRangeSlider(selection, columnName, columnNumber, extents) {
+      var min = +extents[0];
+      var max = +extents[1];
+      // Log scale.
+      if (min >= 0 && max >= 0 && Math.abs(max - min) > 10000) {
+        return dex.ui.RangeSlider.create(selection, {
+          start: [+extents[0], +extents[1]],
+          range: {
+            min: +extents[0],
+            max: +extents[1]
+          },
+          scale: "logarithmic",
+          format: getFormatter(extents),
+          tooltips: true,
+          behaviour: 'drag',
+          connect: true
+        });
+      }
       return dex.ui.RangeSlider.create(selection, {
         start: [+extents[0], +extents[1]],
         range: {
