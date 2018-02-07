@@ -14308,7 +14308,7 @@ var Multiples = function (userConfig) {
     "refreshType": "update",
     "cell.height": 300,
     "cell.width": 400,
-    "limit": 100
+    "limit": 500
   };
 
   chart = new dex.component(userConfig, defaults);
@@ -24956,8 +24956,8 @@ var datafilterpane = function (userConfig) {
       categoryFilters.multiselect({
           includeSelectAllOption: true,
           allSelectedText: 'All',
-          enableFiltering: true,
-          enableFullValueFiltering: true,
+          enableCaseInsensitiveFiltering: true,
+          //enableFullValueFiltering: true,
           buttonText: function buttonTextHandler(options, select) {
             //dex.console.log("OPTIONS", options, "SELECT", select[0]);
             if (options !== undefined && select !== undefined && select.length > 0) {
@@ -25027,20 +25027,11 @@ var datafilterpane = function (userConfig) {
 
     function getStep(extents) {
       try {
-        var delta = Math.abs(+extents[1] - extents[0]) / 1000;
+        var delta = Math.abs(+extents[1] - extents[0]) / 100;
         if (delta < 1) {
           return delta;
         }
-        if (delta < 2) {
-          return 1;
-        }
-        if (delta < 10) {
-          return 5;
-        }
-        if (delta < 50) {
-          return 10;
-        }
-        return Math.round(delta / 2);
+        return 1;
       }
       catch (ex) {
         return 1;
