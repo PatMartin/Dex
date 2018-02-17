@@ -66,8 +66,8 @@ class GroovyTemplateEditor extends DexTask {
     
     def text = templateText.getText()
     
-    def binding = [ "state":state, "dexData":state.dexData, "data":state.dexData.data, "header":state.dexData.header]
-    
+    def binding = getBinding(state)
+
     def engine = new SimpleTemplateEngine()
     def template = engine.createTemplate(text).make(binding)
     
@@ -76,7 +76,20 @@ class GroovyTemplateEditor extends DexTask {
     
     return state
   }
-  
+
+  public Map getBinding(DexTaskState state)
+  {
+    def curDir = new File(".")
+    
+    return [
+      "state":state,
+      "dexData":state.dexData,
+      "data":state.dexData.data,
+      "header":state.dexData.header,
+      "basedir" : curDir.toURI().toURL().toExternalForm()
+    ]
+  }
+    
   public Node getConfig()
   {
     if (configPane == null)
