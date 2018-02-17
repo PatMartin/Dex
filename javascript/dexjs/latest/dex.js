@@ -24941,6 +24941,13 @@ var datafilterpane = function (userConfig) {
       $root.append($dateContainer);
     }
 
+    /*
+    var $manualFilterContainer = $("<div><h3>Manual Filter</h3></div>");
+    var $mfInput = $("<input type='text' name='manualFilter'></input>");
+    $manualFilterContainer.append($mfInput);
+    $root.append($manualFilterContainer);
+    */
+    
     $panelBody.append($root);
     $panelCollapser.append($panelBody);
     $panel.append($panelHeading);
@@ -25058,23 +25065,6 @@ var datafilterpane = function (userConfig) {
     }
 
     function createNumberRangeSlider(selection, columnName, columnNumber, extents) {
-      var min = +extents[0];
-      var max = +extents[1];
-      // Log scale.
-      if (min >= 0 && max >= 0 && Math.abs(max - min) > 10000) {
-        return dex.ui.RangeSlider.create(selection, {
-          start: [+extents[0], +extents[1]],
-          range: {
-            min: +extents[0],
-            max: +extents[1]
-          },
-          scale: "logarithmic",
-          format: getFormatter(extents),
-          tooltips: true,
-          behaviour: 'drag',
-          connect: true
-        });
-      }
       return dex.ui.RangeSlider.create(selection, {
         start: [+extents[0], +extents[1]],
         range: {
@@ -25305,7 +25295,6 @@ var guipane = function (userConfig) {
     //dex.console.log("PICKERS", $pickers);
 
     $pickers.spectrum({
-      color: tinycolor,
       showPalette: true,
       palette: [
         ["rgb(0, 0, 0)", "rgb(67, 67, 67)", "rgb(102, 102, 102)", /*"rgb(153, 153, 153)","rgb(183, 183, 183)",*/
