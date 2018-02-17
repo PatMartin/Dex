@@ -1,7 +1,5 @@
 package com.dexvis.dex.task.input
 
-import java.nio.charset.StandardCharsets
-
 import javafx.beans.value.ChangeListener
 import javafx.scene.Node
 import javafx.scene.control.Button
@@ -13,16 +11,14 @@ import org.simpleframework.xml.Element
 import org.simpleframework.xml.Root
 import org.tbee.javafx.scene.layout.MigPane
 
+import au.com.bytecode.opencsv.CSVReader
+
 import com.dexvis.dex.exception.DexException
 import com.dexvis.dex.wf.DexEnvironment
 import com.dexvis.dex.wf.DexTask
 import com.dexvis.dex.wf.DexTaskState
 import com.dexvis.javafx.scene.control.DexFileChooser
 import com.dexvis.javafx.scene.control.NodeFactory
-
-import de.siegmar.fastcsv.reader.CsvContainer
-import de.siegmar.fastcsv.reader.CsvReader
-import de.siegmar.fastcsv.reader.CsvRow
 
 @Root
 class ReadCsv extends DexTask {
@@ -41,7 +37,7 @@ class ReadCsv extends DexTask {
   private TextField fileText = new TextField()
   
   private DexFileChooser csvChooser = new DexFileChooser("data",
-  "Read CSV", "Read CSV", "CSV", "csv")
+    "Read CSV", "Read CSV", "CSV", "csv")
   
   private Label rowLimitLabel = new Label("Limit Number Of Rows:")
   
@@ -55,21 +51,18 @@ class ReadCsv extends DexTask {
   private String lastDir = ""
   
   DexEnvironment env = DexEnvironment.getInstance()
-  
+
   public DexTaskState execute(DexTaskState state) throws DexException {
     println "Running: $name"
     
-    File csvFile = new File(env.interpolate(fileText.getText()));
-    CsvReader csvReader = new CsvReader();
-    csvReader.setContainsHeader(true);
+    CSVReader reader = new CSVReader(new FileReader(new File(
+        env.interpolate(fileText.getText()))))
     
-    CsvContainer csv = csvReader.read(csvFile, StandardCharsets.UTF_8);
-
-    // Copy the header    
-    state.dexData.header = csv.header
+    state.dexData.header = reader.readNext().collect
+    { it }
     state.dexData.data = []
     
-    //List<String> row
+    List<String> row
     
     boolean limit = limitRows.isSelected()
     int rowLimit = Integer.MAX_VALUE
@@ -84,15 +77,11 @@ class ReadCsv extends DexTask {
     }
     
     int rowNum = 0;
-
-    for (CsvRow row : csv.getRows()) {
-
-      if (!limit || rowNum < rowLimit) {
-        state.dexData.data << row.fields
-      }
+    
+    while (((row = reader.readNext()) != null) && ((limit == false) || (limit && rowNum < rowLimit))) {
+      state.dexData.data << row.collect() { it }
       rowNum++;
     }
-
     return state
   }
   
@@ -114,7 +103,7 @@ class ReadCsv extends DexTask {
       configPane.add(rowLimitText, "grow")
       configPane.add(limitRows, "span")
       browseButton.setOnAction({ action -> csvChooser.setTextPath(action)})
-      
+
       fileText.textProperty().addListener((ChangeListener){obj, oldVal, newVal ->
         effectiveFile.setText(env.interpolate(fileText.getText()))
       })

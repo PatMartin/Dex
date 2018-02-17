@@ -1,6 +1,5 @@
 package com.dexvis.dex.task.info
 
-import java.nio.charset.StandardCharsets
 import java.util.concurrent.Future
 
 import javafx.collections.FXCollections
@@ -20,6 +19,8 @@ import org.simpleframework.xml.ElementList
 import org.simpleframework.xml.Root
 import org.tbee.javafx.scene.layout.MigPane
 
+import au.com.bytecode.opencsv.CSVReader
+
 import com.dexvis.dex.Dex
 import com.dexvis.dex.DexData
 import com.dexvis.dex.exception.DexException
@@ -29,10 +30,6 @@ import com.dexvis.dex.wf.InternalTask
 import com.dexvis.javafx.scene.control.NodeFactory
 import com.dexvis.util.WebViewUtil
 import com.thoughtworks.xstream.annotations.XStreamOmitField
-
-import de.siegmar.fastcsv.reader.CsvContainer
-import de.siegmar.fastcsv.reader.CsvReader
-import de.siegmar.fastcsv.reader.CsvRow
 
 @Root
 class CompareDatasources extends DexTask {
@@ -87,20 +84,18 @@ class CompareDatasources extends DexTask {
         {
           updateMessage("Preprocessing Data To Compare: $reader1Key to $reader2Key")
           
-          CsvReader reader1 = new CsvReader();
-          CsvReader reader2 = new CsvReader();
+          CSVReader reader1 = new CSVReader(new FileReader(file1))
+          CSVReader reader2 = new CSVReader(new FileReader(file2))
           
-          reader1.setContainsHeader(true);
-          reader2.setContainsHeader(true);
-          
-          CsvContainer csv1 = reader1.read(file1, StandardCharsets.UTF_8);
-          CsvContainer csv2 = reader2.read(file2, StandardCharsets.UTF_8);
-          
-          def header1 = csv1.header
-          def header2 = csv2.header
+          def header1 = reader1.readNext().collect { h1 -> return h1 as String}
+          def header2 = reader2.readNext().collect { h2 -> return h2 as String}
+          def row
           
           List<List<String>> data1 = []
           List<List<String>> data2 = []
+          
+          header1.each { data1 << []}
+          header2.each { data2 << []}
           
           // Storing data by column not row.  So the structure is:
           //
@@ -112,8 +107,22 @@ class CompareDatasources extends DexTask {
           // This allows us to directly compare columns vs other columns in
           // data2 which is read in exactly the same way.
           //def rnum=1
-          for (CsvRow row : csv1.getRows()) { data1 << row.getFields() }
-          for (CsvRow row : csv2.getRows()) { data2 << row.getFields() }
+          while (row = reader1.readNext())
+          {
+            row.eachWithIndex { col, ri ->
+              //println "$reader1Key[$rnum]: RI: $ri, hlen: ${header1.size()}"
+              data1[ri] << (col as String) }
+            //rnum++
+          }
+          
+          //rnum=1
+          while (row = reader2.readNext())
+          {
+            row.eachWithIndex { col, ri ->
+              //println "$reader2Key[$rnum]: RI: $ri, hlen: ${header2.size()}"
+              data2[ri] << (col as String) }
+            //rnum++
+          }
           
           Map<String, Object> symbolTable = [
             'datasource1' : reader1Key,
