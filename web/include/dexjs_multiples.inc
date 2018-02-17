@@ -66,7 +66,16 @@ src="https://getfirebug.com/firebug-lite.js">
 
 <%
   println dexData.toCsvString();
-  if (context && context.config) {
+  if (context && context.config && options) {
+    println "var userOptions = " +
+      new JsonBuilder(options).toPrettyString() + ";";
+    
+    println "var defaultConfig = " +
+      new JsonBuilder(context.config).toPrettyString() + ";";
+      
+    println "var userConfig = dex.config.expandAndOverlay(userOptions, defaultConfig);"
+  }
+  else if (context && context.config) {
     println "var userConfig = " +
       new JsonBuilder(context.config).toPrettyString() + ";";
   }
