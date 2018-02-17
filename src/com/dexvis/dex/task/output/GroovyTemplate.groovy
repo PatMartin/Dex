@@ -1,10 +1,15 @@
 package com.dexvis.dex.task.output
 
 import groovy.text.SimpleTemplateEngine
+import javafx.beans.property.SimpleStringProperty
+import javafx.beans.property.StringProperty
+import javafx.event.ActionEvent
 import javafx.scene.Node
 import javafx.scene.control.Button
 import javafx.scene.control.Label
 import javafx.scene.control.TextField
+import javafx.scene.web.WebEngine
+import javafx.scene.web.WebView
 
 import org.apache.commons.io.FileUtils
 import org.simpleframework.xml.Element
@@ -18,6 +23,7 @@ import com.dexvis.dex.wf.DexTaskState
 import com.dexvis.javafx.scene.control.DexFileChooser
 import com.dexvis.javafx.scene.control.ModalDialog
 import com.dexvis.javafx.scene.control.NodeFactory
+import com.dexvis.javafx.scene.control.editor.CodeMirrorEditor
 
 /**
  * 
@@ -46,7 +52,17 @@ class GroovyTemplate extends DexTask {
     "Choose HTML", "Save HTML", "HTML", "html")
   private DexFileChooser templateChooser = new DexFileChooser("web",
     "Load Template", "Save Groovy Template", "GTMPL", "gtmpl")
+  private DexFileChooser groovyChooser = new DexFileChooser("scripts/groovy",
+    "Load Groovy Script", "Save Groovy Script", "GROOVY", "groovy")
   
+  @Element(name="groovyCode", required=false)
+  private StringProperty groovyCode = new SimpleStringProperty(
+  "// Enter groovy code here...");
+  
+  private WebView wv = new WebView()
+  private WebEngine we = wv.getEngine()
+  private CodeMirrorEditor editor = null;
+
   /**
    * 
    * Override the default constructor to provide this component's name, category and help file.
@@ -63,8 +79,19 @@ class GroovyTemplate extends DexTask {
     try
     {
       DexEnvironment env = DexEnvironment.getInstance()
+      
+      Binding shellBinding = new Binding();
+      def options = [:]
+      shellBinding.setVariable("options", options);
+
+      GroovyShell shell = new GroovyShell(shellBinding)
+      shell.evaluate(groovyCode.getValue())
+      options = shellBinding.getVariable("options")
+      
       def templateCode = new File(env.interpolate(templateText.getText())).text
+      
       def binding = getBinding(state)
+      binding["options"] = options;
       
       def engine = new SimpleTemplateEngine()
       def template = engine.createTemplate(templateCode).make(binding)
@@ -117,6 +144,20 @@ class GroovyTemplate extends DexTask {
       Button chooseOutputFileButton = new Button("Choose Output File")
       chooseOutputFileButton.setOnAction({ action -> htmlChooser.setTextPath(action)})
       
+      Button loadGroovyScriptButton = new Button("Load")
+      loadGroovyScriptButton.setOnAction({ event -> load(event)})
+
+      Button saveGroovyScriptButton = new Button("Save")
+      saveGroovyScriptButton.setOnAction({ event -> save(event) })
+      
+      def bindings = [
+        'mode'     : 'groovy',
+        'mime'     : 'text/x-groovy',
+        'theme'    : 'eclipse'
+      ]
+
+      editor = new CodeMirrorEditor(we, bindings, groovyCode)
+      
       configPane.add(NodeFactory.createTitle("Groovy Template"), "grow,span")
       configPane.add(templateLabel)
       configPane.add(templateText, "grow")
@@ -124,8 +165,46 @@ class GroovyTemplate extends DexTask {
       configPane.add(outputLabel)
       configPane.add(outputFileText, "grow")
       configPane.add(chooseOutputFileButton, "span")
+      configPane.add(wv, "align left,span,grow")
+      configPane.add(loadGroovyScriptButton)
+      configPane.add(saveGroovyScriptButton)
     }
     
     return configPane
+  }
+  
+  public load(ActionEvent evt)
+  {
+    try
+    {
+      File loadFile = groovyChooser.load(evt)
+
+      if (loadFile != null)
+      {
+        // Automatically updates groovyCode via shared StringProperty
+        editor.setEditorContent(FileUtils.readFileToString(loadFile))
+      }
+    }
+    catch(Exception ex)
+    {
+      ex.printStackTrace()
+    }
+  }
+
+  public save(ActionEvent evt)
+  {
+    try
+    {
+      File saveFile = groovyChooser.save(evt)
+
+      if (saveFile != null)
+      {
+        FileUtils.writeStringToFile(saveFile, groovyCode.getValue())
+      }
+    }
+    catch(Exception ex)
+    {
+      ex.printStackTrace()
+    }
   }
 }
