@@ -75,7 +75,7 @@ class GroovyScript extends DexTask {
     {
       // No idea how long this will take.
       updateProgress(-1.0, -1.0)
-      updateMessage("Executing over all the data...")
+      updateMessage("Processing entire table")
       binding.setVariable("dex", state.dexData)
       binding.setVariable("header", state.dexData.header)
       binding.setVariable("data", state.dexData.data)
