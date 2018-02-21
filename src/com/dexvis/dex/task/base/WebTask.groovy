@@ -168,7 +168,8 @@ class WebTask extends DexTask {
       "dexData":state.dexData,
       "data":state.dexData.data,
       "header":state.dexData.header,
-      "basedir" : curDir.toURI().toURL().toExternalForm()
+      "basedir" : curDir.toURI().toURL().toExternalForm(),
+      "options":[:]
     ]
   }
   
@@ -321,7 +322,12 @@ class WebTask extends DexTask {
       if (saveFile != null)
       {
         // Replace output config with dexjs-config
+        try {
         we.executeScript("save();");
+        }
+        catch (Exception ex) {
+          println "No javascript save function defined"
+        }
         String saveOutput = output;
         try {
           String config = we.executeScript(
