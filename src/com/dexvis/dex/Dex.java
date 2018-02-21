@@ -10,6 +10,7 @@ import java.util.concurrent.CompletionService;
 import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.FutureTask;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -42,7 +43,6 @@ import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 import org.tbee.javafx.scene.layout.MigPane;
 
 import com.dexvis.dex.collections.HierarchicalMap;
-import com.dexvis.dex.exception.DexException;
 import com.dexvis.dex.wf.DexJob;
 import com.dexvis.dex.wf.DexJobScheduler;
 import com.dexvis.dex.wf.DexTask;
@@ -66,13 +66,15 @@ import com.dexvis.util.ThreadUtil;
  */
 public class Dex extends Application
 {
+  public static Dex instance;
+  
   // Thread factory for executing task serially.
   private final static BasicThreadFactory serialThreadFactory = new BasicThreadFactory.Builder()
       .namingPattern("Dex-Serial-Task-%d").daemon(true)
       .priority(Thread.MAX_PRIORITY).build();
   
   // Executor for executing task serially.
-  public final static ExecutorService serialExecutor = Executors
+  public static ExecutorService serialExecutor = Executors
       .newSingleThreadExecutor(serialThreadFactory);
   
   // Thread factory for concurrent task execution. Such task may not update the
@@ -82,13 +84,13 @@ public class Dex extends Application
       .priority(Thread.MAX_PRIORITY).build();
   
   // Executor for parallel task execution.
-  public final static ExecutorService concurrentExecutor = Executors
+  public static ExecutorService concurrentExecutor = Executors
       .newFixedThreadPool(
           Math.max(1, Runtime.getRuntime().availableProcessors() - 1),
           concurrentThreadFactory);
   
   // Service for task completion notification.
-  public final static CompletionService<Object> CCS = new ExecutorCompletionService(
+  public static CompletionService<Object> CCS = new ExecutorCompletionService(
       concurrentExecutor);
   
   static
@@ -195,6 +197,7 @@ public class Dex extends Application
   {
     try
     {
+      instance = this;
       this.stage = stage;
       stage.setTitle("Data Explorer");
       
@@ -457,6 +460,11 @@ public class Dex extends Application
     }
   }
   
+  public static Dex getInstance()
+  {
+    return Dex.instance;
+  }
+  
   public static void reportException(Stage stage, Exception ex)
   {
     ThreadUtil.runAndWait(() -> {
@@ -471,6 +479,36 @@ public class Dex extends Application
             .toString(), "Ok");
       }
     });
+  }
+  
+  public static void updateUI()
+  {
+    try
+    {
+      // actual work to update UI:
+      FutureTask<Void> updateUITask = new FutureTask(() -> {
+      }, null);
+      
+      // submit for execution on FX Application Thread:
+      Platform.runLater(updateUITask);
+      
+      // block until work complete:
+      updateUITask.get();
+    }
+    catch(Exception ex)
+    {
+      ex.printStackTrace();
+    }
+  }
+  
+  public static void killAllSerialTasks()
+  {
+    ExecutorService oldExecutorService = serialExecutor;
+    oldExecutorService.shutdownNow();
+    
+    // Executor for parallel task execution.
+    serialExecutor = Executors
+        .newSingleThreadExecutor(serialThreadFactory);
   }
   
   public void executeWorkflow(ActionEvent evt)
