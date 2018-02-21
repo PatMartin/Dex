@@ -79,7 +79,7 @@ public class SerialJob implements DexJob
           {
             if (ERROR)
             {
-              task.updateMessage("Aborted due to previous error.");
+              task.updateMessage(": Aborted due to previous error.");
               task.progressAborted();
             }
             else if (Dex.serialExecutor.isShutdown())
@@ -103,7 +103,7 @@ public class SerialJob implements DexJob
                   }
                   catch(DexException dEx)
                   {
-                    //dEx.printStackTrace();
+                    // dEx.printStackTrace();
                     Dex.reportException(stage, dEx);
                   }
                 });
@@ -114,10 +114,11 @@ public class SerialJob implements DexJob
               {
                 state = task.execute(state);
               }
-              task.updateMessage("Completed: "
+              task.updateMessage(task.getFinalMessage() + ": Completed: "
                   + (System.currentTimeMillis() - startTime) + " ms");
               task.updateProgress(100);
               task.done();
+              Dex.updateUI();
             }
           }
           catch(Exception ex)
@@ -166,31 +167,28 @@ public class SerialJob implements DexJob
       }
     }
     
-    Button cancelButton = new Button("Cancel");
-    cancelButton.setOnAction((action) -> {
-      // TODO: Figure out how to cancel task on a daemon.
+    Button stopButton = new Button("Stop");
+    stopButton.setOnAction((action) -> {
         terminate();
         stage.hide();
       });
     
+    Button killButton = new Button("Kill");
+    killButton.setOnAction((action) -> {
+      terminate();
+      Dex.killAllSerialTasks();
+      stage.hide();
+    });
+    
     Button dismissButton = new Button("Dismiss");
     dismissButton.setOnAction((action) -> {
-      // TODO: Figure out thread control.
-      // executorService.shutdownNow();
-      // executorService = Executors.newSingleThreadExecutor(threadFactory);
-      // progress.getTasks().clear();
-        stage.hide();
-      });
-    
-    Button bgButton = new Button("Run in Background");
-    bgButton.setOnAction((action) -> {
       stage.hide();
     });
     
     progressPane.add(progress, "grow,span");
-    progressPane.add(cancelButton);
-    progressPane.add(dismissButton);
-    progressPane.add(bgButton, "span");
+    progressPane.add(stopButton);
+    //progressPane.add(killButton);
+    progressPane.add(dismissButton, "span");
     
     Scene scene = new Scene(progressPane, Color.LIGHTBLUE);
     stage.setScene(scene);
@@ -232,7 +230,7 @@ public class SerialJob implements DexJob
     
     for (DexTask task : taskList)
     {
-      if (task.getActive())
+      if (task.getActive() && !isTerminated())
       {
         state = task.start(state);
       }

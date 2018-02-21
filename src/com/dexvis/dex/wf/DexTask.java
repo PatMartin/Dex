@@ -30,7 +30,7 @@ public class DexTask extends Task<DexTask> implements Comparable<DexTask>,
    */
   private static final long serialVersionUID = -3296675819537504912L;
   // Base directory for all task help files.
-
+  
   // State of this task, initialize to start.
   @XStreamOmitField
   private DexTaskState dexTaskState = new DexTaskState();
@@ -54,7 +54,9 @@ public class DexTask extends Task<DexTask> implements Comparable<DexTask>,
   // Defaults to an active component.
   private boolean active = true;
   
-  @Element(name= "config-def", required = false)
+  private String finalMessage = null;
+  
+  @Element(name = "config-def", required = false)
   private String configDefinition = "[ { \"type\" : \"label\", \"initialValue\": \"No configuration is available\" } ]";
   
   public DexTask()
@@ -500,12 +502,27 @@ public class DexTask extends Task<DexTask> implements Comparable<DexTask>,
   
   public void updateMessage(String message)
   {
+    javafx.concurrent.Task task;
     super.updateMessage(message);
   }
   
   public void updateProgress(double percentCompleted, double max)
   {
     super.updateProgress(percentCompleted, max);
+  }
+  
+  public void setFinalMessage(String message)
+  {
+    finalMessage = message;
+  }
+  
+  public String getFinalMessage()
+  {
+    if (finalMessage != null && finalMessage.length() > 0)
+    {
+      return finalMessage;
+    }
+    return super.getMessage();
   }
   
   public void progressAborted()
