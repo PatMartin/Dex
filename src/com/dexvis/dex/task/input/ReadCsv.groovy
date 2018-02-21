@@ -54,7 +54,12 @@ class ReadCsv extends DexTask {
 
   public DexTaskState execute(DexTaskState state) throws DexException {
     println "Running: $name"
+
+    def filePath = env.interpolate(fileText.getText())
+    updateProgress(-1.0, -1.0)
     
+    updateMessage("Reading Csv: '${filePath}'")
+
     CSVReader reader = new CSVReader(new FileReader(new File(
         env.interpolate(fileText.getText()))))
     
@@ -81,7 +86,12 @@ class ReadCsv extends DexTask {
     while (((row = reader.readNext()) != null) && ((limit == false) || (limit && rowNum < rowLimit))) {
       state.dexData.data << row.collect() { it }
       rowNum++;
+      if (rowNum % 100000 == 0) {
+        updateMessage("Read: ${rowNum} rows")
+      }
     }
+    
+    setFinalMessage("Read: ${rowNum} rows");
     return state
   }
   

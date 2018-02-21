@@ -310,6 +310,8 @@ class CreateJdbcTable extends DexTask {
   {
     PreparedStatement pstmt = null;
     int BATCH_FACTOR = 1000;
+    int errorCount = 0;
+    int batchCount = 0;
     
     try
     {
@@ -360,11 +362,13 @@ class CreateJdbcTable extends DexTask {
         {
           if ((ri + 1) % BATCH_FACTOR == 0)
           {
+            batchCount++;
             pstmt.executeBatch()
           }
         }
         catch (Exception ex)
         {
+          errorCount++;
           updateMessage("Skipping batch ending at: $ri: " + row.collect{ "\"$it\"" }.join(","))
           ex.printStackTrace()
         }
@@ -373,10 +377,12 @@ class CreateJdbcTable extends DexTask {
       try
       {
         pstmt.executeBatch()
+        batchCount++;
       }
       catch (Exception ex)
       {
         ex.printStackTrace()
+        errorCount++;
       }
     }
     catch (Exception ex)
@@ -386,6 +392,15 @@ class CreateJdbcTable extends DexTask {
     finally
     {
       pstmt?.close()
+      if (errorCount > 1) {
+        updateMessage(batchCount + " batches processed with " + errorCount + " errors");
+      }
+      else if (errorCount == 1) {
+        updateMessage(batchCount + " batches processed with 1 error");
+      }
+      else {
+        updateMessage(batchCount + " batches processed");
+      }
     }
   }
   
@@ -393,6 +408,8 @@ class CreateJdbcTable extends DexTask {
       List<String> dataTypes, Map<String, DateFormat> dateFmtMap)
   {
     PreparedStatement pstmt = null;
+    int rowCount = 0;
+    int errorCount = 0;
     
     try
     {
@@ -403,12 +420,11 @@ class CreateJdbcTable extends DexTask {
         if ((ri+1) % 1000 == 0)
         {
           con.commit();
-          updateMessage("Inserting row ${ri + 1}")
+          updateMessage("Row: ${ri + 1}, Errors: ${errorCount}")
         }
         pstmt.clearParameters()
         //println "ROW: $row"
-        row.eachWithIndex
-        { param, i ->
+        row.eachWithIndex { param, i ->
           //def scrubbedParam = (param =~ "[\\]\\-\\[]").replaceAll("")
           
           if (dataTypes[i] == "integer")
@@ -495,13 +511,18 @@ class CreateJdbcTable extends DexTask {
         
         try
         {
+          rowCount++;
           pstmt.execute()
         }
         catch (Exception ex)
         {
+          errorCount++;
           updateMessage("Skipping row $ri: " + row.collect{ "\"$it\"" }.join(","))
-          println "OFFENDING ROW: " + row.collect{ "\"$it\"" }.join(",")
-          ex.printStackTrace()
+          // No sense in inundating the user with endless errros
+          if (errorCount < 10) {
+            println "OFFENDING ROW: " + row.collect{ "\"$it\"" }.join(",")
+            ex.printStackTrace()
+          }
         }
       }
     }
@@ -512,6 +533,7 @@ class CreateJdbcTable extends DexTask {
     finally
     {
       pstmt?.close()
+      updateMessage("Rows: ${rowCount}, Errors: ${errorCount}")
     }
   }
   
