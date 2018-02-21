@@ -148,6 +148,7 @@ class WebDriverTask extends DexTask {
       "dexData":state.dexData,
       "data":state.dexData.data,
       "header":state.dexData.header,
+      "options":[:],
       "basedir" : curDir.toURI().toURL().toExternalForm()
     ]
   }
