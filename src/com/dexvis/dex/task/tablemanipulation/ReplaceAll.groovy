@@ -40,6 +40,7 @@ class ReplaceAll extends DexTask {
    */
   public ReplaceAll() {
     super("Table Manipulation", "Replace All", "table_manipulation/ReplaceAll.html")
+    getMetaData().setTaskExecutionUpdatesUI(false)
   }
   
   public DexTaskState execute(DexTaskState state) throws DexException {
