@@ -47,7 +47,6 @@ class P5Script extends DexTask {
 
   public DexTaskState execute(DexTaskState state) throws DexException {
     println "Running: $name"
-    println "Property Sheet Configuration: ${getPropertySheet()}"
     println "Config: ${config}"
     long start = System.currentTimeMillis()
     updateProgress(0, 100);
