@@ -33,7 +33,7 @@ class P5Script extends DexTask {
 
   private CodeMirrorEditor editor = null;
 
-  private DexFileChooser p5Chooser = new DexFileChooser("p5",
+  private DexFileChooser p5Chooser = new DexFileChooser("scripts/p5",
   "Load P5 Script", "Save P5 Script", "P5", "p5")
 
   public P5Script() {
