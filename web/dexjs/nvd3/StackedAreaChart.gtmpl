@@ -7,6 +7,7 @@ println render("web/include/dexjs.inc", [
       "data"          : data,
       "header"        : header,
       "basedir"       : basedir,
+      "options"  : options,
       "context"       : [
         "title"       : "dex.js : NVD3 Stacked Area Chart",
         "chart"       : "dex.charts.nvd3.StackedAreaChart",

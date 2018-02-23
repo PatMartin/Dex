@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <%
 import static com.dexvis.util.GroovyUtil.renderTemplate as render;
+import groovy.json.*
 
 println render("web/include/styles.inc", [:])
 if (context.styles) {
@@ -90,13 +91,34 @@ function getGuiDefinition()
 }
 <%
   println dexData.toCsvString();
+
+  if (context && context.config && options) {
+    println "// context.confg and options"
+    println "var userOptions = " +
+      new JsonBuilder(options).toPrettyString() + ";";
+    
+    println "var defaultConfig = " +
+      new JsonBuilder(context.config).toPrettyString() + ";";
+      
+    println "var userConfig = dex.config.expandAndOverlay(userOptions, defaultConfig);"
+  }
+  else if (context && context.config) {
+    println "// context.config"
+    println "var userConfig = " +
+      new JsonBuilder(context.config).toPrettyString() + ";";
+  }
+  else {
+    println "// options"
+    println "var userConfig = " +
+      new JsonBuilder(options).toPrettyString() + ";";
+  }
 %>
 
 // Limit initial view to 100 rows for performance.
-var chart = ${context.chart}({
+var chart = ${context.chart}(dex.config.expandAndOverlay({
     parent : "#ChartArea",
     csv : csv.limitRows(100)
-  });
+  }, userConfig));
 
 \$(document).ready(function () {
 

@@ -7,6 +7,7 @@ println render("web/include/dexjs.inc", [
       "data"      : data,
       "header"    : header,
       "basedir"   : basedir,
+      "options"  : options,
       "context"   : [
         "title"   : "dex.js : D3Plus Ring Network",
         "chart"   : "dex.charts.d3plus.RingNetwork",
