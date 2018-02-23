@@ -509,6 +509,56 @@ public class DexData {
     return groupByIndex(groupName, valueName, columnNames.collect { colName -> getColumnNumber(colName)})
   }
   
+  public DexData ungroupColumn(List<String> hierarchy, String columnName, String valueColumn)
+  {
+    println "Ungrouping Column: ${columnName} with value ${valueColumn}"
+    
+    DexData dd = new DexData();
+    
+    def hi = hierarchy.collect { getColumnNumber(it) }
+    def ci = getColumnNumber(columnName)
+    def vi = getColumnNumber(valueColumn)
+    
+    def entries = [:]
+    def categoryMap = [:]
+    
+    // Ensure existence of hashes
+    data.eachWithIndex {
+      row, ri ->
+      
+      def key = hi.collect { row[hi] }.join('::')
+      def entry
+      if (!entries[key]) {
+        entry = [:]
+        entries[key] = entry
+      }
+      else {
+        entry = entries[key]
+      }
+    
+      hi.each { entry[header[it]] = row[it] }
+      entry[row[ci]] = row[vi]
+      categoryMap[row[ci]] = 1;
+    }
+    
+    def categories = categoryMap.collect { it.key }
+    
+    hierarchy.each { dd.header << it }
+    categories.each { dd.header << it }
+    
+    entries.each {
+      k, v ->
+      def row = []
+      dd.header.each {
+        h ->
+        row << ((v[h]) ? v[h] : 0)
+      }
+      dd.data << row
+    }
+    
+    return dd;
+  }
+  
   public List<Integer> getMaxLengths()
   {
     List<Integer> maxLengths = []
