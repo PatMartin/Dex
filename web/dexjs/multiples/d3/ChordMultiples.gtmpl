@@ -7,6 +7,7 @@ println render("web/include/dexjs_multiples.inc", [
       "data"      : data,
       "header"    : header,
       "basedir"   : basedir,
+      "options"   : options,
       "context"   : [
         "title"   : "dex.js : Chord Diagram Multiples",
         "chartConstructor" : "dex.charts.d3.Chord",

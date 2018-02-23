@@ -7,9 +7,11 @@ println render("web/include/dexjs_multiples.inc", [
       "data"      : data,
       "header"    : header,
       "basedir"   : basedir,
+      "options"   : options,
       "context"   : [
-        "title"   : "dex.js : Netwrok Multiples",
-        "base"   : "dex.charts.vis.Network",
+        "title"   : "dex.js : Network Multiples",
+        "chartConstructor" : "dex.charts.vis.Network",
+        "config" : [:],
         "styles"  : [ "javascript/vis/latest/vis.css" ],
         "scripts" : [ "javascript/vis/latest/vis.js" ]
       ]
