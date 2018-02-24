@@ -72,6 +72,7 @@ class GroovyTemplate extends DexTask {
   public GroovyTemplate()
   {
     super("Output", "Groovy Template", "output/GroovyTemplate.html")
+    getMetaData().setTaskExecutionUpdatesUI(false)
   }
   
   public DexTaskState execute(DexTaskState state) throws DexException

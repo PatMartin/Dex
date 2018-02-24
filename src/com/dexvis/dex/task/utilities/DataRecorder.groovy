@@ -25,6 +25,7 @@ class DataRecorder extends DexTask
   public DataRecorder()
   {
     super("Utilities", "Data Recorder", "utilities/DataRecorder.html")
+    getMetaData().setTaskExecutionUpdatesUI(false)
   }
 
   public DexTaskState initialize(DexTaskState state) throws DexException

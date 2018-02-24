@@ -13,6 +13,7 @@ public class AddRowNumber extends DexTask
   {
     super("Table Manipulation", "Add Row Number",
         "table_manipulation/AddRowNumber.html");
+    getMetaData().setTaskExecutionUpdatesUI(false)
   }
   
   public DexTaskState execute(DexTaskState state) throws DexException

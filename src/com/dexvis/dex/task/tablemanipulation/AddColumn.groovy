@@ -45,6 +45,7 @@ class AddColumn extends DexTask {
   public AddColumn()
   {
     super("Table Manipulation", "Add Column", "table_manipulation/AddColumn.html")
+    getMetaData().setTaskExecutionUpdatesUI(false)
   }
 
   public DexTaskState execute(DexTaskState state) throws DexException

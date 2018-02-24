@@ -24,6 +24,7 @@ import com.sun.glass.ui.CommonDialogs.ExtensionFilter
 class ExecuteProcess extends DexTask {
   public ExecuteProcess() {
     super("Utilities", "Execute Process", "utilities/ExecuteProcess.html")
+    getMetaData().setTaskExecutionUpdatesUI(false)
   }
   
   private MigPane configPane = null

@@ -26,6 +26,7 @@ class MultiFileInput extends DexTask {
   
   public MultiFileInput() {
     super("Input", "Multi File Input", "input/MultiFileInput.html")
+    getMetaData().setTaskExecutionUpdatesUI(false)
   }
   
   private MigPane configPane = null

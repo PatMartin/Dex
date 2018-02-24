@@ -59,6 +59,7 @@ class Documentation extends DexTask
   public Documentation()
   {
     super("Utilities", "Documentation", "utilities/Documentation.html")
+    getMetaData().setTaskExecutionUpdatesUI(false)
   }
 
   public Node getConfig()

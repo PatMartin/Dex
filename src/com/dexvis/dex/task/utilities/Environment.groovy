@@ -51,7 +51,7 @@ class Environment extends DexTask {
   public Environment()
   {
     super("Utilities", "Environment", "utilities/Environment.html")
-    
+    getMetaData().setTaskExecutionUpdatesUI(false)
     setEnvironment();
   }
   
