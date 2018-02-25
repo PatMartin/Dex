@@ -1,0 +1,32 @@
+<%
+import static com.dexvis.util.GroovyUtil.renderTemplate as render;
+
+println render("web/include/dexjs_multiples.inc", [
+  "state"     : state,
+  "dexData"   : dexData,
+  "data"      : data,
+  "header"    : header,
+  "basedir"   : basedir,
+  "options"   : options,
+  "context"   : [
+    "chartConstructor" : "dex.charts.echarts.ParallelCoordinates",
+    "config" : [
+       "series" : [ "symbolSize": 5 ],
+       "cell": [ "height": 500, "width": 800 ],
+       "model" : [
+          "attributes": [
+            "options": [
+            legend: [show: false],
+            backgroundColor: "#FFFFFD",
+            axisLabel: [ margin: 8, rotate: 45 ],
+            "grid": [ left: 50, top: 20, right: 15, bottom: 30 ]
+          ]
+        ]
+      ]
+    ],
+    "title"   : "dex.js : ECharts Parallel Coordinate Multiples",
+    "styles"  : [ ],
+    "scripts" : [ "javascript/echarts/latest/echarts.min.js" ]
+  ]
+])
+%>
