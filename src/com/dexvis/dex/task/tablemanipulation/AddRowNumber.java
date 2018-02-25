@@ -9,11 +9,11 @@ import com.dexvis.dex.wf.DexTaskState;
 @Root
 public class AddRowNumber extends DexTask
 {
-  public AddRowNumber()
+  public AddRowNumber() throws DexException
   {
     super("Table Manipulation", "Add Row Number",
         "table_manipulation/AddRowNumber.html");
-    getMetaData().setTaskExecutionUpdatesUI(false)
+    getMetaData().setTaskExecutionUpdatesUI(false);
   }
   
   public DexTaskState execute(DexTaskState state) throws DexException
