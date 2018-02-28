@@ -12050,11 +12050,13 @@ var LineChart = function (userConfig) {
 
     // Set formatters here.
     if (options.xAxis.axisLabel !== undefined && options.xAxis.axisLabel.formatter !== undefined) {
-      options.xAxis.axisLabel.formatter = dex.config.getFormatter(options.xAxis.axisLabel.formatter);
+      options.xAxis.axisLabel.formatter =
+        dex.config.getFormatter(options.xAxis.axisLabel.formatter, xInfo.type);
     }
 
     if (options.yAxis.axisLabel !== undefined && options.yAxis.axisLabel.formatter !== undefined) {
-      options.yAxis.axisLabel.formatter = dex.config.getFormatter(options.yAxis.axisLabel.formatter);
+      options.yAxis.axisLabel.formatter =
+        dex.config.getFormatter(options.yAxis.axisLabel.formatter, yInfo.type);
     }
 
     seriesNames.forEach(function (seriesName) {
@@ -17962,7 +17964,7 @@ module.exports = function (dex) {
     }
   };
 
-  config.getFormatter = function getFormatter(name) {
+  config.getFormatter = function getFormatter(name, type) {
     dex.console.log("getFormatter", name);
     var formatters = {
       "none" : function(value, i) {
@@ -17971,26 +17973,30 @@ module.exports = function (dex) {
       },
 
       "abbreviate" : function(value) {
-        dex.console.log("short formatting of: '" + value + "'");
-
-        if (value > 1000000000000000000) {
-          return parseInt(value / 1000000000000000) + "E"
+        if (type === "number") {
+          if (value > 1000000000000000000) {
+            return parseInt(value / 1000000000000000) + "E"
+          }
+          else if (value > 1000000000000000) {
+            return parseInt(value / 1000000000000) + "P"
+          }
+          else if (value > 1000000000000) {
+            return parseInt(value / 1000000000) + "T"
+          }
+          else if (value > 1000000000) {
+            return parseInt(value / 1000000000) + "G"
+          }
+          else if (value > 1000000) {
+            return parseInt(value / 1000000) + "M"
+          }
+          else if (value > 1000) {
+            return parseInt(value / 1000) + "K"
+          }
+          else {
+            return value;
+          }
         }
-        else if (value > 1000000000000000) {
-          return parseInt(value / 1000000000000) + "P"
-        }
-        else if (value > 1000000000000) {
-          return parseInt(value / 1000000000) + "T"
-        }
-        else if (value > 1000000000) {
-          return parseInt(value / 1000000000) + "G"
-        }
-        else if (value > 1000000) {
-          return parseInt(value / 1000000) + "M"
-        }
-        else if (value > 1000) {
-          return parseInt(value / 1000) + "K"
-        }
+        // Non numbers simply pass thru
         else {
           return value;
         }
