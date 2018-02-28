@@ -12048,6 +12048,15 @@ var LineChart = function (userConfig) {
       options.yAxis.data = undefined;
     }
 
+    // Set formatters here.
+    if (options.xAxis.axisLabel !== undefined && options.xAxis.axisLabel.formatter !== undefined) {
+      options.xAxis.axisLabel.formatter = dex.config.getFormatter(options.xAxis.axisLabel.formatter);
+    }
+
+    if (options.yAxis.axisLabel !== undefined && options.yAxis.axisLabel.formatter !== undefined) {
+      options.yAxis.axisLabel.formatter = dex.config.getFormatter(options.yAxis.axisLabel.formatter);
+    }
+
     seriesNames.forEach(function (seriesName) {
       var selectedCsv = csv.selectRows(function (row) {
         return row[seriesInfo.position] == seriesName;
@@ -17953,6 +17962,51 @@ module.exports = function (dex) {
     }
   };
 
+  config.getFormatter = function getFormatter(name) {
+    dex.console.log("getFormatter", name);
+    var formatters = {
+      "none" : function(value, i) {
+        dex.console.log("default formatting of: '" + value + "'");
+        return value;
+      },
+
+      "abbreviate" : function(value) {
+        dex.console.log("short formatting of: '" + value + "'");
+
+        if (value > 1000000000000000000) {
+          return parseInt(value / 1000000000000000) + "E"
+        }
+        else if (value > 1000000000000000) {
+          return parseInt(value / 1000000000000) + "P"
+        }
+        else if (value > 1000000000000) {
+          return parseInt(value / 1000000000) + "T"
+        }
+        else if (value > 1000000000) {
+          return parseInt(value / 1000000000) + "G"
+        }
+        else if (value > 1000000) {
+          return parseInt(value / 1000000) + "M"
+        }
+        else if (value > 1000) {
+          return parseInt(value / 1000) + "K"
+        }
+        else {
+          return value;
+        }
+      }
+    };
+    if (name === undefined || name.length == 0) {
+      return formatters.default;
+    }
+    else if (formatters[name] !== undefined) {
+      return formatters[name];
+    }
+    else {
+      return name;
+    }
+  };
+
   /**
    *
    * Return the configuration for a font after the user's
@@ -20312,7 +20366,7 @@ module.exports = function (dex) {
         },
         {
           "name": "Formatter",
-          "description": "Formatter of the label.",
+          "description": "Formatter of the label. Ex: none, comma-delimited, succinct",
           "target": ns + "formatter",
           "type": "string",
           "initialValue": ""
@@ -25577,7 +25631,6 @@ var guipane = function (userConfig) {
             if (!INITIALIZING) {
               cmp.refreshAsync();
             }
-            ;
           }
         }
         $choices.multiselect('updateButtonText');
