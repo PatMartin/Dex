@@ -25182,6 +25182,7 @@ var datafilterpane = function (userConfig) {
           includeSelectAllOption: true,
           allSelectedText: 'All',
           enableCaseInsensitiveFiltering: true,
+          enableHTML: true,
           //enableFullValueFiltering: true,
           buttonText: function buttonTextHandler(options, select) {
             //dex.console.log("OPTIONS", options, "SELECT", select[0]);
@@ -25191,7 +25192,8 @@ var datafilterpane = function (userConfig) {
                 return select[0].id + ": All (" + select[0].children.length + ")";
               }
               else {
-                return select[0].id + ": " + options.length + " of " + select[0].children.length;
+                return "<font color='red'>" + select[0].id + ": " + options.length + " of " +
+                  select[0].children.length + "</font>";
               }
             }
             else {
