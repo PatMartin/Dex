@@ -38,13 +38,12 @@ class FileInput extends DexTask {
   public DexTaskState execute(DexTaskState state) throws DexException {
     println "Running: $name"
     
-    FileInputStream inputFile = new FileInputStream(fileText.getText())
-    ArrayList<String> lines = inputFile.text.split('\n')
-    lines = lines.collect
-    { it.trim() }
-    
     state.dexData.header = ["NUM", "LINE"]
     state.dexData.data = []
+    
+    FileInputStream inputFile = new FileInputStream(fileText.getText())
+    ArrayList<String> lines = inputFile.text.split('\n')
+    lines = lines.collect { it.trim() }
     
     int lineNum = 1
     

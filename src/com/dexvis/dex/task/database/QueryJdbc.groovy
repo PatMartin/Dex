@@ -74,6 +74,10 @@ class QueryJdbc extends DexTask {
   public DexTaskState execute(DexTaskState state) throws DexException {
     DexEnvironment env = DexEnvironment.getInstance()
     
+    // Free any memory invested in pipeline since we'll overwrite it anyhow.
+    state.dexData.header = []
+    state.dexData.data = []
+    
     def List<String> header=[]
     def List<List<String>> data=[]
     

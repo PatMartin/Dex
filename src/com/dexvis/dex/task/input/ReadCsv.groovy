@@ -55,6 +55,10 @@ class ReadCsv extends DexTask {
   public DexTaskState execute(DexTaskState state) throws DexException {
     println "Running: $name"
 
+    // Free any memory invested in pipeline since we'll overwrite it anyhow.
+    state.dexData.header = []
+    state.dexData.data = []
+        
     def filePath = env.interpolate(fileText.getText())
     updateProgress(-1.0, -1.0)
     
@@ -63,9 +67,7 @@ class ReadCsv extends DexTask {
     CSVReader reader = new CSVReader(new FileReader(new File(
         env.interpolate(fileText.getText()))))
     
-    state.dexData.header = reader.readNext().collect
-    { it }
-    state.dexData.data = []
+    state.dexData.header = reader.readNext().collect { it }
     
     List<String> row
     

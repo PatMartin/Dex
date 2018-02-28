@@ -47,11 +47,15 @@ class ReadJson extends DexTask {
   public DexTaskState execute(DexTaskState state) throws DexException {
     println "Running: $name"
 
+    // Free any memory invested in pipeline since we'll overwrite it anyhow.
+    state.dexData.header = []
+    state.dexData.data = []
+        
     String jsonStr = FileUtils.readFileToString(new File(fileText.getText()), "UTF-8");
     List<NVP> nvpList = JsonUtil.parseNVPList("root", jsonStr);
 
     state.dexData.header = [ "NAME", "VALUE" ]
-    state.dexData.data = []
+
     nvpList.each {
       nvp ->
       state.dexData.data << [ nvp.getName(), nvp.getValue() ]
