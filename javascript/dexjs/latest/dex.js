@@ -2613,8 +2613,7 @@ module.exports = function (dex) {
     return indices;
   }
   return array;
-}
-;
+};
 },{}],5:[function(require,module,exports){
 /**
  *
@@ -7943,6 +7942,7 @@ var Sankey = function (userConfig) {
     'palette': "ECharts",
     units: "UNITS",
     iterations: 32,
+    aggregate: true,
     link: {
       normal: dex.config.link({
         'fill.fillColor': 'none',
@@ -8034,6 +8034,13 @@ var Sankey = function (userConfig) {
               "minValue": 1,
               "maxValue": 400,
               "initialValue": 32
+            },
+            {
+              "name" : "Aggregate Links",
+              "description": "Aggregate multiple links with same source/target into 1.",
+              "target": "aggregate",
+              "type" : "boolean",
+              "initialValue": true
             }
           ]
         }
@@ -8089,6 +8096,8 @@ var Sankey = function (userConfig) {
     var graph;
     var types = csv.guessTypes();
 
+    // When the last number in the data is a number, use it
+    // for proportional scaling.
     if (types[csv.header.length - 1] == "number") {
       var valueFn = function (csv) {
         return function (unusedCsv, unusedColumnIndex, ri) {
@@ -8096,10 +8105,20 @@ var Sankey = function (userConfig) {
         }
       }(csv);
 
-      graph = csv.exclude([csv.header.length - 1]).getGraph(valueFn);
+      if (config.aggregate) {
+        graph = csv.exclude([csv.header.length - 1]).getAggregatedGraph(valueFn);
+      }
+      else {
+        graph = csv.exclude([csv.header.length - 1]).getGraph(valueFn);
+      }
     }
     else {
-      graph = csv.getGraph();
+      if (config.aggregate) {
+        graph = csv.getAggregatedGraph();
+      }
+      else {
+        graph = csv.getGraph();
+      }
     }
 
     sankey
@@ -14521,7 +14540,8 @@ var Multiples = function (userConfig) {
     "refreshType": "update",
     "cell.height": 300,
     "cell.width": 400,
-    "limit": 500
+    "limit": 500,
+    "groupBy": ""
   };
 
   chart = new dex.component(userConfig, defaults);
@@ -14563,6 +14583,14 @@ var Multiples = function (userConfig) {
               "step": 10,
               "initialValue": 400,
               "target": "cell.width"
+            },
+            {
+              "name": "Group By",
+              "description": "Pick the columns on which to categorize or group the multiples by.",
+              "type": "multiple-choice",
+              "choices": chart.config.csv.header,
+              "initialValue" : "Name",
+              "target" : "groupBy",
             }
           ]
         }
@@ -14622,14 +14650,25 @@ var Multiples = function (userConfig) {
     // Remove the children of the chart's parent.
     $parent.empty();
 
-    var frames = csv.getFramesByIndex(0);
+    dex.console.log("GROUPING-BY: ", config.groupBy);
+    var frames;
+
+    if (config.groupBy !== undefined && config.groupBy.length > 0) {
+      //dex.console.log("GROUP-BY", config.groupBy);
+      //var columnNames = config.groupBy.split(",");
+      frames = csv.getFramesByColumns(config.groupBy);
+    }
+    else {
+      frames = csv.getFramesByIndex(0);
+    }
+
     if (frames.frameIndices.length > config.limit) {
       $parent.append("<h3>Limit of " + config.limit + " multiples imposed.  Attempted to chart " +
         frames.frameIndices.length + " multiples.</h3>");
       return chart;
     }
     //dex.console.stacktrace();
-    //dex.console.log("SIMPLE-MULTIPLES-FRAMES", frames);
+    dex.console.log("SIMPLE-MULTIPLES-FRAMES", frames);
 
     var $container = $parent.append("<div></div>")
       .addClass("dex-multiples")
@@ -22266,34 +22305,34 @@ csv.prototype.getFramesByColumns = function (columns) {
   var csv = this;
 
   var columnIndexes = columns.map(function (col) {
-    return this.getColumnNumber(col);
+    return csv.getColumnNumber(col);
   });
 
   var axisCsv = this.include(columnIndexes);
-  var seriesCsv = this.exclude(columnIndexes);
+  var frameMap = {};
 
-  // If there are no series.
-  if (seriesCsv.header.length == 0) {
-    return {
-      frameIndices: [axisCsv.header.join(" vs ")],
-      frames: [axisCsv]
+  axisCsv.data.forEach(function(row) {
+    var key = row.join(" > ");
+    if (frameMap[key] === undefined) {
+      frameMap[key] = new dex.csv(csv.header);
     }
-  }
+  });
+
+  csv.data.forEach(function(row) {
+    var key = dex.array.slice(row, columnIndexes).join(" > ");
+    frameMap[key].data.push(row);
+  });
 
   var frames = {
     frameIndices: [],
     frames: []
   };
 
-  seriesCsv.header.forEach(function (h, hi) {
-    frames.frameIndices.push(h);
-    var frame = new dex.csv(axisCsv);
-    frame.header.push(h);
-    seriesCsv.data.forEach(function (row, ri) {
-      frame.data[ri].push(row[hi]);
-    });
-    frames.frames.push(frame);
+  Object.keys(frameMap).forEach(function(key) {
+    frames.frameIndices.push(key);
+    frames.frames.push(frameMap[key])
   });
+
   dex.console.log("FRAMES", frames);
   return frames;
 };
@@ -22789,8 +22828,76 @@ csv.prototype.getGraph = function (valueFunction) {
     });
   }
 
-  //dex.console.log("NODES", nodes, links, indexMap);
+  //dex.console.log("NODES", nodes, "LINKS", JSON.stringify(links), "INDEX-MAP", indexMap);
   return {'nodes': nodes, 'links': links};
+};
+
+csv.prototype.getAggregatedGraph = function (valueFunction) {
+  var valueFn = valueFunction || function () {
+    return 1;
+  };
+  var csv = this;
+  var nodes = [];
+  var linkMap = {};
+  var links = [];
+  var nodeNum = 0;
+  var indexMap = [];
+
+  // Record uniques across the data, treating each column as it's own namespace.
+  csv.header.map(function (col, ci) {
+    indexMap.push({});
+    csv.data.map(function (row, ri) {
+      if (_.isUndefined(indexMap[ci][row[ci]])) {
+        indexMap[ci][row[ci]] = nodeNum;
+        nodes.push({'name': row[ci], 'category': csv.header[ci]});
+        nodeNum++;
+      }
+    });
+  });
+
+  for (var ci = 1; ci < csv.header.length; ci++) {
+    csv.data.map(function (row, ri) {
+      var source = indexMap[ci - 1][row[ci - 1]];
+      var target = indexMap[ci][row[ci]];
+      var value = valueFn(csv, ci - 1, ri, ci, ri);
+
+      if (linkMap[source] === undefined) {
+        linkMap[source] = {};
+      }
+
+      if (linkMap[source][target] === undefined)  {
+        linkMap[source][target] = value;
+      }
+      else {
+        linkMap[source][target] += value;
+      }
+    });
+  }
+
+  Object.keys(linkMap).forEach(function(source) {
+    Object.keys(linkMap[source]).forEach(function(target) {
+      links.push({
+        'source': +source,
+        'target': +target,
+        'value': +(linkMap[source][target])
+      });
+    });
+  });
+
+  //dex.console.log("AGGREGATED > NODES", nodes, "LINKS", JSON.stringify(links), "INDEX-MAP", indexMap);
+  return {'nodes': nodes, 'links': links};
+};
+
+csv.prototype.toNestedJson = function (manualWeight) {
+  var csv = this;
+  manualWeight = manualWeight || false;
+  var result = {
+    'name': csv.header[0],
+    'children': this.toNestedJsonChildren(
+      this.getConnectionMap(csv), manualWeight)
+  };
+  //dex.console.log("toNestedJson.result()", result);
+  return result;
 };
 
 csv.prototype.toNestedJson = function (manualWeight) {
@@ -25218,13 +25325,6 @@ var datafilterpane = function (userConfig) {
 
       $root.append($dateContainer);
     }
-
-    /*
-    var $manualFilterContainer = $("<div><h3>Manual Filter</h3></div>");
-    var $mfInput = $("<input type='text' name='manualFilter'></input>");
-    $manualFilterContainer.append($mfInput);
-    $root.append($manualFilterContainer);
-    */
     
     $panelBody.append($root);
     $panelCollapser.append($panelBody);
@@ -25540,6 +25640,7 @@ var guipane = function (userConfig) {
   var componentMap = {};
   var targetList = {};
   var INTITIALIZING = false;
+  var CHANGED = false;
 
   var defaults = {
     // The parent container of this pane.
@@ -25643,7 +25744,56 @@ var guipane = function (userConfig) {
       }
     });
 
-    $choices.multiselect('updateButtonText');
+    var $multipleChoices = $(config.parent + ' .control-multiple-choice');
+
+    if ($multipleChoices.length > 0) {
+      $multipleChoices.multiselect({
+          includeSelectAllOption: true,
+          allSelectedText: 'All',
+          enableCaseInsensitiveFiltering: true,
+          enableHTML: true,
+          //enableFullValueFiltering: true,
+          buttonText: function buttonTextHandler(options, select) {
+            //dex.console.log("OPTIONS", options, "SELECT", select[0]);
+            if (options !== undefined && select !== undefined && select.length > 0) {
+
+              if (options.length == select[0].children.length) {
+                return "Selected: All (" + select[0].children.length + ")";
+              }
+              else {
+                return "<font color='red'>Selected: " + options.length + " of " +
+                  select[0].children.length + "</font>";
+              }
+            }
+            else {
+              return "Undefined";
+            }
+          },
+          onSelectAll: function selectAllHandler() {
+            CHANGED = true;
+          },
+          onChange: function onChangeHandler(option, checked) {
+            CHANGED = true;
+          },
+          onDropdownHide: function onDropdownHideHandler(evt) {
+            if (this.getSelected().length > 0) {
+              var option = this.getSelected()[0];
+              var vals = this.getSelected().map(function () {
+                return $(this).text();
+              }).get();
+              var cmp = componentMap[option.getAttribute("targetComponent")];
+              var attName = option.getAttribute("targetAttribute");
+              if (cmp != undefined) {
+                cmp.attrSave(attName, vals);
+                  cmp.refreshAsync();
+              }
+            }
+          }
+        });
+
+      //$multipleChoices.multiselect('selectAll', false);
+      $multipleChoices.multiselect('updateButtonText', false);
+    }
 
     // Enable String Input
     var stringInputs = $(config.parent + ' .control-string input');
@@ -25844,6 +25994,9 @@ var guipane = function (userConfig) {
       case "choice" :
         addChoice(targetComponent, $targetElt, guiDef, depth);
         break;
+      case "multiple-choice" :
+        addMultipleChoice(targetComponent, $targetElt, guiDef, depth);
+        break;
       case "color" :
         addColor(targetComponent, $targetElt, guiDef, depth);
         break;
@@ -25957,6 +26110,45 @@ var guipane = function (userConfig) {
         .attr("targetComponent", targetComponent)
         .text(choice);
 
+      if (choice === guiDef.initialValue) {
+        $option.attr("selected", "selected");
+      }
+
+      $select.append($option);
+    });
+
+    $leftCell.append($label);
+    $rightCell.append($select);
+    $row.append($leftCell);
+    $row.append($rightCell);
+
+    //dex.console.log("CHOICE", guiDef);
+    $targetElt.append($row);
+  }
+
+  function addMultipleChoice(targetComponent, $targetElt, guiDef, depth) {
+    var $row = $("<tr></tr>");
+    var $leftCell = $("<td></td>");
+    var $rightCell = $("<td></td>");
+    var $label = $("<label></label>")
+      .attr("title", guiDef.description)
+      .html("<strong>" + guiDef.name + ": </strong>")
+
+    var $select = $("<select></select>")
+      .attr("multiple", "multiple")
+      .attr("id", guiDef.name)
+      .attr("targetAttribute", guiDef.target)
+      .attr("targetComponent", targetComponent)
+      .addClass("control-multiple-choice");
+
+    guiDef.choices.forEach(function (choice) {
+      var $option = $("<option></option>")
+        .attr("value", choice)
+        .attr("targetAttribute", guiDef.target)
+        .attr("targetComponent", targetComponent)
+        .text(choice);
+
+      dex.console.log("COMPARING CHOICE: '" + choice + "' to '", guiDef);
       if (choice === guiDef.initialValue) {
         $option.attr("selected", "selected");
       }
