@@ -7947,7 +7947,7 @@ var Sankey = function (userConfig) {
       normal: dex.config.link({
         'fill.fillColor': 'none',
         'stroke.color': 'black',
-        'stroke.opacity': .2
+        'stroke.opacity': .05
       }),
       emphasis: dex.config.link({
         'fill.fillColor': 'none',
@@ -7958,7 +7958,7 @@ var Sankey = function (userConfig) {
     node: {
       normal: dex.config.link({
         'width': 20,
-        'padding': 10,
+        'padding': .05,
         'fill.fillColor': 'none',
         'stroke.color': 'black',
         'stroke.opacity': .2
@@ -8186,7 +8186,7 @@ var Sankey = function (userConfig) {
       .enter().append("g")
       .attr("class", "node")
       .attr("transform", function (d) {
-        //dex.console.log("CONTAINER-D", d);
+        //dex.console.log("ADDING NODE AT: ", d);
         return "translate(" + d.x + "," + d.y + ")";
       })
       .call(d3.drag()
@@ -8299,7 +8299,7 @@ var Sankey = function (userConfig) {
     d3 = dex.charts.d3.d3v4;
     var sankey = {},
       nodeWidth = 24,
-      nodePadding = 8,
+      nodePadding = .1,
       size = [1, 1],
       nodes = [],
       links = [];
@@ -8476,19 +8476,48 @@ var Sankey = function (userConfig) {
       }
 
       function initializeNodeDepth() {
+        //dex.console.log("Nodes-By-Breadth", nodesByBreadth);
+
+        var maxNodes = d3.max(nodesByBreadth, function(nodes) {
+          return nodes.length;
+        });
+        //dex.console.log("MAX-NODES", maxNodes);
+        // If the space used for padding exceeds 10% of total size,
+        // shrink to 10%
+        var columnPadding = (maxNodes > 1) ?
+          (size[1] * nodePadding) / (maxNodes - 1) : 0;
+
+        // Create base ky based on worst case (most rows)
         var ky = d3.min(nodesByBreadth, function (nodes) {
-          return (size[1] - (nodes.length - 1) * nodePadding) / d3.sum(nodes, value);
+          //dex.console.log("size1", size[1]);
+          return (size[1] - ((nodes.length - 1) * columnPadding)) /
+            d3.sum(nodes, value);
         });
 
+        var yPixelMap = {};
+
         nodesByBreadth.forEach(function (nodes) {
+          var columnPadding = (nodes.length > 1) ?
+            (size[1] * nodePadding) / (nodes.length - 1) : 0;
+
+          var yPixels = (size[1] - ((nodes.length - 1) * columnPadding)) /
+            d3.sum(nodes, value);
+          yPixelMap[nodes[0].category] = yPixels;
+
           nodes.forEach(function (node, i) {
             node.y = i;
-            node.dy = node.value * ky;
+            // This is it:
+            //dex.console.log("node", node);
+
+            node.yPixels = yPixels;
+            node.dy = node.value * yPixels;
           });
         });
 
         links.forEach(function (link) {
-          link.dy = link.value * ky;
+          //dex.console.log("LINK", link);
+          //link.dy = link.value * ky;
+          link.dy = link.value * yPixelMap[link.source.category];
         });
       }
 
@@ -8530,24 +8559,26 @@ var Sankey = function (userConfig) {
             n = nodes.length,
             i;
 
+          var columnPadding = (size[1] * .1) / (nodes.length - 1);
+
           // Push any overlapping nodes down.
           nodes.sort(ascendingDepth);
           for (i = 0; i < n; ++i) {
             node = nodes[i];
             dy = y0 - node.y;
             if (dy > 0) node.y += dy;
-            y0 = node.y + node.dy + nodePadding;
+            y0 = node.y + node.dy + columnPadding;
           }
 
           // If the bottommost node goes outside the bounds, push it back up.
-          dy = y0 - nodePadding - size[1];
+          dy = y0 - columnPadding - size[1];
           if (dy > 0) {
             y0 = node.y -= dy;
 
             // Push any overlapping nodes back up.
             for (i = n - 2; i >= 0; --i) {
               node = nodes[i];
-              dy = node.y + node.dy + nodePadding - y0;
+              dy = node.y + node.dy + columnPadding - y0;
               if (dy > 0) node.y -= dy;
               y0 = node.y;
             }
