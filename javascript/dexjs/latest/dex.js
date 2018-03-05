@@ -4032,11 +4032,8 @@ var Chord = function (userConfig) {
     var chart = this;
     var config = chart.config;
     var csv = config.csv;
-    var margin = config.margin;
-    margin.top = +margin.top;
-    margin.bottom = +margin.bottom;
-    margin.left = +margin.left;
-    margin.right = +margin.right;
+    var margin = chart.getMargins();
+
     config.color = config.color = dex.color.getColormap(config.colorScheme);
 
     var width = +config.width - margin.left - margin.right;
@@ -8060,7 +8057,6 @@ var Sankey = function (userConfig) {
   chart.update = function () {
     d3 = dex.charts.d3.d3v4;
     var config = chart.config;
-    var margin = config.margin;
     var csv = config.csv;
     var units = config.units;
 
@@ -8216,7 +8212,7 @@ var Sankey = function (userConfig) {
           .call(dex.config.configureLink, config.link.emphasis)
           .style("fill", "none")
           .style("stroke-width", function (d) {
-            return Math.max(1, d.dy);
+            return Math.max(.1, d.dy);
           });
       })
       .on("mouseout", function (d) {
@@ -8265,6 +8261,14 @@ var Sankey = function (userConfig) {
       .attr("dy", ".35em")
       .attr("text-anchor", "end")
       .attr("transform", null)
+      .attr("visibility", function(d) {
+        if (d.dy < (chart.config.label.normal.font.size - 1)) {
+          return "hidden";
+        }
+        else {
+          return "visible";
+        }
+      })
       .text(function (d) {
         return d.name;
       })
@@ -8481,9 +8485,8 @@ var Sankey = function (userConfig) {
         var maxNodes = d3.max(nodesByBreadth, function(nodes) {
           return nodes.length;
         });
-        //dex.console.log("MAX-NODES", maxNodes);
-        // If the space used for padding exceeds 10% of total size,
-        // shrink to 10%
+        // Set columnPadding to the number of pixels to space between
+        // nodes with a special case of 1 node being unpadded.
         var columnPadding = (maxNodes > 1) ?
           (size[1] * nodePadding) / (maxNodes - 1) : 0;
 
@@ -8494,30 +8497,16 @@ var Sankey = function (userConfig) {
             d3.sum(nodes, value);
         });
 
-        var yPixelMap = {};
-
         nodesByBreadth.forEach(function (nodes) {
-          var columnPadding = (nodes.length > 1) ?
-            (size[1] * nodePadding) / (nodes.length - 1) : 0;
-
-          var yPixels = (size[1] - ((nodes.length - 1) * columnPadding)) /
-            d3.sum(nodes, value);
-          yPixelMap[nodes[0].category] = yPixels;
 
           nodes.forEach(function (node, i) {
             node.y = i;
-            // This is it:
-            //dex.console.log("node", node);
-
-            node.yPixels = yPixels;
-            node.dy = node.value * yPixels;
+            node.dy = node.value * ky;
           });
         });
 
         links.forEach(function (link) {
-          //dex.console.log("LINK", link);
-          //link.dy = link.value * ky;
-          link.dy = link.value * yPixelMap[link.source.category];
+          link.dy = link.value * ky;
         });
       }
 
@@ -8559,7 +8548,9 @@ var Sankey = function (userConfig) {
             n = nodes.length,
             i;
 
-          var columnPadding = (size[1] * .1) / (nodes.length - 1);
+          var columnPadding = (nodes.length > 1) ?
+            (size[1] * nodePadding) / (nodes.length - 1) :
+            1;
 
           // Push any overlapping nodes down.
           nodes.sort(ascendingDepth);
