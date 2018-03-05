@@ -6697,16 +6697,14 @@ var ParallelCoordinates = function (userConfig) {
         }
       }
     }),
-    'verticalLabel': dex.config.text({
+    'tickLabel': dex.config.text({
       // If you want to stagger labels.
       'dy': function (d, i) {
         return (i % 2) ?
           -chart.config.margin.top * .40 :
           -chart.config.margin.top * .40;
       },
-      'font.size': function (d) {
-        return 18
-      },
+      'font.size': 18,
       'fill.fillColor': 'red',
       'anchor': 'middle',
       'text': function (d) {
@@ -6805,9 +6803,9 @@ var ParallelCoordinates = function (userConfig) {
           ]
         },
         dex.config.gui.brush({}, "brush"),
-        dex.config.gui.text({name: "Tick Label"}, "axis.label"),
+        dex.config.gui.text({name: "Tick Label"}, "tickLabel"),
         dex.config.gui.path({name: "Axis Line"}, "axis.line"),
-        dex.config.gui.text({name: "Axis Label"}, "verticalLabel"),
+        dex.config.gui.text({name: "Axis Label"}, "axis.label"),
         dex.config.gui.linkGroup({}, "link")
       ]
     };
@@ -6971,11 +6969,14 @@ var ParallelCoordinates = function (userConfig) {
 
         // Now that the axis has rendered, adjust the tick labels based on our spec.
         var tickLabels = d3.select(this)
-          .selectAll('.tick text')
-          .call(dex.config.configureText, myConfig.label, i);
+          .selectAll("text")
+          .call(dex.config.configureText, config.tickLabel, i);
 
+        //var axisLabels = d3.select(this)
+        //  .selectAll('.tick text')
+        //  .call(dex.config.configureText, myConfig.label, i);
 
-        var maxFont = 48;
+        var maxFont = config.tickLabel.font.size;
 
         var availableHeight = height / (tickLabels[0].length);
 
@@ -6991,15 +6992,23 @@ var ParallelCoordinates = function (userConfig) {
             }
           });
 
-        maxFont = Math.min(availableHeight, maxFont);
-        tickLabels.style("font-size", "" + maxFont + "px")
+        maxFont = Math.min(availableHeight - 1, maxFont);
+        tickLabels
+          .style("font-size", "" + maxFont + "px")
+          .attr("visibility", function(d) {
+            "use strict";
+            if (maxFont < 4) {
+              return "hidden";
+            }
+            else {
+              return "visible";
+            }
+          })
           .attr("dy", ".3em")
           .attr("dx", (i < config.csv.header.length - 1) ? "-4px" : "4px");
-
-
       })
       .append("text")
-      .call(dex.config.configureText, config.verticalLabel);
+      .call(dex.config.configureText, config.tickLabel);
 
     // Add and store a brush for each axis.
     var brush = g.append("g")
@@ -13306,7 +13315,7 @@ var RadarChart = function (userConfig) {
       normal: {
         lineStyle: {
           width: 1,
-          opacity: .8
+          opacity: .5
         }
       },
       emphasis: {
@@ -13354,6 +13363,7 @@ var RadarChart = function (userConfig) {
             dex.config.gui.echartsTitle({}, "options.title"),
             dex.config.gui.echartsGrid({}, "options.grid"),
             dex.config.gui.echartsSymbol({}, "series"),
+            dex.config.gui.echartsItemStyle({}, "itemStyle"),
             {
               "name": "Color Scheme",
               "description": "The color scheme.",
@@ -13371,8 +13381,9 @@ var RadarChart = function (userConfig) {
             }
           ]
         },
-        dex.config.gui.echartsLabel({name: "Normal Label"}, "series.label.normal"),
-        dex.config.gui.echartsLabel({name: "Emphasis Label"}, "series.label.emphasis")
+        dex.config.gui.echartsLabelGroup({}, "series.label"),
+        dex.config.gui.echartsLineStyle({}, "series.lineStyle"),
+        dex.config.gui.echartsAreaStyle({}, "series.areaStyle")
       ]
     };
 
@@ -20672,6 +20683,49 @@ module.exports = function (dex) {
     };
     return dex.config.expandAndOverlay(userConfig, defaults);
   };
+  gui.echartsAreaStyle = function echartsAreaStyle(config, prefix) {
+    var ns = (typeof prefix !== 'undefined') ? (prefix + ".") : "";
+    var userConfig = config || {};
+    var defaults = {
+      "type": "group",
+      "name": "Area Style",
+      "contents": [
+        {
+          "name": "Color",
+          "description": "Area color.",
+          "target": ns + "color",
+          "type": "color",
+          "initialValue": "#000000"
+        },
+        {
+          "name": "Shadow Blur",
+          "description": "Shadow blur.",
+          "target": ns + "shadowBlur",
+          "type": "float",
+          "minValue": 0,
+          "maxValue": 20,
+          "initialValue": 0
+        },
+        {
+          "name": "Shadow Color",
+          "description": "Shadow color.",
+          "target": ns + "shadowColor",
+          "type": "color",
+          "initialValue": "#000000"
+        },
+        {
+          "name": "Opacity",
+          "description": "Opacity.",
+          "target": ns + "opacity",
+          "type": "float",
+          "minValue": 0,
+          "maxValue": 1,
+          "initialValue": 1
+        }
+      ]
+    };
+    return dex.config.expandAndOverlay(userConfig, defaults);
+  };
   gui.echartsTitle = function echartsTitle(config, prefix) {
     var ns = (typeof prefix !== 'undefined') ? (prefix + ".") : "";
     var userConfig = config || {};
@@ -25699,6 +25753,7 @@ var guipane = function (userConfig) {
 
     $pickers.spectrum({
       showPalette: true,
+      showAlpha: true,
       palette: [
         ["rgb(0, 0, 0)", "rgb(67, 67, 67)", "rgb(102, 102, 102)", /*"rgb(153, 153, 153)","rgb(183, 183, 183)",*/
           "rgb(204, 204, 204)", "rgb(217, 217, 217)", /*"rgb(239, 239, 239)", "rgb(243, 243, 243)",*/ "rgb(255, 255, 255)"],
