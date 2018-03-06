@@ -3331,6 +3331,7 @@ module.exports = function charts() {
     'd3plus'   : require("./d3plus/d3plus"),
     'echarts'  : require("./echarts/echarts"),
     'elegans'  : require("./elegans/elegans"),
+    'grid'     : require("./grid/grid"),
     'multiples': require("./multiples/multiples"),
     'nvd3'     : require("./nvd3/nvd3"),
     'taucharts': require("./taucharts/taucharts"),
@@ -3338,7 +3339,7 @@ module.exports = function charts() {
     'vis'      : require("./vis/vis")
   };
 };
-},{"./c3/c3":14,"./d3/d3":36,"./d3plus/d3plus":38,"./echarts/echarts":50,"./elegans/elegans":52,"./multiples/multiples":55,"./nvd3/nvd3":58,"./taucharts/taucharts":67,"./threejs/threejs":69,"./vis/vis":72}],16:[function(require,module,exports){
+},{"./c3/c3":14,"./d3/d3":36,"./d3plus/d3plus":38,"./echarts/echarts":50,"./elegans/elegans":52,"./grid/grid":54,"./multiples/multiples":57,"./nvd3/nvd3":60,"./taucharts/taucharts":69,"./threejs/threejs":71,"./vis/vis":74}],16:[function(require,module,exports){
 /**
  *
  * This is the base constructor for a D3 BumpChart component.
@@ -14372,6 +14373,194 @@ module.exports = elegans;
 },{"./ScatterPlot":51}],53:[function(require,module,exports){
 /**
  *
+ * This is the base constructor for a JS Grid.
+ *
+ * @param userConfig The chart's configuration.
+ *
+ * @returns {JqGrid}
+ *
+ * @memberof dex/charts/grid
+ *
+ */
+var JqGrid = function (userConfig) {
+  var chart;
+
+  var defaults = {
+    'parent': '#Grid_JqGridParent',
+    'id': 'Grid_JqGridId',
+    'class': 'Grid_JqGridClass',
+    'resizable': true,
+    'width': "100%",
+    'height': "100%",
+    'margin': {top: 5, bottom: 5, left: 5, right: 5},
+    'grid': {
+      "height": "auto",
+      "datatype": "local",
+      "search": true,
+      "page": 1,
+      "height": "auto",
+      "width": "auto",
+      "loadonce": true,
+      "rowNum": 1000
+    }
+  };
+
+  chart = new dex.component(userConfig, defaults);
+
+  chart.getGuiDefinition = function getGuiDefinition(config) {
+    var defaults = {
+      "type": "group",
+      "name": "Grid Configuration",
+      "contents": [
+        dex.config.gui.dimensions(),
+        dex.config.gui.general(),
+        {
+          "type": "group",
+          "name": "Miscellaneous",
+          "contents": []
+        }
+      ]
+    };
+
+    var guiDef = dex.config.expandAndOverlay(config, defaults);
+    dex.config.gui.sync(chart, guiDef);
+    return guiDef;
+  };
+
+  chart.render = function render() {
+    d3 = dex.charts.d3.d3v3;
+    chart.resize().update();
+    return chart;
+  };
+
+  chart.update = function update() {
+    var config = chart.config;
+    var csv = config.csv;
+    var margin = chart.getMargins();
+
+    var width = +config.width - margin.left - margin.right;
+    var height = +config.height - margin.top - margin.bottom;
+
+    // Remove the old stuff
+    d3.selectAll(config.parent).selectAll("*").remove();
+
+    var colModel = csv.guessTypes().map(function (type, hi) {
+      switch (type) {
+        case "string": {
+          return {
+            name: csv.header[hi],
+            index: csv.header[hi],
+            width: 40
+          }
+        }
+        case "number" : {
+          return {
+            name: csv.header[hi],
+            index: csv.header[hi],
+            sorttype: "float",
+            width: 30
+          }
+        }
+        default: {
+          return {
+            name: csv.header[hi],
+            index: csv.header[hi],
+            sorttype: "text",
+            width: 20
+          }
+        }
+      }
+    });
+
+    //dex.console.log("FIELDS", fields);
+    var $parent = $(config.parent);
+    //dex.console.log("parent", $parent);
+
+    config.grid.colModel = colModel;
+    var $list = $("<table id='" + config.id + "_list'></table>");
+    var $pager = $("<div id='" + config.id + "_pager'></div>");
+
+    $parent.append($list);
+    $parent.append($pager);
+
+    config.grid.data = csv.toJson();
+    config.grid.colNames = csv.header;
+    config.grid.pager = "#" + config.id + "_pager";
+    //dex.console.log("height", $parent.height());
+    //dex.console.log("width", $parent.width());
+    config.grid.height = height * .9;
+    config.grid.width = width;
+
+    config.grid.numRows = 1000;
+    config.grid.scroll = 1;
+
+    //dex.console.log("config.grid", config.grid);
+    $("#" + config.id + "_list").jqGrid(config.grid);
+    $list.navGrid("#" + config.id + "_pager",
+      {
+        search: true,
+        add: false,
+        edit: false,
+        del: false,
+        refresh: true
+      },
+      // Edit options
+      {},
+      // Add options
+      {},
+      // Delete options
+      {},
+      // Search options
+      {
+        multipleSearch: true,
+        multipleGroup: true,
+        buttons: [
+          {
+            side: "right",
+            text: "Custom",
+            position: "first",
+            click: function (form, params, event) {
+              alert("Custom action in search form");
+            }
+          }
+        ]
+      }
+    );
+
+    return chart;
+  };
+
+  chart.refresh = function () {
+    return chart.update();
+  };
+
+  $(document).ready(function () {
+    var config = chart.config;
+    // Make the entire chart draggable.
+    //$(chart.config.parent).draggable();
+  });
+
+  return chart;
+
+};
+
+module.exports = JqGrid;
+},{}],54:[function(require,module,exports){
+/**
+ *
+ * This module contains components related to grids and tables of information.
+ *
+ * @module dex/charts/grid
+ *
+ */
+var grid = {};
+
+grid.JqGrid = require("./JqGrid");
+
+module.exports = grid;
+},{"./JqGrid":53}],55:[function(require,module,exports){
+/**
+ *
  * This is the base constructor for Gridster base multiples.
  *
  * @param userConfig The chart's configuration.
@@ -14545,7 +14734,7 @@ var GridsterMultiples = function (userConfig) {
 };
 
 module.exports = GridsterMultiples;
-},{}],54:[function(require,module,exports){
+},{}],56:[function(require,module,exports){
 /**
  *
  * This is the base constructor for Simple HTML based multiples.
@@ -14757,7 +14946,7 @@ var Multiples = function (userConfig) {
 };
 
 module.exports = Multiples;
-},{}],55:[function(require,module,exports){
+},{}],57:[function(require,module,exports){
 /**
  *
  * This module contains components related to producing multiples.
@@ -14771,7 +14960,7 @@ multiples.GridsterMultiples = require("./GridsterMultiples");
 multiples.Multiples = require("./SimpleMultiples");
 
 module.exports = multiples;
-},{"./GridsterMultiples":53,"./SimpleMultiples":54}],56:[function(require,module,exports){
+},{"./GridsterMultiples":55,"./SimpleMultiples":56}],58:[function(require,module,exports){
 /**
  *
  * This is the base constructor for a NVD3 BubbleChart.
@@ -14941,7 +15130,7 @@ var BubbleChart = function (userConfig) {
 };
 
 module.exports = BubbleChart;
-},{}],57:[function(require,module,exports){
+},{}],59:[function(require,module,exports){
 /**
  *
  * This is the base constructor for a NVD3 StackedAreaChart.
@@ -15096,7 +15285,7 @@ var StackedAreaChart = function (userConfig) {
 };
 
 module.exports = StackedAreaChart;
-},{}],58:[function(require,module,exports){
+},{}],60:[function(require,module,exports){
 /**
  *
  * This module provides NVD3 based visualization components.
@@ -15110,7 +15299,7 @@ nvd3.StackedAreaChart = require("./StackedAreaChart");
 nvd3.BubbleChart = require("./BubbleChart");
 
 module.exports = nvd3;
-},{"./BubbleChart":56,"./StackedAreaChart":57}],59:[function(require,module,exports){
+},{"./BubbleChart":58,"./StackedAreaChart":59}],61:[function(require,module,exports){
 /**
  *
  * This is the base constructor for a TauChart AreaChart.
@@ -15140,7 +15329,7 @@ var AreaChart = function (userConfig) {
   return chart;
 };
 module.exports = AreaChart;
-},{}],60:[function(require,module,exports){
+},{}],62:[function(require,module,exports){
 /**
  *
  * This is the base constructor for a TauChart BarChart.
@@ -15170,7 +15359,7 @@ var BarChart = function (userConfig) {
   return chart;
 };
 module.exports = BarChart;
-},{}],61:[function(require,module,exports){
+},{}],63:[function(require,module,exports){
 /**
  *
  * This is the base constructor for a TauChart HorizontalBarChart.
@@ -15200,7 +15389,7 @@ var HorizontalBarChart = function (userConfig) {
   return chart;
 };
 module.exports = HorizontalBarChart;
-},{}],62:[function(require,module,exports){
+},{}],64:[function(require,module,exports){
 /**
  *
  * This is the base constructor for a TauChart HorizontalStackedBarChart.
@@ -15230,7 +15419,7 @@ var HorizontalStackedBarChart = function (userConfig) {
   return chart;
 };
 module.exports = HorizontalStackedBarChart;
-},{}],63:[function(require,module,exports){
+},{}],65:[function(require,module,exports){
 /**
  *
  * This is the base constructor for a TauChart LineChart.
@@ -15260,7 +15449,7 @@ var LineChart = function (userConfig) {
   return chart;
 };
 module.exports = LineChart;
-},{}],64:[function(require,module,exports){
+},{}],66:[function(require,module,exports){
 /**
  *
  * This is the base constructor for a TauChart ScatterPlot.
@@ -15290,7 +15479,7 @@ var ScatterPlot = function (userConfig) {
   return chart;
 };
 module.exports = ScatterPlot;
-},{}],65:[function(require,module,exports){
+},{}],67:[function(require,module,exports){
 /**
  *
  * This is the base constructor for a TauChart StackedBarChart.
@@ -15320,7 +15509,7 @@ var StackedBarChart = function (userConfig) {
   return chart;
 };
 module.exports = StackedBarChart;
-},{}],66:[function(require,module,exports){
+},{}],68:[function(require,module,exports){
 /**
  *
  * This is the base constructor for a TauChart.
@@ -15707,7 +15896,7 @@ var TauChart = function (userConfig) {
 };
 
 module.exports = TauChart;
-},{}],67:[function(require,module,exports){
+},{}],69:[function(require,module,exports){
 /**
  *
  * @module dex/charts/taucharts
@@ -15724,7 +15913,7 @@ taucharts.StackedBarChart = require("./StackedBarChart");
 taucharts.HorizontalBarChart = require("./HorizontalBarChart");
 taucharts.HorizontalStackedBarChart = require("./HorizontalStackedBarChart");
 module.exports = taucharts;
-},{"./AreaChart":59,"./BarChart":60,"./HorizontalBarChart":61,"./HorizontalStackedBarChart":62,"./LineChart":63,"./ScatterPlot":64,"./StackedBarChart":65,"./TauChart":66}],68:[function(require,module,exports){
+},{"./AreaChart":61,"./BarChart":62,"./HorizontalBarChart":63,"./HorizontalStackedBarChart":64,"./LineChart":65,"./ScatterPlot":66,"./StackedBarChart":67,"./TauChart":68}],70:[function(require,module,exports){
 /**
  *
  * This is the base constructor for a WebGL ScatterPlot component.
@@ -16105,7 +16294,7 @@ var ScatterPlot = function (userConfig) {
 };
 
 module.exports = ScatterPlot;
-},{}],69:[function(require,module,exports){
+},{}],71:[function(require,module,exports){
 /**
  *
  * This module provides ThreeJS/WebGL based visualization components.
@@ -16118,7 +16307,7 @@ var threejs = {};
 threejs.ScatterPlot = require("./ScatterPlot");
 
 module.exports = threejs;
-},{"./ScatterPlot":68}],70:[function(require,module,exports){
+},{"./ScatterPlot":70}],72:[function(require,module,exports){
 /**
  *
  * This is the base constructor for a VisJS Network component.
@@ -16517,7 +16706,7 @@ var Network = function (userConfig) {
 };
 
 module.exports = Network;
-},{}],71:[function(require,module,exports){
+},{}],73:[function(require,module,exports){
 /**
  *
  * This is the base constructor for a VisJS Timeline component.
@@ -16662,7 +16851,7 @@ var Network = function (userConfig) {
 };
 
 module.exports = Network;
-},{}],72:[function(require,module,exports){
+},{}],74:[function(require,module,exports){
 /**
  *
  * This module provides VisJS based visualizations.
@@ -16676,7 +16865,7 @@ vis.Network = require("./Network");
 vis.Timeline = require("./Timeline");
 
 module.exports = vis;
-},{"./Network":70,"./Timeline":71}],73:[function(require,module,exports){
+},{"./Network":72,"./Timeline":73}],75:[function(require,module,exports){
 module.exports = function (dex) {
   /**
    *
@@ -17259,7 +17448,7 @@ module.exports = function (dex) {
   return color;
 };
 
-},{}],74:[function(require,module,exports){
+},{}],76:[function(require,module,exports){
 module.exports = function (dex) {
   /**
    *
@@ -17846,7 +18035,7 @@ module.exports = function (dex) {
   return component;
 };
 
-},{}],75:[function(require,module,exports){
+},{}],77:[function(require,module,exports){
 module.exports = function (dex) {
   /**
    *
@@ -19165,7 +19354,7 @@ module.exports = function (dex) {
 
   return config;
 };
-},{"./gui":76}],76:[function(require,module,exports){
+},{"./gui":78}],78:[function(require,module,exports){
 module.exports = function (dex) {
   /**
    *
@@ -21166,7 +21355,7 @@ module.exports = function (dex) {
 
   return gui;
 };
-},{}],77:[function(require,module,exports){
+},{}],79:[function(require,module,exports){
 module.exports = function (dex) {
   /**
    *
@@ -21379,7 +21568,7 @@ module.exports = function (dex) {
 
   return dexConsole;
 };
-},{}],78:[function(require,module,exports){
+},{}],80:[function(require,module,exports){
 /**
  *
  * Construct a csv from the supplied header and data.
@@ -23103,7 +23292,7 @@ csv.prototype.getConnectionMap = function () {
 };
 
 module.exports = csv;
-},{}],79:[function(require,module,exports){
+},{}],81:[function(require,module,exports){
 module.exports = function (dex) {
   return function (name) {
     function spec(name) {
@@ -23324,7 +23513,7 @@ module.exports = function (dex) {
     return new spec(name);
   }
 };
-},{}],80:[function(require,module,exports){
+},{}],82:[function(require,module,exports){
 module.exports = function (dex) {
   /**
    *
@@ -23752,7 +23941,7 @@ module.exports = function (dex) {
   return datagen;
 };
 
-},{}],81:[function(require,module,exports){
+},{}],83:[function(require,module,exports){
 /**
  *
  * @type {dex}
@@ -23930,7 +24119,7 @@ if ($.fn.button.noConflict != undefined) {
 }
 
 module.exports = dex;
-},{"../lib/noUiSlider/noUiSlider":3,"./array/array":4,"./charts/charts":15,"./color/color":73,"./component/component":74,"./config/config":75,"./console/console":77,"./csv/csv":78,"./data/spec":79,"./datagen/datagen":80,"./geometry/geometry":82,"./json/json":83,"./matrix/matrix":84,"./object/object":85,"./ui/ui":93,"./util/util":95}],82:[function(require,module,exports){
+},{"../lib/noUiSlider/noUiSlider":3,"./array/array":4,"./charts/charts":15,"./color/color":75,"./component/component":76,"./config/config":77,"./console/console":79,"./csv/csv":80,"./data/spec":81,"./datagen/datagen":82,"./geometry/geometry":84,"./json/json":85,"./matrix/matrix":86,"./object/object":87,"./ui/ui":95,"./util/util":97}],84:[function(require,module,exports){
 module.exports = function (dex) {
   /**
    *
@@ -24186,7 +24375,7 @@ module.exports = function (dex) {
   return geometry;
 };
 
-},{}],83:[function(require,module,exports){
+},{}],85:[function(require,module,exports){
 module.exports = function (dex) {
   /**
    *
@@ -24308,7 +24497,7 @@ module.exports = function (dex) {
   return json;
 };
 
-},{}],84:[function(require,module,exports){
+},{}],86:[function(require,module,exports){
 module.exports = function (dex) {
   /**
    *
@@ -24649,7 +24838,7 @@ module.exports = function (dex) {
   return matrix;
 };
 
-},{}],85:[function(require,module,exports){
+},{}],87:[function(require,module,exports){
 module.exports = function (dex) {
   Function.prototype.clone = function() {
     var fct = this;
@@ -25059,7 +25248,7 @@ module.exports = function (dex) {
 };
 
 
-},{}],86:[function(require,module,exports){
+},{}],88:[function(require,module,exports){
 /**
  *
  * Creates a Table component for visualizing tabular data.
@@ -25139,7 +25328,7 @@ var ColumnSelector = function (userConfig) {
 };
 
 module.exports = ColumnSelector;
-},{}],87:[function(require,module,exports){
+},{}],89:[function(require,module,exports){
 /**
  *
  * Creates a ConfigurationPane component.
@@ -25264,7 +25453,7 @@ var ConfigurationPane = function (userConfig) {
 };
 
 module.exports = ConfigurationPane;
-},{}],88:[function(require,module,exports){
+},{}],90:[function(require,module,exports){
 var datafilterpane = function (userConfig) {
   var chart;
   var INITIALIZING = false;
@@ -25710,7 +25899,7 @@ var datafilterpane = function (userConfig) {
 };
 
 module.exports = datafilterpane;
-},{}],89:[function(require,module,exports){
+},{}],91:[function(require,module,exports){
 var guipane = function (userConfig) {
   var pane;
   var componentMap = {};
@@ -26426,7 +26615,7 @@ var guipane = function (userConfig) {
 };
 
 module.exports = guipane;
-},{}],90:[function(require,module,exports){
+},{}],92:[function(require,module,exports){
 /**
  *
  * Construct a player component.
@@ -26635,7 +26824,7 @@ var Player = function (userConfig) {
 };
 
 module.exports = Player;
-},{}],91:[function(require,module,exports){
+},{}],93:[function(require,module,exports){
 /**
  *
  * This creates a SqlQuery component which provides a SQL
@@ -26730,7 +26919,7 @@ var SqlQuery = function (userConfig) {
 };
 
 module.exports = SqlQuery;
-},{}],92:[function(require,module,exports){
+},{}],94:[function(require,module,exports){
 /**
  *
  * Creates a Table component for visualizing tabular data.
@@ -26826,7 +27015,7 @@ var Table = function (userConfig) {
 };
 
 module.exports = Table;
-},{}],93:[function(require,module,exports){
+},{}],95:[function(require,module,exports){
 module.exports = function (dex) {
   /**
    *
@@ -26846,7 +27035,7 @@ module.exports = function (dex) {
   ui.ColumnSelector = require("./ColumnSelector");
   return ui;
 };
-},{"./ColumnSelector":86,"./ConfigurationPane":87,"./DataFilterPane":88,"./GuiPane":89,"./Player":90,"./SqlQuery":91,"./Table":92}],94:[function(require,module,exports){
+},{"./ColumnSelector":88,"./ConfigurationPane":89,"./DataFilterPane":90,"./GuiPane":91,"./Player":92,"./SqlQuery":93,"./Table":94}],96:[function(require,module,exports){
 module.exports = function util(dex) {
   /**
    *
@@ -26931,7 +27120,7 @@ module.exports = function util(dex) {
 
   return d3util;
 };
-},{}],95:[function(require,module,exports){
+},{}],97:[function(require,module,exports){
 module.exports = function (dex) {
 
   var util = {};
@@ -26940,5 +27129,5 @@ module.exports = function (dex) {
 
   return util;
 };
-},{"./d3":94}]},{},[81])(81)
+},{"./d3":96}]},{},[83])(83)
 });
