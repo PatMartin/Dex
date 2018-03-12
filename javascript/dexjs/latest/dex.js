@@ -11274,30 +11274,39 @@ var RingNetwork = function (userConfig) {
     'class': 'RingNetworkClass',
     'resizable': true,
     // Sample default data...
-    'csv': {
-      'header': ["NAME", "GENDER", "VEHICLE"],
-      'data': [
-        ["JIM", "M", "CAR"],
-        ["JOE", "M", "CAR"],
-        ["PAT", "M", "TRUCK"],
-        ["SALLY", "F", "TRUCK"]
-      ]
-    },
+    'csv': undefined,
     'type': "rings",
     'connect': 'last',
     //'connect' : 'all',
     'width': "100%",
     'height': "100%",
-    'transform': "",
-    'margin': {
-      'left': 100,
-      'right': 100,
-      'top': 50,
-      'bottom': 50
-    }
+    'transform': ""
   };
 
   var chart = new dex.component(userConfig, defaults);
+  chart.spec = new dex.data.spec("Ring Network")
+    .anything("nodes");
+
+  chart.getGuiDefinition = function getGuiDefinition(config) {
+    var defaults = {
+      "type": "group",
+      "name": "D3Plus Ring Network Settings",
+      "contents": [
+        dex.config.gui.general(),
+        dex.config.gui.dimensions(),
+        {
+          "type": "group",
+          "name": "General",
+          "contents": [
+          ]
+        }
+      ]
+    };
+
+    var guiDef = dex.config.expandAndOverlay(config, defaults);
+    dex.config.gui.sync(chart, guiDef);
+    return guiDef;
+  };
 
   chart.render = function render() {
     d3 = dex.charts.d3.d3v3;
@@ -11868,6 +11877,7 @@ var LineChart = function (userConfig) {
     "height": "100%",
     "type": "linechart",
     "palette": "ECharts",
+    "dimensions": { "series": 0, "x": 1, "y": 2 },
     // If I make this csv change aware, I can change update model to "update".
     "refreshType": "update",
     "series.symbol": "circle",
@@ -11935,6 +11945,8 @@ var LineChart = function (userConfig) {
     .any("x")
     .any("y");
 
+  //dex.console.log("SPEC", chart.spec);
+
   chart.getGuiDefinition = function getGuiDefinition(config) {
     var defaults = {
       "type": "group",
@@ -11948,6 +11960,10 @@ var LineChart = function (userConfig) {
             dex.config.gui.echartsGrid({}, "options.grid"),
             dex.config.gui.echartsTooltip({}, "options.tooltip"),
             dex.config.gui.echartsSymbol({}, "series"),
+            dex.config.gui.columnDimensions({},
+              "dimensions",
+              chart.config.csv,
+              chart.config.dimensions),
             {
               "name": "Color Scheme",
               "description": "The color scheme.",
@@ -12029,7 +12045,7 @@ var LineChart = function (userConfig) {
   chart.getOptions = function (csv) {
     var options, seriesNames, seriesInfo, xInfo, yInfo;
 
-    var csvSpec = chart.spec.parse(csv);
+    var csvSpec = chart.spec.parse(csv, chart.config.dimensions);
 
     //dex.console.log("CHART-CONFIG", chart.config);
     //dex.console.log("LINE-CHART-CSV", csv);
@@ -12054,20 +12070,25 @@ var LineChart = function (userConfig) {
     xInfo = csvSpec.specified[1];
     yInfo = csvSpec.specified[2];
 
-    chart.config.seriesInfo = seriesInfo;
-    chart.config.xInfo = xInfo;
-    chart.config.yInfo = yInfo;
+    var seriesIndex = csvSpec.specified[0].position;
+    var xIndex = csvSpec.specified[1].position;
+    var yIndex = csvSpec.specified[2].position;
+    var types = csv.guessTypes();
 
-    seriesNames = csv.uniqueArray(seriesInfo.position);
+    var xType = types[xIndex];
+    var yType = types[yIndex];
+    var seriesType = types[seriesIndex];
+
+    seriesNames = csv.uniqueArray(seriesIndex);
     options.legend = {data: seriesNames};
 
-    if (xInfo.type == "string") {
+    if (xType == "string") {
       options.xAxis = dex.config.expandAndOverlay({
         type: "category",
-        data: csv.uniqueArray(xInfo.position)
+        data: csv.uniqueArray(xIndex)
       }, options.xAxis);
     }
-    else if (xInfo.type == "date") {
+    else if (xType == "date") {
       options.xAxis = dex.config.expandAndOverlay({
         type: "time"
       }, options.xAxis);
@@ -12080,13 +12101,13 @@ var LineChart = function (userConfig) {
       options.xAxis.data = undefined;
     }
 
-    if (yInfo.type == "string") {
+    if (yType == "string") {
       options.yAxis = dex.config.expandAndOverlay({
         type: "category",
-        data: csv.uniqueArray(yInfo.position)
+        data: csv.uniqueArray(yIndex)
       }, options.yAxis);
     }
-    else if (yInfo.type == "date") {
+    else if (yType == "date") {
       options.yAxis = dex.config.expandAndOverlay({
         type: "time"
       }, options.yAxis);
@@ -12102,21 +12123,21 @@ var LineChart = function (userConfig) {
     // Set formatters here.
     if (options.xAxis.axisLabel !== undefined && options.xAxis.axisLabel.formatter !== undefined) {
       options.xAxis.axisLabel.formatter =
-        dex.config.getFormatter(options.xAxis.axisLabel.formatter, xInfo.type);
+        dex.config.getFormatter(options.xAxis.axisLabel.formatter, xType);
     }
 
     if (options.yAxis.axisLabel !== undefined && options.yAxis.axisLabel.formatter !== undefined) {
       options.yAxis.axisLabel.formatter =
-        dex.config.getFormatter(options.yAxis.axisLabel.formatter, yInfo.type);
+        dex.config.getFormatter(options.yAxis.axisLabel.formatter, yType);
     }
 
     seriesNames.forEach(function (seriesName) {
       var selectedCsv = csv.selectRows(function (row) {
-        return row[seriesInfo.position] == seriesName;
+        return row[seriesIndex] == seriesName;
       });
 
       var seriesData = selectedCsv.data.map(function (row, ri) {
-        var newRow = [row[xInfo.position], row[yInfo.position]];
+        var newRow = [row[xIndex], row[yIndex]];
         row.forEach(function (col, ci) {
           newRow.push(selectedCsv.header[ci] + ":::" + col);
         });
@@ -12700,6 +12721,7 @@ var PieChart = function (userConfig) {
     'width': "100%",
     'height': "100%",
     'type': 'pie',
+    'dimensions' : { 'series' : 0, 'category': 1, 'size': 2},
     'palette': 'ECharts',
     'aggregationMethod': "Sum",
     'aggregationFunction': function (values) {
@@ -12784,6 +12806,10 @@ var PieChart = function (userConfig) {
           "type": "group",
           "name": "General",
           "contents": [
+            dex.config.gui.columnDimensions({},
+              "dimensions",
+              chart.config.csv,
+              chart.config.dimensions),
             dex.config.gui.echartsTitle({}, "options.title"),
             dex.config.gui.echartsGrid({}, "options.grid"),
             dex.config.gui.echartsTooltip({}, "options.tooltip"),
@@ -12885,7 +12911,7 @@ var PieChart = function (userConfig) {
 
   chart.getOptions = function (csv) {
     var options, seriesNames, seriesInfo, valueInfo, categoryInfo;
-    var csvSpec = chart.spec.parse(csv);
+    var csvSpec = chart.spec.parse(csv, chart.config.dimensions);
 
     options = dex.config.expandAndOverlay({
       tooltip: {
@@ -12995,6 +13021,7 @@ var PolarPlot = function (userConfig) {
     'series.type': 'line',
     'series.itemStyle.normal.opacity': .6,
     'series.itemStyle.emphasis.opacity': .9,
+    'dimensions': {'series': 0, 'angle': 1, 'radius': 2, 'size': 3 },
     "options": {
       tooltip: {
         backgroundColor: "#FFFFFF",
@@ -13048,6 +13075,7 @@ var PolarPlot = function (userConfig) {
     .optionalNumber("size");
 
   chart.getGuiDefinition = function getGuiDefinition(config) {
+    dex.console.log("COLUMN NAME FOR SERIES", chart.config.csv.getColumnName(chart.config.dimensions.series));
     var defaults = {
       "type": "group",
       "name": "EChart Polar Plot Settings",
@@ -13061,6 +13089,10 @@ var PolarPlot = function (userConfig) {
             dex.config.gui.echartsGrid({}, "options.grid"),
             dex.config.gui.echartsTooltip({}, "options.tooltip"),
             dex.config.gui.echartsSymbol({}, "series"),
+            dex.config.gui.columnDimensions({},
+              "dimensions",
+              chart.config.csv,
+              chart.config.dimensions),
             {
               "name": "Chart Type",
               "description": "The chart type.",
@@ -13170,7 +13202,7 @@ var PolarPlot = function (userConfig) {
     var seriesInfo, radiusInfo, angleInfo, scaleInfo;
     var scaling = false;
 
-    var csvSpec = chart.spec.parse(csv);
+    var csvSpec = chart.spec.parse(csv, chart.config.dimensions);
 
     var options = dex.config.expandAndOverlay(chart.config.options, {
         series: [],
@@ -13182,8 +13214,8 @@ var PolarPlot = function (userConfig) {
     //dex.console.log("SPEC", csvSpec);
 
     seriesInfo = csvSpec.specified[0];
-    radiusInfo = csvSpec.specified[1];
-    angleInfo = csvSpec.specified[2];
+    angleInfo = csvSpec.specified[1];
+    radiusInfo = csvSpec.specified[2];
 
     chart.config.seriesInfo = seriesInfo;
     chart.config.radiusInfo = radiusInfo;
@@ -13312,6 +13344,7 @@ var RadarChart = function (userConfig) {
     'height': "100%",
     'palette': 'ECharts',
     'type': 'radar',
+    'dimensions': { 'series': 0, 'angle': 1, 'radius': 2 },
     'series.itemStyle': {
       normal: {
         lineStyle: {
@@ -13361,6 +13394,10 @@ var RadarChart = function (userConfig) {
           "type": "group",
           "name": "General Options",
           "contents": [
+            dex.config.gui.columnDimensions({},
+              "dimensions",
+              chart.config.csv,
+              chart.config.dimensions),
             dex.config.gui.echartsTitle({}, "options.title"),
             dex.config.gui.echartsGrid({}, "options.grid"),
             dex.config.gui.echartsSymbol({}, "series"),
@@ -13395,7 +13432,7 @@ var RadarChart = function (userConfig) {
 
   chart.getOptions = function (csv) {
     var options, seriesNames, seriesInfo, angleInfo, radiusInfo, maxRadius, minRadius;
-    var csvSpec = chart.spec.parse(csv);
+    var csvSpec = chart.spec.parse(csv, chart.config.dimensions);
 
     options = dex.config.expandAndOverlay(chart.config.options, {
       series: [],
@@ -13474,6 +13511,7 @@ var SingleAxisScatterPlot = function (userConfig) {
     'type': 'single-axis',
     'radius': {'min': 1, 'max': 20},
     'sizeMethod': 'linear',
+    'dimensions' : { 'series': 0, 'x': 1, 'size': 2 },
     'sizeScale': function (value) {
       if (typeof sizeScale == "undefined") {
         sizeScale = chart.config.csv.getScalingMethod(
@@ -13535,6 +13573,10 @@ var SingleAxisScatterPlot = function (userConfig) {
           "type": "group",
           "name": "General",
           "contents": [
+            dex.config.gui.columnDimensions({},
+              "dimensions",
+              chart.config.csv,
+              chart.config.dimensions),
             dex.config.gui.echartsTitle({}, "options.title"),
             dex.config.gui.echartsGrid({}, "options.grid"),
             dex.config.gui.echartsTooltip({}, "options.tooltip"),
@@ -13591,7 +13633,7 @@ var SingleAxisScatterPlot = function (userConfig) {
 
   chart.getOptions = function (csv) {
     var options, seriesNames, seriesInfo, xInfo;
-    var csvSpec = chart.spec.parse(csv);
+    var csvSpec = chart.spec.parse(csv, chart.config.dimensions);
 
     options = dex.config.expandAndOverlay(chart.config.options, {
       title: [],
@@ -13718,6 +13760,7 @@ var SteamGraph = function (userConfig) {
     'width': "100%",
     'height': "100%",
     'type': 'steam',
+    "dimensions": { "series": 0, "x": 1, "y": 2 },
     "options": {
       tooltip: {
         backgroundColor: "#FFFFFF",
@@ -13751,7 +13794,7 @@ var SteamGraph = function (userConfig) {
   chart.spec = new dex.data.spec("Steam Graph")
     .any("series")
     .any("x")
-    .number("value");
+    .number("y");
 
   chart.getGuiDefinition = function getGuiDefinition(config) {
     var defaults = {
@@ -13762,6 +13805,10 @@ var SteamGraph = function (userConfig) {
           "type": "group",
           "name": "General",
           "contents": [
+            dex.config.gui.columnDimensions({},
+              "dimensions",
+              chart.config.csv,
+              chart.config.dimensions),
             {
               "name": "Display Legend",
               "description": "Determines whether or not to draw the legend or not.",
@@ -13783,7 +13830,7 @@ var SteamGraph = function (userConfig) {
               "target": "options.backgroundColor",
               "type": "color",
               "initialValue": "#ffffff"
-            },
+            }
           ]
         },
         dex.config.gui.margins({}, "options.singleAxis"),
@@ -13804,7 +13851,7 @@ var SteamGraph = function (userConfig) {
 
   chart.getOptions = function (csv) {
     var options, seriesNames, seriesInfo, xInfo, valueInfo;
-    var csvSpec = chart.spec.parse(csv);
+    var csvSpec = chart.spec.parse(csv, chart.config.dimensions);
 
     options = dex.config.expandAndOverlay(chart.config.options, {
       title: [],
@@ -13916,6 +13963,7 @@ var Timeline = function (userConfig) {
     'height': "100%",
     'type': 'timeline',
     'palette': 'ECharts',
+    'dimensions' : {'series':0, 'sequence':1, 'x': 2, 'y':3, 'size':4},
     'sizeScale': new dex.csv().getScalingMethods().linear,
     'radius': {min: 5, max: 50},
     'series.type': 'scatter',
@@ -13958,6 +14006,8 @@ var Timeline = function (userConfig) {
           "type": "group",
           "name": "General Options",
           "contents": [
+            dex.config.gui.columnDimensions({}, "dimensions",
+              chart.config.csv, chart.config.dimensions),
             dex.config.gui.echartsTimeline({}, "options.baseOption.timeline"),
             dex.config.gui.echartsTitle({}, "options.baseOption.title"),
             dex.config.gui.echartsGrid({}, "options.baseOption.grid"),
@@ -14005,7 +14055,7 @@ var Timeline = function (userConfig) {
   };
 
   chart.getOptions = function (csv) {
-    var csvSpec = chart.spec.parse(csv);
+    var csvSpec = chart.spec.parse(csv, chart.config.dimensions);
 
     var catMap = {};
     var seqMap = {};
@@ -15608,12 +15658,46 @@ var TauChart = function (userConfig) {
       "name": "TauChart Settings",
       "contents": [
         {
+          "type": "group",
+          "name": "Plugins",
+          "contents": [
+            {
+              "name": "Enable Legend",
+              "description": "Enable the legend.",
+              "type": "boolean",
+              "target": "plugins.legend",
+              "initialValue": true
+            },
+            {
+              "name": "Enable Tooltips",
+              "description": "Enable tooltips.",
+              "type": "boolean",
+              "target": "plugins.tooltips",
+              "initialValue": true
+            },
+            {
+              "name": "Enable Quick Filters",
+              "description": "Enable the quick filters.",
+              "type": "boolean",
+              "target": "plugins.quickfilters",
+              "initialValue": true
+            },
+            {
+              "name": "Enable Trend Lines",
+              "description": "Enable the trendlines plugin.",
+              "type": "boolean",
+              "target": "plugins.trendline",
+              "initialValue": false
+            }
+          ]
+        },
+        {
           "name": "Chart Type",
           "description": "The type of chart.",
           "type": "choice",
           "choices": ["scatterplot", "line", "area", "bar", "horizontal-bar",
             "stacked-bar", "horizontal-stacked-bar"],
-          "target": "options.type",
+          "target": "type",
           "initialValue": "scatterplot"
         },
         {
@@ -15720,28 +15804,32 @@ var TauChart = function (userConfig) {
           "description": "The X Axis",
           "type": "choice",
           "choices": chart.config.csv.header,
-          "target": "options.x"
+          "target": "options.x",
+          "initialValue": chart.config.csv.header[1]
         },
         {
           "name": "Y-Axis",
           "description": "The Y Axis",
           "type": "choice",
           "choices": chart.config.csv.header,
-          "target": "options.y"
+          "target": "options.y",
+          "initialValue": chart.config.csv.header[2]
         },
         {
           "name": "Color",
           "description": "The color",
           "type": "choice",
           "choices": dex.array.combine(["none"], chart.config.csv.header),
-          "target": "options.color"
+          "target": "options.color",
+          "initialValue": chart.config.csv.header[0]
         },
         {
           "name": "Size",
           "description": "Size by.",
           "type": "choice",
           "choices": dex.array.combine(["none"], chart.config.csv.header),
-          "target": "options.size"
+          "target": "options.size",
+          "initialValue": "none"
         },
         {
           "name": "Split",
@@ -15749,34 +15837,6 @@ var TauChart = function (userConfig) {
           "type": "choice",
           "choices": dex.array.combine(["none"], chart.config.csv.header),
           "target": "options.split"
-        },
-        {
-          "name": "Enable Legend",
-          "description": "Enable the legend.",
-          "type": "boolean",
-          "target": "plugins.legend",
-          "initialValue": true
-        },
-        {
-          "name": "Enable Tooltips",
-          "description": "Enable tooltips.",
-          "type": "boolean",
-          "target": "plugins.tooltips",
-          "initialValue": true
-        },
-        {
-          "name": "Enable Quick Filters",
-          "description": "Enable the quick filters.",
-          "type": "boolean",
-          "target": "plugins.quickfilters",
-          "initialValue": true
-        },
-        {
-          "name": "Enable Trend Lines",
-          "description": "Enable the trendlines plugin.",
-          "type": "boolean",
-          "target": "plugins.trendline",
-          "initialValue": false
         }
       ]
     };
@@ -20541,7 +20601,7 @@ module.exports = function (dex) {
           "description": "Whether the tooltip is triggered by axis location or by item.",
           "target": ns + "trigger",
           "type": "choice",
-          "choices": [ "item", "axis", "none" ],
+          "choices": ["item", "axis", "none"],
           "initialValue": "item"
         },
         {
@@ -21173,6 +21233,32 @@ module.exports = function (dex) {
         dex.config.gui.echartsLineStyle(config.lineStyle || {}, ns + "lineStyle")
       ]
     };
+    return dex.config.expandAndOverlay(userConfig, defaults);
+  };
+  gui.columnDimensions = function columnDimensions(config, prefix, csv, dimensions) {
+    var ns = (typeof prefix !== 'undefined') ? (prefix + ".") : "";
+    var userConfig = config || {};
+
+    var defaults = {
+      "type": "group",
+      "name": "Dimensions",
+      "contents": []
+    };
+
+    Object.keys(dimensions).forEach(function (dimension) {
+      dimensions[dimension] = csv.getColumnName(dimensions[dimension]);
+
+      var name = dimension.charAt(0).toUpperCase() + dimension.slice(1);
+      defaults.contents.push({
+        "name": name,
+        "description": name + " value.",
+        "target": ns + dimension,
+        "type": "choice",
+        "choices": csv.header,
+        "initialValue": dimensions[dimension]
+      });
+    });
+
     return dex.config.expandAndOverlay(userConfig, defaults);
   };
   gui.echartsAxis = function echartsAxis(config, prefix) {
@@ -21817,12 +21903,10 @@ csv.prototype.getColumnName = function (colIndex) {
     return null;
   }
 
-  if (colIndex >= 0 && colIndex < csv.header.length) {
-    return csv.header[colIndex];
-  }
+  var colNum = csv.getColumnNumber(colIndex);
 
-  if (csv.header.indexOf(colIndex) >= 0) {
-    return colIndex;
+  if (colNum >= 0) {
+    return csv.header[colNum];
   }
 
   return null;
@@ -23429,9 +23513,7 @@ module.exports = function (dex) {
         return spec;
       };
 
-      spec.parse = function (csv) {
-        // Overkill I think
-        // var csv = new dex.csv(specCsv);
+      spec.parse = function (csv, assignments) {
 
         // Initialize our assessment:
         var assessment = {
@@ -23448,16 +23530,45 @@ module.exports = function (dex) {
           return spec.specError(assessment);
         }
 
-        assessment.types = csv.guessTypes();
-        assessment.received = "[" + assessment.types.join(",") + "]";
-        assessment.unspecified = csv.header.map(function (hdr, hi) {
-          return {header: hdr, position: hi, type: assessment.types[hi]};
-        });
-        assessment.specified = [];
+        if (assignments !== undefined) {
+          assessment.types = csv.guessTypes();
+          assessment.received = "[" + assessment.types.join(",") + "]";
 
-        spec.specs.forEach(function (s) {
-          s.specify(assessment);
-        });
+          assessment.unspecified = csv.header.map(function (hdr, hi) {
+            if (assignments[hdr] !== undefined) {
+              // Manually defined, therefore specified.
+            }
+            else {
+              return {header: hdr, position: hi, type: assessment.types[hi]};
+            }
+          });
+          assessment.specified = [];
+
+          Object.keys(assignments).forEach(function(key) {
+            var header = assignments[key];
+            var name = csv.getColumnName(header);
+            var position = csv.getColumnNumber(header);
+
+            //dex.console.log("KEY", key, "HEADER", header, "NAME", name,
+            //  "POS", position);
+            assessment.specified.push({
+              header: name,
+              position: position,
+              type: assessment.types[position]})
+          });
+        }
+        else {
+          assessment.types = csv.guessTypes();
+          assessment.received = "[" + assessment.types.join(",") + "]";
+          assessment.unspecified = csv.header.map(function (hdr, hi) {
+            return {header: hdr, position: hi, type: assessment.types[hi]};
+          });
+          assessment.specified = [];
+
+          spec.specs.forEach(function (s) {
+            s.specify(assessment);
+          });
+        }
 
         if (assessment.valid == false) {
           return spec.specError(assessment);
@@ -24110,6 +24221,37 @@ dex.data = {};
 dex.data.spec = require("./data/spec")(dex);
 
 dex.charts = require("./charts/charts")(dex);
+
+///////////////
+//
+// Polyfills:
+//
+///////////////
+if (!String.prototype.includes) {
+  String.prototype.includes = function(search, start) {
+    if (typeof start !== 'number') {
+      start = 0;
+    }
+
+    if (start + search.length > this.length) {
+      return false;
+    } else {
+      return this.indexOf(search, start) !== -1;
+    }
+  };
+}
+
+if (!Array.prototype.includes) {
+  Object.defineProperty(Array.prototype, "includes", {
+    enumerable: false,
+    value: function(obj) {
+      var newArr = this.filter(function(el) {
+        return el == obj;
+      });
+      return newArr.length > 0;
+    }
+  });
+}
 
 d3 = dex.charts.d3.d3v3;
 
@@ -26376,6 +26518,7 @@ var guipane = function (userConfig) {
         .attr("targetComponent", targetComponent)
         .text(choice);
 
+      //dex.console.log("COMPARING CHOICE: '" + choice + "' to '", guiDef);
       if (choice === guiDef.initialValue) {
         $option.attr("selected", "selected");
       }
@@ -26414,7 +26557,7 @@ var guipane = function (userConfig) {
         .attr("targetComponent", targetComponent)
         .text(choice);
 
-      dex.console.log("COMPARING CHOICE: '" + choice + "' to '", guiDef);
+      //dex.console.log("COMPARING MULTIPLE CHOICE: '" + choice + "' to '", guiDef);
       if (choice === guiDef.initialValue) {
         $option.attr("selected", "selected");
       }
