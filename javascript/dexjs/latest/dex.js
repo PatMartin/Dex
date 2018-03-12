@@ -14862,7 +14862,7 @@ var Multiples = function (userConfig) {
               "type": "multiple-choice",
               "choices": chart.config.csv.header,
               "initialValue" : "Name",
-              "target" : "groupBy",
+              "target" : "groupBy"
             }
           ]
         }
@@ -14887,7 +14887,8 @@ var Multiples = function (userConfig) {
     // component and simplifies the interface.
     dex.object.visit(biGuiDef, function (obj) {
       //dex.console.log("BI-GUI-DEF Visiting: ", name + "=" + obj);
-      if (obj["target"] !== undefined) {
+      if (obj !== undefined && obj !== null && obj["target"] !== undefined
+      && obj["target"] !== null) {
         obj["target"] = "model.attributes." + obj["target"];
         //dex.console.log("Renaming: '" + obj["target"] +
         //  "' to 'model.attributes." + obj["target"] + "'");
@@ -25028,13 +25029,15 @@ module.exports = function (dex) {
   };
 
   object.visit = function visit(obj, visitor) {
-    visitor(obj);
-    object.keys(obj).forEach(function(key) {
-      //dex.console.log("Visiting(" + key + ")" + " of type: '" + (typeof obj[key]) + "'");
-      if (obj[key] !== undefined && ((typeof obj[key]) === "object")) {
-        dex.object.visit(obj[key], visitor);
-      }
-    });
+    if (obj !== undefined && visitor !== undefined) {
+      visitor(obj);
+      object.keys(obj).forEach(function (key) {
+        //dex.console.log("Visiting(" + key + ")" + " of type: '" + (typeof obj[key]) + "'");
+        if (obj[key] !== undefined && ((typeof obj[key]) === "object")) {
+          dex.object.visit(obj[key], visitor);
+        }
+      });
+    }
   };
 
   /**
