@@ -57,48 +57,15 @@ class DescribeData extends DexTask {
     
     //println "Viewing: ${state.dexData}"
     
-    List<String> dheader = ["Column", "Column Name", "Distinct", "Trimmed Distinct", "String", "Double", "Integer", "Date"]
+    List<String> dheader = ["Column Name", "Position", "Type", "Type Ingoring Null"]
     List<String, List<String>> ddata = new ArrayList<String, List<String>> ()
+    
+    List<String> types           = state.dexData.guessTypes();
+    List<String> ignoreNullTypes = state.dexData.guessTypes(true);
     
     for (int i=0; i<state.dexData.header.size(); i++)
     {
-      def valMap = [:]
-      def trimValMap = [:]
-      def possibleStrings = 0
-      def possibleDoubles = 0
-      def possibleIntegers = 0
-      def possibleDates = 0;
-      
-      def tmp
-      
-      for (int j=0; j<state.dexData.data.size(); j++)
-      {
-        valMap[state.dexData.data[j][i]] = 1
-        trimValMap[state.dexData.data[j][i].trim()] = 1
-        possibleStrings++
-        try
-        {
-          tmp = state.dexData.data[j][i] as Double
-          possibleDoubles++
-        }
-        catch (Exception ex)
-        {
-        }
-        try
-        {
-          tmp = state.dexData.data[j][i] as Integer
-          possibleIntegers++
-        }
-        catch (Exception ex)
-        {
-        }
-        if (DateUtil.createDate(state.dexData.data[j][i]) != null)
-        {
-          possibleDates++;
-        }
-      }
-      
-      ddata << ["$i", state.dexData.header[i], "${valMap.keySet().size()}", "${trimValMap.keySet().size()}", "$possibleStrings", "$possibleDoubles", "$possibleIntegers", "$possibleDates"]
+      ddata << [ state.dexData.header[i], i, types.get(i), ignoreNullTypes.get(i)]
     }
     
     for (int i = 0; i < dheader.size(); i++)
@@ -140,8 +107,8 @@ class DescribeData extends DexTask {
     }
     
     headerLabel.setText(commaFmt.format(ddata.size()) + " Rows of " +
-      commaFmt.format(dheader.size()) + " Columns = " +
-      commaFmt.format(ddata.size() * dheader.size()) + " Items");
+        commaFmt.format(dheader.size()) + " Columns = " +
+        commaFmt.format(ddata.size() * dheader.size()) + " Items");
     
     tableView.getColumns().addAll(cols)
     
