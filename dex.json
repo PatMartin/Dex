@@ -1,14 +1,254 @@
 {
-  "dateFormats" : [
-    {
-      "name"   : "MM/DD/yyyy",
-      "pattern": "^((0[1-9])|(1[0-2]))/((0[1-9])|([12][0-9])|(3[01]))/\\d{4}$",
-      "format" : "MM/DD/yyyy"
-    },
-    {
-      "name"   : "MM-DD-yyyy",
-      "pattern": "^((0[1-9])|(1[0-2]))-((0[1-9])|([12][0-9])|(3[01]))-\\d{4}$",
-      "format" : "MM-DD-yyyy"
-    }
-  ]
+	"dateFormats": 
+	[
+		{
+			"name": "yyyyMMdd",
+			"pattern": "^\\d{4}((0[1-9])|(1[0-2]))((0[1-9])|([12][0-9])|(3[01]))$",
+			"format": "yyyyMMdd",
+			"tests": 
+			[
+				"19991231"
+			]
+		},
+
+		{
+			"name": "dd-MM-yyyy",
+			"pattern": "^((0[1-9])|([12][0-9])|(3[01]))-((0[1-9])|(1[0-2]))-\\d{4}$",
+			"format": "dd-MM-yyyy",
+			"tests": 
+			[
+				"12-21-2016"
+			]
+		},
+
+		{
+			"name": "dd/MM/yyyy",
+			"pattern": "^((0[1-9])|([12][0-9])|(3[01]))/((0[1-9])|(1[0-2]))/\\d{4}$",
+			"format": "dd/MM/yyyy",
+			"tests": 
+			[
+				"12/21/2016"
+			]
+		},
+
+		{
+			"name": "MM-dd-yyyy",
+			"pattern": "^((0[1-9])|(1[0-2]))-((0[1-9])|([12][0-9])|(3[01]))-\\d{4}$",
+			"format": "MM-dd-yyyy",
+			"tests": 
+			[
+				"21-12-2016"
+			]
+		},
+
+		{
+			"name": "MM/dd/yyyy",
+			"pattern": "^((0[1-9])|(1[0-2]))/((0[1-9])|([12][0-9])|(3[01]))/\\d{4}$",
+			"format": "MM/dd/yyyy",
+			"tests": 
+			[
+				"21/12/2016"
+			]
+		},
+
+		{
+			"name": "yyyy-MM-dd",
+			"pattern": "^\\d{4}-((0[1-9])|(1[0-2]))-((0[1-9])|([12][0-9])|(3[01]))$",
+			"format": "yyyy-MM-dd",
+			"tests": 
+			[
+				"2015-12-21"
+			]
+		},
+
+		{
+			"name": "yyyy/MM/dd",
+			"pattern": "^\\d{4}/((0[1-9])|(1[0-2]))/((0[1-9])|([12][0-9])|(3[01]))$",
+			"format": "yyyy/MM/dd",
+			"tests": 
+			[
+				"2015/12/21"
+			]
+		},
+
+		{
+			"name": "yyyy-dd-MM",
+			"pattern": "^\\d{4}-((0[1-9])|([12][0-9])|(3[01]))-((0[1-9])|(1[0-2]))$",
+			"format": "yyyy-dd-MM",
+			"tests": 
+			[
+				"2015-21-12"
+			]
+		},
+
+		{
+			"name": "yyyy/dd/MM",
+			"pattern": "^\\d{4}/((0[1-9])|([12][0-9])|(3[01]))/((0[1-9])|(1[0-2]))$",
+			"format": "yyyy/dd/MM",
+			"tests": 
+			[
+				"2015/21/12"
+			]
+		},
+
+		{
+			"name": "MM-yyyy",
+			"pattern": "^((0[1-9])|(1[0-2]))-\\d{4}$",
+			"format": "MM-yyyy",
+			"tests": 
+			[
+				"12/2015"
+			]
+		},
+
+		{
+			"name": "MM/yyyy",
+			"pattern": "^((0[1-9])|(1[0-2]))/\\d{4}$",
+			"format": "MM/yyyy",
+			"tests": 
+			[
+				"12-2015"
+			]
+		},
+
+		{
+			"name": "MM yyyy",
+			"pattern": "^((0[1-9])|(1[0-2]))\\s\\d{4}$",
+			"format": "MM yyyy",
+			"tests": 
+			[
+				"12 2015"
+			]
+		},
+
+		{
+			"name": "yyyy-MM",
+			"pattern": "^\\d{4}-((0[1-9])|(1[0-2]))$",
+			"format": "yyyy-MM",
+			"tests": 
+			[
+				"2015-12"
+			]
+		},
+
+		{
+			"name": "yyyy/MM",
+			"pattern": "^\\d{4}/((0[1-9])|(1[0-2]))$",
+			"format": "yyyy/MM",
+			"tests": 
+			[
+				"2015/12"
+			]
+		},
+
+		{
+			"name": "yyyy MM",
+			"pattern": "^\\d{4}\\s((0[1-9])|(1[0-2]))$",
+			"format": "yyyy MM",
+			"tests": 
+			[
+				"2015 12"
+			]
+		},
+
+		{
+			"name": "yyyy-MM-dd'T'HH:mm:ss'Z'",
+			"pattern": "^\\d{4}-((0[1-9])|(1[0-2]))-((0[1-9])|([12][0-9])|(3[01]))T\\d{2}:\\d{2}:\\d{2}Z$",
+			"format": "yyyy-MM-dd'T'HH:mm:ss'Z'",
+			"tests": 
+			[
+				"1968-07-29T08:30:12Z"
+			]
+		},
+
+		{
+			"name": "yyyy/MM/dd'T'HH:mm:ss'Z'",
+			"pattern": "^\\d{4}/((0[1-9])|(1[0-2]))/((0[1-9])|([12][0-9])|(3[01]))T\\d{2}:\\d{2}:\\d{2}Z$",
+			"format": "yyyy/MM/dd'T'HH:mm:ss'Z'",
+			"tests": 
+			[
+				"1968/07/29T08:30:12Z"
+			]
+		},
+
+		{
+			"name": "yyyy-MM-dd'T'HH:mm:ss",
+			"pattern": "^\\d{4}-((0[1-9])|(1[0-2]))-((0[1-9])|([12][0-9])|(3[01]))T\\d{2}:\\d{2}:\\d{2}$",
+			"format": "yyyy-MM-dd'T'HH:mm:ss",
+			"tests": 
+			[
+				"1968-07-29T08:30:12"
+			]
+		},
+
+		{
+			"name": "yyyy/MM/dd'T'HH:mm:ss",
+			"pattern": "^\\d{4}/((0[1-9])|(1[0-2]))/((0[1-9])|([12][0-9])|(3[01]))T\\d{2}:\\d{2}:\\d{2}$",
+			"format": "yyyy/MM/dd'T'HH:mm:ss",
+			"tests": 
+			[
+				"1968/07/29T08:30:12"
+			]
+		},
+
+		{
+			"name": "yyyy-MM-dd'T'HH:mm",
+			"pattern": "^\\d{4}-((0[1-9])|(1[0-2]))-((0[1-9])|([12][0-9])|(3[01]))T\\d{2}:\\d{2}$",
+			"format": "yyyy-MM-dd'T'HH:mm",
+			"tests": 
+			[
+				"1968-07-29T08:30"
+			]
+		},
+
+		{
+			"name": "yyyy/MM/dd'T'HH:mm",
+			"pattern": "^\\d{4}/((0[1-9])|(1[0-2]))/((0[1-9])|([12][0-9])|(3[01]))T\\d{2}:\\d{2}$",
+			"format": "yyyy/MM/dd'T'HH:mm",
+			"tests": 
+			[
+				"1968/07/29T08:30"
+			]
+		},
+
+		{
+			"name": "yyyy-MM-dd HH:mm",
+			"pattern": "^\\d{4}-((0[1-9])|(1[0-2]))-((0[1-9])|([12][0-9])|(3[01]))\\s\\d{2}:\\d{2}$",
+			"format": "yyyy-MM-dd HH:mm",
+			"tests": 
+			[
+				"1968-07-29 08:30"
+			]
+		},
+
+		{
+			"name": "yyyy/MM/dd HH:mm",
+			"pattern": "^\\d{4}/((0[1-9])|(1[0-2]))/((0[1-9])|([12][0-9])|(3[01]))\\s\\d{2}:\\d{2}$",
+			"format": "yyyy/MM/dd HH:mm",
+			"tests": 
+			[
+				"1968/07/29 08:30"
+			]
+		},
+
+		{
+			"name": "MM/dd/yyyy HH:mm",
+			"pattern": "^((0[1-9])|(1[0-2]))/((0[1-9])|([12][0-9])|(3[01]))/\\d{4}\\s\\d{2}:\\d{2}$",
+			"format": "MM/dd/yyyy HH:mm",
+			"tests": 
+			[
+				"12/21/2015 21:14"
+			]
+		},
+
+		{
+			"name": "Mongo ISODate",
+			"pattern": "^(Mon|Tue|Wed|Thu|Fri|Sat|Sun)\\s(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\\s\\d{2}\\s\\d{4}\\s\\d{2}:\\d{2}:\\d{2}.*$",
+			"format": "EEE MMM dd yyyy HH:mm:ss",
+			"tests": 
+			[
+				"Tue Mar 06 2018 08:15:02 GMT-0500 (EST)"
+			]
+		}
+	]
 }
