@@ -4,8 +4,10 @@ import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.Modifier;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.concurrent.CompletionService;
 import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
@@ -54,7 +56,10 @@ import com.dexvis.javafx.scene.control.DexTaskList;
 import com.dexvis.javafx.scene.control.DexTaskTree;
 import com.dexvis.javafx.scene.control.ModalDialog;
 import com.dexvis.util.ClassPathUtil;
+import com.dexvis.util.DateUtil;
+import com.dexvis.util.JsonUtil;
 import com.dexvis.util.SortedList;
+import com.dexvis.util.StreamUtil;
 import com.dexvis.util.ThreadUtil;
 
 /**
@@ -67,6 +72,8 @@ import com.dexvis.util.ThreadUtil;
 public class Dex extends Application
 {
   public static Dex instance;
+  
+  private static Object config = null;
   
   // Thread factory for executing task serially.
   private final static BasicThreadFactory serialThreadFactory = new BasicThreadFactory.Builder()
@@ -99,6 +106,34 @@ public class Dex extends Application
     // available core.
     System.out.println("Available Processors: "
         + Runtime.getRuntime().availableProcessors());
+    
+    String configPath = (System.getProperties().contains("dex.config")) ? System
+        .getProperties().getProperty("dex.config") : "dex.json";
+    
+    try
+    {
+      config = JsonUtil.readPath(configPath);
+      
+      Map<String, Object> map = (Map<String, Object>) config;
+      List<Object> dateFormats = (List) map.get("dateFormats");
+      
+      for (Object obj : dateFormats)
+      {
+        Map<String, String> spec = (Map<String, String>) obj;
+        String name = spec.get("name");
+        String pattern = spec.get("pattern");
+        String format = spec.get("format");
+        System.out.println("Adding date format: name='" + name + "', pattern='"
+            + pattern + "', format='" + format + "'");
+        DateUtil.addFormat(pattern, format);
+      }
+    }
+    catch(Exception ex)
+    {
+      System.err.println("Error Reading: '" + configPath + "'");
+      ex.printStackTrace();
+    }
+    System.out.println("DEX-CONFIG: '" + config + "'");
   }
   
   // GUI component housing our project name. Defaults to UnsavedProject.dex
@@ -507,8 +542,7 @@ public class Dex extends Application
     oldExecutorService.shutdownNow();
     
     // Executor for parallel task execution.
-    serialExecutor = Executors
-        .newSingleThreadExecutor(serialThreadFactory);
+    serialExecutor = Executors.newSingleThreadExecutor(serialThreadFactory);
   }
   
   public void executeWorkflow(ActionEvent evt)
