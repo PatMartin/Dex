@@ -119,6 +119,9 @@ class CreateJdbcTable extends DexTask {
   @Element(name="string_max", required=false)
   private TextField stringMaxText = new TextField("256")
   
+  @Element(name="ignoreNulls", required=false)
+  private CheckBox ignoreNullsCB = new CheckBox()
+  
   RangeSlider stringLengthSlider = new RangeSlider(0, 4000, 16, 256)
   
   public DexTaskState execute(DexTaskState state) throws DexException {
@@ -657,8 +660,9 @@ CREATE (src)-[:${state.dexData.header[node2Index]}]->(dest),
       Label passLabel = new Label("Password:")
       Label userLabel = new Label("Username:")
       Label tableLabel = new Label("Table Name:")
-      Label rightSizingLabel = new Label("Right Sizing:")
-      Label strictLabel = new Label("Strict Types:")
+      Label rightSizingLabel = new Label("Right Sizing?")
+      Label ignoreNullsLabel = new Label("Ignore Nulls?")
+      Label strictLabel = new Label("Strict Types?")
       Label stringRangeLabel = new Label("String Bounds:")
       Label batchLabel = new Label("Batch:")
       
@@ -685,6 +689,9 @@ CREATE (src)-[:${state.dexData.header[node2Index]}]->(dest),
       configPane.add(tableText, "grow,span")
       configPane.add(rightSizingLabel)
       configPane.add(rightSizingCB, "grow, span")
+      
+      configPane.add(ignoreNullsLabel)
+      configPane.add(ignoreNullsCB, "grow, span")
       
       configPane.add(stringRangeLabel)
       configPane.add(stringMinText)
