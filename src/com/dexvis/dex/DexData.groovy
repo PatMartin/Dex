@@ -647,6 +647,10 @@ public class DexData {
       {
         types << "string"
       }
+      else if (possibleDate)
+      {
+        types << "date"
+      }
       else if (possibleInteger)
       {
         types << "integer"
@@ -654,10 +658,6 @@ public class DexData {
       else if (possibleDouble)
       {
         types << "double"
-      }
-      else if (possibleDate)
-      {
-        types << "date"
       }
       else
       {
