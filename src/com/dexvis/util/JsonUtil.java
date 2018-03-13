@@ -1,5 +1,7 @@
 package com.dexvis.util;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,6 +28,16 @@ import com.dexvis.datastruct.NVP;
  */
 public class JsonUtil
 {
+  public static Object pathToObject(String jsonPath) throws IOException
+  {
+    return fileToObject(new File(jsonPath));
+  }
+  
+  public static Object fileToObject(File jsonFile) throws IOException
+  {
+    return stringToObject(StreamUtil.readFile(jsonFile));
+  }
+  
   /**
    * 
    * Given a string containing valid JSON, return it's Java object
@@ -37,7 +49,7 @@ public class JsonUtil
    * @return The java object equivalent to the JSON string.
    * 
    */
-  public static Object parseJsonString(String jsonStr)
+  public static Object stringToObject(String jsonStr)
   {
     try
     {
@@ -59,7 +71,7 @@ public class JsonUtil
     ArrayList<NVP> nvpList = new ArrayList<NVP>();
     if (jsonStr != null)
     {
-      Object jsonObj = parseJsonString(jsonStr);
+      Object jsonObj = stringToObject(jsonStr);
       parseNVPList(rootName, nvpList, jsonObj);
     }
     return nvpList;
@@ -197,6 +209,6 @@ public class JsonUtil
   
   public static void main(String args[])
   {
-    System.out.println(parseJsonString("[ {\"foo\": \"bar\"} ]"));
+    System.out.println(stringToObject("[ {\"foo\": \"bar\"} ]"));
   }
 }
