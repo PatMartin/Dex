@@ -38,7 +38,7 @@ public class DexData {
   {
     this(header, new ArrayList<List<String>>())
   }
-
+  
   /**
    *
    * Given a header and some data, construct a DexData structure to match.
@@ -51,7 +51,7 @@ public class DexData {
   {
     this(header, data, new ArrayList<List<String>>())
   }
-
+  
   /**
    * 
    * Given a header, some data, and a list of types, construct a DexData structure to match.
@@ -67,17 +67,15 @@ public class DexData {
     this.data = new ArrayList<List<String>>()
     this.types = new ArrayList<List<String>>()
     
-    data.each {
-      row ->
+    data.each { row ->
       this.data << row.collect()
     }
     
-    types.each {
-      row ->
+    types.each { row ->
       this.types << row
     }
   }
-
+  
   /**
    *
    * Given a header and some data, construct a DexData structure to match.
@@ -523,8 +521,7 @@ public class DexData {
     def categoryMap = [:]
     
     // Ensure existence of hashes
-    data.eachWithIndex {
-      row, ri ->
+    data.eachWithIndex { row, ri ->
       
       def key = hi.collect { row[hi] }.join('::')
       def entry
@@ -535,7 +532,7 @@ public class DexData {
       else {
         entry = entries[key]
       }
-    
+      
       hi.each { entry[header[it]] = row[it] }
       entry[row[ci]] = row[vi]
       categoryMap[row[ci]] = 1;
@@ -546,11 +543,9 @@ public class DexData {
     hierarchy.each { dd.header << it }
     categories.each { dd.header << it }
     
-    entries.each {
-      k, v ->
+    entries.each { k, v ->
       def row = []
-      dd.header.each {
-        h ->
+      dd.header.each { h ->
         row << ((v[h]) ? v[h] : 0)
       }
       dd.data << row
@@ -581,7 +576,7 @@ public class DexData {
   // This routine will guess basic datatypes.  It will prefer data types of:
   // Integer over Double over String.
   // Strings with valid date
-  public List<String> guessTypes()
+  public List<String> guessTypes(ignoreNulls=false)
   {
     List<String> types = []
     
@@ -593,7 +588,7 @@ public class DexData {
       
       boolean allNull = true
       boolean allEmpty = true
-      
+
       data.eachWithIndex { row, ri ->
         if (row[ci])
         {
@@ -606,7 +601,12 @@ public class DexData {
             {
               try
               {
-                row[ci] as Integer
+                if (ignoreNulls && row[ci] == null) {
+                  // Do nothing
+                }
+                else {
+                  row[ci] as Integer
+                }
               }
               catch (Exception ex)
               {
@@ -619,7 +619,12 @@ public class DexData {
             {
               try
               {
-                row[ci] as Double
+                if (ignoreNulls && row[ci] == null) {
+                  // Do nothing
+                }
+                else {
+                  row[ci] as Double
+                }
               }
               catch (Exception ex)
               {
@@ -631,8 +636,12 @@ public class DexData {
         }
       }
       
-      possibleDate = DateUtil.guessFormat(getColumn(ci)) != null
-      
+      def fmt = DateUtil.guessFormat(getColumn(ci))
+      if (fmt != null) {
+        println "Possible Date With Format: '${fmt.toPattern()}'"
+      }
+      possibleDate = fmt != null
+
       // Only future-proof way to handle data of indeterminant format
       if (allNull || allEmpty)
       {
@@ -668,14 +677,13 @@ public class DexData {
   {
     def csvHeader = "[" + header.collect { return "\"$it\"" }.join(',') + "]"
     def csvData = []
-
+    
     data.eachWithIndex
-    {
-      row, ri ->
+    { row, ri ->
       csvData << "[" + row.collect { return "\"$it\"" }.join(',') + "]"
     }
     def csvStr = "var " + name + " = new dex.csv($csvHeader,\n[" + csvData.join(',\n') + "]);";
-
+    
     return csvStr;
   }
   
