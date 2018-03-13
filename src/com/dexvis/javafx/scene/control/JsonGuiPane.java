@@ -81,7 +81,7 @@ public class JsonGuiPane extends MigPane
     mainPane.getChildren().clear();
     
     // Load our configuration into java objects.
-    Object jsonSpec = JsonUtil.parseJsonString(guiDef);
+    Object jsonSpec = JsonUtil.stringToObject(guiDef);
     
     // Add the controls to the guiPane.
     addChartControls(mainPane, jsonSpec);

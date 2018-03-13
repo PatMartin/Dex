@@ -112,7 +112,7 @@ public class Dex extends Application
     
     try
     {
-      config = JsonUtil.readPath(configPath);
+      config = JsonUtil.pathToObject(configPath);
       
       Map<String, Object> map = (Map<String, Object>) config;
       List<Object> dateFormats = (List) map.get("dateFormats");
