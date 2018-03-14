@@ -14833,168 +14833,163 @@ var Multiples = function (userConfig) {
       "name": "Multiples Configuration",
       "contents": [
         {
-          "type": "group",
-          "name": "Dimensions",
-          "contents": [
-            {
-              "name": "Cell Height",
-              "description": "Cell Height",
-              "type": "int",
-              "minValue": 50,
-              "maxValue": 1600,
-              "step": 10,
-              "initialValue": 300,
-              "target": "cell.height"
-            },
-            {
-              "name": "Cell Width",
-              "description": "Cell Width",
-              "type": "int",
-              "minValue": 50,
-              "maxValue": 2000,
-              "step": 10,
-              "initialValue": 400,
-              "target": "cell.width"
-            },
-            {
-              "name": "Group By",
-              "description": "Pick the columns on which to categorize or group the multiples by.",
-              "type": "multiple-choice",
-              "choices": chart.config.csv.header,
-              "initialValue" : "Name",
-              "target" : "groupBy"
-            }
-          ]
+          "name": "Cell Height",
+          "description": "Cell Height",
+          "type": "int",
+          "minValue": 50,
+          "maxValue": 1600,
+          "step": 10,
+          "initialValue": 300,
+          "target": "cell.height"
+        },
+        {
+          "name": "Cell Width",
+          "description": "Cell Width",
+          "type": "int",
+          "minValue": 50,
+          "maxValue": 2000,
+          "step": 10,
+          "initialValue": 400,
+          "target": "cell.width"
+        },
+        {
+          "name": "Group By",
+          "description": "Pick the columns on which to categorize or group the multiples by.",
+          "type": "multiple-choice",
+          "choices": chart.config.csv.header,
+          "initialValue": chart.config.csv.header[0],
+          "target": "groupBy"
         }
       ]
     };
 
-    var guiDef = dex.config.expandAndOverlay(config, defaults);
-    guiDef = dex.config.gui.sync(chart, guiDef);
+  var guiDef = dex.config.expandAndOverlay(config, defaults);
+  guiDef = dex.config.gui.sync(chart, guiDef);
 
-    var biGuiDef = baseInstance.getGuiDefinition();
-    // Redefine default gui configuration to be a child of Multiples
-    // with the base path of: target='model.attributes.${original_path}'
-    // This causes the engine to keep state for a multiples base-chart
-    // encapsulated within itself.  IE: No eventing models necessary to
-    // communicate basic changes.
-    //
-    //  We do this by visiting every object withini the gui-def of the
-    // name 'target'.  We rename the object key to have the given
-    // prefixed target.
-    //
-    // Basically stitches the basechart gui-config into the Multiples
-    // component and simplifies the interface.
-    dex.object.visit(biGuiDef, function (obj) {
-      //dex.console.log("BI-GUI-DEF Visiting: ", name + "=" + obj);
-      if (obj !== undefined && obj !== null && obj["target"] !== undefined
+  var biGuiDef = baseInstance.getGuiDefinition();
+  // Redefine default gui configuration to be a child of Multiples
+  // with the base path of: target='model.attributes.${original_path}'
+  // This causes the engine to keep state for a multiples base-chart
+  // encapsulated within itself.  IE: No eventing models necessary to
+  // communicate basic changes.
+  //
+  //  We do this by visiting every object withini the gui-def of the
+  // name 'target'.  We rename the object key to have the given
+  // prefixed target.
+  //
+  // Basically stitches the basechart gui-config into the Multiples
+  // component and simplifies the interface.
+  dex.object.visit(biGuiDef, function (obj) {
+    //dex.console.log("BI-GUI-DEF Visiting: ", name + "=" + obj);
+    if (obj !== undefined && obj !== null && obj["target"] !== undefined
       && obj["target"] !== null) {
-        obj["target"] = "model.attributes." + obj["target"];
-        //dex.console.log("Renaming: '" + obj["target"] +
-        //  "' to 'model.attributes." + obj["target"] + "'");
-      }
+      obj["target"] = "model.attributes." + obj["target"];
+      //dex.console.log("Renaming: '" + obj["target"] +
+      //  "' to 'model.attributes." + obj["target"] + "'");
+    }
+  });
+
+  guiDef.contents.push(biGuiDef);
+  //dex.console.log("GUI-DEF:", biGuiDef);
+  return guiDef;
+};
+
+chart.render = function render() {
+  var config = chart.config;
+  var csv = config.csv;
+  var $parent = $(config.parent);
+
+  // If we have previous cells, delete them and start with a new array of cells.
+  if (cells !== undefined) {
+    dex.console.log("-- REMOVING " + cells.length + " CELLS");
+    // Unregisters any window resize handlers.
+    cells.forEach(function (cell, i) {
+      //dex.console.log("-- REMOVING CELL[" + i + "]=", cell);
+      cell.deleteChart();
     });
+  }
 
-    guiDef.contents.push(biGuiDef);
-    //dex.console.log("GUI-DEF:", biGuiDef);
-    return guiDef;
-  };
+  cells = [];
 
-  chart.render = function render() {
-    var config = chart.config;
-    var csv = config.csv;
-    var $parent = $(config.parent);
+  //dex.console.log("dex.charts.multiples.SimpleMultiples.baseInstance=", baseInstance,
+  //  "CHART=", chart);
 
-    // If we have previous cells, delete them and start with a new array of cells.
-    if (cells !== undefined) {
-      dex.console.log("-- REMOVING " + cells.length + " CELLS");
-      // Unregisters any window resize handlers.
-      cells.forEach(function (cell, i) {
-        //dex.console.log("-- REMOVING CELL[" + i + "]=", cell);
-        cell.deleteChart();
-      });
-    }
+  // Remove the children of the chart's parent.
+  $parent.empty();
 
-    cells = [];
+  //dex.console.log("GROUPING-BY: ", config.groupBy);
+  var frames;
 
-    //dex.console.log("dex.charts.multiples.SimpleMultiples.baseInstance=", baseInstance,
-    //  "CHART=", chart);
+  if (config.groupBy !== undefined && config.groupBy.length > 0) {
+    //dex.console.log("GROUP-BY", config.groupBy);
+    //var columnNames = config.groupBy.split(",");
+    frames = csv.getFramesByColumns(config.groupBy);
+  }
+  else {
+    frames = csv.getFramesByIndex(0);
+  }
 
-    // Remove the children of the chart's parent.
-    $parent.empty();
-
-    dex.console.log("GROUPING-BY: ", config.groupBy);
-    var frames;
-
-    if (config.groupBy !== undefined && config.groupBy.length > 0) {
-      //dex.console.log("GROUP-BY", config.groupBy);
-      //var columnNames = config.groupBy.split(",");
-      frames = csv.getFramesByColumns(config.groupBy);
-    }
-    else {
-      frames = csv.getFramesByIndex(0);
-    }
-
-    if (frames.frameIndices.length > config.limit) {
-      $parent.append("<h3>Limit of " + config.limit + " multiples imposed.  Attempted to chart " +
-        frames.frameIndices.length + " multiples.</h3>");
-      return chart;
-    }
-    //dex.console.stacktrace();
-    dex.console.log("SIMPLE-MULTIPLES-FRAMES", frames);
-
-    var $container = $parent.append("<div></div>")
-      .addClass("dex-multiples")
-      .attr("width", config.width)
-      .attr("height", config.height);
-
-    frames.frames.forEach(function (frame, i) {
-      var cellId = config.id + "_cell_" + i;
-      var $cell = $("<div></div>")
-        .addClass("dex-multiples-cell")
-        .attr("id", cellId);
-
-      var title = frames.frameIndices[i];
-      var $title = $("<div></div>")
-        .addClass("dex-multiples-cell-title")
-        .text(title)
-        .css("width", config.cell.width);
-      $cell.append($title);
-
-      var $cellContents = $("<div></div>")
-        .addClass("dex-multiples-cell-contents")
-        .css("width", config.cell.width)
-        .css("height", config.cell.height);
-
-      $cell.append($cellContents);
-
-      $container.append($cell);
-
-      var cellConfig = {
-        "parent": "#" + cellId + " .dex-multiples-cell-contents",
-        "csv": frame
-      };
-
-      var cellChart = chart.config.model.chartConstructor(
-        dex.config.expandAndOverlay(cellConfig, chart.config.model.attributes || {}));
-
-      cellChart.render();
-      cells.push(cellChart);
-    });
-
+  if (frames.frameIndices.length > config.limit) {
+    $parent.append("<h3>Limit of " + config.limit + " multiples imposed.  Attempted to chart " +
+      frames.frameIndices.length + " multiples.</h3>");
     return chart;
-  };
+  }
+  //dex.console.stacktrace();
+  //dex.console.log("SIMPLE-MULTIPLES-FRAMES", frames);
 
-  chart.update = function () {
-    return chart.render();
-  };
+  var $container = $parent.append("<div></div>")
+    .addClass("dex-multiples")
+    .attr("width", config.width)
+    .attr("height", config.height);
 
-  $(document).ready(function () {
-    //var config = chart.config;
+  frames.frames.forEach(function (frame, i) {
+    var cellId = config.id + "_cell_" + i;
+    var $cell = $("<div></div>")
+      .addClass("dex-multiples-cell")
+      .attr("id", cellId);
+
+    var title = frames.frameIndices[i];
+    var $title = $("<div></div>")
+      .addClass("dex-multiples-cell-title")
+      .text(title)
+      .css("width", config.cell.width);
+    $cell.append($title);
+
+    var $cellContents = $("<div></div>")
+      .addClass("dex-multiples-cell-contents")
+      .css("width", config.cell.width)
+      .css("height", config.cell.height);
+
+    $cell.append($cellContents);
+
+    $container.append($cell);
+
+    var cellConfig = {
+      "parent": "#" + cellId + " .dex-multiples-cell-contents",
+      "csv": frame
+    };
+
+    var cellChart = chart.config.model.chartConstructor(
+      dex.config.expandAndOverlay(cellConfig, chart.config.model.attributes || {}));
+
+    cellChart.render();
+    cells.push(cellChart);
   });
 
   return chart;
 };
+
+chart.update = function () {
+  return chart.render();
+};
+
+$(document).ready(function () {
+  //var config = chart.config;
+});
+
+return chart;
+}
+;
 
 module.exports = Multiples;
 },{}],57:[function(require,module,exports){
@@ -22661,16 +22656,18 @@ csv.prototype.getFramesByColumns = function (columns) {
   var axisCsv = this.include(columnIndexes);
   var frameMap = {};
 
+  var groupedHeader = csv.header.filter(function(hdr, hi) { return !columnIndexes.includes(hi)});
+
   axisCsv.data.forEach(function(row) {
     var key = row.join(" > ");
     if (frameMap[key] === undefined) {
-      frameMap[key] = new dex.csv(csv.header);
+      frameMap[key] = new dex.csv(groupedHeader);
     }
   });
 
   csv.data.forEach(function(row) {
     var key = dex.array.slice(row, columnIndexes).join(" > ");
-    frameMap[key].data.push(row);
+    frameMap[key].data.push(row.filter(function (col, i) { return !columnIndexes.includes(i); }));
   });
 
   var frames = {
@@ -22683,7 +22680,7 @@ csv.prototype.getFramesByColumns = function (columns) {
     frames.frames.push(frameMap[key])
   });
 
-  dex.console.log("FRAMES", frames);
+  //dex.console.log("FRAMES", frames);
   return frames;
 };
 
