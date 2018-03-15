@@ -91,7 +91,7 @@ src="https://getfirebug.com/firebug-lite.js">
 var multiples = dex.charts.multiples.Multiples(dex.config.expandAndOverlay(
   {
     parent: '#ChartArea',
-    csv: new dex.csv(),
+    csv: csv,
     limit: 500,
     model: {
       chartConstructor: <% print context.chartConstructor %>
