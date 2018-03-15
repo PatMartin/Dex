@@ -85,10 +85,10 @@ class KMeans extends DexTask {
     println "KMEANS: ${kmeans}"
     
     ndata.eachWithIndex { row, ri ->
-      dex.data[ri] << kmeans.predict(row)
+      dex.data[ri] << new String("${kmeans.predict(row)}")
     }
 
-    dex.header << columnNameText.getText()
+    dex.header << new String("${columnNameText.getText()}")
     return state
   }
   
