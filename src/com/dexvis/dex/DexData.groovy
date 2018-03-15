@@ -126,6 +126,38 @@ public class DexData {
     return columnMap
   }
   
+  public List<String> getUniques(int colIndex) {
+    return getUniques(getColumnName(colIndex))
+  }
+  
+  public List<String> getUniques(String colName) {    
+    def valueMap = [:]
+    getColumn(colName).each { valueMap[it] = true }
+    return valueMap.keySet().sort()
+  }
+  
+  public List<Integer> categorize(String colName) {
+    return categorize(getColumnNumber(colName))
+  }
+  
+  public List<Integer> categorize(int colIndex) {
+    def uniques = getUniques(colIndex);
+    def catMap = [:]
+    
+    uniques.eachWithIndex {
+      cat, i ->
+      catMap[cat] = i;
+    }
+    
+    def categories = new ArrayList<Integer>()
+    data.eachWithIndex {
+      row, ri ->
+      categories.add(catMap[row[colIndex]])
+    }
+    
+    return categories;
+  }
+  
   public List<Map<String, String>> getMapList()
   {
     List<Map<String, String>> list = new ArrayList<Map<String, String>>();
@@ -178,6 +210,10 @@ public class DexData {
     //println "HEADER: $header"
     //println "getColumn($name) index=${header.findIndexOf() { it==name }}"
     return getColumn(header.findIndexOf() {it==name})
+  }
+  
+  public String getColumnName(int colIndex) {
+    return header[colIndex]
   }
   
   /**
@@ -312,6 +348,7 @@ public class DexData {
       }
     }
   }
+  
   
   /**
    * 
@@ -588,7 +625,7 @@ public class DexData {
       
       boolean allNull = true
       boolean allEmpty = true
-
+      
       data.eachWithIndex { row, ri ->
         if (row[ci])
         {
@@ -641,7 +678,7 @@ public class DexData {
         println "Possible Date With Format: '${fmt.toPattern()}'"
       }
       possibleDate = fmt != null
-
+      
       // Only future-proof way to handle data of indeterminant format
       if (allNull || allEmpty)
       {
