@@ -21,7 +21,7 @@ import com.dexvis.javafx.scene.control.NodeFactory
 @Root(name="kmeans")
 class KMeans extends DexTask {
   public KMeans() {
-    super("Machine Learning", "KMeans", "ml/smile/KMeans.html")
+    super("Machine Learning", "KMeans", "ml/smile/clustering/KMeans.html")
   }
   
   private MigPane configPane = null
@@ -34,8 +34,10 @@ class KMeans extends DexTask {
   
   private Button clearButton = new Button("Clear")
   
+  @Element(name="numClusters", required=false)
   Slider numClustersSlider = new Slider(1, 100, 4)
-  Label numClustersValueLabel = new Label("4")
+
+  Label numClustersValueLabel = new Label("")
   
   public DexTaskState execute(DexTaskState state) throws DexException {
     
@@ -92,14 +94,8 @@ class KMeans extends DexTask {
     return state
   }
   
-  public String toString()
-  {
-    return name
-  }
-  
   public Node getConfig()
   {
-    
     if (configPane == null)
     {
       Label numClustersLabel = new Label("# Clusters")
@@ -124,6 +120,7 @@ class KMeans extends DexTask {
       numClustersSlider.setShowTickLabels(false)
       
       numClustersSlider.setShowTickMarks(true)
+      numClustersValueLabel.setText((((int) numClustersSlider.getValue()) as String))
       
       numClustersSlider.setOnMouseDragged({ MouseEvent event ->
         numClustersValueLabel.setText((((int) numClustersSlider.getValue()) as String))
