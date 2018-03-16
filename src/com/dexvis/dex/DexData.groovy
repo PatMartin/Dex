@@ -148,13 +148,10 @@ public class DexData {
       cat, i ->
       catMap[cat] = i;
     }
-    
+
     def categories = new ArrayList<Integer>()
-    data.eachWithIndex {
-      row, ri ->
-      categories.add(catMap[row[colIndex]])
-    }
-    
+    getColumn(colIndex).each { categories.add(catMap[it]) }
+
     return categories;
   }
   
