@@ -24,6 +24,7 @@ import com.dexvis.dex.exception.DexException
 import com.dexvis.dex.wf.DexTask
 import com.dexvis.dex.wf.DexTaskState
 import com.dexvis.javafx.scene.control.DexFileChooser
+import javafx.collections.FXCollections
 import com.dexvis.javafx.scene.control.NodeFactory
 import com.thoughtworks.xstream.XStream
 import com.thoughtworks.xstream.io.xml.DomDriver
@@ -52,6 +53,10 @@ class DecisionTree extends DexTask {
   private Label effectiveFile = new Label("")
   private Label fileLabel = new Label("File Name:")
   
+  @Element(name="splitRule", required=false)
+  private ChoiceBox splitRuleCB = new ChoiceBox(FXCollections.observableArrayList(
+  "GINI", "Entropy", "Classification Error"))
+  
   @Element(required=false)
   private TextField fileText = new TextField()
   
@@ -65,7 +70,7 @@ class DecisionTree extends DexTask {
   private smile.classification.DecisionTree dtree = null
   
   private DexFileChooser modelChooser = new DexFileChooser("model",
-  "Load Decision Tree Model", "Save Decision Tree Model", "GROOVY", "dt_mdl")
+  "Load Decision Tree Model", "Save Decision Tree Model", "Decision Tree Model", "dt_mdl")
   
   private XStream xstream = new XStream(new DomDriver())
   
@@ -178,8 +183,29 @@ class DecisionTree extends DexTask {
     println "CATMAP: ${catMap}"
     
     if (IS_TRAINING) {
-      dtree = new smile.classification.DecisionTree(atts, ndata, classify,
+      // Determine split rule
+      def splitRule = splitRuleCB.getSelectionModel().getSelectedItem()
+      
+      println "Using Split Rule: '${splitRule}'"
+      
+      switch (splitRule) {
+        case "Gini":
+          dtree = new smile.classification.DecisionTree(atts, ndata, classify,
           (int) maxNodesSlider.getValue(), SplitRule.GINI)
+          break;
+        case "Entropy":
+          dtree = new smile.classification.DecisionTree(atts, ndata, classify,
+          (int) maxNodesSlider.getValue(), SplitRule.ENTROPY)
+          break;
+        case "Classification Error":
+          dtree = new smile.classification.DecisionTree(atts, ndata, classify,
+          (int) maxNodesSlider.getValue(), SplitRule.CLASSIFICATION_ERROR)
+          break;
+        default:
+          dtree = new smile.classification.DecisionTree(atts, ndata, classify,
+          (int) maxNodesSlider.getValue(), SplitRule.GINI)
+      }
+      
       
       FileWriter writer = new FileWriter(new File(fileText.getText()))
       ObjectOutputStream modelOut = xstream.createObjectOutputStream(writer);
@@ -223,7 +249,13 @@ class DecisionTree extends DexTask {
     else {
       statusText.setText("Predicted ${dex.data.size()} outcomes.")
     }
-    graphVizTextArea.setText(dtree.dot())
+    String graphStr = dtree.dot()
+    catMap.each { key, value ->
+      println "CAT: ${key}=${value}"
+      graphStr = graphStr.replaceAll('<class = ' + key + '>', '<class = ' + value + ' >')
+    }
+    
+    graphVizTextArea.setText(graphStr)
     println "HEADER: ${dex.header}"
     return state
   }
@@ -237,8 +269,9 @@ class DecisionTree extends DexTask {
       Label statusLabel = new Label("Status:")
       Label graphVizLabel = new Label("Graph Viz:")
       Label columnNameLabel = new Label("Destination Column")
+      Label splitRuleLabel = new Label("Split Rule")
       
-      configPane = new MigPane("", "[][grow]", "[][][][][][][][][][grow][]")
+      configPane = new MigPane("", "[][grow]", "[][][][][][][][][][][grow][]")
       configPane.setStyle("-fx-background-color: white;")
       
       configPane.add(NodeFactory.createTitle("Decision Tree"), "grow,span")
@@ -265,6 +298,8 @@ class DecisionTree extends DexTask {
       configPane.add(browseButton, "span")
       configPane.add(columnListView, "grow,span")
       
+      configPane.add(splitRuleLabel)
+      configPane.add(splitRuleCB, "grow,span");
       
       configPane.add(maxNodesValueLabel, "grow,span");
       configPane.add(maxNodesLabel);
