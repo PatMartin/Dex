@@ -262,5 +262,98 @@
 				"2018"
 			]
 		}
+	],
+
+	"databases": 
+	[
+		{
+			"name": "HyperSQL",
+			"driver": "org.hsqldb.jdbc.JDBCDriver",
+			"url": "jdbc:hsqldb:mem:csvdb",
+			"password": "",
+			"username": "sa",
+			"typeMap": 
+			{
+				"integer": "INTEGER",
+				"double": "DOUBLE",
+				"date": "TIMESTAMP",
+				"string": "VARCHAR"
+			}
+		},
+
+		{
+			"name": "Oracle",
+			"driver": "oracle.jdbc.OracleDriver",
+			"url": "jdbc:oracle:thin:@localhost:1521:XE",
+			"password": "DEX",
+			"username": "DEX",
+			"typeMap": 
+			{
+				"integer": "NUMBER(19,0)",
+				"double": "NUMBER(19,4)",
+				"date": "DATE",
+				"string": "VARCHAR2"
+			}
+		},
+
+		{
+			"name": "MySql",
+			"driver": "com.mysql.jdbc.Driver",
+			"url": "jdbc:mysql://localhost:3306/dex",
+			"password": "DEX",
+			"username": "DEX",
+			"typeMap": 
+			{
+				"integer": "NUMBER(19,0)",
+				"double": "NUMBER(19,4)",
+				"date": "DATE",
+				"string": "VARCHAR2"
+			}
+		},
+
+		{
+			"name": "Sqlite",
+			"driver": "org.sqlite.JDBC",
+			"url": "jdbc:sqlite:dex.db",
+			"password": "DEX",
+			"username": "DEX",
+			"typeMap": 
+			{
+				"integer": "NUMBER(19,0)",
+				"double": "NUMBER(19,4)",
+				"date": "DATE",
+				"string": "VARCHAR2"
+			}
+		},
+
+		{
+			"name": "Neo4J",
+			"driver": "org.neo4j.jdbc.Driver",
+			"url": "jdbc:neo4j://localhost:7575/dex",
+			"password": "DEX",
+			"username": "DEX",
+			"typeMap": 
+			{
+				"integer": "NUMBER(19,0)",
+				"double": "NUMBER(19,4)",
+				"date": "DATE",
+				"string": "VARCHAR2"
+			}
+		},
+
+		{
+			"name": "Generic JDBC",
+			"driver": "jdbc.path.to.driver",
+			"url": "jdbc:<driver_url>",
+			"password": "DEX",
+			"username": "DEX",
+			"typeMap": 
+			{
+				"integer": "NUMBER(19,0)",
+				"double": "NUMBER(19,4)",
+				"date": "DATE",
+				"string": "VARCHAR2"
+			}
+		}
 	]
 }
