@@ -40,7 +40,7 @@ class DecisionTree extends DexTask {
   private ListSelectionView<String> columnListView = new ListSelectionView<>();
   
   @Element(name="columnName", required=false)
-  private TextField columnNameText = new TextField("DTREE")
+  private TextField columnNameText = new TextField()
   
   @Element(name="resultColumn", required=false)
   private ChoiceBox classifyColumnCB = new ChoiceBox()
@@ -75,6 +75,10 @@ class DecisionTree extends DexTask {
     def dex = state.getDexData();
     def allTypes = dex.guessTypes()
     def initializing = false
+    
+    if (columnNameText.getText() == null || columnNameText.getText().length() <= 0) {
+      columnNameText.setText("DTREE")
+    }
     
     // Only update if the list is empty.
     if (columnListView.getSourceItems().size() == 0 && columnListView.getTargetItems().size() == 0)
@@ -173,12 +177,6 @@ class DecisionTree extends DexTask {
     println "CLASSES: ${classify}"
     println "CATMAP: ${catMap}"
     
-    // Add file path thingy for storing trained model.
-    // if   - empty, populate and pass-thru
-    // if   - data fields do not exist, error
-    // if   - classify field present -> train and score
-    // else - predict
-    
     if (IS_TRAINING) {
       dtree = new smile.classification.DecisionTree(atts, ndata, classify,
           (int) maxNodesSlider.getValue(), SplitRule.GINI)
@@ -217,7 +215,7 @@ class DecisionTree extends DexTask {
       dex.data[ri] << prediction
       
     }
-    dex.header << "DTREE"
+    dex.header << columnNameText.getText()
     if (IS_TRAINING) {
       statusText.setText("Training Data Performance: ${numRight} correct predictions out of" +
           " ${dex.data.size()} = ${numRight/dex.data.size() * 100.0}")
@@ -238,8 +236,9 @@ class DecisionTree extends DexTask {
       Label classifyColumnLabel = new Label("Classify Column");
       Label statusLabel = new Label("Status:")
       Label graphVizLabel = new Label("Graph Viz:")
+      Label columnNameLabel = new Label("Destination Column")
       
-      configPane = new MigPane("", "[][grow]", "[][][][][][][][][grow][]")
+      configPane = new MigPane("", "[][grow]", "[][][][][][][][][][grow][]")
       configPane.setStyle("-fx-background-color: white;")
       
       configPane.add(NodeFactory.createTitle("Decision Tree"), "grow,span")
@@ -286,6 +285,8 @@ class DecisionTree extends DexTask {
       
       configPane.add(classifyColumnLabel)
       configPane.add(classifyColumnCB, "grow,span")
+      configPane.add(columnNameLabel)
+      configPane.add(columnNameText, "grow, span")
       configPane.add(statusLabel)
       configPane.add(statusText, "grow,span")
       configPane.add(graphVizLabel)
