@@ -567,6 +567,11 @@ public class DexTask extends Task<DexTask> implements Comparable<DexTask>,
     super.cancelled();
   }
   
+  public String toString()
+  {
+    return name;
+  }
+  
   @Commit
   public void build()
   {
