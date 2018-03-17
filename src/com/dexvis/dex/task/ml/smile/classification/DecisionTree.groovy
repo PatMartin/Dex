@@ -1,8 +1,9 @@
 package com.dexvis.dex.task.ml.smile.classification
 
-import javafx.scene.Node
-
+import groovy.text.SimpleTemplateEngine
+import javafx.collections.FXCollections
 import javafx.event.EventHandler
+import javafx.scene.Node
 import javafx.scene.control.Button
 import javafx.scene.control.ChoiceBox
 import javafx.scene.control.Label
@@ -10,7 +11,10 @@ import javafx.scene.control.Slider
 import javafx.scene.control.TextArea
 import javafx.scene.control.TextField
 import javafx.scene.input.MouseEvent
+import javafx.scene.web.WebEngine
+import javafx.scene.web.WebView
 
+import org.apache.commons.io.FileUtils
 import org.controlsfx.control.ListSelectionView
 import org.simpleframework.xml.Element
 import org.simpleframework.xml.Root
@@ -24,16 +28,20 @@ import com.dexvis.dex.exception.DexException
 import com.dexvis.dex.wf.DexTask
 import com.dexvis.dex.wf.DexTaskState
 import com.dexvis.javafx.scene.control.DexFileChooser
-import javafx.collections.FXCollections
 import com.dexvis.javafx.scene.control.NodeFactory
+import com.dexvis.util.WebViewUtil
 import com.thoughtworks.xstream.XStream
 import com.thoughtworks.xstream.io.xml.DomDriver
 
 @Root(name="decision-tree")
 class DecisionTree extends DexTask {
   public DecisionTree() {
-    super("Machine Learning", "Decision Tree", "ml/smile/classification/DecisionTree.html")
+    super("Machine Learning", "Decision Tree",
+       "ml/smile/classification/DecisionTree.html")
   }
+  
+  private WebView wv = new WebView()
+  private WebEngine we = wv.getEngine()
   
   private MigPane configPane = null
   
@@ -47,7 +55,6 @@ class DecisionTree extends DexTask {
   private ChoiceBox classifyColumnCB = new ChoiceBox()
   
   private TextField statusText = new TextField("")
-  private TextArea graphVizTextArea = new TextArea("");
   
   private Label effectiveFileLabel = new Label("Effective File Name: ")
   private Label effectiveFile = new Label("")
@@ -69,8 +76,9 @@ class DecisionTree extends DexTask {
   
   private smile.classification.DecisionTree dtree = null
   
-  private DexFileChooser modelChooser = new DexFileChooser("model",
-  "Load Decision Tree Model", "Save Decision Tree Model", "Decision Tree Model", "dt_mdl")
+  private DexFileChooser modelChooser = new DexFileChooser("models",
+  "Load Decision Tree Model", "Save Decision Tree Model",
+   "Decision Tree Model", "dt_mdl")
   
   private XStream xstream = new XStream(new DomDriver())
   
@@ -107,7 +115,7 @@ class DecisionTree extends DexTask {
     if (classifyColumnCB.getSelectionModel().isEmpty()) {
       initializing = true
       classifyColumnCB.getItems().addAll(state.dexData.header)
-      classifyColumnCB.getSelectionModel().setSelectedIndex(0)
+      classifyColumnCB.getSelectionModel().select(0)
     }
     
     // Tell the user to initialize the program
@@ -249,13 +257,22 @@ class DecisionTree extends DexTask {
     else {
       statusText.setText("Predicted ${dex.data.size()} outcomes.")
     }
-    String graphStr = dtree.dot()
+    String graphStr = dtree.dot().replaceAll('\n', "");
     catMap.each { key, value ->
       println "CAT: ${key}=${value}"
       graphStr = graphStr.replaceAll('<class = ' + key + '>', '<class = ' + value + ' >')
     }
     
-    graphVizTextArea.setText(graphStr)
+    String graphVizTemplate = FileUtils.readFileToString(
+        new File("web/graphviz/graphviz.gtmpl"))
+    
+    def binding = [ "graph": graphStr ]
+    def engine = new SimpleTemplateEngine()
+    def template = engine.createTemplate(graphVizTemplate).make(binding)
+    String graphVizOutput = template.toString()
+    we?.loadContent(graphVizOutput)
+    
+    //graphVizTextArea.setText(graphStr)
     println "HEADER: ${dex.header}"
     return state
   }
@@ -267,9 +284,9 @@ class DecisionTree extends DexTask {
       Label maxNodesLabel = new Label("Max Nodes")
       Label classifyColumnLabel = new Label("Classify Column");
       Label statusLabel = new Label("Status:")
-      Label graphVizLabel = new Label("Graph Viz:")
       Label columnNameLabel = new Label("Destination Column")
       Label splitRuleLabel = new Label("Split Rule")
+      WebViewUtil.noData(we)
       
       configPane = new MigPane("", "[][grow]", "[][][][][][][][][][][grow][]")
       configPane.setStyle("-fx-background-color: white;")
@@ -324,9 +341,8 @@ class DecisionTree extends DexTask {
       configPane.add(columnNameText, "grow, span")
       configPane.add(statusLabel)
       configPane.add(statusText, "grow,span")
-      configPane.add(graphVizLabel)
-      configPane.add(graphVizTextArea, "growx,growy,span")
-      configPane.add(clearButton, "grow,span")
+      configPane.add(wv, "grow,span")
+      configPane.add(clearButton, "grow, span")
       
       clearButton.setOnAction({ actionEvent ->
         columnListView.getSourceItems().clear()
