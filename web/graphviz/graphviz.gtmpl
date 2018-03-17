@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>GraphViz</title>
+<script type="text/javascript">
+<% println new File("javascript/graphviz/latest/graphviz.js").text %>
+</script>
+<!--
+<script type="text/javascript"
+src="https://getfirebug.com/firebug-lite.js">
+{
+    overrideConsole: false,
+    startInNewWindow: false,
+    startOpened: true,
+    enableTrace: true
+}
+</script>
+-->
+  </head>
+  <body>
+    <script>
+      <% println "var graph = '${graph}';" %>
+      document.body.innerHTML += Viz(graph);    
+    </script>
+  </body>
+</html>
