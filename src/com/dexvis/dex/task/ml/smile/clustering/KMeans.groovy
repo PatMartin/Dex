@@ -7,6 +7,8 @@ import javafx.scene.control.Label
 import javafx.scene.control.Slider
 import javafx.scene.control.TextField
 import javafx.scene.input.MouseEvent
+import javafx.scene.web.WebEngine
+import javafx.scene.web.WebView
 
 import org.controlsfx.control.ListSelectionView
 import org.simpleframework.xml.Element
@@ -17,12 +19,16 @@ import com.dexvis.dex.exception.DexException
 import com.dexvis.dex.wf.DexTask
 import com.dexvis.dex.wf.DexTaskState
 import com.dexvis.javafx.scene.control.NodeFactory
+import com.dexvis.util.WebViewUtil
 
 @Root(name="kmeans")
 class KMeans extends DexTask {
   public KMeans() {
     super("Machine Learning", "KMeans", "ml/smile/clustering/KMeans.html")
   }
+  
+  private WebView wv = new WebView()
+  private WebEngine we = wv.getEngine()
   
   private MigPane configPane = null
   
@@ -36,7 +42,7 @@ class KMeans extends DexTask {
   
   @Element(name="numClusters", required=false)
   Slider numClustersSlider = new Slider(1, 100, 4)
-
+  
   Label numClustersValueLabel = new Label("")
   
   public DexTaskState execute(DexTaskState state) throws DexException {
@@ -48,48 +54,32 @@ class KMeans extends DexTask {
     if (columnListView.getSourceItems().size() == 0 && columnListView.getTargetItems().size() == 0)
     {
       columnListView.getSourceItems().addAll(state.getDexData().getHeader())
-      
-      // Select everything.
-      selected = dex
     }
     
-    if (columnListView.getTargetItems().size() > 0)
+    if (columnListView.getTargetItems().size() <= 0)
     {
-      // User driven selection of data for kmean analysis
-      selected = dex.select(columnListView.getTargetItems())
+      throw new DexException("${getName()} : You must select at least one column for consideration.")
     }
     
-    double[][] ndata = new double[selected.data.size()][selected.header.size()]
+    // Define base attributes
+    def columns = columnListView.getTargetItems()
+    def ndata= dex.getDoubles(columns)
     
-    // Get type information on kmean inputs
-    def types = selected.guessTypes()
-    println "TYPES: '${types}'"
-    
-    types.eachWithIndex { type, hi ->
-      
-      switch (type) {
-        case type == "double" || type == "integer":
-          selected.data.eachWithIndex { row, ri ->
-            ndata[ri][hi] = row[hi] as Double
-          }
-          break
-        default:
-          def categories = dex.categorize(hi);
-          selected.data.eachWithIndex { row, ri ->
-            ndata[ri][hi] = categories[ri] as Double
-          }
-      }
-    }
-    
-    println "NDATA: ${ndata}";
     smile.clustering.KMeans kmeans = new smile.clustering.KMeans(ndata,
-      numClustersValueLabel.getText() as Integer)
+        numClustersValueLabel.getText() as Integer)
     println "KMEANS: ${kmeans}"
     
     ndata.eachWithIndex { row, ri ->
       dex.data[ri] << new String("${kmeans.predict(row)}")
     }
-
+    
+    WebViewUtil.displayGroovyTemplate(we, "web/ml/smile/KMeans.gtmpl", [
+      "centroids": kmeans.centroids(),
+      "clusterLabels": kmeans.getClusterLabel(),
+      "clusterValues": ndata,
+      "distortion": kmeans.distortion()
+    ])
+    
     dex.header << new String("${columnNameText.getText()}")
     return state
   }
@@ -101,20 +91,18 @@ class KMeans extends DexTask {
       Label numClustersLabel = new Label("# Clusters")
       Label columnNameLabel = new Label("Column Name")
       
-      configPane = new MigPane("", "[][grow]", "[][][][][][]")
+      configPane = new MigPane("", "[][grow]", "[][][][][][grow][]")
       configPane.setStyle("-fx-background-color: white;")
       
       configPane.add(NodeFactory.createTitle("KMeans"), "grow,span")
       configPane.add(columnListView, "grow,span")
-      configPane.add(clearButton, "grow,span")
-      
       
       configPane.add(numClustersValueLabel, "grow,span");
       configPane.add(numClustersLabel);
       configPane.add(numClustersSlider, "grow,span")
       
       numClustersSlider.setMinorTickCount(0)
-      
+
       numClustersSlider.setMajorTickUnit(1)
       numClustersSlider.snapToTicksProperty().set(true)
       numClustersSlider.setShowTickLabels(false)
@@ -128,7 +116,10 @@ class KMeans extends DexTask {
       
       configPane.add(columnNameLabel)
       configPane.add(columnNameText, "grow,span")
-      
+
+      configPane.add(wv, "grow,span")
+      configPane.add(clearButton, "grow,span")
+
       clearButton.setOnAction({ actionEvent ->
         columnListView.getSourceItems().clear()
         columnListView.getTargetItems().clear()

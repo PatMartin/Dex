@@ -79,10 +79,8 @@ class RidgeRegression extends DexTask {
   private XStream xstream = new XStream(new DomDriver())
   
   public DexTaskState execute(DexTaskState state) throws DexException {
-    
-    def selected
     def dex = state.getDexData();
-    def allTypes = dex.guessTypes()
+    def types = dex.guessTypes()
     def initializing = false
     
     if (columnNameText.getText() == null || columnNameText.getText().length() <= 0) {
@@ -94,16 +92,6 @@ class RidgeRegression extends DexTask {
     {
       initializing = true
       columnListView.getSourceItems().addAll(state.getDexData().getHeader())
-      
-      // Select everything.
-      selected = dex
-    }
-    
-    // Create selected, a subset of dex data to be considered for the decision tree prediction.
-    if (columnListView.getTargetItems().size() > 0)
-    {
-      // User driven selection of data for kmean analysis
-      selected = dex.select(columnListView.getTargetItems())
     }
     
     // If we have not picked a prediction column, defaul to column 0 and flag
@@ -124,56 +112,31 @@ class RidgeRegression extends DexTask {
       throw new DexException("You must select at least one column in task ${getName()}.")
     }
     
-    // data which will drive our training and predictions.
-    double[][] ndata = new double[selected.data.size()][selected.header.size()]
-    
-    println "SELECTED: ${selected}"
-    
-    if (selected.header.size() != columnListView.getTargetItems().size()) {
-      throw new DexException("${getName()} > Data Mismatch Error : selected header size: " +
-      "${selected.header.size} does not match user selection size: ${columnListView.getTargetItems().size()}")
-    }
-    
     String classColName = "" + classifyColumnCB.getSelectionModel().getSelectedItem()
     // Figure out if we are training or we are predicting.
     boolean IS_TRAINING = dex.columnExists(classColName)
     
     println "IS_TRAINING: ${IS_TRAINING}"
     
-    def types = selected.guessTypes()
-    println "TYPES: '${types}'"
-    
     // Define base attributes
-    def atts = new Attribute[types.size()]
+    def columns = columnListView.getTargetItems()
+    def ndata= dex.getDoubles(columns)
+    def atts = dex.getNumericAttributes(columns)
     
-    types.eachWithIndex { type, hi ->
-      //println "HANDLING TYPE: '${type}'"
-      atts[hi] = new NumericAttribute(selected.header[hi])
-      
-      switch (type) {
-        case { it in ["double", "integer"]}:
-          selected.data.eachWithIndex { row, ri ->
-            ndata[ri][hi] = Double.parseDouble("" + row[hi])
-          }
-          break
-        default:
-          def categories = dex.categorize(hi);
-          selected.data.eachWithIndex { row, ri ->
-            ndata[ri][hi] = Double.parseDouble("" + categories[ri])
-          }
-      }
+    if (ndata[0].size() != columnListView.getTargetItems().size()) {
+      throw new DexException("${getName()} > Data Mismatch Error : selected header size: " +
+      "${ndata[0].size} does not match user selection size: ${columnListView.getTargetItems().size()}")
     }
     
     //println "NDATA: ${ndata}";
-    
     int responseIndex = classifyColumnCB.getSelectionModel().getSelectedIndex()
-    def responseType = allTypes[responseIndex]
+    def responseType = types[responseIndex]
+    
     if (responseType == "date" || responseType == "string") {
       throw new DexException("Ridge Regression can only predict numerics values.")
     }
-    def responses = new double[dex.data.size()]
     
-    def catMap = [:]
+    def responses = new double[dex.data.size()]
     
     responses.eachWithIndex { response, i ->
       responses[i] = (int) Double.parseDouble("" + dex.data[i][responseIndex])
@@ -199,7 +162,6 @@ class RidgeRegression extends DexTask {
       ridge = (smile.regression.RidgeRegression) modelIn.readObject();
     }
     
-
     ndata.eachWithIndex { row, ri ->
       double prediction = ridge.predict(row)
       dex.data[ri] << "" + prediction
@@ -216,14 +178,23 @@ class RidgeRegression extends DexTask {
       statusText.setText("Predicted ${dex.data.size()} outcomes.")
     }
     
-    //String graphVizTemplate = FileUtils.readFileToString(
-    //    new File("web/graphviz/graphviz.gtmpl"))
+    String graphVizTemplate = FileUtils.readFileToString(
+        new File("web/ml/smile/RidgeRegression.gtmpl"))
     
-    //def binding = [ "graph": graphStr ]
-    //def engine = new SimpleTemplateEngine()
-    //def template = engine.createTemplate(graphVizTemplate).make(binding)
-    //String graphVizOutput = template.toString()
-    //we?.loadContent(graphVizOutput)
+    def binding = [
+       "df": ridge.df(),
+       "error": ridge.error(),
+       "ftest": ridge.ftest(),
+       "rss": ridge.RSS(),
+       "pValue": ridge.pvalue(),
+       "rSquared": ridge.RSquared(),
+       "shrinkage": ridge.shrinkage(),
+       "adjRSquared": ridge.adjustedRSquared()
+      ]
+    def engine = new SimpleTemplateEngine()
+    def template = engine.createTemplate(graphVizTemplate).make(binding)
+    String graphVizOutput = template.toString()
+    we?.loadContent(graphVizOutput)
 
     println "HEADER: ${dex.header}"
     return state

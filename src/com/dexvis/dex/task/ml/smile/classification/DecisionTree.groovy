@@ -1,6 +1,5 @@
 package com.dexvis.dex.task.ml.smile.classification
 
-import groovy.text.SimpleTemplateEngine
 import javafx.collections.FXCollections
 import javafx.event.EventHandler
 import javafx.scene.Node
@@ -8,28 +7,27 @@ import javafx.scene.control.Button
 import javafx.scene.control.ChoiceBox
 import javafx.scene.control.Label
 import javafx.scene.control.Slider
-import javafx.scene.control.TextArea
 import javafx.scene.control.TextField
 import javafx.scene.input.MouseEvent
 import javafx.scene.web.WebEngine
 import javafx.scene.web.WebView
 
-import org.apache.commons.io.FileUtils
 import org.controlsfx.control.ListSelectionView
 import org.simpleframework.xml.Element
 import org.simpleframework.xml.Root
 import org.tbee.javafx.scene.layout.MigPane
 
 import smile.classification.DecisionTree.SplitRule
-import smile.data.NumericAttribute
 import smile.data.Attribute
 
 import com.dexvis.dex.exception.DexException
+import com.dexvis.dex.wf.DexEnvironment
 import com.dexvis.dex.wf.DexTask
 import com.dexvis.dex.wf.DexTaskState
 import com.dexvis.javafx.scene.control.DexFileChooser
 import com.dexvis.javafx.scene.control.NodeFactory
 import com.dexvis.util.WebViewUtil
+import com.dexvis.util.XStreamUtil
 import com.thoughtworks.xstream.XStream
 import com.thoughtworks.xstream.io.xml.DomDriver
 
@@ -37,9 +35,10 @@ import com.thoughtworks.xstream.io.xml.DomDriver
 class DecisionTree extends DexTask {
   public DecisionTree() {
     super("Machine Learning", "Decision Tree",
-       "ml/smile/classification/DecisionTree.html")
+    "ml/smile/classification/DecisionTree.html")
   }
   
+  private DexEnvironment env = DexEnvironment.getInstance()
   private WebView wv = new WebView()
   private WebEngine we = wv.getEngine()
   
@@ -58,6 +57,7 @@ class DecisionTree extends DexTask {
   
   private Label effectiveFileLabel = new Label("Effective File Name: ")
   private Label effectiveFile = new Label("")
+  
   private Label fileLabel = new Label("File Name:")
   
   @Element(name="splitRule", required=false)
@@ -78,7 +78,7 @@ class DecisionTree extends DexTask {
   
   private DexFileChooser modelChooser = new DexFileChooser("models",
   "Load Decision Tree Model", "Save Decision Tree Model",
-   "Decision Tree Model", "dt_mdl")
+  "Decision Tree Model", "dt_mdl")
   
   private XStream xstream = new XStream(new DomDriver())
   
@@ -86,11 +86,11 @@ class DecisionTree extends DexTask {
     
     def selected
     def dex = state.getDexData();
-    def allTypes = dex.guessTypes()
+    def types = dex.guessTypes()
     def initializing = false
     
     if (columnNameText.getText() == null || columnNameText.getText().length() <= 0) {
-      columnNameText.setText("DTREE")
+      columnNameText.setText("DTREE_PREDICTION")
     }
     
     // Only update if the list is empty.
@@ -99,7 +99,7 @@ class DecisionTree extends DexTask {
       initializing = true
       columnListView.getSourceItems().addAll(state.getDexData().getHeader())
       
-      // Select everything.
+      // Select everything by default.
       selected = dex
     }
     
@@ -110,7 +110,7 @@ class DecisionTree extends DexTask {
       selected = dex.select(columnListView.getTargetItems())
     }
     
-    // If we have not picked a prediction column, defaul to column 0 and flag
+    // If we have not picked a prediction column, default to column 0 and flag
     // this task as being in the process of initialzing.
     if (classifyColumnCB.getSelectionModel().isEmpty()) {
       initializing = true
@@ -127,68 +127,24 @@ class DecisionTree extends DexTask {
     if (columnListView.getTargetItems().size() <= 0) {
       throw new DexException("You must select at least one column in task ${getName()}.")
     }
-    
-    // data which will drive our training and predictions.
-    double[][] ndata = new double[selected.data.size()][selected.header.size()]
-    
-    println "SELECTED: ${selected}"
-    
-    if (selected.header.size() != columnListView.getTargetItems().size()) {
+
+    // Define base attributes
+    def columns = columnListView.getTargetItems()
+    def ndata= dex.getDoubles(columns)
+    def atts = dex.getNumericAttributes(columns)
+        
+    if (ndata[0].size() != columnListView.getTargetItems().size()) {
       throw new DexException("${getName()} > Data Mismatch Error : selected header size: " +
-      "${selected.header.size} does not match user selection size: ${columnListView.getTargetItems().size()}")
+      "${ndata[0].size()} does not match user selection size: ${columnListView.getTargetItems().size()}")
     }
     
     String classColName = "" + classifyColumnCB.getSelectionModel().getSelectedItem()
     // Figure out if we are training or we are predicting.
     boolean IS_TRAINING = dex.columnExists(classColName)
-    
-    println "IS_TRAINING: ${IS_TRAINING}"
-    
-    def types = selected.guessTypes()
-    println "TYPES: '${types}'"
-    
-    // Define base attributes
-    def atts = new Attribute[types.size()]
-    
-    types.eachWithIndex { type, hi ->
-      //println "HANDLING TYPE: '${type}'"
-      atts[hi] = new NumericAttribute(selected.header[hi])
-      
-      switch (type) {
-        case { it in ["double", "integer"]}:
-          selected.data.eachWithIndex { row, ri ->
-            ndata[ri][hi] = Double.parseDouble("" + row[hi])
-            //println("setting numeric: ndata[${ri}][{hi}]=${row[hi]}" )
-          }
-          break
-        default:
-          def categories = dex.categorize(hi);
-          selected.data.eachWithIndex { row, ri ->
-            ndata[ri][hi] = Double.parseDouble("" + categories[ri])
-          }
-      }
-    }
-    
+
     //println "NDATA: ${ndata}";
-    
-    int classifyIndex = classifyColumnCB.getSelectionModel().getSelectedIndex()
-    def classifyType = allTypes[classifyIndex]
-    def classify = new int[dex.data.size()]
-    
-    def catMap = [:]
-    def categories = dex.categorize(classifyIndex)
-    
-    categories.eachWithIndex { category, i ->
-      classify[i] = (int) Double.parseDouble("" + category)
-    }
-    
-    dex.data.eachWithIndex { row, ri ->
-      catMap[classify[ri]] = row[classifyIndex]
-    }
-    
-    println "MAX-NODES: ${maxNodesValueLabel.getText()}"
-    println "CLASSES: ${classify}"
-    println "CATMAP: ${catMap}"
+    int responseIndex = classifyColumnCB.getSelectionModel().getSelectedIndex()
+    def classification = dex.classify(responseIndex)
     
     if (IS_TRAINING) {
       // Determine split rule
@@ -197,39 +153,47 @@ class DecisionTree extends DexTask {
       println "Using Split Rule: '${splitRule}'"
       
       switch (splitRule) {
-        case "Gini":
-          dtree = new smile.classification.DecisionTree(atts, ndata, classify,
+        case "GINI":
+          dtree = new smile.classification.DecisionTree(
+          (Attribute []) atts, (double [][]) ndata, (int[]) classification.classes,
           (int) maxNodesSlider.getValue(), SplitRule.GINI)
           break;
         case "Entropy":
-          dtree = new smile.classification.DecisionTree(atts, ndata, classify,
+          dtree = new smile.classification.DecisionTree(
+          (Attribute []) atts, (double [][]) ndata, (int[]) classification.classes,
           (int) maxNodesSlider.getValue(), SplitRule.ENTROPY)
           break;
         case "Classification Error":
-          dtree = new smile.classification.DecisionTree(atts, ndata, classify,
+          dtree = new smile.classification.DecisionTree(
+          (Attribute []) atts, (double [][]) ndata, (int[]) classification.classes,
           (int) maxNodesSlider.getValue(), SplitRule.CLASSIFICATION_ERROR)
           break;
         default:
-          dtree = new smile.classification.DecisionTree(atts, ndata, classify,
+          dtree = new smile.classification.DecisionTree(
+          (Attribute []) atts, (double [][]) ndata, (int[]) classification.classes,
           (int) maxNodesSlider.getValue(), SplitRule.GINI)
       }
       
+      String filePath = env.interpolate(fileText.getText())
+      effectiveFile.setText(filePath)
       
-      FileWriter writer = new FileWriter(new File(fileText.getText()))
-      ObjectOutputStream modelOut = xstream.createObjectOutputStream(writer);
-      
-      modelOut.writeObject(dtree)
-      modelOut.writeObject(catMap)
-      modelOut.close();
+      XStreamUtil.writeObjects(filePath, dtree, classification.classMap)
     }
     else // Predicting
     {
-      FileReader reader = new FileReader(new File(fileText.getText()))
+      String filePath = env.interpolate(fileText.getText())
+      effectiveFile.setText(filePath)
+      
+      
+      FileReader reader = new FileReader(filePath)
       ObjectInputStream modelIn = xstream.createObjectInputStream(reader)
       
+      def objs = XStreamUtil.readObjects(filePath)
+      
       // Load from model file from object stream.
-      dtree = (smile.classification.DecisionTree) modelIn.readObject();
-      catMap = (Map) modelIn.readObject();
+      dtree = (smile.classification.DecisionTree) objs[0];
+      classification = [:]
+      classification.classMap = (Map) objs[1];
     }
     
     println "IMPORTANCE: ${dtree.importance()}"
@@ -238,16 +202,14 @@ class DecisionTree extends DexTask {
     int numRight = 0
     int numWrong = 0
     ndata.eachWithIndex { row, ri ->
-      String prediction = new String("${catMap[dtree.predict(row)]}")
-      if (prediction == dex.data[ri][classifyIndex]) {
+      String prediction = new String("${classification.classMap[dtree.predict(row)]}")
+      if (prediction == dex.data[ri][responseIndex]) {
         numRight++;
       }
       else {
         numWrong++;
       }
-      
       dex.data[ri] << prediction
-      
     }
     dex.header << columnNameText.getText()
     if (IS_TRAINING) {
@@ -257,22 +219,23 @@ class DecisionTree extends DexTask {
     else {
       statusText.setText("Predicted ${dex.data.size()} outcomes.")
     }
+    
+    // Massage the graphviz dot string so that the target classes are
+    // labeled with original name.
     String graphStr = dtree.dot().replaceAll('\n', "");
-    catMap.each { key, value ->
-      println "CAT: ${key}=${value}"
+    classification.classMap.each { key, value ->
+      println "CLASS: ${key}=${value}"
       graphStr = graphStr.replaceAll('<class = ' + key + '>', '<class = ' + value + ' >')
     }
     
-    String graphVizTemplate = FileUtils.readFileToString(
-        new File("web/graphviz/graphviz.gtmpl"))
+    WebViewUtil.displayGroovyTemplate(we, "web/ml/smile/DecisionTree.gtmpl", [
+      "graph": graphStr,
+      "right": numRight,
+      "wrong": numWrong,
+      "importance": dtree.importance(),
+      "columns" : columns
+    ])
     
-    def binding = [ "graph": graphStr ]
-    def engine = new SimpleTemplateEngine()
-    def template = engine.createTemplate(graphVizTemplate).make(binding)
-    String graphVizOutput = template.toString()
-    we?.loadContent(graphVizOutput)
-    
-    //graphVizTextArea.setText(graphStr)
     println "HEADER: ${dex.header}"
     return state
   }
@@ -352,5 +315,4 @@ class DecisionTree extends DexTask {
     }
     return configPane
   }
-  
 }
