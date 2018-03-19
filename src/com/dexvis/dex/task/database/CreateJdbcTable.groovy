@@ -122,7 +122,7 @@ class CreateJdbcTable extends DexTask {
   @Element(name="ignoreNulls", required=false)
   private CheckBox ignoreNullsCB = new CheckBox()
   
-  RangeSlider stringLengthSlider = new RangeSlider(0, 4000, 16, 256)
+  private RangeSlider stringLengthSlider = new RangeSlider(0, 4000, 16, 256)
   
   public DexTaskState execute(DexTaskState state) throws DexException {
     
