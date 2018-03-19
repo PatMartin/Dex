@@ -139,7 +139,12 @@ class RidgeRegression extends DexTask {
     def responses = new double[dex.data.size()]
     
     responses.eachWithIndex { response, i ->
-      responses[i] = (int) Double.parseDouble("" + dex.data[i][responseIndex])
+      try {
+      responses[i] = Double.parseDouble("" + dex.data[i][responseIndex])
+      }
+      catch (Exception ex) {
+        responses[i] = Double.NaN
+      }
     }
     
     
