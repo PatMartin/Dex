@@ -1,6 +1,6 @@
 package com.dexvis.util
 
-import groovy.text.StreamingTemplateEngine;
+import groovy.text.SimpleTemplateEngine
 import javafx.scene.web.WebEngine
 
 import org.apache.commons.io.FileUtils
@@ -8,7 +8,7 @@ import org.apache.commons.io.FileUtils
 class WebViewUtil {
   public static void displayGroovyTemplate(WebEngine we, String templatePath, Map<String, Object> bindings) {
     String templateCode = FileUtils.readFileToString(new File(templatePath));
-    def engine = StreamingTemplateEngine()
+    def engine = new SimpleTemplateEngine()
     String template = engine.createTemplate(templateCode).make(bindings).toString()
 
     we?.loadContent(template)

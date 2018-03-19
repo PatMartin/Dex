@@ -38,7 +38,7 @@ public class DexUtil {
     
     return rootMap
   }
-  
+
   public static DexTask copyTask(DexTask task) {
     
     StringWriter sw = new StringWriter();
