@@ -1,5 +1,8 @@
 package com.dexvis.dex
 
+import smile.data.Attribute
+import smile.data.NumericAttribute
+
 import com.dexvis.dex.exception.DexException
 import com.dexvis.util.DateUtil
 
@@ -130,29 +133,79 @@ public class DexData {
     return getUniques(getColumnName(colIndex))
   }
   
-  public List<String> getUniques(String colName) {    
+  public List<String> getUniques(String colName) {
     def valueMap = [:]
     getColumn(colName).each { valueMap[it] = true }
     return valueMap.keySet().sort()
   }
   
-  public List<Integer> categorize(String colName) {
-    return categorize(getColumnNumber(colName))
+  public classify(String colName) {
+    return classify(getColumnNumber(colName))
   }
   
-  public List<Integer> categorize(int colIndex) {
+  public classify(int colIndex) {
     def uniques = getUniques(colIndex);
-    def catMap = [:]
+    def val2Class = [:]
+    def class2Val = [:]
     
-    uniques.eachWithIndex {
-      cat, i ->
-      catMap[cat] = i;
+    uniques.eachWithIndex { classification, i ->
+      
+      val2Class[classification] = i
+      class2Val[i] = classification
     }
+    
+    def classes = new ArrayList<Integer>()
+    getColumn(colIndex).each { classes.add(val2Class[it]) }
+    
+    return [
+      classes: classes,
+      classMap: class2Val
+    ]
+  }
+  
+  public NumericAttribute[] getNumericAttributes(List<String> columns) {
+    if (columns == null || columns.size() <= 0) {
+      return new Attribute[0]
+    }
+    
+    def atts = new NumericAttribute[columns.size()]
+    columns.eachWithIndex { col, ci ->
+      atts[ci] = new NumericAttribute(col)
+    }
+    return atts;
+  }
+  
+  public double[][] getDoubles(List<String> columns, double outOfScope=-1.0) {
+    DexData selected = select(columns)
+    List<String> selectedTypes = selected.guessTypes()
 
-    def categories = new ArrayList<Integer>()
-    getColumn(colIndex).each { categories.add(catMap[it]) }
-
-    return categories;
+    println "SELECTED: ${selected}"
+    println "SELECTED-TYPES: ${selectedTypes}"
+    double[][] ddata = new double[selected.data.size()][selected.header.size()]
+    
+    selectedTypes.eachWithIndex { type, hi ->
+      
+      switch (type) {
+        case { it in ["double", "integer"]}:
+          selected.data.eachWithIndex { row, ri ->
+            
+            try {
+              ddata[ri][hi] = Double.parseDouble("" + row[hi])
+            }
+            catch (Exception ex) {
+              ddata[ri][hi] = outOfScope;
+              println "Could not convert ndata[${ri}][${hi}] = '${row[hi]}' to Double"
+            }
+          }
+          break
+        default:
+          def classification = classify(hi);
+          selected.data.eachWithIndex { row, ri ->
+            ddata[ri][hi] = Double.parseDouble("" + classification.classes[ri])
+          }
+      }
+    }
+    return ddata
   }
   
   public List<Map<String, String>> getMapList()
