@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>GraphViz</title>
+<script type="text/javascript">
+<% println new File("javascript/graphviz/latest/graphviz.js").text %>
+</script>
+<!--
+<script type="text/javascript"
+src="https://getfirebug.com/firebug-lite.js">
+{
+    overrideConsole: false,
+    startInNewWindow: false,
+    startOpened: true,
+    enableTrace: true
+}
+</script>
+-->
+  </head>
+  <body>
+  <table align="right" border="1">
+    <tr><td>Performance:</td><td><%= ((right / (right + wrong) * 100.0) as Double).round(1) %>%: <%= right %> correct of <%= right + wrong %></td></tr>
+    <tr><td align="CENTER" colspan="2">Importance</td></tr>
+<%
+  importance.eachWithIndex {
+    val, i ->
+    println "<tr><td>${columns[i]}</td><td>${val}</td></tr>"
+  }
+%>
+  </table>
+    <script>
+      <% println "var graph = '${graph}';" %>
+      document.body.innerHTML += Viz(graph);    
+    </script>
+  </body>
+</html>

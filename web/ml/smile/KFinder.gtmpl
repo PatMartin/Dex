@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+  <head>
+<style>
+  html,body {
+    height : 100%;
+    min-height : 100%;
+    width : 100%;
+    min-width : 100%;
+  }
+  
+  #ChartArea {
+    height : 100%;
+    min-height : 100%;
+    width : 100%;
+    min-width : 100%;
+    display: inline-block;
+  }
+<%
+  println new File("javascript/jquery-ui/latest/jquery-ui.min.css").text
+  println new File("javascript/jquery-ui/latest/jquery-ui.theme.min.css").text
+  println new File("javascript/dexjs/latest/dex-jquery.css").text
+  println new File("javascript/bootstrap3/latest/bootstrap.min.css").text
+  println new File("javascript/dexjs/latest/dex-bootstrap.css").text
+  println new File("javascript/dexjs/latest/dex.css").text
+  println new File("javascript/c3/latest/c3.min.css").text
+%>
+</style>
+    <meta charset="utf-8">
+    <title>GraphViz</title>
+<script type="text/javascript">
+<%
+  println new File("javascript/tether/latest/tether.min.js").text
+  println new File("javascript/jquery/latest/jquery.min.js").text
+  println new File("javascript/jquery-ui/latest/jquery-ui.min.js").text
+  println new File("javascript/dexjs/latest/dex-jquery.js").text
+  println new File("javascript/bootstrap3/latest/bootstrap.min.js").text
+  println new File("javascript/dexjs/latest/dex-bootstrap.js").text
+  println new File("javascript/underscore/latest/underscore-min.js").text
+  println new File("javascript/dexjs/latest/dex-libs.min.js").text
+  println new File("javascript/dexjs/latest/dex.min.js").text
+  println new File("javascript/c3/latest/c3.min.js").text
+%>
+</script>
+<!--
+<script type="text/javascript"
+src="https://getfirebug.com/firebug-lite.js">
+{
+    overrideConsole: false,
+    startInNewWindow: false,
+    startOpened: true,
+    enableTrace: true
+}
+</script>
+-->
+  </head>
+  <body>
+  <div id='ChartArea'></div>
+<script>
+<% println "var distortion = ${distortion};" %>
+
+  var csv = new dex.csv(["K", "Distortion"], distortion);
+  var chart = dex.charts.c3.LineChart({
+    parent: "#ChartArea",
+    csv: csv,
+    "options.subchart": false
+  })
+    .render();
+</script>
+  </body>
+</html>
