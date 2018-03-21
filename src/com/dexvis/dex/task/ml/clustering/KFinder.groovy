@@ -1,4 +1,4 @@
-package com.dexvis.dex.task.ml.smile.clustering
+package com.dexvis.dex.task.ml.clustering
 
 import javafx.scene.Node
 import javafx.event.EventHandler
@@ -27,7 +27,7 @@ import com.dexvis.util.WebViewUtil
 @Root(name="kFinder")
 class KFinder extends DexTask {
   public KFinder() {
-    super("Machine Learning", "KFinder", "ml/smile/clustering/KFinder.html")
+    super("Machine Learning: Clustering", "KFinder", "ml/smile/clustering/KFinder.html")
   }
   
   private WebView wv = new WebView()

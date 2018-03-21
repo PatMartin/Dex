@@ -1,4 +1,4 @@
-package com.dexvis.dex.task.ml.smile.regression
+package com.dexvis.dex.task.ml.regression
 
 import javafx.event.EventHandler
 import javafx.scene.Node
@@ -30,7 +30,7 @@ import com.dexvis.util.WebViewUtil
 @Root(name="lasso-regression")
 class LassoRegression extends DexTask {
   public LassoRegression() {
-    super("Machine Learning", "Lasso Regression",
+    super("Machine Learning: Regression", "Lasso Regression",
     "ml/smile/classification/LassoRegression.html")
   }
   

@@ -1,4 +1,4 @@
-package com.dexvis.dex.task.ml.smile.regression
+package com.dexvis.dex.task.ml.regression
 
 import javafx.event.EventHandler
 import javafx.scene.Node
@@ -30,7 +30,7 @@ import com.dexvis.util.WebViewUtil
 @Root(name="ridge-regression")
 class RidgeRegression extends DexTask {
   public RidgeRegression() {
-    super("Machine Learning", "Ridge Regression",
+    super("Machine Learning: Regression", "Ridge Regression",
     "ml/smile/classification/RidgeRegression.html")
   }
   

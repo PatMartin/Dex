@@ -728,7 +728,7 @@ public class DexData {
         println "Possible Date With Format: '${fmt.toPattern()}'"
       }
       possibleDate = fmt != null
-      
+
       // Only future-proof way to handle data of indeterminant format
       if (allNull || allEmpty)
       {

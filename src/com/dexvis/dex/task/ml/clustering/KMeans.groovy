@@ -1,4 +1,4 @@
-package com.dexvis.dex.task.ml.smile.clustering
+package com.dexvis.dex.task.ml.clustering
 
 import javafx.event.EventHandler
 import javafx.scene.Node
@@ -24,7 +24,7 @@ import com.dexvis.util.WebViewUtil
 @Root(name="kmeans")
 class KMeans extends DexTask {
   public KMeans() {
-    super("Machine Learning", "KMeans", "ml/smile/clustering/KMeans.html")
+    super("Machine Learning: Clustering", "KMeans", "ml/smile/clustering/KMeans.html")
   }
   
   private WebView wv = new WebView()

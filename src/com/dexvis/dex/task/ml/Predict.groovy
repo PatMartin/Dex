@@ -1,4 +1,4 @@
-package com.dexvis.dex.task.ml.smile
+package com.dexvis.dex.task.ml
 
 import javafx.event.EventHandler
 import javafx.scene.Node

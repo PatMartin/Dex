@@ -1,4 +1,4 @@
-package com.dexvis.dex.task.ml.smile.classification
+package com.dexvis.dex.task.ml.classification
 
 import javafx.collections.FXCollections
 import javafx.event.EventHandler
@@ -34,7 +34,7 @@ import com.dexvis.util.WebViewUtil
 @Root(name="decision-tree")
 class DecisionTree extends DexTask {
   public DecisionTree() {
-    super("Machine Learning", "Decision Tree",
+    super("Machine Learning: Classification", "Decision Tree",
     "ml/smile/classification/DecisionTree.html")
   }
   
@@ -101,12 +101,12 @@ class DecisionTree extends DexTask {
     // Create selected, a subset of dex data to be considered for the decision tree prediction.
     if (columnListView.getTargetItems().size() <= 0)
     {
-      throw new DexException("You must select at least one column for evaluation.");
+      initializing = true
     }
     
     // If we have not picked a prediction column, default to column 0 and flag
     // this task as being in the process of initialzing.
-    if (classifyColumnCB.getSelectionModel().isEmpty()) {
+    if (classifyColumnCB.getSelectionModel().isEmpty() || classifyColumnCB.getItems().size() <= 0) {
       initializing = true
       classifyColumnCB.getItems().addAll(state.dexData.header)
       classifyColumnCB.getSelectionModel().select(0)
@@ -287,6 +287,7 @@ class DecisionTree extends DexTask {
         columnListView.getSourceItems().clear()
         columnListView.getTargetItems().clear()
         classifyColumnCB.getItems().clear()
+        classifyColumnCB.getSelectionModel().clearSelection()
       } as EventHandler);
     }
     return configPane
