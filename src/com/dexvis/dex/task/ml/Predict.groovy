@@ -26,7 +26,7 @@ import com.dexvis.util.XStreamUtil
 @Root(name="predict")
 class Predict extends DexTask {
   public Predict() {
-    super("Machine Learning", "Predict",
+    super("Machine Learning: Prediction", "Predict",
     "ml/smile/classification/Predict.html")
   }
   
