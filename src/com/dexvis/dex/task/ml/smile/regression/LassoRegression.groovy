@@ -27,11 +27,11 @@ import com.dexvis.javafx.scene.control.NodeFactory
 import com.dexvis.util.PathUtil
 import com.dexvis.util.WebViewUtil
 
-@Root(name="ridge-regression")
-class RidgeRegression extends DexTask {
-  public RidgeRegression() {
-    super("Machine Learning", "Ridge Regression",
-    "ml/smile/classification/RidgeRegression.html")
+@Root(name="lasso-regression")
+class LassoRegression extends DexTask {
+  public LassoRegression() {
+    super("Machine Learning", "Lasso Regression",
+    "ml/smile/classification/LassoRegression.html")
   }
   
   private DexEnvironment env = DexEnvironment.getInstance()
@@ -68,15 +68,15 @@ class RidgeRegression extends DexTask {
   private Label lambdaValueLabel = new Label("")
 
   private DexFileChooser modelChooser = new DexFileChooser("models",
-  "Load Ridge Regression Model", "Save Ridge Regression Model",
-  "Ridge Regression Model", "ridge.mdl")
+  "Load Lasso Regression Model", "Save Lasso Regression Model",
+  "Lasso Regression Model", "lasso.mdl")
   
   public DexTaskState execute(DexTaskState state) throws DexException {
     def dex = state.getDexData()
     def types = dex.guessTypes()
     
     if (columnNameText.getText() == null || columnNameText.getText().length() <= 0) {
-      columnNameText.setText("RIDGE")
+      columnNameText.setText("LASSO_PREDICTION")
     }
     
     // Only update if the list is empty.
@@ -116,7 +116,7 @@ class RidgeRegression extends DexTask {
     def responseType = types[responseIndex]
     
     if (responseType == "date" || responseType == "string") {
-      throw new DexException("Ridge Regression can only predict numerics values.")
+      throw new DexException("Lasso Regression can only predict numerics values.")
     }
     
     def responses = new double[dex.data.size()]
@@ -135,30 +135,30 @@ class RidgeRegression extends DexTask {
     effectiveFile.setText(filePath)
 
     // Ridge, Lasso, RLS
-    smile.regression.RidgeRegression ridge = new smile.regression.RidgeRegression(ndata, responses,
+    smile.regression.LASSO lasso = new smile.regression.LASSO(ndata, responses,
       lambdaSlider.getValue())
     
-    model = new DexModel("Ridge Regression", features, featureTypes, ridge)
+    model = new DexModel("Lasso Regression", features, featureTypes, lasso)
     
     if (autosaveCB.isSelected()) {
       model.write(filePath)
     }
 
     ndata.eachWithIndex { row, ri ->
-      double prediction = ridge.predict(row)
+      double prediction = lasso.predict(row)
       dex.data[ri] << "" + prediction
     }
     dex.header << columnNameText.getText()
     
-    WebViewUtil.displayGroovyTemplate(we, "web/ml/smile/RidgeRegression.gtmpl", [
-      "df": ridge.df(),
-      "error": ridge.error(),
-      "ftest": ridge.ftest(),
-      "rss": ridge.RSS(),
-      "pValue": ridge.pvalue(),
-      "rSquared": ridge.RSquared(),
-      "shrinkage": ridge.shrinkage(),
-      "adjRSquared": ridge.adjustedRSquared()
+    WebViewUtil.displayGroovyTemplate(we, "web/ml/smile/LassoRegression.gtmpl", [
+      "df": lasso.df(),
+      "error": lasso.error(),
+      "ftest": lasso.ftest(),
+      "rss": lasso.RSS(),
+      "pValue": lasso.pvalue(),
+      "rSquared": lasso.RSquared(),
+      "shrinkage": lasso.shrinkage(),
+      "adjRSquared": lasso.adjustedRSquared()
     ])
 
     return state
@@ -177,7 +177,7 @@ class RidgeRegression extends DexTask {
       configPane = new MigPane("", "[][grow]", "[][][][][][][][][][grow][]")
       configPane.setStyle("-fx-background-color: white;")
       
-      configPane.add(NodeFactory.createTitle("Ridge Regression"), "grow,span")
+      configPane.add(NodeFactory.createTitle("Lasso Regression"), "grow,span")
       Button saveButton = new Button("Save Model")
       
       saveButton.setOnAction({ actionEvent ->

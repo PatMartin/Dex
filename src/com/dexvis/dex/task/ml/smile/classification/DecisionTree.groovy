@@ -4,6 +4,7 @@ import javafx.collections.FXCollections
 import javafx.event.EventHandler
 import javafx.scene.Node
 import javafx.scene.control.Button
+import javafx.scene.control.CheckBox
 import javafx.scene.control.ChoiceBox
 import javafx.scene.control.Label
 import javafx.scene.control.Slider
@@ -20,16 +21,15 @@ import org.tbee.javafx.scene.layout.MigPane
 import smile.classification.DecisionTree.SplitRule
 import smile.data.Attribute
 
+import com.dexvis.dex.DexModel
 import com.dexvis.dex.exception.DexException
 import com.dexvis.dex.wf.DexEnvironment
 import com.dexvis.dex.wf.DexTask
 import com.dexvis.dex.wf.DexTaskState
 import com.dexvis.javafx.scene.control.DexFileChooser
 import com.dexvis.javafx.scene.control.NodeFactory
+import com.dexvis.util.PathUtil
 import com.dexvis.util.WebViewUtil
-import com.dexvis.util.XStreamUtil
-import com.thoughtworks.xstream.XStream
-import com.thoughtworks.xstream.io.xml.DomDriver
 
 @Root(name="decision-tree")
 class DecisionTree extends DexTask {
@@ -41,6 +41,7 @@ class DecisionTree extends DexTask {
   private DexEnvironment env = DexEnvironment.getInstance()
   private WebView wv = new WebView()
   private WebEngine we = wv.getEngine()
+  private DexModel model = null;
   
   private MigPane configPane = null
   
@@ -50,10 +51,11 @@ class DecisionTree extends DexTask {
   @Element(name="columnName", required=false)
   private TextField columnNameText = new TextField()
   
+  @Element(name="autosave", required=false)
+  private CheckBox autosaveCB = new CheckBox()
+  
   @Element(name="resultColumn", required=false)
   private ChoiceBox classifyColumnCB = new ChoiceBox()
-  
-  private TextField statusText = new TextField("")
   
   private Label effectiveFileLabel = new Label("Effective File Name: ")
   private Label effectiveFile = new Label("")
@@ -78,13 +80,9 @@ class DecisionTree extends DexTask {
   
   private DexFileChooser modelChooser = new DexFileChooser("models",
   "Load Decision Tree Model", "Save Decision Tree Model",
-  "Decision Tree Model", "dt_mdl")
-  
-  private XStream xstream = new XStream(new DomDriver())
+  "Decision Tree Model", "dtree.mdl")
   
   public DexTaskState execute(DexTaskState state) throws DexException {
-    
-    def selected
     def dex = state.getDexData();
     def types = dex.guessTypes()
     def initializing = false
@@ -98,16 +96,12 @@ class DecisionTree extends DexTask {
     {
       initializing = true
       columnListView.getSourceItems().addAll(state.getDexData().getHeader())
-      
-      // Select everything by default.
-      selected = dex
     }
     
     // Create selected, a subset of dex data to be considered for the decision tree prediction.
-    if (columnListView.getTargetItems().size() > 0)
+    if (columnListView.getTargetItems().size() <= 0)
     {
-      // User driven selection of data for kmean analysis
-      selected = dex.select(columnListView.getTargetItems())
+      throw new DexException("You must select at least one column for evaluation.");
     }
     
     // If we have not picked a prediction column, default to column 0 and flag
@@ -127,77 +121,60 @@ class DecisionTree extends DexTask {
     if (columnListView.getTargetItems().size() <= 0) {
       throw new DexException("You must select at least one column in task ${getName()}.")
     }
-
+    
     // Define base attributes
-    def columns = columnListView.getTargetItems()
-    def ndata= dex.getDoubles(columns)
-    def atts = dex.getNumericAttributes(columns)
-        
+    def features = columnListView.getTargetItems()
+    def featureTypes = dex.select(features).guessTypes();
+    def ndata= dex.getDoubles(features)
+    def atts = dex.getNumericAttributes(features)
+    
     if (ndata[0].size() != columnListView.getTargetItems().size()) {
       throw new DexException("${getName()} > Data Mismatch Error : selected header size: " +
       "${ndata[0].size()} does not match user selection size: ${columnListView.getTargetItems().size()}")
     }
     
     String classColName = "" + classifyColumnCB.getSelectionModel().getSelectedItem()
-    // Figure out if we are training or we are predicting.
-    boolean IS_TRAINING = dex.columnExists(classColName)
-
-    //println "NDATA: ${ndata}";
+    
     int responseIndex = classifyColumnCB.getSelectionModel().getSelectedIndex()
     def classification = dex.classify(responseIndex)
     
-    if (IS_TRAINING) {
-      // Determine split rule
-      def splitRule = splitRuleCB.getSelectionModel().getSelectedItem()
-      
-      println "Using Split Rule: '${splitRule}'"
-      
-      switch (splitRule) {
-        case "GINI":
-          dtree = new smile.classification.DecisionTree(
-          (Attribute []) atts, (double [][]) ndata, (int[]) classification.classes,
-          (int) maxNodesSlider.getValue(), SplitRule.GINI)
-          break;
-        case "Entropy":
-          dtree = new smile.classification.DecisionTree(
-          (Attribute []) atts, (double [][]) ndata, (int[]) classification.classes,
-          (int) maxNodesSlider.getValue(), SplitRule.ENTROPY)
-          break;
-        case "Classification Error":
-          dtree = new smile.classification.DecisionTree(
-          (Attribute []) atts, (double [][]) ndata, (int[]) classification.classes,
-          (int) maxNodesSlider.getValue(), SplitRule.CLASSIFICATION_ERROR)
-          break;
-        default:
-          dtree = new smile.classification.DecisionTree(
-          (Attribute []) atts, (double [][]) ndata, (int[]) classification.classes,
-          (int) maxNodesSlider.getValue(), SplitRule.GINI)
-      }
-      
-      String filePath = env.interpolate(fileText.getText())
-      effectiveFile.setText(filePath)
-      
-      XStreamUtil.writeObjects(filePath, dtree, classification.classMap)
-    }
-    else // Predicting
-    {
-      String filePath = env.interpolate(fileText.getText())
-      effectiveFile.setText(filePath)
-      
-      
-      FileReader reader = new FileReader(filePath)
-      ObjectInputStream modelIn = xstream.createObjectInputStream(reader)
-      
-      def objs = XStreamUtil.readObjects(filePath)
-      
-      // Load from model file from object stream.
-      dtree = (smile.classification.DecisionTree) objs[0];
-      classification = [:]
-      classification.classMap = (Map) objs[1];
+    // Determine split rule
+    def splitRule = splitRuleCB.getSelectionModel().getSelectedItem()
+    
+    switch (splitRule) {
+      case "GINI":
+        dtree = new smile.classification.DecisionTree(
+        (Attribute []) atts, (double [][]) ndata, (int[]) classification.classes,
+        (int) maxNodesSlider.getValue(), SplitRule.GINI)
+        break;
+      case "Entropy":
+        dtree = new smile.classification.DecisionTree(
+        (Attribute []) atts, (double [][]) ndata, (int[]) classification.classes,
+        (int) maxNodesSlider.getValue(), SplitRule.ENTROPY)
+        break;
+      case "Classification Error":
+        dtree = new smile.classification.DecisionTree(
+        (Attribute []) atts, (double [][]) ndata, (int[]) classification.classes,
+        (int) maxNodesSlider.getValue(), SplitRule.CLASSIFICATION_ERROR)
+        break;
+      default:
+        dtree = new smile.classification.DecisionTree(
+        (Attribute []) atts, (double [][]) ndata, (int[]) classification.classes,
+        (int) maxNodesSlider.getValue(), SplitRule.GINI)
     }
     
-    println "IMPORTANCE: ${dtree.importance()}"
-    println "GRAPH-VIZ: ${dtree.dot()}"
+    // Prepare and store the model to disk
+    String filePath = env.interpolate(fileText.getText())
+    effectiveFile.setText(filePath)
+    
+    Map<String, Object> modelProperties = new HashMap<String, Object>();
+    // Prep the dex model for persistence
+    model = new DexModel("Decision Tree", features, featureTypes, dtree,
+        [ classificationMap : classification.classMap ])
+    
+    if (autosaveCB.isSelected()) {
+      model.write(filePath)
+    }
     
     int numRight = 0
     int numWrong = 0
@@ -212,13 +189,6 @@ class DecisionTree extends DexTask {
       dex.data[ri] << prediction
     }
     dex.header << columnNameText.getText()
-    if (IS_TRAINING) {
-      statusText.setText("Training Data Performance: ${numRight} correct predictions out of" +
-          " ${dex.data.size()} = ${numRight/dex.data.size() * 100.0}")
-    }
-    else {
-      statusText.setText("Predicted ${dex.data.size()} outcomes.")
-    }
     
     // Massage the graphviz dot string so that the target classes are
     // labeled with original name.
@@ -233,7 +203,7 @@ class DecisionTree extends DexTask {
       "right": numRight,
       "wrong": numWrong,
       "importance": dtree.importance(),
-      "columns" : columns
+      "columns" : features
     ])
     
     println "HEADER: ${dex.header}"
@@ -246,27 +216,31 @@ class DecisionTree extends DexTask {
     {
       Label maxNodesLabel = new Label("Max Nodes")
       Label classifyColumnLabel = new Label("Classify Column");
-      Label statusLabel = new Label("Status:")
       Label columnNameLabel = new Label("Destination Column")
       Label splitRuleLabel = new Label("Split Rule")
+      Label autosaveLabel = new Label("Autosave")
       WebViewUtil.noData(we)
       
-      configPane = new MigPane("", "[][grow]", "[][][][][][][][][][][grow][]")
+      configPane = new MigPane("", "[][grow]", "[][][][][][][][][][grow][]")
       configPane.setStyle("-fx-background-color: white;")
       
       configPane.add(NodeFactory.createTitle("Decision Tree"), "grow,span")
-      Button browseButton = new Button("Browse")
+      Button saveButton = new Button("Save Model")
       
-      browseButton.setOnAction({ actionEvent ->
-        println "ACTION-EVENT: ${actionEvent}"
+      saveButton.setOnAction({ actionEvent ->
         try
         {
-          File browseFile = modelChooser.load(actionEvent)
-          fileText.setText(browseFile.getCanonicalPath())
+          File saveFile = modelChooser.save(actionEvent)
+          String path = PathUtil.getRelativePath(saveFile)
+          fileText.setText(path)
+          effectiveFile.setText(path)
+          if (model != null) {
+            model.write(path)
+          }
         }
         catch(Exception ex)
         {
-          ex.printStackTrace()
+          //ex.printStackTrace()
         }
       } as EventHandler);
       
@@ -275,15 +249,18 @@ class DecisionTree extends DexTask {
       
       configPane.add(fileLabel)
       configPane.add(fileText, "grow")
-      configPane.add(browseButton, "span")
+      configPane.add(saveButton, "span")
       configPane.add(columnListView, "grow,span")
+      
+      configPane.add(autosaveLabel)
+      configPane.add(autosaveCB, "span")
       
       configPane.add(splitRuleLabel)
       configPane.add(splitRuleCB, "grow,span");
       
-      configPane.add(maxNodesValueLabel, "grow,span");
       configPane.add(maxNodesLabel);
-      configPane.add(maxNodesSlider, "grow,span")
+      configPane.add(maxNodesSlider, "grow")
+      configPane.add(maxNodesValueLabel, "span");
       
       maxNodesSlider.setMinorTickCount(0)
       
@@ -302,8 +279,7 @@ class DecisionTree extends DexTask {
       configPane.add(classifyColumnCB, "grow,span")
       configPane.add(columnNameLabel)
       configPane.add(columnNameText, "grow, span")
-      configPane.add(statusLabel)
-      configPane.add(statusText, "grow,span")
+      
       configPane.add(wv, "grow,span")
       configPane.add(clearButton, "grow, span")
       

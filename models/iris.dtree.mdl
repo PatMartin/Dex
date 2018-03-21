@@ -1,0 +1,167 @@
+<object-stream>
+  <string>Decision Tree</string>
+  <list>
+    <string>Sepal Length</string>
+    <string>Sepal Width</string>
+    <string>Petal Length</string>
+    <string>Petal Width</string>
+  </list>
+  <list>
+    <string>double</string>
+    <string>double</string>
+    <string>double</string>
+    <string>double</string>
+  </list>
+  <smile.classification.DecisionTree>
+    <attributes class="smile.data.NumericAttribute-array">
+      <smile.data.NumericAttribute>
+        <type>NUMERIC</type>
+        <weight>1.0</weight>
+        <name>Sepal Length</name>
+      </smile.data.NumericAttribute>
+      <smile.data.NumericAttribute>
+        <type>NUMERIC</type>
+        <weight>1.0</weight>
+        <name>Sepal Width</name>
+      </smile.data.NumericAttribute>
+      <smile.data.NumericAttribute>
+        <type>NUMERIC</type>
+        <weight>1.0</weight>
+        <name>Petal Length</name>
+      </smile.data.NumericAttribute>
+      <smile.data.NumericAttribute>
+        <type>NUMERIC</type>
+        <weight>1.0</weight>
+        <name>Petal Width</name>
+      </smile.data.NumericAttribute>
+    </attributes>
+    <importance>
+      <double>0.0</double>
+      <double>0.0</double>
+      <double>0.4157235939643345</double>
+      <double>0.38969404186795487</double>
+    </importance>
+    <root>
+      <output>0</output>
+      <posteriori>
+        <double>0.3333333333333333</double>
+        <double>0.3333333333333333</double>
+        <double>0.3333333333333333</double>
+      </posteriori>
+      <splitFeature>2</splitFeature>
+      <splitValue>2.45</splitValue>
+      <splitScore>0.3333333333333332</splitScore>
+      <trueChild>
+        <output>0</output>
+        <posteriori>
+          <double>0.9622641509433962</double>
+          <double>0.018867924528301886</double>
+          <double>0.018867924528301886</double>
+        </posteriori>
+        <splitFeature>-1</splitFeature>
+        <splitValue>NaN</splitValue>
+        <splitScore>0.0</splitScore>
+        <trueChildOutput>-1</trueChildOutput>
+        <falseChildOutput>-1</falseChildOutput>
+        <outer-class reference="../../.."/>
+      </trueChild>
+      <falseChild>
+        <output>1</output>
+        <posteriori>
+          <double>0.009708737864077669</double>
+          <double>0.49514563106796117</double>
+          <double>0.49514563106796117</double>
+        </posteriori>
+        <splitFeature>3</splitFeature>
+        <splitValue>1.75</splitValue>
+        <splitScore>0.38969404186795487</splitScore>
+        <trueChild>
+          <output>1</output>
+          <posteriori>
+            <double>0.017543859649122806</double>
+            <double>0.8771929824561403</double>
+            <double>0.10526315789473684</double>
+          </posteriori>
+          <splitFeature>2</splitFeature>
+          <splitValue>4.95</splitValue>
+          <splitScore>0.0823902606310013</splitScore>
+          <trueChild>
+            <output>1</output>
+            <posteriori>
+              <double>0.0196078431372549</double>
+              <double>0.9411764705882353</double>
+              <double>0.0392156862745098</double>
+            </posteriori>
+            <splitFeature>3</splitFeature>
+            <splitValue>1.65</splitValue>
+            <splitScore>0.040798611111111174</splitScore>
+            <trueChildOutput>1</trueChildOutput>
+            <falseChildOutput>2</falseChildOutput>
+            <outer-class reference="../../../../.."/>
+          </trueChild>
+          <falseChild>
+            <output>2</output>
+            <posteriori>
+              <double>0.1111111111111111</double>
+              <double>0.3333333333333333</double>
+              <double>0.5555555555555556</double>
+            </posteriori>
+            <splitFeature>3</splitFeature>
+            <splitValue>1.55</splitValue>
+            <splitScore>0.22222222222222218</splitScore>
+            <trueChildOutput>2</trueChildOutput>
+            <falseChildOutput>1</falseChildOutput>
+            <outer-class reference="../../../../.."/>
+          </falseChild>
+          <trueChildOutput>1</trueChildOutput>
+          <falseChildOutput>2</falseChildOutput>
+          <outer-class reference="../../../.."/>
+        </trueChild>
+        <falseChild>
+          <output>2</output>
+          <posteriori>
+            <double>0.02040816326530612</double>
+            <double>0.04081632653061224</double>
+            <double>0.9387755102040817</double>
+          </posteriori>
+          <splitFeature>0</splitFeature>
+          <splitValue>5.95</splitValue>
+          <splitScore>0.005266000540102685</splitScore>
+          <trueChildOutput>2</trueChildOutput>
+          <falseChildOutput>2</falseChildOutput>
+          <outer-class reference="../../../.."/>
+        </falseChild>
+        <trueChildOutput>1</trueChildOutput>
+        <falseChildOutput>2</falseChildOutput>
+        <outer-class reference="../../.."/>
+      </falseChild>
+      <trueChildOutput>0</trueChildOutput>
+      <falseChildOutput>1</falseChildOutput>
+      <outer-class reference="../.."/>
+    </root>
+    <rule>GINI</rule>
+    <k>3</k>
+    <nodeSize>1</nodeSize>
+    <maxNodes>4</maxNodes>
+    <mtry>4</mtry>
+  </smile.classification.DecisionTree>
+  <linked-hash-map>
+    <entry>
+      <string>classificationMap</string>
+      <linked-hash-map>
+        <entry>
+          <int>0</int>
+          <string>setosa</string>
+        </entry>
+        <entry>
+          <int>1</int>
+          <string>versicolor</string>
+        </entry>
+        <entry>
+          <int>2</int>
+          <string>virginica</string>
+        </entry>
+      </linked-hash-map>
+    </entry>
+  </linked-hash-map>
+</object-stream>

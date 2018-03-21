@@ -1,0 +1,106 @@
+<object-stream>
+  <string>Decision Tree</string>
+  <list>
+    <string>AGE_CLUSTER</string>
+  </list>
+  <list>
+    <string>integer</string>
+  </list>
+  <smile.classification.DecisionTree>
+    <attributes class="smile.data.NumericAttribute-array">
+      <smile.data.NumericAttribute>
+        <type>NUMERIC</type>
+        <weight>1.0</weight>
+        <name>AGE_CLUSTER</name>
+      </smile.data.NumericAttribute>
+    </attributes>
+    <importance>
+      <double>2.8613592812898325E-4</double>
+    </importance>
+    <root>
+      <output>0</output>
+      <posteriori>
+        <double>0.6161616161616161</double>
+        <double>0.3838383838383838</double>
+      </posteriori>
+      <splitFeature>0</splitFeature>
+      <splitValue>2.5</splitValue>
+      <splitScore>2.643645467604594E-4</splitScore>
+      <trueChild>
+        <output>0</output>
+        <posteriori>
+          <double>0.6272727272727273</double>
+          <double>0.37272727272727274</double>
+        </posteriori>
+        <splitFeature>-1</splitFeature>
+        <splitValue>NaN</splitValue>
+        <splitScore>0.0</splitScore>
+        <trueChildOutput>-1</trueChildOutput>
+        <falseChildOutput>-1</falseChildOutput>
+        <outer-class reference="../../.."/>
+      </trueChild>
+      <falseChild>
+        <output>0</output>
+        <posteriori>
+          <double>0.6043956043956044</double>
+          <double>0.3956043956043956</double>
+        </posteriori>
+        <splitFeature>0</splitFeature>
+        <splitValue>5.5</splitValue>
+        <splitScore>2.1771381368523857E-5</splitScore>
+        <trueChild>
+          <output>0</output>
+          <posteriori>
+            <double>0.6014492753623188</double>
+            <double>0.39855072463768115</double>
+          </posteriori>
+          <splitFeature>-1</splitFeature>
+          <splitValue>NaN</splitValue>
+          <splitScore>0.0</splitScore>
+          <trueChildOutput>-1</trueChildOutput>
+          <falseChildOutput>-1</falseChildOutput>
+          <outer-class reference="../../../.."/>
+        </trueChild>
+        <falseChild>
+          <output>0</output>
+          <posteriori>
+            <double>0.6077348066298343</double>
+            <double>0.39226519337016574</double>
+          </posteriori>
+          <splitFeature>-1</splitFeature>
+          <splitValue>NaN</splitValue>
+          <splitScore>0.0</splitScore>
+          <trueChildOutput>-1</trueChildOutput>
+          <falseChildOutput>-1</falseChildOutput>
+          <outer-class reference="../../../.."/>
+        </falseChild>
+        <trueChildOutput>0</trueChildOutput>
+        <falseChildOutput>0</falseChildOutput>
+        <outer-class reference="../../.."/>
+      </falseChild>
+      <trueChildOutput>0</trueChildOutput>
+      <falseChildOutput>0</falseChildOutput>
+      <outer-class reference="../.."/>
+    </root>
+    <rule>GINI</rule>
+    <k>2</k>
+    <nodeSize>1</nodeSize>
+    <maxNodes>11</maxNodes>
+    <mtry>1</mtry>
+  </smile.classification.DecisionTree>
+  <linked-hash-map>
+    <entry>
+      <string>classificationMap</string>
+      <linked-hash-map>
+        <entry>
+          <int>0</int>
+          <string>0</string>
+        </entry>
+        <entry>
+          <int>1</int>
+          <string>1</string>
+        </entry>
+      </linked-hash-map>
+    </entry>
+  </linked-hash-map>
+</object-stream>

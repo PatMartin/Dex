@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Prediction</title>
+  </head>
+  <body>
+  <table border="1">
+    <tr><td>Model Type:</td><td><%= modelType %></td></tr>
+    <tr><td>Num Predictions:</td><td><%= ((numPredictions == null) ? "none" : numPredictions) %></td></tr>
+    <tr><td align="center" colspan="2">Features</td></tr>
+<%
+  features.eachWithIndex {
+    feature, i ->
+    println "<tr><td>${feature}</td><td>${featureTypes[i]}</td></tr>"
+  }
+%>
+  </table>
+  </body>
+</html>

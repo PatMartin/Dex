@@ -1,0 +1,107 @@
+<dex-project version="0.8">
+   <tasks class="java.util.ArrayList">
+      <task-item name="Documentation" active="true">
+         <task class="com.dexvis.dex.task.utilities.Documentation">
+            <config-def>[ { &quot;type&quot; : &quot;label&quot;, &quot;initialValue&quot;: &quot;No configuration is available&quot; } ]</config-def>
+            <editor>&lt;html dir=&quot;ltr&quot;&gt;&lt;head&gt;&lt;/head&gt;&lt;body contenteditable=&quot;true&quot;&gt;&lt;h1&gt;&lt;font face=&quot;Segoe UI&quot; size=&quot;6&quot;&gt;LASSO Regression Training&lt;/font&gt;&lt;/h1&gt;&lt;p&gt;&lt;font face=&quot;Segoe UI&quot; size=&quot;4&quot;&gt;This example demonstrates how to train a LASSO regression model.&lt;/font&gt;&lt;/p&gt;&lt;h2&gt;&lt;font face=&quot;Segoe UI&quot; size=&quot;5&quot;&gt;Task Overview&lt;/font&gt;&lt;/h2&gt;&lt;p&gt;&lt;/p&gt;&lt;ol&gt;&lt;li&gt;&lt;font face=&quot;Segoe UI&quot;&gt;&lt;b&gt;Documentation&lt;/b&gt;&amp;nbsp;- This task, which documents the flow.&lt;/font&gt;&lt;/li&gt;&lt;li&gt;&lt;b style=&quot;font-family: &apos;Segoe UI&apos;;&quot;&gt;Read CSV&lt;/b&gt;&lt;span style=&quot;font-family: &apos;Segoe UI&apos;;&quot;&gt;&amp;nbsp;- Read in our dataset.&lt;/span&gt;&lt;/li&gt;&lt;li&gt;&lt;span style=&quot;font-family: &apos;Segoe UI&apos;;&quot;&gt;&lt;b&gt;View Data&lt;/b&gt;&amp;nbsp;- A visual checkpoint.&lt;/span&gt;&lt;/li&gt;&lt;li&gt;&lt;b style=&quot;font-family: &apos;Segoe UI&apos;;&quot;&gt;Lasso Regression&lt;/b&gt;&lt;span style=&quot;font-family: &apos;Segoe UI&apos;;&quot;&gt;&amp;nbsp;- Train our LASSO regression model.&lt;/span&gt;&lt;/li&gt;&lt;li&gt;&lt;span style=&quot;font-family: &apos;Segoe UI&apos;;&quot;&gt;&lt;b&gt;Add Row Number&lt;/b&gt;&amp;nbsp;- Add a row number to the data.&lt;/span&gt;&lt;/li&gt;&lt;li&gt;&lt;span style=&quot;font-family: &apos;Segoe UI&apos;;&quot;&gt;&lt;b&gt;Select Columns&lt;/b&gt;&amp;nbsp;- Select a subset of the columns for comparison.&lt;/span&gt;&lt;/li&gt;&lt;li&gt;&lt;span style=&quot;font-family: &apos;Segoe UI&apos;;&quot;&gt;&lt;b&gt;View Data&lt;/b&gt;&amp;nbsp;- A visual checkpoint.&lt;/span&gt;&lt;/li&gt;&lt;li&gt;&lt;span style=&quot;font-family: &apos;Segoe UI&apos;;&quot;&gt;&lt;b&gt;Compare Prediction&lt;/b&gt;&amp;nbsp;- Graphs actual vs predicted.&lt;/span&gt;&lt;/li&gt;&lt;/ol&gt;&lt;p&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</editor>
+            <docFileText></docFileText>
+         </task>
+      </task-item>
+      <task-item name="Read CSV" active="true">
+         <task class="com.dexvis.dex.task.input.ReadCsv">
+            <config-def>[ { &quot;type&quot; : &quot;label&quot;, &quot;initialValue&quot;: &quot;No configuration is available&quot; } ]</config-def>
+            <fileText>data\iris.csv</fileText>
+            <limitRows>false</limitRows>
+            <rowLimitText>0</rowLimitText>
+            <lastDir></lastDir>
+         </task>
+      </task-item>
+      <task-item name="View Data" active="true">
+         <task class="com.dexvis.dex.task.utilities.ViewData">
+            <config-def>[ { &quot;type&quot; : &quot;label&quot;, &quot;initialValue&quot;: &quot;No configuration is available&quot; } ]</config-def>
+         </task>
+      </task-item>
+      <task-item name="Lasso Regression" active="true">
+         <task class="com.dexvis.dex.task.ml.smile.regression.LassoRegression">
+            <config-def>[ { &quot;type&quot; : &quot;label&quot;, &quot;initialValue&quot;: &quot;No configuration is available&quot; } ]</config-def>
+            <columnList>&lt;com.dexvis.simple.types.SimpleListSelectionView&gt;
+  &lt;sourceList&gt;
+    &lt;string&gt;Sepal Length&lt;/string&gt;
+  &lt;/sourceList&gt;
+  &lt;targetList&gt;
+    &lt;string&gt;Sepal Width&lt;/string&gt;
+    &lt;string&gt;Petal Length&lt;/string&gt;
+    &lt;string&gt;Petal Width&lt;/string&gt;
+    &lt;string&gt;Species&lt;/string&gt;
+  &lt;/targetList&gt;
+&lt;/com.dexvis.simple.types.SimpleListSelectionView&gt;</columnList>
+            <columnName>LASSO_PREDICTION</columnName>
+            <responseColumn>&lt;map&gt;
+  &lt;entry&gt;
+    &lt;string&gt;items&lt;/string&gt;
+    &lt;list&gt;
+      &lt;string&gt;Sepal Length&lt;/string&gt;
+      &lt;string&gt;Sepal Width&lt;/string&gt;
+      &lt;string&gt;Petal Length&lt;/string&gt;
+      &lt;string&gt;Petal Width&lt;/string&gt;
+      &lt;string&gt;Species&lt;/string&gt;
+    &lt;/list&gt;
+  &lt;/entry&gt;
+  &lt;entry&gt;
+    &lt;string&gt;selected&lt;/string&gt;
+    &lt;string&gt;Sepal Length&lt;/string&gt;
+  &lt;/entry&gt;
+&lt;/map&gt;</responseColumn>
+            <autosave>false</autosave>
+            <fileText>models\iris.lasso.mdl</fileText>
+            <lambda>&lt;map&gt;
+  &lt;entry&gt;
+    &lt;string&gt;min&lt;/string&gt;
+    &lt;double&gt;0.01&lt;/double&gt;
+  &lt;/entry&gt;
+  &lt;entry&gt;
+    &lt;string&gt;max&lt;/string&gt;
+    &lt;double&gt;20.0&lt;/double&gt;
+  &lt;/entry&gt;
+  &lt;entry&gt;
+    &lt;string&gt;value&lt;/string&gt;
+    &lt;double&gt;0.1&lt;/double&gt;
+  &lt;/entry&gt;
+&lt;/map&gt;</lambda>
+         </task>
+      </task-item>
+      <task-item name="Add Row Number" active="true">
+         <task class="com.dexvis.dex.task.tablemanipulation.AddRowNumber">
+            <config-def>[ { &quot;type&quot; : &quot;label&quot;, &quot;initialValue&quot;: &quot;No configuration is available&quot; } ]</config-def>
+         </task>
+      </task-item>
+      <task-item name="Select Columns" active="true">
+         <task class="com.dexvis.dex.task.tablemanipulation.SelectColumns">
+            <config-def>[ { &quot;type&quot; : &quot;label&quot;, &quot;initialValue&quot;: &quot;No configuration is available&quot; } ]</config-def>
+            <columnList>&lt;com.dexvis.simple.types.SimpleListSelectionView&gt;
+  &lt;sourceList&gt;
+    &lt;string&gt;Sepal Width&lt;/string&gt;
+    &lt;string&gt;Petal Length&lt;/string&gt;
+    &lt;string&gt;Petal Width&lt;/string&gt;
+    &lt;string&gt;Species&lt;/string&gt;
+  &lt;/sourceList&gt;
+  &lt;targetList&gt;
+    &lt;string&gt;RI&lt;/string&gt;
+    &lt;string&gt;Sepal Length&lt;/string&gt;
+    &lt;string&gt;LASSO_PREDICTION&lt;/string&gt;
+  &lt;/targetList&gt;
+&lt;/com.dexvis.simple.types.SimpleListSelectionView&gt;</columnList>
+         </task>
+      </task-item>
+      <task-item name="View Data" active="true">
+         <task class="com.dexvis.dex.task.utilities.ViewData">
+            <config-def>[ { &quot;type&quot; : &quot;label&quot;, &quot;initialValue&quot;: &quot;No configuration is available&quot; } ]</config-def>
+         </task>
+      </task-item>
+      <task-item name="Compare Prediction" active="true">
+         <task class="com.dexvis.dex.task.vis.c3.C3LineChart">
+            <config-def>{&quot;c3linechart&quot;:{&quot;type&quot;:&quot;group&quot;,&quot;name&quot;:&quot;C3 Settings&quot;,&quot;contents&quot;:[{&quot;type&quot;:&quot;group&quot;,&quot;name&quot;:&quot;General&quot;,&quot;contents&quot;:[{&quot;type&quot;:&quot;group&quot;,&quot;name&quot;:&quot;Margins&quot;,&quot;contents&quot;:[{&quot;name&quot;:&quot;Top Margin&quot;,&quot;description&quot;:&quot;The top margin of the chart.&quot;,&quot;target&quot;:&quot;options.padding.top&quot;,&quot;type&quot;:&quot;int&quot;,&quot;minValue&quot;:0,&quot;maxValue&quot;:200,&quot;initialValue&quot;:20},{&quot;name&quot;:&quot;Bottom Margin&quot;,&quot;description&quot;:&quot;The bottom margin of the chart.&quot;,&quot;target&quot;:&quot;options.padding.bottom&quot;,&quot;type&quot;:&quot;int&quot;,&quot;minValue&quot;:0,&quot;maxValue&quot;:200,&quot;initialValue&quot;:20},{&quot;name&quot;:&quot;Left Margin&quot;,&quot;description&quot;:&quot;The left margin of the chart.&quot;,&quot;target&quot;:&quot;options.padding.left&quot;,&quot;type&quot;:&quot;int&quot;,&quot;minValue&quot;:0,&quot;maxValue&quot;:200,&quot;initialValue&quot;:20},{&quot;name&quot;:&quot;Right Margin&quot;,&quot;description&quot;:&quot;The right margin of the chart.&quot;,&quot;target&quot;:&quot;options.padding.right&quot;,&quot;type&quot;:&quot;int&quot;,&quot;minValue&quot;:0,&quot;maxValue&quot;:200,&quot;initialValue&quot;:20}]},{&quot;name&quot;:&quot;Show Tooltips&quot;,&quot;description&quot;:&quot;If true, show tooltips.&quot;,&quot;type&quot;:&quot;boolean&quot;,&quot;initialValue&quot;:true,&quot;target&quot;:&quot;options.tooltip.show&quot;},{&quot;name&quot;:&quot;Group Tooltips&quot;,&quot;description&quot;:&quot;If true, group tooltips.&quot;,&quot;type&quot;:&quot;boolean&quot;,&quot;initialValue&quot;:true,&quot;target&quot;:&quot;options.tooltip.grouped&quot;},{&quot;name&quot;:&quot;Show Subchart&quot;,&quot;description&quot;:&quot;If true, show subchart.&quot;,&quot;type&quot;:&quot;boolean&quot;,&quot;initialValue&quot;:true,&quot;target&quot;:&quot;options.subchart.show&quot;},{&quot;name&quot;:&quot;Enable Zoom&quot;,&quot;description&quot;:&quot;If true, enable zoom.&quot;,&quot;type&quot;:&quot;boolean&quot;,&quot;initialValue&quot;:true,&quot;target&quot;:&quot;options.zoom.enabled&quot;},{&quot;name&quot;:&quot;Show Points&quot;,&quot;description&quot;:&quot;If true, show points.&quot;,&quot;type&quot;:&quot;boolean&quot;,&quot;initialValue&quot;:true,&quot;target&quot;:&quot;options.point.show&quot;},{&quot;name&quot;:&quot;Show Legend&quot;,&quot;description&quot;:&quot;Location of legend.&quot;,&quot;type&quot;:&quot;boolean&quot;,&quot;initialValue&quot;:true,&quot;target&quot;:&quot;options.legend.show&quot;},{&quot;name&quot;:&quot;Legend Position&quot;,&quot;description&quot;:&quot;Location of legend.&quot;,&quot;type&quot;:&quot;choice&quot;,&quot;choices&quot;:[&quot;right&quot;,&quot;bottom&quot;,&quot;inset&quot;],&quot;initialValue&quot;:&quot;right&quot;,&quot;target&quot;:&quot;options.legend.position&quot;},{&quot;name&quot;:&quot;Color Scheme&quot;,&quot;description&quot;:&quot;Color Scheme&quot;,&quot;type&quot;:&quot;choice&quot;,&quot;choices&quot;:[&quot;Stop Light&quot;,&quot;White to Red&quot;,&quot;White to Blue&quot;,&quot;Red White and Blue&quot;,&quot;ECharts&quot;,&quot;category10&quot;,&quot;category20b&quot;,&quot;category20c&quot;,&quot;category20&quot;,&quot;c64Dark&quot;,&quot;c64Light&quot;,&quot;divergingDark12&quot;,&quot;divergingPastel12&quot;,&quot;hueSoft128&quot;,&quot;hueHard128&quot;,&quot;crayola8&quot;,&quot;crayola120&quot;,&quot;YlGn_3&quot;,&quot;YlGn_4&quot;,&quot;YlGn_5&quot;,&quot;YlGn_6&quot;,&quot;YlGn_7&quot;,&quot;YlGn_8&quot;,&quot;YlGn_9&quot;,&quot;YlGnBu_3&quot;,&quot;YlGnBu_4&quot;,&quot;YlGnBu_5&quot;,&quot;YlGnBu_6&quot;,&quot;YlGnBu_7&quot;,&quot;YlGnBu_8&quot;,&quot;YlGnBu_9&quot;,&quot;GnBu_3&quot;,&quot;GnBu_4&quot;,&quot;GnBu_5&quot;,&quot;GnBu_6&quot;,&quot;GnBu_7&quot;,&quot;GnBu_8&quot;,&quot;GnBu_9&quot;,&quot;BuGn_3&quot;,&quot;BuGn_4&quot;,&quot;BuGn_5&quot;,&quot;BuGn_6&quot;,&quot;BuGn_7&quot;,&quot;BuGn_8&quot;,&quot;BuGn_9&quot;,&quot;PuBuGn_3&quot;,&quot;PuBuGn_4&quot;,&quot;PuBuGn_5&quot;,&quot;PuBuGn_6&quot;,&quot;PuBuGn_7&quot;,&quot;PuBuGn_8&quot;,&quot;PuBuGn_9&quot;,&quot;PuBu_3&quot;,&quot;PuBu_4&quot;,&quot;PuBu_5&quot;,&quot;PuBu_6&quot;,&quot;PuBu_7&quot;,&quot;PuBu_8&quot;,&quot;PuBu_9&quot;,&quot;BuPu_3&quot;,&quot;BuPu_4&quot;,&quot;BuPu_5&quot;,&quot;BuPu_6&quot;,&quot;BuPu_7&quot;,&quot;BuPu_8&quot;,&quot;BuPu_9&quot;,&quot;RdPu_3&quot;,&quot;RdPu_4&quot;,&quot;RdPu_5&quot;,&quot;RdPu_6&quot;,&quot;RdPu_7&quot;,&quot;RdPu_8&quot;,&quot;RdPu_9&quot;,&quot;PuRd_3&quot;,&quot;PuRd_4&quot;,&quot;PuRd_5&quot;,&quot;PuRd_6&quot;,&quot;PuRd_7&quot;,&quot;PuRd_8&quot;,&quot;PuRd_9&quot;,&quot;OrRd_3&quot;,&quot;OrRd_4&quot;,&quot;OrRd_5&quot;,&quot;OrRd_6&quot;,&quot;OrRd_7&quot;,&quot;OrRd_8&quot;,&quot;OrRd_9&quot;,&quot;YlOrRd_3&quot;,&quot;YlOrRd_4&quot;,&quot;YlOrRd_5&quot;,&quot;YlOrRd_6&quot;,&quot;YlOrRd_7&quot;,&quot;YlOrRd_8&quot;,&quot;YlOrRd_9&quot;,&quot;YlOrBr_3&quot;,&quot;YlOrBr_4&quot;,&quot;YlOrBr_5&quot;,&quot;YlOrBr_6&quot;,&quot;YlOrBr_7&quot;,&quot;YlOrBr_8&quot;,&quot;YlOrBr_9&quot;,&quot;Purples_3&quot;,&quot;Purples_4&quot;,&quot;Purples_5&quot;,&quot;Purples_6&quot;,&quot;Purples_7&quot;,&quot;Purples_8&quot;,&quot;Purples_9&quot;,&quot;Blues_3&quot;,&quot;Blues_4&quot;,&quot;Blues_5&quot;,&quot;Blues_6&quot;,&quot;Blues_7&quot;,&quot;Blues_8&quot;,&quot;Blues_9&quot;,&quot;Greens_3&quot;,&quot;Greens_4&quot;,&quot;Greens_5&quot;,&quot;Greens_6&quot;,&quot;Greens_7&quot;,&quot;Greens_8&quot;,&quot;Greens_9&quot;,&quot;Oranges_3&quot;,&quot;Oranges_4&quot;,&quot;Oranges_5&quot;,&quot;Oranges_6&quot;,&quot;Oranges_7&quot;,&quot;Oranges_8&quot;,&quot;Oranges_9&quot;,&quot;Reds_3&quot;,&quot;Reds_4&quot;,&quot;Reds_5&quot;,&quot;Reds_6&quot;,&quot;Reds_7&quot;,&quot;Reds_8&quot;,&quot;Reds_9&quot;,&quot;Greys_3&quot;,&quot;Greys_4&quot;,&quot;Greys_5&quot;,&quot;Greys_6&quot;,&quot;Greys_7&quot;,&quot;Greys_8&quot;,&quot;Greys_9&quot;,&quot;PuOr_3&quot;,&quot;PuOr_4&quot;,&quot;PuOr_5&quot;,&quot;PuOr_6&quot;,&quot;PuOr_7&quot;,&quot;PuOr_8&quot;,&quot;PuOr_9&quot;,&quot;PuOr_10&quot;,&quot;PuOr_11&quot;,&quot;BrBG_3&quot;,&quot;BrBG_4&quot;,&quot;BrBG_5&quot;,&quot;BrBG_6&quot;,&quot;BrBG_7&quot;,&quot;BrBG_8&quot;,&quot;BrBG_9&quot;,&quot;BrBG_10&quot;,&quot;BrBG_11&quot;,&quot;PRGn_3&quot;,&quot;PRGn_4&quot;,&quot;PRGn_5&quot;,&quot;PRGn_6&quot;,&quot;PRGn_7&quot;,&quot;PRGn_8&quot;,&quot;PRGn_9&quot;,&quot;PRGn_10&quot;,&quot;PRGn_11&quot;,&quot;PiYG_3&quot;,&quot;PiYG_4&quot;,&quot;PiYG_5&quot;,&quot;PiYG_6&quot;,&quot;PiYG_7&quot;,&quot;PiYG_8&quot;,&quot;PiYG_9&quot;,&quot;PiYG_10&quot;,&quot;PiYG_11&quot;,&quot;RdBu_3&quot;,&quot;RdBu_4&quot;,&quot;RdBu_5&quot;,&quot;RdBu_6&quot;,&quot;RdBu_7&quot;,&quot;RdBu_8&quot;,&quot;RdBu_9&quot;,&quot;RdBu_10&quot;,&quot;RdBu_11&quot;,&quot;RdGy_3&quot;,&quot;RdGy_4&quot;,&quot;RdGy_5&quot;,&quot;RdGy_6&quot;,&quot;RdGy_7&quot;,&quot;RdGy_8&quot;,&quot;RdGy_9&quot;,&quot;RdGy_10&quot;,&quot;RdGy_11&quot;,&quot;RdYlBu_3&quot;,&quot;RdYlBu_4&quot;,&quot;RdYlBu_5&quot;,&quot;RdYlBu_6&quot;,&quot;RdYlBu_7&quot;,&quot;RdYlBu_8&quot;,&quot;RdYlBu_9&quot;,&quot;RdYlBu_10&quot;,&quot;RdYlBu_11&quot;,&quot;Spectral_3&quot;,&quot;Spectral_4&quot;,&quot;Spectral_5&quot;,&quot;Spectral_6&quot;,&quot;Spectral_7&quot;,&quot;Spectral_8&quot;,&quot;Spectral_9&quot;,&quot;Spectral_10&quot;,&quot;Spectral_11&quot;,&quot;RdYlGn_3&quot;,&quot;RdYlGn_4&quot;,&quot;RdYlGn_5&quot;,&quot;RdYlGn_6&quot;,&quot;RdYlGn_7&quot;,&quot;RdYlGn_8&quot;,&quot;RdYlGn_9&quot;,&quot;RdYlGn_10&quot;,&quot;RdYlGn_11&quot;,&quot;Accent_3&quot;,&quot;Accent_4&quot;,&quot;Accent_5&quot;,&quot;Accent_6&quot;,&quot;Accent_7&quot;,&quot;Accent_8&quot;,&quot;Dark2_3&quot;,&quot;Dark2_4&quot;,&quot;Dark2_5&quot;,&quot;Dark2_6&quot;,&quot;Dark2_7&quot;,&quot;Dark2_8&quot;,&quot;Paired_3&quot;,&quot;Paired_4&quot;,&quot;Paired_5&quot;,&quot;Paired_6&quot;,&quot;Paired_7&quot;,&quot;Paired_8&quot;,&quot;Paired_9&quot;,&quot;Paired_10&quot;,&quot;Paired_11&quot;,&quot;Paired_12&quot;,&quot;Pastel1_3&quot;,&quot;Pastel1_4&quot;,&quot;Pastel1_5&quot;,&quot;Pastel1_6&quot;,&quot;Pastel1_7&quot;,&quot;Pastel1_8&quot;,&quot;Pastel1_9&quot;,&quot;Pastel2_3&quot;,&quot;Pastel2_4&quot;,&quot;Pastel2_5&quot;,&quot;Pastel2_6&quot;,&quot;Pastel2_7&quot;,&quot;Pastel2_8&quot;,&quot;Set1_3&quot;,&quot;Set1_4&quot;,&quot;Set1_5&quot;,&quot;Set1_6&quot;,&quot;Set1_7&quot;,&quot;Set1_8&quot;,&quot;Set1_9&quot;,&quot;Set2_3&quot;,&quot;Set2_4&quot;,&quot;Set2_5&quot;,&quot;Set2_6&quot;,&quot;Set2_7&quot;,&quot;Set2_8&quot;,&quot;Set3_3&quot;,&quot;Set3_4&quot;,&quot;Set3_5&quot;,&quot;Set3_6&quot;,&quot;Set3_7&quot;,&quot;Set3_8&quot;,&quot;Set3_9&quot;,&quot;Set3_10&quot;,&quot;Set3_11&quot;,&quot;Set3_12&quot;],&quot;target&quot;:&quot;options.colorScheme&quot;,&quot;initialValue&quot;:&quot;category10&quot;},{&quot;name&quot;:&quot;Type&quot;,&quot;description&quot;:&quot;Type of chart&quot;,&quot;type&quot;:&quot;choice&quot;,&quot;choices&quot;:[&quot;line&quot;,&quot;spline&quot;,&quot;area&quot;,&quot;area-spline&quot;,&quot;bar&quot;,&quot;scatter&quot;,&quot;step&quot;,&quot;donut&quot;,&quot;pie&quot;],&quot;target&quot;:&quot;options.data.type&quot;,&quot;initialValue&quot;:&quot;line&quot;},{&quot;name&quot;:&quot;Stack&quot;,&quot;description&quot;:&quot;Stack items&quot;,&quot;type&quot;:&quot;boolean&quot;,&quot;initialValue&quot;:false,&quot;target&quot;:&quot;stack&quot;}]}]}}</config-def>
+         </task>
+      </task-item>
+   </tasks>
+</dex-project>
