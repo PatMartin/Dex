@@ -41,6 +41,8 @@ public class SerialJob implements DexJob
           DexTask task = item.getTask().get();
           if (task != null)
           {
+            // Initialize node
+            task.getConfig();
             taskList.add(task);
           }
         }
