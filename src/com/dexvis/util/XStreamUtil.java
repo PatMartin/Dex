@@ -24,12 +24,13 @@ public class XStreamUtil
       throws FileNotFoundException, ClassNotFoundException
   {
     List<Object> objs = new ArrayList<Object>();
+    ObjectInputStream ois = null;
     
     try
     {
       XStream xstream = new XStream(new DomDriver());
       FileReader reader = new FileReader(path);
-      ObjectInputStream ois = xstream.createObjectInputStream(reader);
+      ois = xstream.createObjectInputStream(reader);
       
       while (true)
       {
@@ -41,11 +42,26 @@ public class XStreamUtil
     {
       // EOF reached.
     }
+    finally
+    {
+      try
+      {
+        if (ois != null)
+        {
+          ois.close();
+        }
+      }
+      catch(Exception ex)
+      {
+        
+      }
+    }
     
     return objs;
   }
   
-  public static void writeObjects(String path, Object... objects) throws IOException
+  public static void writeObjects(String path, Object... objects)
+      throws IOException
   {
     if (objects == null || objects.length <= 0)
     {
@@ -60,6 +76,26 @@ public class XStreamUtil
     {
       oos.writeObject(obj);
     }
+    oos.close();
+  }
+  
+  public static Object readObject(String path) throws IOException,
+      ClassNotFoundException
+  {
+    XStream xstream = new XStream(new DomDriver());
+    FileReader reader = new FileReader(path);
+    ObjectInputStream ois = xstream.createObjectInputStream(reader);
+    Object obj = ois.readObject();
+    ois.close();
+    return obj;
+  }
+  
+  public static void writeObject(String path, Object obj) throws IOException
+  {
+    XStream xstream = new XStream(new DomDriver());
+    FileWriter writer = new FileWriter(new File(path));
+    ObjectOutputStream oos = xstream.createObjectOutputStream(writer);
+    oos.writeObject(obj);
     oos.close();
   }
 }
