@@ -179,8 +179,8 @@ public class DexData {
     DexData selected = select(columns)
     List<String> selectedTypes = selected.guessTypes()
 
-    println "SELECTED: ${selected}"
-    println "SELECTED-TYPES: ${selectedTypes}"
+    //println "SELECTED: ${selected}"
+    //println "SELECTED-TYPES: ${selectedTypes}"
     double[][] ddata = new double[selected.data.size()][selected.header.size()]
     
     selectedTypes.eachWithIndex { type, hi ->
@@ -344,6 +344,27 @@ public class DexData {
     DexData newDexData = new DexData(newHeader, data.collect { it[indices] })
     //println "DEX RETURNS: $newDexData"
     return newDexData
+  }
+
+  public DexData head(limit)
+  {
+    if (limit == null) {
+      return this
+    }
+    
+    if (limit >= data.size()) {
+      return new DexData(header, data)
+    }
+    def newData = new DexData(header)
+    
+    data.eachWithIndex {
+      row, ri ->
+      if (ri < limit) {
+        newData.data << row.collect()
+      }
+    }
+
+    return newData;
   }
   
   /**
