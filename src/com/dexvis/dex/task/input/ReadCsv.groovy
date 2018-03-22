@@ -80,7 +80,7 @@ class ReadCsv extends DexTask {
     // Filter or file reader
     if (filterCB.isSelected()) {
       def baseReader = new FileReader(new File(env.interpolate(fileText.getText())))
-      fileReader = new RegexFilterReader(baseReader, filterText.getText())
+      fileReader = new RegexFilterReader(baseReader, filterText.getText(), true)
     }
     else {
       fileReader = new FileReader(new File(env.interpolate(fileText.getText())))

@@ -9,6 +9,8 @@ import java.util.regex.Pattern;
 public class RegexFilterReader extends BufferedReader
 {
   private Pattern pattern = null;
+  private boolean firstLineIsHeader = false;
+  private boolean firstLine = true;
   
   public RegexFilterReader(Reader in, String pattern)
   {
@@ -16,15 +18,33 @@ public class RegexFilterReader extends BufferedReader
     this.pattern = Pattern.compile(pattern);
   }
   
+  public RegexFilterReader(Reader in, String pattern, boolean firstLineIsHeader)
+  {
+    super(in);
+    this.pattern = Pattern.compile(pattern);
+    this.firstLineIsHeader = firstLineIsHeader;
+  }
+  
   public final String readLine() throws IOException
   {
-    String line;
-    do
+    String line = null;
+    if (firstLineIsHeader && firstLine)
     {
-      line = super.readLine();
-      //System.out.println("MATCH: " + pattern.matcher(line).matches() + ", LINE: " + line);
+      firstLine = false;
+      do
+      {
+        line = super.readLine();
+      }
+      while (line == null);
     }
-    while ((line != null) && !pattern.matcher(line).matches());
+    else {
+      do
+      {
+        line = super.readLine();
+      }
+      while ((line != null) && !pattern.matcher(line).matches());
+    }
+
     return line;
   }
   
@@ -37,7 +57,7 @@ public class RegexFilterReader extends BufferedReader
         if (args.length != 2)
           throw new IllegalArgumentException("Wrong number of arguments");
         RegexFilterReader in = new RegexFilterReader(new FileReader(args[1]),
-            args[0]);
+            args[0], true);
         String line;
         while ((line = in.readLine()) != null)
           System.out.println(line);
