@@ -19,7 +19,8 @@ import org.simpleframework.xml.ElementList
 import org.simpleframework.xml.Root
 import org.tbee.javafx.scene.layout.MigPane
 
-import au.com.bytecode.opencsv.CSVReader
+import com.opencsv.CSVReader
+/*import au.com.bytecode.opencsv.CSVReader*/
 
 import com.dexvis.dex.Dex
 import com.dexvis.dex.DexData
