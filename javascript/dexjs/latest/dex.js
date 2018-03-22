@@ -14445,14 +14445,14 @@ var JqGrid = function (userConfig) {
     'height': "100%",
     'margin': {top: 5, bottom: 5, left: 5, right: 5},
     'grid': {
-      "height": "auto",
       "datatype": "local",
       "search": true,
       "page": 1,
       "height": "auto",
       "width": "auto",
       "loadonce": true,
-      "rowNum": 1000
+      "rowNum": 1000,
+      "shrinkToFit": false
     }
   };
 
@@ -14468,7 +14468,15 @@ var JqGrid = function (userConfig) {
         {
           "type": "group",
           "name": "Miscellaneous",
-          "contents": []
+          "contents": [
+            {
+              "name": "Shrink To Fit",
+              "description": "Shrink/Grow the grid to the available parent dimensions, otherwise scroll.",
+              "target": "grid.shrinkToFit",
+              "type": "boolean",
+              "initialValue": true
+            },
+          ]
         }
       ]
     };
