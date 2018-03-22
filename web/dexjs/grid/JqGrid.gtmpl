@@ -10,7 +10,13 @@ println render("web/include/dexjs.inc", [
       "options"   : options,
       "context"  : [
         "title"  : "dex.js : JqGrid",
-        "chart"  : "dex.charts.grid.JqGrid"
+        "chart"  : "dex.charts.grid.JqGrid",
+        "config" : [
+          "grid" : [
+            "shrinkToFit": header.size() < 10,
+            "rownumbers" : true
+          ]
+        ]
       ]
     ])
 %>
