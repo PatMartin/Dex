@@ -50,7 +50,7 @@ class ReadCsv extends DexTask {
   private Label rowLimitLabel = new Label("Limit Number Of Rows:")
   
   @Element(required=false)
-  private CheckBox limitRowsCB = new CheckBox()
+  private CheckBox limitRows = new CheckBox()
   
   @Element(required=false)
   private CheckBox filterCB = new CheckBox()
@@ -91,7 +91,7 @@ class ReadCsv extends DexTask {
     
     List<String> row
     
-    boolean limit = limitRowsCB.isSelected()
+    boolean limit = limitRows.isSelected()
     int rowLimit = Integer.MAX_VALUE
     
     try {
@@ -179,7 +179,7 @@ class ReadCsv extends DexTask {
       configPane.add(browseButton, "span")
       configPane.add(rowLimitLabel)
       configPane.add(rowLimitText, "grow")
-      configPane.add(limitRowsCB, "span")
+      configPane.add(limitRows, "span")
       
       configPane.add(filterLabel)
       configPane.add(filterText, "grow")
