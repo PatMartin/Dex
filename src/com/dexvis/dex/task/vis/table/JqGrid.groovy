@@ -11,8 +11,8 @@ class JqGrid extends WebTask
 {
   public JqGrid()
   {
-    super("Visualization: Table", "JqGrid",
-      "visualization/table/JqGrid.html",
+    super("Visualization: Table", "JQ Grid",
+      "visualization/table/JQGrid.html",
       "web/dexjs/grid/JqGrid.gtmpl")
   }
 }
