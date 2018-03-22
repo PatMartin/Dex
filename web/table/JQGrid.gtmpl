@@ -60,7 +60,7 @@ println """
       datatype: "local",
       //height: '100%',
       //width: 'auto',
-      autowidth: true,
+      autowidth: false,
       autoheight: true,
       //shrinkToFit: true,
       colName: colNames,
