@@ -1,7 +1,7 @@
 <object-stream>
   <string>Decision Tree</string>
   <list>
-    <string>AGE_CLUSTER</string>
+    <string>RELATION_CLUSTER</string>
   </list>
   <list>
     <string>integer</string>
@@ -11,11 +11,11 @@
       <smile.data.NumericAttribute>
         <type>NUMERIC</type>
         <weight>1.0</weight>
-        <name>AGE_CLUSTER</name>
+        <name>RELATION_CLUSTER</name>
       </smile.data.NumericAttribute>
     </attributes>
     <importance>
-      <double>2.8613592812898325E-4</double>
+      <double>0.01549098528868556</double>
     </importance>
     <root>
       <output>0</output>
@@ -24,13 +24,13 @@
         <double>0.3838383838383838</double>
       </posteriori>
       <splitFeature>0</splitFeature>
-      <splitValue>2.5</splitValue>
-      <splitScore>2.643645467604594E-4</splitScore>
+      <splitValue>3.5</splitValue>
+      <splitScore>0.0067361547425344726</splitScore>
       <trueChild>
         <output>0</output>
         <posteriori>
-          <double>0.6272727272727273</double>
-          <double>0.37272727272727274</double>
+          <double>0.6440443213296398</double>
+          <double>0.3559556786703601</double>
         </posteriori>
         <splitFeature>-1</splitFeature>
         <splitValue>NaN</splitValue>
@@ -40,19 +40,19 @@
         <outer-class reference="../../.."/>
       </trueChild>
       <falseChild>
-        <output>0</output>
+        <output>1</output>
         <posteriori>
-          <double>0.6043956043956044</double>
-          <double>0.3956043956043956</double>
+          <double>0.49710982658959535</double>
+          <double>0.5028901734104047</double>
         </posteriori>
         <splitFeature>0</splitFeature>
-        <splitValue>5.5</splitValue>
-        <splitScore>2.1771381368523857E-5</splitScore>
+        <splitValue>6.5</splitValue>
+        <splitScore>0.008754830546151088</splitScore>
         <trueChild>
           <output>0</output>
           <posteriori>
-            <double>0.6014492753623188</double>
-            <double>0.39855072463768115</double>
+            <double>0.5431034482758621</double>
+            <double>0.45689655172413796</double>
           </posteriori>
           <splitFeature>-1</splitFeature>
           <splitValue>NaN</splitValue>
@@ -62,10 +62,10 @@
           <outer-class reference="../../../.."/>
         </trueChild>
         <falseChild>
-          <output>0</output>
+          <output>1</output>
           <posteriori>
-            <double>0.6077348066298343</double>
-            <double>0.39226519337016574</double>
+            <double>0.4067796610169492</double>
+            <double>0.5932203389830508</double>
           </posteriori>
           <splitFeature>-1</splitFeature>
           <splitValue>NaN</splitValue>
@@ -75,11 +75,11 @@
           <outer-class reference="../../../.."/>
         </falseChild>
         <trueChildOutput>0</trueChildOutput>
-        <falseChildOutput>0</falseChildOutput>
+        <falseChildOutput>1</falseChildOutput>
         <outer-class reference="../../.."/>
       </falseChild>
       <trueChildOutput>0</trueChildOutput>
-      <falseChildOutput>0</falseChildOutput>
+      <falseChildOutput>1</falseChildOutput>
       <outer-class reference="../.."/>
     </root>
     <rule>GINI</rule>
