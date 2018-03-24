@@ -1,4 +1,4 @@
-# JAVA needs to be version 1.7u6 or better.
+# JAVA needs to be version 1.8 or better.
 
 CP="Dex.jar:`find lib -name \*.jar | xargs echo | sed 's/ /:/g'`"
-java -Xmx1024m -Xms1024m -cp $CP com.javafx.main.Main
+java -Xmx2g -Xms1g -cp $CP com.dexvis.dex.Dex
