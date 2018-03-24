@@ -179,7 +179,7 @@ class LassoRegression extends DexTask {
       
       configPane.add(NodeFactory.createTitle("Lasso Regression"), "grow,span")
       Button saveButton = new Button("Save Model")
-      
+
       saveButton.setOnAction({ actionEvent ->
         try
         {

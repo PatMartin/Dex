@@ -106,7 +106,7 @@ class KMeans extends DexTask {
       numClustersSlider.setMajorTickUnit(1)
       numClustersSlider.snapToTicksProperty().set(true)
       numClustersSlider.setShowTickLabels(false)
-      
+
       numClustersSlider.setShowTickMarks(true)
       numClustersValueLabel.setText((((int) numClustersSlider.getValue()) as String))
       
