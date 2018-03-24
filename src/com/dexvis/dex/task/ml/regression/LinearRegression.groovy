@@ -94,7 +94,7 @@ class LinearRegression extends DexTask {
       configPane = new MigPane("", "[][grow]", "[][][grow]")
       configPane.setStyle("-fx-background-color: white;")
       
-      configPane.add(NodeFactory.createTitle("Lasso Regression"), "grow,span")
+      configPane.add(NodeFactory.createTitle("Linear Regression"), "grow,span")
       configPane.add(xLabel)
       configPane.add(xCB, "span")
       configPane.add(columnListView, "grow,span")
