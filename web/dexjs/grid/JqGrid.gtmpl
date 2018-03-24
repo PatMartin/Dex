@@ -13,7 +13,7 @@ println render("web/include/dexjs.inc", [
         "chart"  : "dex.charts.grid.JqGrid",
         "config" : [
           "grid" : [
-            "shrinkToFit": header.size() < 10,
+            "shrinkToFit": header.size() < 15,
             "rownumbers" : true
           ]
         ]
