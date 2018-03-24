@@ -3,7 +3,7 @@
       <task-item name="Documentation" active="true">
          <task class="com.dexvis.dex.task.utilities.Documentation">
             <config-def>[ { &quot;type&quot; : &quot;label&quot;, &quot;initialValue&quot;: &quot;No configuration is available&quot; } ]</config-def>
-            <editor>&lt;html dir=&quot;ltr&quot;&gt;&lt;head&gt;&lt;/head&gt;&lt;body contenteditable=&quot;true&quot;&gt;&lt;h1&gt;&lt;font face=&quot;Segoe UI&quot; size=&quot;6&quot;&gt;LASSO Regression Training&lt;/font&gt;&lt;/h1&gt;&lt;p&gt;&lt;font face=&quot;Segoe UI&quot; size=&quot;4&quot;&gt;This example demonstrates how to train a LASSO regression model.&lt;/font&gt;&lt;/p&gt;&lt;h2&gt;&lt;font face=&quot;Segoe UI&quot; size=&quot;5&quot;&gt;Task Overview&lt;/font&gt;&lt;/h2&gt;&lt;p&gt;&lt;/p&gt;&lt;ol&gt;&lt;li&gt;&lt;font face=&quot;Segoe UI&quot;&gt;&lt;b&gt;Documentation&lt;/b&gt;&amp;nbsp;- This task, which documents the flow.&lt;/font&gt;&lt;/li&gt;&lt;li&gt;&lt;b style=&quot;font-family: &apos;Segoe UI&apos;;&quot;&gt;Read CSV&lt;/b&gt;&lt;span style=&quot;font-family: &apos;Segoe UI&apos;;&quot;&gt;&amp;nbsp;- Read in our dataset.&lt;/span&gt;&lt;/li&gt;&lt;li&gt;&lt;span style=&quot;font-family: &apos;Segoe UI&apos;;&quot;&gt;&lt;b&gt;View Data&lt;/b&gt;&amp;nbsp;- A visual checkpoint.&lt;/span&gt;&lt;/li&gt;&lt;li&gt;&lt;b style=&quot;font-family: &apos;Segoe UI&apos;;&quot;&gt;Lasso Regression&lt;/b&gt;&lt;span style=&quot;font-family: &apos;Segoe UI&apos;;&quot;&gt;&amp;nbsp;- Train our LASSO regression model.&lt;/span&gt;&lt;/li&gt;&lt;li&gt;&lt;span style=&quot;font-family: &apos;Segoe UI&apos;;&quot;&gt;&lt;b&gt;Add Row Number&lt;/b&gt;&amp;nbsp;- Add a row number to the data.&lt;/span&gt;&lt;/li&gt;&lt;li&gt;&lt;span style=&quot;font-family: &apos;Segoe UI&apos;;&quot;&gt;&lt;b&gt;Select Columns&lt;/b&gt;&amp;nbsp;- Select a subset of the columns for comparison.&lt;/span&gt;&lt;/li&gt;&lt;li&gt;&lt;span style=&quot;font-family: &apos;Segoe UI&apos;;&quot;&gt;&lt;b&gt;View Data&lt;/b&gt;&amp;nbsp;- A visual checkpoint.&lt;/span&gt;&lt;/li&gt;&lt;li&gt;&lt;span style=&quot;font-family: &apos;Segoe UI&apos;;&quot;&gt;&lt;b&gt;Compare Prediction&lt;/b&gt;&amp;nbsp;- Graphs actual vs predicted.&lt;/span&gt;&lt;/li&gt;&lt;/ol&gt;&lt;p&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</editor>
+            <editor>&lt;html dir=&quot;ltr&quot;&gt;&lt;head&gt;&lt;/head&gt;&lt;body contenteditable=&quot;true&quot;&gt;&lt;h1&gt;&lt;font face=&quot;Segoe UI&quot; size=&quot;6&quot;&gt;KMeans&lt;/font&gt;&lt;/h1&gt;&lt;p&gt;&lt;font face=&quot;Segoe UI&quot; size=&quot;4&quot;&gt;This example demonstrates how to use KMeans for clustering.&lt;/font&gt;&lt;/p&gt;&lt;h2&gt;&lt;font face=&quot;Segoe UI&quot; size=&quot;5&quot;&gt;Task Overview&lt;/font&gt;&lt;/h2&gt;&lt;p&gt;&lt;/p&gt;&lt;ol&gt;&lt;li&gt;&lt;font face=&quot;Segoe UI&quot;&gt;&lt;b&gt;Documentation&lt;/b&gt;&amp;nbsp;- This task, which documents the flow.&lt;/font&gt;&lt;/li&gt;&lt;li&gt;&lt;b style=&quot;font-family: &apos;Segoe UI&apos;;&quot;&gt;Read CSV&lt;/b&gt;&lt;span style=&quot;font-family: &apos;Segoe UI&apos;;&quot;&gt;&amp;nbsp;- Read in our dataset.&lt;/span&gt;&lt;/li&gt;&lt;li&gt;&lt;span style=&quot;font-family: &apos;Segoe UI&apos;;&quot;&gt;&lt;b&gt;View Data&lt;/b&gt;&amp;nbsp;- A visual checkpoint.&lt;/span&gt;&lt;/li&gt;&lt;li&gt;&lt;b style=&quot;font-family: &apos;Segoe UI&apos;;&quot;&gt;KFinger&lt;/b&gt;&lt;span style=&quot;font-family: &apos;Segoe UI&apos;;&quot;&gt;&amp;nbsp;- Use KFinder to find the optimal value of K.&lt;/span&gt;&lt;/li&gt;&lt;li&gt;&lt;span style=&quot;font-family: &apos;Segoe UI&apos;;&quot;&gt;&lt;b&gt;Create Age Cluster&amp;nbsp;&lt;/b&gt;- Create a cluster for age.&lt;/span&gt;&lt;/li&gt;&lt;li&gt;&lt;span style=&quot;font-family: &apos;Segoe UI&apos;;&quot;&gt;&lt;b&gt;View Data&lt;/b&gt;&amp;nbsp;- A visual checkpoint.&lt;/span&gt;&lt;/li&gt;&lt;li&gt;&lt;span style=&quot;font-family: &apos;Segoe UI&apos;;&quot;&gt;&lt;b&gt;Decision Tree&lt;/b&gt;&amp;nbsp;- Use a decision tree to gauge the performance of the age cluster.&lt;/span&gt;&lt;/li&gt;&lt;/ol&gt;&lt;p&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</editor>
             <docFileText></docFileText>
          </task>
       </task-item>
@@ -12,7 +12,9 @@
             <config-def>[ { &quot;type&quot; : &quot;label&quot;, &quot;initialValue&quot;: &quot;No configuration is available&quot; } ]</config-def>
             <fileText>data\kaggle\titanic\train.csv</fileText>
             <limitRows>false</limitRows>
+            <filterCB>false</filterCB>
             <rowLimitText>0</rowLimitText>
+            <filter></filter>
             <lastDir></lastDir>
          </task>
       </task-item>
@@ -22,7 +24,7 @@
          </task>
       </task-item>
       <task-item name="KFinder" active="true">
-         <task class="com.dexvis.dex.task.ml.smile.clustering.KFinder">
+         <task class="com.dexvis.dex.task.ml.clustering.KFinder">
             <config-def>[ { &quot;type&quot; : &quot;label&quot;, &quot;initialValue&quot;: &quot;No configuration is available&quot; } ]</config-def>
             <columnList>&lt;com.dexvis.simple.types.SimpleListSelectionView&gt;
   &lt;sourceList&gt;
@@ -48,7 +50,7 @@
          </task>
       </task-item>
       <task-item name="Create Age Cluster" active="true">
-         <task class="com.dexvis.dex.task.ml.smile.clustering.KMeans">
+         <task class="com.dexvis.dex.task.ml.clustering.KMeans">
             <config-def>[ { &quot;type&quot; : &quot;label&quot;, &quot;initialValue&quot;: &quot;No configuration is available&quot; } ]</config-def>
             <columnList>&lt;com.dexvis.simple.types.SimpleListSelectionView&gt;
   &lt;sourceList&gt;
@@ -92,7 +94,7 @@
          </task>
       </task-item>
       <task-item name="Decision Tree" active="true">
-         <task class="com.dexvis.dex.task.ml.smile.classification.DecisionTree">
+         <task class="com.dexvis.dex.task.ml.classification.DecisionTree">
             <config-def>[ { &quot;type&quot; : &quot;label&quot;, &quot;initialValue&quot;: &quot;No configuration is available&quot; } ]</config-def>
             <columnList>&lt;com.dexvis.simple.types.SimpleListSelectionView&gt;
   &lt;sourceList&gt;
@@ -114,7 +116,7 @@
   &lt;/targetList&gt;
 &lt;/com.dexvis.simple.types.SimpleListSelectionView&gt;</columnList>
             <columnName>DTREE_PREDICTION</columnName>
-            <autosave>false</autosave>
+            <autosave>true</autosave>
             <resultColumn>&lt;map&gt;
   &lt;entry&gt;
     &lt;string&gt;items&lt;/string&gt;
@@ -148,6 +150,10 @@
       &lt;string&gt;Classification Error&lt;/string&gt;
     &lt;/list&gt;
   &lt;/entry&gt;
+  &lt;entry&gt;
+    &lt;string&gt;selected&lt;/string&gt;
+    &lt;string&gt;GINI&lt;/string&gt;
+  &lt;/entry&gt;
 &lt;/map&gt;</splitRule>
             <fileText>models\kmeans_demo.dtree.mdl</fileText>
             <maxNodes>&lt;map&gt;
@@ -161,7 +167,7 @@
   &lt;/entry&gt;
   &lt;entry&gt;
     &lt;string&gt;value&lt;/string&gt;
-    &lt;double&gt;7.0&lt;/double&gt;
+    &lt;double&gt;4.0&lt;/double&gt;
   &lt;/entry&gt;
 &lt;/map&gt;</maxNodes>
          </task>

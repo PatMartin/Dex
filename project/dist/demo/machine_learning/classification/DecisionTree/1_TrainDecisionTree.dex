@@ -12,7 +12,9 @@
             <config-def>[ { &quot;type&quot; : &quot;label&quot;, &quot;initialValue&quot;: &quot;No configuration is available&quot; } ]</config-def>
             <fileText>data\iris.csv</fileText>
             <limitRows>false</limitRows>
+            <filterCB>false</filterCB>
             <rowLimitText>0</rowLimitText>
+            <filter></filter>
             <lastDir></lastDir>
          </task>
       </task-item>
@@ -22,7 +24,7 @@
          </task>
       </task-item>
       <task-item name="Decision Tree" active="true">
-         <task class="com.dexvis.dex.task.ml.smile.classification.DecisionTree">
+         <task class="com.dexvis.dex.task.ml.classification.DecisionTree">
             <config-def>[ { &quot;type&quot; : &quot;label&quot;, &quot;initialValue&quot;: &quot;No configuration is available&quot; } ]</config-def>
             <columnList>&lt;com.dexvis.simple.types.SimpleListSelectionView&gt;
   &lt;sourceList&gt;

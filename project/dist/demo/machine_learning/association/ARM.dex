@@ -1,5 +1,12 @@
 <dex-project version="0.8">
    <tasks class="java.util.ArrayList">
+      <task-item name="Documentation" active="true">
+         <task class="com.dexvis.dex.task.utilities.Documentation">
+            <config-def>[ { &quot;type&quot; : &quot;label&quot;, &quot;initialValue&quot;: &quot;No configuration is available&quot; } ]</config-def>
+            <editor>&lt;html dir=&quot;ltr&quot;&gt;&lt;head&gt;&lt;/head&gt;&lt;body contenteditable=&quot;true&quot;&gt;&lt;h1&gt;&lt;font face=&quot;Segoe UI&quot; size=&quot;6&quot;&gt;Decision Tree Training&lt;/font&gt;&lt;/h1&gt;&lt;p&gt;&lt;font face=&quot;Segoe UI&quot; size=&quot;4&quot;&gt;This example demonstrates how to train a decision tree model.&lt;/font&gt;&lt;/p&gt;&lt;h2&gt;&lt;font face=&quot;Segoe UI&quot; size=&quot;5&quot;&gt;Task Overview&lt;/font&gt;&lt;/h2&gt;&lt;p&gt;&lt;/p&gt;&lt;ol&gt;&lt;li&gt;&lt;font face=&quot;Segoe UI&quot;&gt;&lt;b&gt;Documentation&lt;/b&gt;&amp;nbsp;- This task, which documents the flow.&lt;/font&gt;&lt;/li&gt;&lt;li&gt;&lt;b style=&quot;font-family: &apos;Segoe UI&apos;;&quot;&gt;Read CSV&lt;/b&gt;&lt;span style=&quot;font-family: &apos;Segoe UI&apos;;&quot;&gt;&amp;nbsp;- Read in our dataset.&lt;/span&gt;&lt;/li&gt;&lt;li&gt;&lt;span style=&quot;font-family: &apos;Segoe UI&apos;;&quot;&gt;&lt;b&gt;View Data&lt;/b&gt;&amp;nbsp;- A visual checkpoint.&lt;/span&gt;&lt;/li&gt;&lt;li&gt;&lt;b style=&quot;font-family: &apos;Segoe UI&apos;;&quot;&gt;ARM&lt;/b&gt;&lt;span style=&quot;font-family: &apos;Segoe UI&apos;;&quot;&gt;&amp;nbsp;- Apply Association Rule Mining to our dataset.&lt;/span&gt;&lt;/li&gt;&lt;li&gt;&lt;span style=&quot;font-family: &apos;Segoe UI&apos;;&quot;&gt;&lt;b&gt;View Data&lt;/b&gt;&amp;nbsp;- A visual checkpoint.&lt;/span&gt;&lt;/li&gt;&lt;li&gt;&lt;span style=&quot;font-family: &apos;Segoe UI&apos;;&quot;&gt;&lt;b&gt;Select Columns&lt;/b&gt;&amp;nbsp;- Select the columns we wish to display.&lt;/span&gt;&lt;/li&gt;&lt;li&gt;&lt;span style=&quot;font-family: &apos;Segoe UI&apos;;&quot;&gt;&lt;b&gt;Sankey Diagram&lt;/b&gt;&amp;nbsp;- Visualize the associations with a Sankey diagram.&lt;/span&gt;&lt;/li&gt;&lt;/ol&gt;&lt;p&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</editor>
+            <docFileText></docFileText>
+         </task>
+      </task-item>
       <task-item name="Read CSV" active="true">
          <task class="com.dexvis.dex.task.input.ReadCsv">
             <config-def>[ { &quot;type&quot; : &quot;label&quot;, &quot;initialValue&quot;: &quot;No configuration is available&quot; } ]</config-def>
@@ -9,6 +16,11 @@
             <rowLimitText>0</rowLimitText>
             <filter></filter>
             <lastDir></lastDir>
+         </task>
+      </task-item>
+      <task-item name="View Data" active="true">
+         <task class="com.dexvis.dex.task.utilities.ViewData">
+            <config-def>[ { &quot;type&quot; : &quot;label&quot;, &quot;initialValue&quot;: &quot;No configuration is available&quot; } ]</config-def>
          </task>
       </task-item>
       <task-item name="ARM" active="true">
