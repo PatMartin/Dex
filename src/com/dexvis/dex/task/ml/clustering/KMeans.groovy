@@ -24,7 +24,7 @@ import com.dexvis.util.WebViewUtil
 @Root(name="kmeans")
 class KMeans extends DexTask {
   public KMeans() {
-    super("Machine Learning: Clustering", "KMeans", "ml/smile/clustering/KMeans.html")
+    super("Machine Learning: Clustering", "KMeans", "ml/clustering/KMeans.html")
   }
   
   private WebView wv = new WebView()
@@ -73,7 +73,7 @@ class KMeans extends DexTask {
       dex.data[ri] << new String("${kmeans.predict(row)}")
     }
     
-    WebViewUtil.displayGroovyTemplate(we, "web/ml/smile/KMeans.gtmpl", [
+    WebViewUtil.displayGroovyTemplate(we, "template/internal/tasks/ml/clustering/KMeans.gtmpl", [
       "centroids": kmeans.centroids(),
       "clusterLabels": kmeans.getClusterLabel(),
       "clusterValues": ndata,

@@ -1,0 +1,149 @@
+<dex-project version="0.8">
+   <tasks class="java.util.ArrayList">
+      <task-item name="Documentation" active="true">
+         <task class="com.dexvis.dex.task.utilities.Documentation">
+            <config-def>[ { &quot;type&quot; : &quot;label&quot;, &quot;initialValue&quot;: &quot;No configuration is available&quot; } ]</config-def>
+            <editor>&lt;html dir=&quot;ltr&quot;&gt;&lt;head&gt;&lt;/head&gt;&lt;body contenteditable=&quot;true&quot;&gt;&lt;h1&gt;&lt;font face=&quot;Segoe UI&quot; size=&quot;6&quot;&gt;KMeans&lt;/font&gt;&lt;/h1&gt;&lt;p&gt;&lt;font face=&quot;Segoe UI&quot; size=&quot;4&quot;&gt;This example demonstrates how to use KMeans for clustering.&lt;/font&gt;&lt;/p&gt;&lt;h2&gt;&lt;font face=&quot;Segoe UI&quot; size=&quot;5&quot;&gt;Task Overview&lt;/font&gt;&lt;/h2&gt;&lt;p&gt;&lt;/p&gt;&lt;ol&gt;&lt;li&gt;&lt;font face=&quot;Segoe UI&quot;&gt;&lt;b&gt;Documentation&lt;/b&gt;&amp;nbsp;- This task, which documents the flow.&lt;/font&gt;&lt;/li&gt;&lt;li&gt;&lt;b style=&quot;font-family: &apos;Segoe UI&apos;;&quot;&gt;Read CSV&lt;/b&gt;&lt;span style=&quot;font-family: &apos;Segoe UI&apos;;&quot;&gt;&amp;nbsp;- Read in our dataset.&lt;/span&gt;&lt;/li&gt;&lt;li&gt;&lt;span style=&quot;font-family: &apos;Segoe UI&apos;;&quot;&gt;&lt;b&gt;View Data&lt;/b&gt;&amp;nbsp;- A visual checkpoint.&lt;/span&gt;&lt;/li&gt;&lt;li&gt;&lt;b style=&quot;font-family: &apos;Segoe UI&apos;;&quot;&gt;KFinger&lt;/b&gt;&lt;span style=&quot;font-family: &apos;Segoe UI&apos;;&quot;&gt;&amp;nbsp;- Use KFinder to find the optimal value of K.&lt;/span&gt;&lt;/li&gt;&lt;li&gt;&lt;span style=&quot;font-family: &apos;Segoe UI&apos;;&quot;&gt;&lt;b&gt;Create Age Cluster&amp;nbsp;&lt;/b&gt;- Create a cluster for age.&lt;/span&gt;&lt;/li&gt;&lt;li&gt;&lt;span style=&quot;font-family: &apos;Segoe UI&apos;;&quot;&gt;&lt;b&gt;View Data&lt;/b&gt;&amp;nbsp;- A visual checkpoint.&lt;/span&gt;&lt;/li&gt;&lt;li&gt;&lt;span style=&quot;font-family: &apos;Segoe UI&apos;;&quot;&gt;&lt;b&gt;Decision Tree&lt;/b&gt;&amp;nbsp;- Use a decision tree to gauge the performance of the age cluster.&lt;/span&gt;&lt;/li&gt;&lt;/ol&gt;&lt;p&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</editor>
+            <docFileText></docFileText>
+         </task>
+      </task-item>
+      <task-item name="Read CSV" active="true">
+         <task class="com.dexvis.dex.task.input.ReadCsv">
+            <config-def>[ { &quot;type&quot; : &quot;label&quot;, &quot;initialValue&quot;: &quot;No configuration is available&quot; } ]</config-def>
+            <fileText>data\kaggle\titanic\train.csv</fileText>
+            <limitRows>false</limitRows>
+            <filterCB>false</filterCB>
+            <rowLimitText>0</rowLimitText>
+            <filter></filter>
+            <lastDir></lastDir>
+         </task>
+      </task-item>
+      <task-item name="View Data" active="true">
+         <task class="com.dexvis.dex.task.utilities.ViewData">
+            <config-def>[ { &quot;type&quot; : &quot;label&quot;, &quot;initialValue&quot;: &quot;No configuration is available&quot; } ]</config-def>
+         </task>
+      </task-item>
+      <task-item name="XMeans" active="true">
+         <task class="com.dexvis.dex.task.ml.clustering.XMeans">
+            <config-def>[ { &quot;type&quot; : &quot;label&quot;, &quot;initialValue&quot;: &quot;No configuration is available&quot; } ]</config-def>
+            <columnList>&lt;com.dexvis.simple.types.SimpleListSelectionView&gt;
+  &lt;sourceList&gt;
+    &lt;string&gt;PassengerId&lt;/string&gt;
+    &lt;string&gt;Name&lt;/string&gt;
+    &lt;string&gt;Ticket&lt;/string&gt;
+    &lt;string&gt;Cabin&lt;/string&gt;
+    &lt;string&gt;Embarked&lt;/string&gt;
+    &lt;string&gt;Survived&lt;/string&gt;
+    &lt;string&gt;Age&lt;/string&gt;
+    &lt;string&gt;Sex&lt;/string&gt;
+    &lt;string&gt;Pclass&lt;/string&gt;
+    &lt;string&gt;Fare&lt;/string&gt;
+  &lt;/sourceList&gt;
+  &lt;targetList&gt;
+    &lt;string&gt;Parch&lt;/string&gt;
+    &lt;string&gt;SibSp&lt;/string&gt;
+  &lt;/targetList&gt;
+&lt;/com.dexvis.simple.types.SimpleListSelectionView&gt;</columnList>
+            <columnName>RELATION_CLUSTER</columnName>
+            <maxClusters>&lt;map&gt;
+  &lt;entry&gt;
+    &lt;string&gt;min&lt;/string&gt;
+    &lt;double&gt;1.0&lt;/double&gt;
+  &lt;/entry&gt;
+  &lt;entry&gt;
+    &lt;string&gt;max&lt;/string&gt;
+    &lt;double&gt;100.0&lt;/double&gt;
+  &lt;/entry&gt;
+  &lt;entry&gt;
+    &lt;string&gt;value&lt;/string&gt;
+    &lt;double&gt;10.0&lt;/double&gt;
+  &lt;/entry&gt;
+&lt;/map&gt;</maxClusters>
+         </task>
+      </task-item>
+      <task-item name="View Data" active="true">
+         <task class="com.dexvis.dex.task.utilities.ViewData">
+            <config-def>[ { &quot;type&quot; : &quot;label&quot;, &quot;initialValue&quot;: &quot;No configuration is available&quot; } ]</config-def>
+         </task>
+      </task-item>
+      <task-item name="Decision Tree" active="true">
+         <task class="com.dexvis.dex.task.ml.classification.DecisionTree">
+            <config-def>[ { &quot;type&quot; : &quot;label&quot;, &quot;initialValue&quot;: &quot;No configuration is available&quot; } ]</config-def>
+            <columnList>&lt;com.dexvis.simple.types.SimpleListSelectionView&gt;
+  &lt;sourceList&gt;
+    &lt;string&gt;PassengerId&lt;/string&gt;
+    &lt;string&gt;Survived&lt;/string&gt;
+    &lt;string&gt;Pclass&lt;/string&gt;
+    &lt;string&gt;Name&lt;/string&gt;
+    &lt;string&gt;Sex&lt;/string&gt;
+    &lt;string&gt;Age&lt;/string&gt;
+    &lt;string&gt;SibSp&lt;/string&gt;
+    &lt;string&gt;Parch&lt;/string&gt;
+    &lt;string&gt;Ticket&lt;/string&gt;
+    &lt;string&gt;Fare&lt;/string&gt;
+    &lt;string&gt;Cabin&lt;/string&gt;
+    &lt;string&gt;Embarked&lt;/string&gt;
+  &lt;/sourceList&gt;
+  &lt;targetList&gt;
+    &lt;string&gt;RELATION_CLUSTER&lt;/string&gt;
+  &lt;/targetList&gt;
+&lt;/com.dexvis.simple.types.SimpleListSelectionView&gt;</columnList>
+            <columnName>DTREE_PREDICTION</columnName>
+            <autosave>true</autosave>
+            <resultColumn>&lt;map&gt;
+  &lt;entry&gt;
+    &lt;string&gt;items&lt;/string&gt;
+    &lt;list&gt;
+      &lt;string&gt;PassengerId&lt;/string&gt;
+      &lt;string&gt;Survived&lt;/string&gt;
+      &lt;string&gt;Pclass&lt;/string&gt;
+      &lt;string&gt;Name&lt;/string&gt;
+      &lt;string&gt;Sex&lt;/string&gt;
+      &lt;string&gt;Age&lt;/string&gt;
+      &lt;string&gt;SibSp&lt;/string&gt;
+      &lt;string&gt;Parch&lt;/string&gt;
+      &lt;string&gt;Ticket&lt;/string&gt;
+      &lt;string&gt;Fare&lt;/string&gt;
+      &lt;string&gt;Cabin&lt;/string&gt;
+      &lt;string&gt;Embarked&lt;/string&gt;
+      &lt;string&gt;RELATION_CLUSTER&lt;/string&gt;
+    &lt;/list&gt;
+  &lt;/entry&gt;
+  &lt;entry&gt;
+    &lt;string&gt;selected&lt;/string&gt;
+    &lt;string&gt;Survived&lt;/string&gt;
+  &lt;/entry&gt;
+&lt;/map&gt;</resultColumn>
+            <splitRule>&lt;map&gt;
+  &lt;entry&gt;
+    &lt;string&gt;items&lt;/string&gt;
+    &lt;list&gt;
+      &lt;string&gt;GINI&lt;/string&gt;
+      &lt;string&gt;Entropy&lt;/string&gt;
+      &lt;string&gt;Classification Error&lt;/string&gt;
+    &lt;/list&gt;
+  &lt;/entry&gt;
+  &lt;entry&gt;
+    &lt;string&gt;selected&lt;/string&gt;
+    &lt;string&gt;GINI&lt;/string&gt;
+  &lt;/entry&gt;
+&lt;/map&gt;</splitRule>
+            <fileText>models\xmeans_demo.dtree.mdl</fileText>
+            <maxNodes>&lt;map&gt;
+  &lt;entry&gt;
+    &lt;string&gt;min&lt;/string&gt;
+    &lt;double&gt;1.0&lt;/double&gt;
+  &lt;/entry&gt;
+  &lt;entry&gt;
+    &lt;string&gt;max&lt;/string&gt;
+    &lt;double&gt;100.0&lt;/double&gt;
+  &lt;/entry&gt;
+  &lt;entry&gt;
+    &lt;string&gt;value&lt;/string&gt;
+    &lt;double&gt;10.0&lt;/double&gt;
+  &lt;/entry&gt;
+&lt;/map&gt;</maxNodes>
+         </task>
+      </task-item>
+   </tasks>
+</dex-project>
