@@ -2,9 +2,45 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title>GraphViz</title>
+    <title>KMeans</title>
+<style>
+  html,body,#Chart, #ConfigurationPane {
+    height : 100%;
+    min-height : 100%;
+    width : 100%;
+    min-width : 100%;
+  }
+  
+  #Chart {
+    display: inline-block;
+  }
+<%
+  println new File("javascript/jquery-ui/latest/jquery-ui.min.css").text
+  println new File("javascript/jquery-ui/latest/jquery-ui.theme.min.css").text
+  println new File("javascript/dexjs/latest/dex-jquery.css").text
+  println new File("javascript/bootstrap3/latest/bootstrap.min.css").text
+  println new File("javascript/dexjs/latest/dex-bootstrap.css").text
+  println new File("javascript/dexjs/latest/dex.css").text
+%>
+</style>
+<script>
+<%
+  println new File("javascript/tether/latest/tether.min.js").text
+  println new File("javascript/jquery/latest/jquery.min.js").text
+  println new File("javascript/jquery-ui/latest/jquery-ui.min.js").text
+  println new File("javascript/dexjs/latest/dex-jquery.js").text
+  println new File("javascript/bootstrap3/latest/bootstrap.min.js").text
+  println new File("javascript/dexjs/latest/dex-bootstrap.js").text
+  println new File("javascript/underscore/latest/underscore-min.js").text
+  println new File("javascript/dexjs/latest/dex-libs.min.js").text
+  println new File("javascript/dexjs/latest/dex.min.js").text
+  println new File("javascript/echarts/latest/echarts.min.js").text
+%>
+</script>
 <script type="text/javascript">
-<% println new File("javascript/graphviz/latest/graphviz.js").text %>
+<%
+import com.dexvis.dex.DexData
+%>
 </script>
 <!--
 <script type="text/javascript"
@@ -19,35 +55,84 @@ src="https://getfirebug.com/firebug-lite.js">
 -->
   </head>
   <body>
+<div class="ui-layout-center">
+    <div id="Chart"></div>
+</div>
+<div class="ui-layout-west">
+    <div id="ConfigurationPane"></div>
+</div>
+
   <table border="1">
     <tr><td>Centroids:</td><td><%= centroids %></td></tr>
     <tr><td>Cluster Labels:</td><td><%= clusterLabels %></td></tr>
     <tr><td>Distortion:</td><td><%= distortion %></td></tr>
   </table>
-
-  <table border="1">
+<script>
 <%
   def cmap = [:]
+  def clusterStr2Values = [:]
+  
   clusterLabels.eachWithIndex {
     cluster, ri ->
     cmap[cluster] = []
   }
 
+  int maxValues = 0
+
   clusterLabels.eachWithIndex {
     cluster, ri ->
     def clusterStr = "[ ${clusterValues[ri].join(', ')} ]"
+    if (clusterValues[ri].size() > maxValues) {
+      maxValues = clusterValues[ri].size()
+    }
+    clusterStr2Values[clusterStr] = clusterValues[ri]
     cmap[cluster] << clusterStr
   }
   
+  def dd = new DexData(["Cluster", "Member Index" ])
   cmap.keySet().sort().each {
     cluster ->
-    cmap[cluster].each {
-      clusterVal ->
-        println "<tr><td>${cluster}</td><td>${clusterVal}</td></tr>"
+    cmap[cluster].eachWithIndex {
+      clusterStr, ci ->
+        def clusterVal = clusterLabels
+        //println "<tr><td>${cluster}</td><td>${clusterVal}</td></tr>"
+        def row =[ "${cluster}", "${ci}" ]
+        clusterStr2Values[clusterStr].each { row << "${it}" }
+        dd.data << row
     }
   }
+
+  (1..maxValues).each { dd.header << "Value ${it}" }
+
+  println dd.toCsvString()
 %>
-</table>
+
+  \$(document).ready(function () {
+
+    \$('body').layout({
+      applyDemoStyles: false,
+      west: {
+        size: 360
+      },
+      onresize: function () {
+        chart.resize();
+      }
+    });
+
+    var chart = dex.charts.echarts.LineChart({
+      "parent" : "#Chart",
+      "series.type": "scatter",
+      "csv" : csv});
+
+    chart.render();
+    
+    var configPane = dex.ui.ConfigurationPane({
+      "parent": "#ConfigurationPane",
+      "csv": csv,
+      "components": [chart]
+    }).render();
+  });
+</script>
 
   </body>
 </html>

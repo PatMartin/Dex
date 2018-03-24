@@ -1,17 +1,16 @@
 package com.dexvis.dex.task.ml.clustering
 
-import javafx.scene.Node
 import javafx.event.EventHandler
+import javafx.scene.Node
 import javafx.scene.control.Button
 import javafx.scene.control.Label
+import javafx.scene.control.Slider
 import javafx.scene.control.TextField
-import javafx.scene.input.KeyEvent
 import javafx.scene.input.MouseEvent
 import javafx.scene.web.WebEngine
 import javafx.scene.web.WebView
 
 import org.controlsfx.control.ListSelectionView
-import org.controlsfx.control.RangeSlider
 import org.simpleframework.xml.Element
 import org.simpleframework.xml.Root
 import org.tbee.javafx.scene.layout.MigPane
@@ -22,12 +21,10 @@ import com.dexvis.dex.wf.DexTaskState
 import com.dexvis.javafx.scene.control.NodeFactory
 import com.dexvis.util.WebViewUtil
 
-
-
-@Root(name="kFinder")
-class KFinder extends DexTask {
-  public KFinder() {
-    super("Machine Learning: Clustering", "KFinder", "ml/clustering/KFinder.html")
+@Root(name="kmeans")
+class XMeans extends DexTask {
+  public XMeans() {
+    super("Machine Learning: Clustering", "XMeans", "ml/clustering/XMeans.html")
   }
   
   private WebView wv = new WebView()
@@ -39,18 +36,14 @@ class KFinder extends DexTask {
   private ListSelectionView<String> columnListView = new ListSelectionView<>();
   
   @Element(name="columnName", required=false)
-  private TextField columnNameText = new TextField("KMEANS")
-  
-  @Element(name="kMin", required=false)
-  private TextField kMinText = new TextField("2")
-  
-  @Element(name="kMax", required=false)
-  private TextField kMaxText = new TextField("10")
-  
-  //@Element(name="kRange", required=false)
-  private RangeSlider kRangeSlider = new RangeSlider(2, 100, 2, 10)
+  private TextField columnNameText = new TextField("XMEANS")
   
   private Button clearButton = new Button("Clear")
+  
+  @Element(name="maxClusters", required=false)
+  Slider maxClustersSLider = new Slider(1, 100, 4)
+  
+  Label maxClustersValueLabel = new Label("")
   
   public DexTaskState execute(DexTaskState state) throws DexException {
     
@@ -72,24 +65,22 @@ class KFinder extends DexTask {
     def columns = columnListView.getTargetItems()
     def ndata= dex.getDoubles(columns)
     
-    smile.clustering.KMeans kmeans; 
-    println "KMEANS: ${kmeans}"
+    smile.clustering.XMeans xmeans = new smile.clustering.XMeans(ndata,
+        maxClustersValueLabel.getText() as Integer)
+    println "XMEANS: ${xmeans}"
     
-    def kmin = kMinText.getText() as Integer
-    def kmax = kMaxText.getText() as Integer
-    
-    def distortion = []
-    
-    (kmin..kmax).each {
-      k ->
-      kmeans = new smile.clustering.KMeans(ndata, k)
-      distortion << [k, kmeans.distortion()]
+    ndata.eachWithIndex { row, ri ->
+      dex.data[ri] << new String("${xmeans.predict(row)}")
     }
     
-    WebViewUtil.displayGroovyTemplate(we, "template/internal/tasks/ml/clustering/KFinder.gtmpl", [
-      "distortion": distortion
+    WebViewUtil.displayGroovyTemplate(we, "template/internal/tasks/ml/clustering/XMeans.gtmpl", [
+      "centroids": xmeans.centroids(),
+      "clusterLabels": xmeans.getClusterLabel(),
+      "clusterValues": ndata,
+      "distortion": xmeans.distortion()
     ])
     
+    dex.header << new String("${columnNameText.getText()}")
     return state
   }
   
@@ -97,37 +88,30 @@ class KFinder extends DexTask {
   {
     if (configPane == null)
     {
-      Label kRangeLabel = new Label("K Range to Test")
+      Label maxClustersLabel = new Label("Max # Clusters")
       Label columnNameLabel = new Label("Column Name")
       
-      configPane = new MigPane("", "[][grow]", "[][][][][grow][]")
+      configPane = new MigPane("", "[][grow]", "[][][][][][grow][]")
       configPane.setStyle("-fx-background-color: white;")
       
-      configPane.add(NodeFactory.createTitle("KMeans"), "grow,span")
+      configPane.add(NodeFactory.createTitle("XMeans"), "grow,span")
       configPane.add(columnListView, "grow,span")
       
-      configPane.add(kRangeLabel);
-      configPane.add(kMinText)
-      configPane.add(kRangeSlider, "grow")
-      configPane.add(kMaxText, "span")
+      configPane.add(maxClustersValueLabel, "grow,span");
+      configPane.add(maxClustersLabel);
+      configPane.add(maxClustersSLider, "grow,span")
       
-      kRangeSlider.setShowTickMarks(true)
-      kRangeSlider.setShowTickLabels(true)
-      kRangeSlider.setBlockIncrement(1)
-      kRangeSlider.setMajorTickUnit(1)
-      kRangeSlider.setMinorTickCount(5)
-      kRangeSlider.setSnapToTicks(true)
-      kRangeSlider.setLowValue(kMinText.getText() as Integer)
-      kRangeSlider.setHighValue(kMaxText.getText() as Integer)
+      maxClustersSLider.setMinorTickCount(0)
+
+      maxClustersSLider.setMajorTickUnit(1)
+      maxClustersSLider.snapToTicksProperty().set(true)
+      maxClustersSLider.setShowTickLabels(false)
+
+      maxClustersSLider.setShowTickMarks(true)
+      maxClustersValueLabel.setText((((int) maxClustersSLider.getValue()) as String))
       
-      kRangeSlider.setOnMouseDragged({ MouseEvent event ->
-        kMinText.setText((kRangeSlider.getLowValue() as Integer) as String)
-        kMaxText.setText((kRangeSlider.getHighValue() as Integer) as String)
-      })
-      
-      kRangeSlider.setOnKeyPressed({ KeyEvent event ->
-        kMinText.setText((kRangeSlider.getLowValue() as Integer) as String)
-        kMaxText.setText((kRangeSlider.getHighValue() as Integer) as String)
+      maxClustersSLider.setOnMouseDragged({ MouseEvent event ->
+        maxClustersValueLabel.setText((((int) maxClustersSLider.getValue()) as String))
       })
       
       configPane.add(columnNameLabel)

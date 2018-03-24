@@ -23,7 +23,7 @@ import com.dexvis.javafx.scene.control.NodeFactory
 class ARM extends DexTask {
   public ARM() {
     super("Machine Learning: Association", "ARM",
-    "ml/smile/association/ARM.html")
+    "ml/association/ARM.html")
   }
   
   private MigPane configPane = null

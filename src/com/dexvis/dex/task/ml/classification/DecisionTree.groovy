@@ -35,7 +35,7 @@ import com.dexvis.util.WebViewUtil
 class DecisionTree extends DexTask {
   public DecisionTree() {
     super("Machine Learning: Classification", "Decision Tree",
-    "ml/smile/classification/DecisionTree.html")
+    "ml/classification/DecisionTree.html")
   }
   
   private DexEnvironment env = DexEnvironment.getInstance()
@@ -198,7 +198,7 @@ class DecisionTree extends DexTask {
       graphStr = graphStr.replaceAll('<class = ' + key + '>', '<class = ' + value + ' >')
     }
     
-    WebViewUtil.displayGroovyTemplate(we, "web/ml/smile/DecisionTree.gtmpl", [
+    WebViewUtil.displayGroovyTemplate(we, "template/internal/tasks/ml/classification/DecisionTree.gtmpl", [
       "graph": graphStr,
       "right": numRight,
       "wrong": numWrong,

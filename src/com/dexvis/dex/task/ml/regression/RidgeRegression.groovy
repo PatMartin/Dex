@@ -31,7 +31,7 @@ import com.dexvis.util.WebViewUtil
 class RidgeRegression extends DexTask {
   public RidgeRegression() {
     super("Machine Learning: Regression", "Ridge Regression",
-    "ml/smile/classification/RidgeRegression.html")
+    "ml/regression/RidgeRegression.html")
   }
   
   private DexEnvironment env = DexEnvironment.getInstance()
@@ -150,7 +150,7 @@ class RidgeRegression extends DexTask {
     }
     dex.header << columnNameText.getText()
     
-    WebViewUtil.displayGroovyTemplate(we, "web/ml/smile/RidgeRegression.gtmpl", [
+    WebViewUtil.displayGroovyTemplate(we, "template/internal/tasks/ml/RidgeRegression.gtmpl", [
       "df": ridge.df(),
       "error": ridge.error(),
       "ftest": ridge.ftest(),

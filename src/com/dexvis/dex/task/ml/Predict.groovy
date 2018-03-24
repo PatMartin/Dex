@@ -27,7 +27,7 @@ import com.dexvis.util.XStreamUtil
 class Predict extends DexTask {
   public Predict() {
     super("Machine Learning: Prediction", "Predict",
-    "ml/smile/classification/Predict.html")
+    "ml/Prediction/Predict.html")
   }
   
   private DexEnvironment env = DexEnvironment.getInstance()
@@ -105,7 +105,7 @@ class Predict extends DexTask {
     }
     
     dex.header << columnNameText.getText()
-    WebViewUtil.displayGroovyTemplate(we, "web/ml/smile/Predict.gtmpl", [
+    WebViewUtil.displayGroovyTemplate(we, "template/internal/tasks/ml/Predict.gtmpl", [
       modelType: model.getType(),
       numPredictions: selected.data.size(),
       features: model.getFeatures(),

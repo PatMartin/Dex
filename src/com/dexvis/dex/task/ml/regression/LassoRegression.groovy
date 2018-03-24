@@ -31,7 +31,7 @@ import com.dexvis.util.WebViewUtil
 class LassoRegression extends DexTask {
   public LassoRegression() {
     super("Machine Learning: Regression", "Lasso Regression",
-    "ml/smile/classification/LassoRegression.html")
+    "ml/regression/LassoRegression.html")
   }
   
   private DexEnvironment env = DexEnvironment.getInstance()
@@ -150,7 +150,7 @@ class LassoRegression extends DexTask {
     }
     dex.header << columnNameText.getText()
     
-    WebViewUtil.displayGroovyTemplate(we, "web/ml/smile/LassoRegression.gtmpl", [
+    WebViewUtil.displayGroovyTemplate(we, "template/internal/tasks/ml/regression/LassoRegression.gtmpl", [
       "df": lasso.df(),
       "error": lasso.error(),
       "ftest": lasso.ftest(),

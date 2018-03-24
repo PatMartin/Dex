@@ -19,7 +19,7 @@ import com.dexvis.javafx.scene.control.NodeFactory
 class LinearRegression extends DexTask {
   public LinearRegression() {
     super("Machine Learning: Regression", "Linear Regression",
-    "ml/smile/regression/LinearRegression.html")
+    "ml/regression/LinearRegression.html")
   }
   
   private MigPane configPane = null
@@ -93,7 +93,7 @@ class LinearRegression extends DexTask {
       Label xLabel = new Label("Select X:")
       configPane = new MigPane("", "[][grow]", "[][][grow]")
       configPane.setStyle("-fx-background-color: white;")
-      
+
       configPane.add(NodeFactory.createTitle("Linear Regression"), "grow,span")
       configPane.add(xLabel)
       configPane.add(xCB, "span")
