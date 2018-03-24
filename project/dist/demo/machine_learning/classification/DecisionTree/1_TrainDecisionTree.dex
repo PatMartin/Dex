@@ -38,7 +38,7 @@
   &lt;/targetList&gt;
 &lt;/com.dexvis.simple.types.SimpleListSelectionView&gt;</columnList>
             <columnName>TRAINED_PREDICTION</columnName>
-            <autosave>true</autosave>
+            <autosave>false</autosave>
             <resultColumn>&lt;map&gt;
   &lt;entry&gt;
     &lt;string&gt;items&lt;/string&gt;
