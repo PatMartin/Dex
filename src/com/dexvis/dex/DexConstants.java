@@ -30,5 +30,5 @@ public interface DexConstants
   public static DataFormat DEX_TASK_LIST_MOVE = new DataFormat(
       "DEX_TASK_LIST_MOVE");
   
-  public final static String TASK_HELP_DIR = "http://patmartin.gitbooks.io/dex-docs/content/tasks/";
+  public final static String TASK_HELP_DIR = "https://patmartin.gitbooks.io/dex-docs/content/tasks/";
 }
