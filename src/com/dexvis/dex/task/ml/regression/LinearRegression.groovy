@@ -73,7 +73,7 @@ class LinearRegression extends DexTask {
         x, xi ->
         regressions.each {
           regression ->
-          dex.data[xi] << ("" + (regression.slope * x + regression.intercept))
+          dex.data[xi] << "${regression.slope * x + regression.intercept"
         }
       }
       
