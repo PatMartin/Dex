@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -106,6 +107,48 @@ public class JsonUtil
     {
       nvpList.add(new NVP(name, jsonObj.toString()));
     }
+  }
+  
+  public static List<Map<String, String>> parseTabular(String jsonStr)
+  {
+    if (jsonStr != null)
+    {
+      return parseTabular(stringToObject(jsonStr));
+    }
+    return null;
+  }
+  
+  private static List<Map<String, String>> parseTabular(Object jsonObj)
+  {
+    List<Map<String, String>> list = new ArrayList<Map<String, String>>();
+    
+    if (jsonObj == null)
+    {
+      return null;
+    }
+    
+    if (jsonObj instanceof List)
+    {
+      List<Object> objList = (List<Object>) jsonObj;
+      for (Object obj : objList)
+      {
+        if (obj instanceof Map) {
+          Map jsonObjMap = (Map) obj;
+          
+          if (jsonObjMap != null) {
+            Map<String, String> objMap = new LinkedHashMap<String, String>();
+            for (Object key : jsonObjMap.keySet()) {
+              String keyStr = key.toString();
+              Object val = jsonObjMap.get(key);
+              String valStr = (val == null) ? "" : val.toString();
+              objMap.put(keyStr, valStr);
+            }
+            list.add(objMap);
+          }
+        }
+      }
+    }
+    return list;
   }
   
   /**
