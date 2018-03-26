@@ -54,7 +54,7 @@
     &lt;string&gt;Sepal Length&lt;/string&gt;
   &lt;/entry&gt;
 &lt;/map&gt;</responseColumn>
-            <autosave>false</autosave>
+            <autosave>true</autosave>
             <fileText>models\iris.lasso.mdl</fileText>
             <lambda>&lt;map&gt;
   &lt;entry&gt;
