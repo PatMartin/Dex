@@ -8,6 +8,7 @@ import javafx.scene.control.TextField
 import javafx.scene.web.WebEngine
 import javafx.scene.web.WebView
 
+import org.apache.commons.math3.stat.regression.SimpleRegression
 import org.simpleframework.xml.Element
 import org.simpleframework.xml.Root
 import org.tbee.javafx.scene.layout.MigPane
@@ -35,7 +36,7 @@ class Predict extends DexTask {
   private WebEngine we = wv.getEngine()
   
   private MigPane configPane = null
-
+  
   @Element(name="columnName", required=false)
   private TextField columnNameText = new TextField()
   
@@ -54,7 +55,6 @@ class Predict extends DexTask {
   
   public DexTaskState execute(DexTaskState state) throws DexException {
     def dex = state.getDexData();
-    def types = dex.guessTypes()
     
     if (columnNameText.getText() == null || columnNameText.getText().length() <= 0) {
       columnNameText.setText("PREDICTION")
@@ -67,15 +67,23 @@ class Predict extends DexTask {
     
     // Load from model file from object stream.
     DexModel model = DexModel.read(filePath);
-    if (!(model.getType() in ["Decision Tree", "Ridge Regression", "Lasso Regression"]))
+    if (!(model.getType() in ["Decision Tree", "Ridge Regression", "Lasso Regression", "Linear Regression"]))
     {
       throw new DexException("Model of type: '${model.getType()}' is not currently supported.")
     }
     
     // Check viability of the data
-    def selected = dex.select(model.getFeatures())
-    if (selected.header.size() != model.getFeatures().size()) {
-      throw new DexException("Model requires features: ${model.getFeatures()} " +
+    def selected;
+    def features = model.getFeatures();
+    
+    if (model.getType() == "Linear Regression") {
+      features = [ model.getProperties()["x"] ]
+    }
+
+    selected = dex.select(features)
+    
+    if (!model.getType() in [ "Linear Regression" ] && selected.header.size() != features.size()) {
+      throw new DexException("Model requires features: ${features} " +
       "but found ${selected.header} instead.")
     }
     
@@ -88,6 +96,7 @@ class Predict extends DexTask {
         String prediction = new String("${classMap[dtree.predict(row)]}")
         dex.data[ri] << prediction
       }
+      dex.header << columnNameText.getText()
     }
     else if (model.getType() == "Ridge Regression") {
       smile.regression.RidgeRegression ridge = (smile.regression.RidgeRegression) model.getModel()
@@ -95,6 +104,7 @@ class Predict extends DexTask {
         String prediction = new String("${ridge.predict(row)}")
         dex.data[ri] << prediction
       }
+      dex.header << columnNameText.getText()
     }
     else if (model.getType() == "Lasso Regression") {
       smile.regression.LASSO lasso = (smile.regression.LASSO) model.getModel()
@@ -102,10 +112,27 @@ class Predict extends DexTask {
         String prediction = new String("${lasso.predict(row)}")
         dex.data[ri] << prediction
       }
+      dex.header << columnNameText.getText()
     }
+    else if (model.getType() == "Linear Regression") {
+      def regressions = (List<SimpleRegression>) model.getModel()
+      def xColumn = (model.getProperties().get("x") as String)
+      def xIndex = dex.getColumnNumber(xColumn)
+      ndata.eachWithIndex { row, ri ->
+        regressions.each { regression ->
+          dex.data[ri] << "${regression.slope * (dex.data[ri][xIndex] as Double) + regression.intercept}"
+        }
+      }
+      model.features.eachWithIndex {
+        feature, fi ->
+        dex.header << "${columnNameText.getText() + feature}"
+      }
+    }
+
+    // Update the types
+    dex.types = dex.guessTypes()
     
-    dex.header << columnNameText.getText()
-    WebViewUtil.displayGroovyTemplate(we, "template/internal/tasks/ml/Predict.gtmpl", [
+    WebViewUtil.displayGroovyTemplate(we, "template/internal/tasks/ml/prediction/Predict.gtmpl", [
       modelType: model.getType(),
       numPredictions: selected.data.size(),
       features: model.getFeatures(),
@@ -133,7 +160,7 @@ class Predict extends DexTask {
           fileText.setText(path)
           effectiveFile.setText(path)
           DexModel model = DexModel.read(path);
-          WebViewUtil.displayGroovyTemplate(we, "web/ml/smile/Predict.gtmpl", [
+          WebViewUtil.displayGroovyTemplate(we, "web/ml/prediction/Predict.gtmpl", [
             modelType: model.getType(),
             numPredictions: 0,
             features: model.getFeatures(),

@@ -328,12 +328,15 @@ public class DexData {
   
   public DexData select(List<String> columns)
   {
+    // Ensure all header entries are strings
+    header = header.collect { it as String }
     def newHeader = columns.findAll
     { col ->
+      println "'${col}' in '${header}' = ${col in header}"
       (col as String) in header
     }
     
-    //println "select($columns) from $header = $newHeader"
+    println "select(${columns}) from ${header} = ${newHeader}"
     if (newHeader.size() == 0)
     {
       return new DexData()
@@ -744,7 +747,7 @@ public class DexData {
         }
       }
       
-      def fmt = DateUtil.guessFormat(getColumn(ci))
+      def fmt = DateUtil.guessFormat(getColumn(ci) as String [])
       if (fmt != null) {
         println "Possible Date With Format: '${fmt.toPattern()}'"
       }

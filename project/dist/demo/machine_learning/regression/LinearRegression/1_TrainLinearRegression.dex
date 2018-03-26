@@ -1,0 +1,140 @@
+<dex-project version="0.8">
+   <tasks class="java.util.ArrayList">
+      <task-item name="Documentation" active="true">
+         <task class="com.dexvis.dex.task.utilities.Documentation">
+            <config-def>[ { &quot;type&quot; : &quot;label&quot;, &quot;initialValue&quot;: &quot;No configuration is available&quot; } ]</config-def>
+            <editor>&lt;html dir=&quot;ltr&quot;&gt;&lt;head&gt;&lt;/head&gt;&lt;body contenteditable=&quot;true&quot;&gt;&lt;h1&gt;&lt;font face=&quot;Segoe UI&quot; size=&quot;6&quot;&gt;Linear Regression Training&lt;/font&gt;&lt;/h1&gt;&lt;p&gt;&lt;font face=&quot;Segoe UI&quot; size=&quot;4&quot;&gt;This example demonstrates how to train a Linear regression model.&lt;/font&gt;&lt;/p&gt;&lt;h2&gt;&lt;font face=&quot;Segoe UI&quot; size=&quot;5&quot;&gt;Task Overview&lt;/font&gt;&lt;/h2&gt;&lt;p&gt;&lt;/p&gt;&lt;p&gt;&lt;p&gt;&lt;ol&gt;&lt;li&gt;&lt;font face=&quot;Segoe UI&quot;&gt;&lt;b&gt;Documentation&lt;/b&gt;&amp;nbsp;- This task, which documents the flow.&lt;/font&gt;&lt;/li&gt;&lt;li&gt;&lt;b style=&quot;font-family: &apos;Segoe UI&apos;;&quot;&gt;Read CSV&lt;/b&gt;&lt;span style=&quot;font-family: &apos;Segoe UI&apos;;&quot;&gt;&amp;nbsp;- Read in our dataset.&lt;/span&gt;&lt;/li&gt;&lt;li&gt;&lt;b style=&quot;font-family: &apos;Segoe UI&apos;;&quot;&gt;Select Columns&lt;/b&gt;&lt;span style=&quot;font-family: &apos;Segoe UI&apos;;&quot;&gt;&amp;nbsp;- Select the columns we want, in the order we want them.&lt;/span&gt;&lt;/li&gt;&lt;li&gt;&lt;b style=&quot;font-family: &apos;Segoe UI&apos;;&quot;&gt;Linear Regression&lt;/b&gt;&lt;span style=&quot;font-family: &apos;Segoe UI&apos;;&quot;&gt;&amp;nbsp;- Train our Linear regression(s) model.&lt;/span&gt;&lt;/li&gt;&lt;li&gt;&lt;b style=&quot;font-family: &apos;Segoe UI&apos;;&quot;&gt;Group Columns&lt;/b&gt;&lt;span style=&quot;font-family: &apos;Segoe UI&apos;;&quot;&gt;&amp;nbsp;- Restructure the data into a form suitable for echarts visualization.&lt;/span&gt;&lt;/li&gt;&lt;li&gt;&lt;b style=&quot;font-family: &apos;Segoe UI&apos;;&quot;&gt;Select Columns&lt;/b&gt;&lt;span style=&quot;font-family: &apos;Segoe UI&apos;;&quot;&gt;&amp;nbsp;- Select the STAT, TIME, STAT_VALUE columns for visualization.&lt;/span&gt;&lt;/li&gt;&lt;li&gt;&lt;b style=&quot;font-family: &apos;Segoe UI&apos;;&quot;&gt;Web Driver&lt;/b&gt;&lt;span style=&quot;font-family: &apos;Segoe UI&apos;;&quot;&gt;&amp;nbsp;- Visualize the results in an external web browser.&lt;/span&gt;&lt;/li&gt;&lt;/ol&gt;&lt;/p&gt;&lt;/p&gt;&lt;p&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</editor>
+            <docFileText></docFileText>
+         </task>
+      </task-item>
+      <task-item name="Read CSV" active="true">
+         <task class="com.dexvis.dex.task.input.ReadCsv">
+            <config-def>[ { &quot;type&quot; : &quot;label&quot;, &quot;initialValue&quot;: &quot;No configuration is available&quot; } ]</config-def>
+            <fileText>data\gc2.csv</fileText>
+            <limitRows>false</limitRows>
+            <filterCB>false</filterCB>
+            <rowLimitText>0</rowLimitText>
+            <filter></filter>
+            <lastDir></lastDir>
+         </task>
+      </task-item>
+      <task-item name="Select Columns" active="true">
+         <task class="com.dexvis.dex.task.tablemanipulation.SelectColumns">
+            <config-def>[ { &quot;type&quot; : &quot;label&quot;, &quot;initialValue&quot;: &quot;No configuration is available&quot; } ]</config-def>
+            <columnList>&lt;com.dexvis.simple.types.SimpleListSelectionView&gt;
+  &lt;sourceList&gt;
+    &lt;string&gt;S0C&lt;/string&gt;
+    &lt;string&gt;S1C&lt;/string&gt;
+    &lt;string&gt;S0U&lt;/string&gt;
+    &lt;string&gt;S1U&lt;/string&gt;
+    &lt;string&gt;EC&lt;/string&gt;
+    &lt;string&gt;EU&lt;/string&gt;
+    &lt;string&gt;OC&lt;/string&gt;
+    &lt;string&gt;PC&lt;/string&gt;
+    &lt;string&gt;YGC&lt;/string&gt;
+    &lt;string&gt;YGCT&lt;/string&gt;
+    &lt;string&gt;GCT&lt;/string&gt;
+  &lt;/sourceList&gt;
+  &lt;targetList&gt;
+    &lt;string&gt;Timestamp&lt;/string&gt;
+    &lt;string&gt;OU&lt;/string&gt;
+    &lt;string&gt;PU&lt;/string&gt;
+    &lt;string&gt;FGC&lt;/string&gt;
+    &lt;string&gt;FGCT&lt;/string&gt;
+  &lt;/targetList&gt;
+&lt;/com.dexvis.simple.types.SimpleListSelectionView&gt;</columnList>
+         </task>
+      </task-item>
+      <task-item name="Linear Regression" active="true">
+         <task class="com.dexvis.dex.task.ml.regression.LinearRegression">
+            <config-def>[ { &quot;type&quot; : &quot;label&quot;, &quot;initialValue&quot;: &quot;No configuration is available&quot; } ]</config-def>
+            <columnList>&lt;com.dexvis.simple.types.SimpleListSelectionView&gt;
+  &lt;sourceList&gt;
+    &lt;string&gt;Timestamp&lt;/string&gt;
+  &lt;/sourceList&gt;
+  &lt;targetList&gt;
+    &lt;string&gt;OU&lt;/string&gt;
+    &lt;string&gt;PU&lt;/string&gt;
+    &lt;string&gt;FGC&lt;/string&gt;
+    &lt;string&gt;FGCT&lt;/string&gt;
+  &lt;/targetList&gt;
+&lt;/com.dexvis.simple.types.SimpleListSelectionView&gt;</columnList>
+            <xColumn>&lt;map&gt;
+  &lt;entry&gt;
+    &lt;string&gt;items&lt;/string&gt;
+    &lt;list&gt;
+      &lt;string&gt;Timestamp&lt;/string&gt;
+      &lt;string&gt;OU&lt;/string&gt;
+      &lt;string&gt;PU&lt;/string&gt;
+      &lt;string&gt;FGC&lt;/string&gt;
+      &lt;string&gt;FGCT&lt;/string&gt;
+    &lt;/list&gt;
+  &lt;/entry&gt;
+  &lt;entry&gt;
+    &lt;string&gt;selected&lt;/string&gt;
+    &lt;string&gt;Timestamp&lt;/string&gt;
+  &lt;/entry&gt;
+&lt;/map&gt;</xColumn>
+            <autosave>true</autosave>
+            <fileText>models\gc2.linreg.mdl</fileText>
+         </task>
+      </task-item>
+      <task-item name="Group Columns" active="true">
+         <task class="com.dexvis.dex.task.tablemanipulation.GroupColumns">
+            <config-def>[ { &quot;type&quot; : &quot;label&quot;, &quot;initialValue&quot;: &quot;No configuration is available&quot; } ]</config-def>
+            <groupName>STAT</groupName>
+            <columnList>&lt;com.dexvis.simple.types.SimpleListSelectionView&gt;
+  &lt;sourceList&gt;
+    &lt;string&gt;Timestamp&lt;/string&gt;
+  &lt;/sourceList&gt;
+  &lt;targetList&gt;
+    &lt;string&gt;OU&lt;/string&gt;
+    &lt;string&gt;PU&lt;/string&gt;
+    &lt;string&gt;FGC&lt;/string&gt;
+    &lt;string&gt;FGCT&lt;/string&gt;
+    &lt;string&gt;REG_OU&lt;/string&gt;
+    &lt;string&gt;REG_PU&lt;/string&gt;
+    &lt;string&gt;REG_FGC&lt;/string&gt;
+    &lt;string&gt;REG_FGCT&lt;/string&gt;
+  &lt;/targetList&gt;
+&lt;/com.dexvis.simple.types.SimpleListSelectionView&gt;</columnList>
+         </task>
+      </task-item>
+      <task-item name="Select Columns" active="true">
+         <task class="com.dexvis.dex.task.tablemanipulation.SelectColumns">
+            <config-def>[ { &quot;type&quot; : &quot;label&quot;, &quot;initialValue&quot;: &quot;No configuration is available&quot; } ]</config-def>
+            <columnList>&lt;com.dexvis.simple.types.SimpleListSelectionView&gt;
+  &lt;sourceList/&gt;
+  &lt;targetList&gt;
+    &lt;string&gt;STAT&lt;/string&gt;
+    &lt;string&gt;Timestamp&lt;/string&gt;
+    &lt;string&gt;STAT_VALUE&lt;/string&gt;
+  &lt;/targetList&gt;
+&lt;/com.dexvis.simple.types.SimpleListSelectionView&gt;</columnList>
+         </task>
+      </task-item>
+      <task-item name="Web Driver" active="true">
+         <task class="com.dexvis.dex.task.base.WebDriverTask">
+            <config-def>[ { &quot;type&quot; : &quot;label&quot;, &quot;initialValue&quot;: &quot;No configuration is available&quot; } ]</config-def>
+            <templateText>web\dexjs\echarts\LineChart.gtmpl</templateText>
+            <outputFileText>output\LinearRegression_Training.html</outputFileText>
+            <firefoxBrowser>&lt;map&gt;
+  &lt;entry&gt;
+    &lt;string&gt;text&lt;/string&gt;
+    &lt;string&gt;Firefox&lt;/string&gt;
+  &lt;/entry&gt;
+&lt;/map&gt;</firefoxBrowser>
+            <chromeBrowser>&lt;map&gt;
+  &lt;entry&gt;
+    &lt;string&gt;text&lt;/string&gt;
+    &lt;string&gt;Chrome&lt;/string&gt;
+  &lt;/entry&gt;
+  &lt;entry&gt;
+    &lt;string&gt;selected&lt;/string&gt;
+    &lt;boolean&gt;true&lt;/boolean&gt;
+  &lt;/entry&gt;
+&lt;/map&gt;</chromeBrowser>
+         </task>
+      </task-item>
+   </tasks>
+</dex-project>

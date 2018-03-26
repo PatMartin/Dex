@@ -44,7 +44,7 @@ class SelectColumns extends DexTask {
 
   public DexTaskState execute(DexTaskState state) throws DexException {
 
-    def newDexData = state.dexData;
+    def selected = state.dexData;
 
     // Only update if the list is empty.
     if (columnListView.getSourceItems().size() == 0 && columnListView.getTargetItems().size() == 0)
@@ -54,9 +54,13 @@ class SelectColumns extends DexTask {
 
     if (columnListView.getTargetItems().size() > 0)
     {
-      newDexData = state.dexData.select(columnListView.getTargetItems())
+      selected = state.dexData.select(columnListView.getTargetItems())
     }
 
+    println "SELECTING: ${columnListView.getTargetItems()}"
+    println "FROM:      ${state.dexData}"
+    println "SELECTED:  ${selected}"
+    
     // Update the table:
     ObservableList<ObservableList<String>> data = FXCollections.observableArrayList()
 
@@ -65,11 +69,11 @@ class SelectColumns extends DexTask {
 
     Collection cols = []
 
-    for (int i = 0; i < newDexData.header.size(); i++)
+    for (int i = 0; i < selected.header.size(); i++)
     {
       final int j = i
 
-      TableColumn col = new TableColumn(newDexData.header.get(i))
+      TableColumn col = new TableColumn(selected.header.get(i))
       col.setCellValueFactory(new Callback<CellDataFeatures<ObservableList, String>, ObservableValue<String>>()
           {
             public ObservableValue<String> call(
@@ -87,12 +91,12 @@ class SelectColumns extends DexTask {
           })
 
       // Estimate preferred width based on length of the header.  16 pixels per character.
-      col.setPrefWidth(newDexData.header.get(i).length() * 16)
+      col.setPrefWidth(selected.header.get(i).length() * 16)
       cols.add(col)
     }
 
     tableView.getColumns().addAll(cols)
-    for (List<String> row : newDexData.data)
+    for (List<String> row : selected.data)
     {
       ObservableList<String> oRow = FXCollections.observableArrayList(row)
       data.add(oRow)
@@ -100,7 +104,7 @@ class SelectColumns extends DexTask {
 
     tableView.setItems(data)
 
-    state.dexData = newDexData;
+    state.dexData = selected;
 
     return state
   }
