@@ -24,7 +24,7 @@ import com.dexvis.util.WebViewUtil
 @Root(name="kmeans")
 class XMeans extends DexTask {
   public XMeans() {
-    super("Machine Learning: Clustering", "XMeans", "ml/clustering/XMeans.html")
+    super("Machine Learning: Clustering", "XMeans", "machine_learning/clustering/XMeans.html")
   }
   
   private WebView wv = new WebView()
@@ -91,14 +91,14 @@ class XMeans extends DexTask {
       Label maxClustersLabel = new Label("Max # Clusters")
       Label columnNameLabel = new Label("Column Name")
       
-      configPane = new MigPane("", "[][grow]", "[][][][][][grow][]")
+      configPane = new MigPane("", "[][][grow]", "[][][][][grow][]")
       configPane.setStyle("-fx-background-color: white;")
       
       configPane.add(NodeFactory.createTitle("XMeans"), "grow,span")
       configPane.add(columnListView, "grow,span")
       
-      configPane.add(maxClustersValueLabel, "grow,span");
       configPane.add(maxClustersLabel);
+      configPane.add(maxClustersValueLabel);
       configPane.add(maxClustersSLider, "grow,span")
       
       maxClustersSLider.setMinorTickCount(0)

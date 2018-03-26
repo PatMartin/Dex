@@ -21,7 +21,7 @@ import com.dexvis.javafx.scene.control.NodeFactory
 class FPGrowth extends DexTask {
   public FPGrowth() {
     super("Machine Learning: Association", "FP Growth",
-    "ml/association/FPGrowth.html")
+    "machine_learning/association/FPGrowth.html")
   }
   
   private MigPane configPane = null

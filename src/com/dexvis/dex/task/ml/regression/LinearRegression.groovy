@@ -19,7 +19,7 @@ import com.dexvis.javafx.scene.control.NodeFactory
 class LinearRegression extends DexTask {
   public LinearRegression() {
     super("Machine Learning: Regression", "Linear Regression",
-    "ml/regression/LinearRegression.html")
+    "machine_learning/regression/LinearRegression.html")
   }
   
   private MigPane configPane = null

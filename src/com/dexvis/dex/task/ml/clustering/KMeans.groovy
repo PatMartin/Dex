@@ -24,7 +24,7 @@ import com.dexvis.util.WebViewUtil
 @Root(name="kmeans")
 class KMeans extends DexTask {
   public KMeans() {
-    super("Machine Learning: Clustering", "KMeans", "ml/clustering/KMeans.html")
+    super("Machine Learning: Clustering", "KMeans", "machine_learning/clustering/KMeans.html")
   }
   
   private WebView wv = new WebView()

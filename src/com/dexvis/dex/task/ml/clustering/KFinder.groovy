@@ -27,7 +27,7 @@ import com.dexvis.util.WebViewUtil
 @Root(name="kFinder")
 class KFinder extends DexTask {
   public KFinder() {
-    super("Machine Learning: Clustering", "KFinder", "ml/clustering/KFinder.html")
+    super("Machine Learning: Clustering", "KFinder", "machine_learning/clustering/KFinder.html")
   }
   
   private WebView wv = new WebView()

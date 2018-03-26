@@ -27,7 +27,7 @@ import com.dexvis.util.XStreamUtil
 class Predict extends DexTask {
   public Predict() {
     super("Machine Learning: Prediction", "Predict",
-    "ml/Prediction/Predict.html")
+    "machine_learning/prediction/Predict.html")
   }
   
   private DexEnvironment env = DexEnvironment.getInstance()

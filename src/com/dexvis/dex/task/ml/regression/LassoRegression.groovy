@@ -17,6 +17,7 @@ import org.simpleframework.xml.Element
 import org.simpleframework.xml.Root
 import org.tbee.javafx.scene.layout.MigPane
 
+import com.dexvis.dex.DexData
 import com.dexvis.dex.DexModel
 import com.dexvis.dex.exception.DexException
 import com.dexvis.dex.wf.DexEnvironment
@@ -31,7 +32,7 @@ import com.dexvis.util.WebViewUtil
 class LassoRegression extends DexTask {
   public LassoRegression() {
     super("Machine Learning: Regression", "Lasso Regression",
-    "ml/regression/LassoRegression.html")
+    "machine_learning/regression/LassoRegression.html")
   }
   
   private DexEnvironment env = DexEnvironment.getInstance()
@@ -74,7 +75,7 @@ class LassoRegression extends DexTask {
   public DexTaskState execute(DexTaskState state) throws DexException {
     def dex = state.getDexData()
     def types = dex.guessTypes()
-    
+    def validationData = new DexData(["Prediction #", "Actual", "Predicted"])
     if (columnNameText.getText() == null || columnNameText.getText().length() <= 0) {
       columnNameText.setText("LASSO_PREDICTION")
     }
@@ -143,10 +144,15 @@ class LassoRegression extends DexTask {
     if (autosaveCB.isSelected()) {
       model.write(filePath)
     }
-
+    
     ndata.eachWithIndex { row, ri ->
       double prediction = lasso.predict(row)
       dex.data[ri] << "" + prediction
+      
+      // Only validate the first 100 predictions...
+      if (validationData.data.size() < 100) {
+        validationData.data << [ "${ri+1}", "${responses[ri]}", "${prediction}" ]
+      }
     }
     dex.header << columnNameText.getText()
     
@@ -158,7 +164,8 @@ class LassoRegression extends DexTask {
       "pValue": lasso.pvalue(),
       "rSquared": lasso.RSquared(),
       "shrinkage": lasso.shrinkage(),
-      "adjRSquared": lasso.adjustedRSquared()
+      "adjRSquared": lasso.adjustedRSquared(),
+      "validationData": validationData 
     ])
 
     return state

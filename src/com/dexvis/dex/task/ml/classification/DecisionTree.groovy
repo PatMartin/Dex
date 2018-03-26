@@ -35,7 +35,7 @@ import com.dexvis.util.WebViewUtil
 class DecisionTree extends DexTask {
   public DecisionTree() {
     super("Machine Learning: Classification", "Decision Tree",
-    "ml/classification/DecisionTree.html")
+    "machine_learning/classification/DecisionTree.html")
   }
   
   private DexEnvironment env = DexEnvironment.getInstance()

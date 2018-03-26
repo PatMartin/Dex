@@ -17,6 +17,7 @@ import org.simpleframework.xml.Element
 import org.simpleframework.xml.Root
 import org.tbee.javafx.scene.layout.MigPane
 
+import com.dexvis.dex.DexData
 import com.dexvis.dex.DexModel
 import com.dexvis.dex.exception.DexException
 import com.dexvis.dex.wf.DexEnvironment
@@ -31,7 +32,7 @@ import com.dexvis.util.WebViewUtil
 class RidgeRegression extends DexTask {
   public RidgeRegression() {
     super("Machine Learning: Regression", "Ridge Regression",
-    "ml/regression/RidgeRegression.html")
+    "machine_learning/regression/RidgeRegression.html")
   }
   
   private DexEnvironment env = DexEnvironment.getInstance()
@@ -74,6 +75,7 @@ class RidgeRegression extends DexTask {
   public DexTaskState execute(DexTaskState state) throws DexException {
     def dex = state.getDexData()
     def types = dex.guessTypes()
+    def validationData = new DexData(["Prediction #", "Actual", "Predicted"])
     
     if (columnNameText.getText() == null || columnNameText.getText().length() <= 0) {
       columnNameText.setText("RIDGE")
@@ -147,10 +149,15 @@ class RidgeRegression extends DexTask {
     ndata.eachWithIndex { row, ri ->
       double prediction = ridge.predict(row)
       dex.data[ri] << "" + prediction
+      
+      // Only validate the first 100 predictions...
+      if (validationData.data.size() < 100) {
+        validationData.data << [ "${ri+1}", "${responses[ri]}", "${prediction}" ]
+      }
     }
     dex.header << columnNameText.getText()
     
-    WebViewUtil.displayGroovyTemplate(we, "template/internal/tasks/ml/RidgeRegression.gtmpl", [
+    WebViewUtil.displayGroovyTemplate(we, "template/internal/tasks/ml/regression/RidgeRegression.gtmpl", [
       "df": ridge.df(),
       "error": ridge.error(),
       "ftest": ridge.ftest(),
@@ -158,7 +165,8 @@ class RidgeRegression extends DexTask {
       "pValue": ridge.pvalue(),
       "rSquared": ridge.RSquared(),
       "shrinkage": ridge.shrinkage(),
-      "adjRSquared": ridge.adjustedRSquared()
+      "adjRSquared": ridge.adjustedRSquared(),
+      "validationData": validationData
     ])
 
     return state
