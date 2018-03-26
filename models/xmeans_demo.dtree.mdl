@@ -15,7 +15,7 @@
       </smile.data.NumericAttribute>
     </attributes>
     <importance>
-      <double>0.09945689464054414</double>
+      <double>0.15138443460446363</double>
     </importance>
     <root>
       <output>0</output>
@@ -24,96 +24,31 @@
         <double>0.3838383838383838</double>
       </posteriori>
       <splitFeature>0</splitFeature>
-      <splitValue>6.5</splitValue>
-      <splitScore>0.009303460694696598</splitScore>
+      <splitValue>4.5</splitValue>
+      <splitScore>0.010061168007353238</splitScore>
       <trueChild>
         <output>0</output>
         <posteriori>
-          <double>0.6378244746600742</double>
-          <double>0.3621755253399258</double>
+          <double>0.6549707602339181</double>
+          <double>0.34502923976608185</double>
         </posteriori>
         <splitFeature>0</splitFeature>
-        <splitValue>4.5</splitValue>
-        <splitScore>0.014835670386053212</splitScore>
+        <splitValue>3.5</splitValue>
+        <splitScore>0.012473235650253711</splitScore>
         <trueChild>
           <output>0</output>
           <posteriori>
-            <double>0.5021459227467812</double>
-            <double>0.4978540772532189</double>
+            <double>0.5034013605442177</double>
+            <double>0.4965986394557823</double>
           </posteriori>
           <splitFeature>0</splitFeature>
-          <splitValue>1.5</splitValue>
-          <splitScore>0.06629239092691869</splitScore>
+          <splitValue>2.0</splitValue>
+          <splitScore>6.746443358407461E-7</splitScore>
           <trueChild>
             <output>0</output>
             <posteriori>
-              <double>0.8809523809523809</double>
-              <double>0.11904761904761904</double>
-            </posteriori>
-            <splitFeature>-1</splitFeature>
-            <splitValue>NaN</splitValue>
-            <splitScore>0.0</splitScore>
-            <trueChildOutput>-1</trueChildOutput>
-            <falseChildOutput>-1</falseChildOutput>
-            <outer-class reference="../../../../.."/>
-          </trueChild>
-          <falseChild>
-            <output>1</output>
-            <posteriori>
-              <double>0.41968911917098445</double>
-              <double>0.5803108808290155</double>
-            </posteriori>
-            <splitFeature>0</splitFeature>
-            <splitValue>3.5</splitValue>
-            <splitScore>0.008630761195467261</splitScore>
-            <trueChild>
-              <output>1</output>
-              <posteriori>
-                <double>0.44785276073619634</double>
-                <double>0.5521472392638037</double>
-              </posteriori>
-              <splitFeature>-1</splitFeature>
-              <splitValue>NaN</splitValue>
-              <splitScore>0.0</splitScore>
-              <trueChildOutput>-1</trueChildOutput>
-              <falseChildOutput>-1</falseChildOutput>
-              <outer-class reference="../../../../../.."/>
-            </trueChild>
-            <falseChild>
-              <output>1</output>
-              <posteriori>
-                <double>0.28125</double>
-                <double>0.71875</double>
-              </posteriori>
-              <splitFeature>-1</splitFeature>
-              <splitValue>NaN</splitValue>
-              <splitScore>0.0</splitScore>
-              <trueChildOutput>-1</trueChildOutput>
-              <falseChildOutput>-1</falseChildOutput>
-              <outer-class reference="../../../../../.."/>
-            </falseChild>
-            <trueChildOutput>1</trueChildOutput>
-            <falseChildOutput>1</falseChildOutput>
-            <outer-class reference="../../../../.."/>
-          </falseChild>
-          <trueChildOutput>0</trueChildOutput>
-          <falseChildOutput>1</falseChildOutput>
-          <outer-class reference="../../../.."/>
-        </trueChild>
-        <falseChild>
-          <output>0</output>
-          <posteriori>
-            <double>0.6920415224913494</double>
-            <double>0.3079584775086505</double>
-          </posteriori>
-          <splitFeature>0</splitFeature>
-          <splitValue>5.5</splitValue>
-          <splitScore>3.8798110496359936E-4</splitScore>
-          <trueChild>
-            <output>0</output>
-            <posteriori>
-              <double>0.6957328385899815</double>
-              <double>0.3042671614100185</double>
+              <double>0.5</double>
+              <double>0.5</double>
             </posteriori>
             <splitFeature>-1</splitFeature>
             <splitValue>NaN</splitValue>
@@ -125,8 +60,8 @@
           <falseChild>
             <output>0</output>
             <posteriori>
-              <double>0.6341463414634146</double>
-              <double>0.36585365853658536</double>
+              <double>0.5034965034965035</double>
+              <double>0.4965034965034965</double>
             </posteriori>
             <splitFeature>-1</splitFeature>
             <splitValue>NaN</splitValue>
@@ -138,6 +73,19 @@
           <trueChildOutput>0</trueChildOutput>
           <falseChildOutput>0</falseChildOutput>
           <outer-class reference="../../../.."/>
+        </trueChild>
+        <falseChild>
+          <output>0</output>
+          <posteriori>
+            <double>0.6957328385899815</double>
+            <double>0.3042671614100185</double>
+          </posteriori>
+          <splitFeature>-1</splitFeature>
+          <splitValue>NaN</splitValue>
+          <splitScore>0.0</splitScore>
+          <trueChildOutput>-1</trueChildOutput>
+          <falseChildOutput>-1</falseChildOutput>
+          <outer-class reference="../../../.."/>
         </falseChild>
         <trueChildOutput>0</trueChildOutput>
         <falseChildOutput>0</falseChildOutput>
@@ -146,30 +94,108 @@
       <falseChild>
         <output>1</output>
         <posteriori>
-          <double>0.4069767441860465</double>
-          <double>0.5930232558139535</double>
+          <double>0.4881516587677725</double>
+          <double>0.5118483412322274</double>
         </posteriori>
         <splitFeature>0</splitFeature>
-        <splitValue>7.5</splitValue>
-        <splitScore>6.630332444773623E-6</splitScore>
+        <splitValue>9.5</splitValue>
+        <splitScore>0.08462031546896812</splitScore>
         <trueChild>
           <output>1</output>
           <posteriori>
-            <double>0.4067796610169492</double>
-            <double>0.5932203389830508</double>
+            <double>0.38323353293413176</double>
+            <double>0.6167664670658682</double>
           </posteriori>
-          <splitFeature>-1</splitFeature>
-          <splitValue>NaN</splitValue>
-          <splitScore>0.0</splitScore>
-          <trueChildOutput>-1</trueChildOutput>
-          <falseChildOutput>-1</falseChildOutput>
+          <splitFeature>0</splitFeature>
+          <splitValue>8.5</splitValue>
+          <splitScore>0.0047878564363905</splitScore>
+          <trueChild>
+            <output>1</output>
+            <posteriori>
+              <double>0.4057971014492754</double>
+              <double>0.5942028985507246</double>
+            </posteriori>
+            <splitFeature>0</splitFeature>
+            <splitValue>7.5</splitValue>
+            <splitScore>0.038985349041577425</splitScore>
+            <trueChild>
+              <output>1</output>
+              <posteriori>
+                <double>0.3671875</double>
+                <double>0.6328125</double>
+              </posteriori>
+              <splitFeature>0</splitFeature>
+              <splitValue>5.5</splitValue>
+              <splitScore>4.558353555847994E-4</splitScore>
+              <trueChild>
+                <output>1</output>
+                <posteriori>
+                  <double>0.35</double>
+                  <double>0.65</double>
+                </posteriori>
+                <splitFeature>-1</splitFeature>
+                <splitValue>NaN</splitValue>
+                <splitScore>0.0</splitScore>
+                <trueChildOutput>-1</trueChildOutput>
+                <falseChildOutput>-1</falseChildOutput>
+                <outer-class reference="../../../../../../.."/>
+              </trueChild>
+              <falseChild>
+                <output>1</output>
+                <posteriori>
+                  <double>0.37777777777777777</double>
+                  <double>0.6222222222222222</double>
+                </posteriori>
+                <splitFeature>-1</splitFeature>
+                <splitValue>NaN</splitValue>
+                <splitScore>0.0</splitScore>
+                <trueChildOutput>-1</trueChildOutput>
+                <falseChildOutput>-1</falseChildOutput>
+                <outer-class reference="../../../../../../.."/>
+              </falseChild>
+              <trueChildOutput>1</trueChildOutput>
+              <falseChildOutput>1</falseChildOutput>
+              <outer-class reference="../../../../../.."/>
+            </trueChild>
+            <falseChild>
+              <output>0</output>
+              <posteriori>
+                <double>0.8333333333333334</double>
+                <double>0.16666666666666666</double>
+              </posteriori>
+              <splitFeature>-1</splitFeature>
+              <splitValue>NaN</splitValue>
+              <splitScore>0.0</splitScore>
+              <trueChildOutput>-1</trueChildOutput>
+              <falseChildOutput>-1</falseChildOutput>
+              <outer-class reference="../../../../../.."/>
+            </falseChild>
+            <trueChildOutput>1</trueChildOutput>
+            <falseChildOutput>0</falseChildOutput>
+            <outer-class reference="../../../../.."/>
+          </trueChild>
+          <falseChild>
+            <output>1</output>
+            <posteriori>
+              <double>0.2903225806451613</double>
+              <double>0.7096774193548387</double>
+            </posteriori>
+            <splitFeature>-1</splitFeature>
+            <splitValue>NaN</splitValue>
+            <splitScore>0.0</splitScore>
+            <trueChildOutput>-1</trueChildOutput>
+            <falseChildOutput>-1</falseChildOutput>
+            <outer-class reference="../../../../.."/>
+          </falseChild>
+          <trueChildOutput>1</trueChildOutput>
+          <falseChildOutput>1</falseChildOutput>
           <outer-class reference="../../../.."/>
         </trueChild>
         <falseChild>
-          <output>1</output>
+          <output>0</output>
           <posteriori>
-            <double>0.41379310344827586</double>
-            <double>0.5862068965517241</double>
+            <double>0.8695652173913043</double>
+            <double>0.13043478260869565</double>
           </posteriori>
           <splitFeature>-1</splitFeature>
           <splitValue>NaN</splitValue>
@@ -179,7 +205,7 @@
           <outer-class reference="../../../.."/>
         </falseChild>
         <trueChildOutput>1</trueChildOutput>
-        <falseChildOutput>1</falseChildOutput>
+        <falseChildOutput>0</falseChildOutput>
         <outer-class reference="../../.."/>
       </falseChild>
       <trueChildOutput>0</trueChildOutput>

@@ -160,7 +160,7 @@ class Predict extends DexTask {
           fileText.setText(path)
           effectiveFile.setText(path)
           DexModel model = DexModel.read(path);
-          WebViewUtil.displayGroovyTemplate(we, "web/ml/prediction/Predict.gtmpl", [
+          WebViewUtil.displayGroovyTemplate(we, "template/internal/tasks/ml/prediction/Predict.gtmpl", [
             modelType: model.getType(),
             numPredictions: 0,
             features: model.getFeatures(),
