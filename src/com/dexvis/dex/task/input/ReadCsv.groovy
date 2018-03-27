@@ -117,7 +117,7 @@ class ReadCsv extends DexTask {
           // Enough data loaded to preview, do it in the background while still loading
           Platform.runLater {
             try {
-              def preview = state.dexData.head((limit && rowLimit < 100) ? rowLimit : 100)
+              def preview = state.dexData.head(100)
               def previewState = new DexTaskState(preview)
               
               WebViewUtil.displayGroovyTemplate(we, "web/dexjs/grid/JqGrid.gtmpl", [
