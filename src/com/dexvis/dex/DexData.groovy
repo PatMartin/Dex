@@ -351,7 +351,6 @@ public class DexData {
 
   public DexData head(limit)
   {
-    println "LIMIT: '${limit}' of type '${limit?.getClass()}' on data of size ${data.size()}"
     if (limit == null) {
       return new DexData(this)
     }
@@ -360,10 +359,16 @@ public class DexData {
       return new DexData(header, data)
     }
     
-    return new DexData(header, data.withIndex().findAll {
+    def newData = new DexData(header)
+
+    data.eachWithIndex {
       row, ri ->
-      return (ri < limit);
-    });
+      if (ri < limit) {
+        newData.data << row.collect()
+      }
+    }
+
+    return newData;
   }
   
   /**
