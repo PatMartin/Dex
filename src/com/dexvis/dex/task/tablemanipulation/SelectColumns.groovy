@@ -57,9 +57,9 @@ class SelectColumns extends DexTask {
       selected = state.dexData.select(columnListView.getTargetItems())
     }
 
-    println "SELECTING: ${columnListView.getTargetItems()}"
-    println "FROM:      ${state.dexData}"
-    println "SELECTED:  ${selected}"
+    //println "SELECTING: ${columnListView.getTargetItems()}"
+    //println "FROM:      ${state.dexData}"
+    //println "SELECTED:  ${selected}"
     
     // Update the table:
     ObservableList<ObservableList<String>> data = FXCollections.observableArrayList()
