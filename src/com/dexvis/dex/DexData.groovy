@@ -69,13 +69,13 @@ public class DexData {
     this.header = header.collect()
     this.data = new ArrayList<List<String>>()
     this.types = new ArrayList<List<String>>()
-    
+
     data.each { row ->
       this.data << row.collect()
     }
     
     types.each { row ->
-      this.types << row
+      this.types << row.collect()
     }
   }
   
@@ -359,7 +359,7 @@ public class DexData {
       return new DexData(header, data)
     }
     def newData = new DexData(header)
-    
+
     data.eachWithIndex {
       row, ri ->
       if (ri < limit) {
