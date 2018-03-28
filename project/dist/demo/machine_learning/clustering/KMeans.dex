@@ -46,7 +46,7 @@
 &lt;/com.dexvis.simple.types.SimpleListSelectionView&gt;</columnList>
             <columnName>KMEANS</columnName>
             <kMin>2</kMin>
-            <kMax>100</kMax>
+            <kMax>10</kMax>
          </task>
       </task-item>
       <task-item name="Create Relation Cluster" active="true">
@@ -64,14 +64,14 @@
     &lt;string&gt;Ticket&lt;/string&gt;
     &lt;string&gt;Cabin&lt;/string&gt;
     &lt;string&gt;Pclass&lt;/string&gt;
-    &lt;string&gt;Age&lt;/string&gt;
-  &lt;/sourceList&gt;
-  &lt;targetList&gt;
     &lt;string&gt;SibSp&lt;/string&gt;
     &lt;string&gt;Parch&lt;/string&gt;
+  &lt;/sourceList&gt;
+  &lt;targetList&gt;
+    &lt;string&gt;Age&lt;/string&gt;
   &lt;/targetList&gt;
 &lt;/com.dexvis.simple.types.SimpleListSelectionView&gt;</columnList>
-            <columnName>RELATION_CLUSTER</columnName>
+            <columnName>AGE_CLUSTER</columnName>
             <numClusters>&lt;map&gt;
   &lt;entry&gt;
     &lt;string&gt;min&lt;/string&gt;
@@ -83,7 +83,7 @@
   &lt;/entry&gt;
   &lt;entry&gt;
     &lt;string&gt;value&lt;/string&gt;
-    &lt;double&gt;8.0&lt;/double&gt;
+    &lt;double&gt;7.0&lt;/double&gt;
   &lt;/entry&gt;
 &lt;/map&gt;</numClusters>
          </task>

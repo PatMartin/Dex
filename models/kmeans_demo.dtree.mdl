@@ -1,7 +1,7 @@
 <object-stream>
   <string>Decision Tree</string>
   <list>
-    <string>RELATION_CLUSTER</string>
+    <string>AGE_CLUSTER</string>
   </list>
   <list>
     <string>integer</string>
@@ -11,11 +11,11 @@
       <smile.data.NumericAttribute>
         <type>NUMERIC</type>
         <weight>1.0</weight>
-        <name>RELATION_CLUSTER</name>
+        <name>AGE_CLUSTER</name>
       </smile.data.NumericAttribute>
     </attributes>
     <importance>
-      <double>2.2926407591783438E-4</double>
+      <double>0.0025320187932562077</double>
     </importance>
     <root>
       <output>0</output>
@@ -24,35 +24,22 @@
         <double>0.3838383838383838</double>
       </posteriori>
       <splitFeature>0</splitFeature>
-      <splitValue>4.5</splitValue>
-      <splitScore>1.1501952180834052E-4</splitScore>
+      <splitValue>5.5</splitValue>
+      <splitScore>0.00199621272695899</splitScore>
       <trueChild>
         <output>0</output>
         <posteriori>
-          <double>0.6214788732394366</double>
-          <double>0.3785211267605634</double>
-        </posteriori>
-        <splitFeature>-1</splitFeature>
-        <splitValue>NaN</splitValue>
-        <splitScore>0.0</splitScore>
-        <trueChildOutput>-1</trueChildOutput>
-        <falseChildOutput>-1</falseChildOutput>
-        <outer-class reference="../../.."/>
-      </trueChild>
-      <falseChild>
-        <output>0</output>
-        <posteriori>
-          <double>0.6055045871559633</double>
-          <double>0.3944954128440367</double>
+          <double>0.6268844221105527</double>
+          <double>0.3731155778894472</double>
         </posteriori>
         <splitFeature>0</splitFeature>
-        <splitValue>6.5</splitValue>
-        <splitScore>1.1424455410949386E-4</splitScore>
+        <splitValue>1.5</splitValue>
+        <splitScore>3.9921777077045473E-4</splitScore>
         <trueChild>
           <output>0</output>
           <posteriori>
-            <double>0.5976331360946746</double>
-            <double>0.40236686390532544</double>
+            <double>0.5939849624060151</double>
+            <double>0.40601503759398494</double>
           </posteriori>
           <splitFeature>-1</splitFeature>
           <splitValue>NaN</splitValue>
@@ -64,18 +51,83 @@
         <falseChild>
           <output>0</output>
           <posteriori>
-            <double>0.6125</double>
-            <double>0.3875</double>
+            <double>0.6330827067669172</double>
+            <double>0.3669172932330827</double>
           </posteriori>
-          <splitFeature>-1</splitFeature>
-          <splitValue>NaN</splitValue>
-          <splitScore>0.0</splitScore>
-          <trueChildOutput>-1</trueChildOutput>
-          <falseChildOutput>-1</falseChildOutput>
+          <splitFeature>0</splitFeature>
+          <splitValue>2.5</splitValue>
+          <splitScore>9.731432653004024E-5</splitScore>
+          <trueChild>
+            <output>0</output>
+            <posteriori>
+              <double>0.6428571428571429</double>
+              <double>0.35714285714285715</double>
+            </posteriori>
+            <splitFeature>-1</splitFeature>
+            <splitValue>NaN</splitValue>
+            <splitScore>0.0</splitScore>
+            <trueChildOutput>-1</trueChildOutput>
+            <falseChildOutput>-1</falseChildOutput>
+            <outer-class reference="../../../../.."/>
+          </trueChild>
+          <falseChild>
+            <output>0</output>
+            <posteriori>
+              <double>0.6284501061571125</double>
+              <double>0.37154989384288745</double>
+            </posteriori>
+            <splitFeature>0</splitFeature>
+            <splitValue>4.5</splitValue>
+            <splitScore>3.927396899672253E-5</splitScore>
+            <trueChild>
+              <output>0</output>
+              <posteriori>
+                <double>0.6262886597938144</double>
+                <double>0.37371134020618557</double>
+              </posteriori>
+              <splitFeature>-1</splitFeature>
+              <splitValue>NaN</splitValue>
+              <splitScore>0.0</splitScore>
+              <trueChildOutput>-1</trueChildOutput>
+              <falseChildOutput>-1</falseChildOutput>
+              <outer-class reference="../../../../../.."/>
+            </trueChild>
+            <falseChild>
+              <output>0</output>
+              <posteriori>
+                <double>0.6352941176470588</double>
+                <double>0.36470588235294116</double>
+              </posteriori>
+              <splitFeature>-1</splitFeature>
+              <splitValue>NaN</splitValue>
+              <splitScore>0.0</splitScore>
+              <trueChildOutput>-1</trueChildOutput>
+              <falseChildOutput>-1</falseChildOutput>
+              <outer-class reference="../../../../../.."/>
+            </falseChild>
+            <trueChildOutput>0</trueChildOutput>
+            <falseChildOutput>0</falseChildOutput>
+            <outer-class reference="../../../../.."/>
+          </falseChild>
+          <trueChildOutput>0</trueChildOutput>
+          <falseChildOutput>0</falseChildOutput>
           <outer-class reference="../../../.."/>
         </falseChild>
         <trueChildOutput>0</trueChildOutput>
         <falseChildOutput>0</falseChildOutput>
+        <outer-class reference="../../.."/>
+      </trueChild>
+      <falseChild>
+        <output>0</output>
+        <posteriori>
+          <double>0.5252525252525253</double>
+          <double>0.47474747474747475</double>
+        </posteriori>
+        <splitFeature>-1</splitFeature>
+        <splitValue>NaN</splitValue>
+        <splitScore>0.0</splitScore>
+        <trueChildOutput>-1</trueChildOutput>
+        <falseChildOutput>-1</falseChildOutput>
         <outer-class reference="../../.."/>
       </falseChild>
       <trueChildOutput>0</trueChildOutput>
@@ -85,7 +137,7 @@
     <rule>GINI</rule>
     <k>2</k>
     <nodeSize>1</nodeSize>
-    <maxNodes>11</maxNodes>
+    <maxNodes>10</maxNodes>
     <mtry>1</mtry>
   </smile.classification.DecisionTree>
   <linked-hash-map>

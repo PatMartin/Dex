@@ -77,6 +77,7 @@ class XMeans extends DexTask {
       "centroids": xmeans.centroids(),
       "clusterLabels": xmeans.getClusterLabel(),
       "clusterValues": ndata,
+      "xmeans": xmeans.toString(),
       "distortion": xmeans.distortion()
     ])
     

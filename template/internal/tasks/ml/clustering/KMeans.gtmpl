@@ -61,14 +61,22 @@ src="https://getfirebug.com/firebug-lite.js">
 <div class="ui-layout-west">
     <div id="ConfigurationPane"></div>
 </div>
-
+<div class="ui-layout-east">
   <table border="1">
-    <tr><td>Centroids:</td><td><%= centroids %></td></tr>
-    <tr><td>Cluster Labels:</td><td><%= clusterLabels %></td></tr>
     <tr><td>Distortion:</td><td><%= distortion %></td></tr>
+    <tr><td>KMeans:</td><td><%= kmeans %></td></tr>
+    <tr><td colspan="2" align="center">Centroids</td></tr>
+<%
+    centroids.eachWithIndex {
+      centroid, i ->
+      println "<tr><td>${i}</td><td>${centroid}</td></tr>"
+    }
+%>
   </table>
+</div>
 <script>
 <%
+
   def cmap = [:]
   def clusterStr2Values = [:]
   
@@ -112,7 +120,10 @@ src="https://getfirebug.com/firebug-lite.js">
     \$('body').layout({
       applyDemoStyles: false,
       west: {
-        size: 360
+        size: 250
+      },
+      east: {
+        size: 250
       },
       onresize: function () {
         chart.resize();

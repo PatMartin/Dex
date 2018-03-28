@@ -62,7 +62,7 @@ src="https://getfirebug.com/firebug-lite.js">
 <div class="ui-layout-west">
     <div id="ConfigurationPane"></div>
 </div>
-
+<div class="ui-layout-east">
   <table border="1">
     <tr><td>DF:</td><td><%= df %></td></tr>
     <tr><td>Error:</td><td><%= error %></td></tr>
@@ -73,7 +73,15 @@ src="https://getfirebug.com/firebug-lite.js">
     <tr><td>R-Squared:</td><td><%= rSquared %></td></tr>
     <tr><td>Shrinkage:</td><td><%= shrinkage %></td></tr>
     <tr><td>Adjusted R-Squared:</td><td><%= adjRSquared %></td></tr>
+    <tr><td colspan="2" align="center">Coefficients</td></tr>
+<%
+    coefficients.eachWithIndex {
+      coefficient, ci ->
+      println "<tr><td>${ci+1}</td><td>${coefficient}</td></tr>"
+    }
+%>
   </table>
+</div>
 <script>
 <%
   println validationData.toCsvString()
@@ -84,7 +92,10 @@ src="https://getfirebug.com/firebug-lite.js">
     \$('body').layout({
       applyDemoStyles: false,
       west: {
-        size: 360
+        size: 250
+      },
+      east: {
+        size: 250
       },
       onresize: function () {
         chart.resize();

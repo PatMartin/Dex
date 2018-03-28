@@ -77,6 +77,7 @@ class KMeans extends DexTask {
       "centroids": kmeans.centroids(),
       "clusterLabels": kmeans.getClusterLabel(),
       "clusterValues": ndata,
+      "kmeans": kmeans.toString(),
       "distortion": kmeans.distortion()
     ])
     

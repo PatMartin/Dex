@@ -166,6 +166,8 @@ class RidgeRegression extends DexTask {
       "rSquared": ridge.RSquared(),
       "shrinkage": ridge.shrinkage(),
       "adjRSquared": ridge.adjustedRSquared(),
+      "coefficients": ridge.coefficients(),
+      "residuals": ridge.residuals(),
       "validationData": validationData
     ])
 

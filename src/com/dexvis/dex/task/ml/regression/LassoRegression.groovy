@@ -165,6 +165,8 @@ class LassoRegression extends DexTask {
       "rSquared": lasso.RSquared(),
       "shrinkage": lasso.shrinkage(),
       "adjRSquared": lasso.adjustedRSquared(),
+      "coefficients": lasso.coefficients(),
+      "residuals": lasso.residuals(),
       "validationData": validationData 
     ])
 
