@@ -1,0 +1,69 @@
+<dex-project version="0.8">
+   <tasks class="java.util.ArrayList">
+      <task-item name="Jar Inspector" active="true">
+         <task class="com.dexvis.dex.task.input.JarInspector">
+            <config-def>[ { &quot;type&quot; : &quot;label&quot;, &quot;initialValue&quot;: &quot;No configuration is available&quot; } ]</config-def>
+            <selfref>false</selfref>
+            <undefined>false</undefined>
+            <string>lib\antlr4.jar</string>
+            <string>lib\bcel-5.2.jar</string>
+            <string>lib\bson-3.4.2.jar</string>
+            <string>lib\commons-cli-1.4.jar</string>
+            <string>lib\commons-cli-1.4-javadoc.jar</string>
+            <string>lib\commons-io-2.4.jar</string>
+            <string>lib\commons-lang3-3.3.2.jar</string>
+            <string>lib\commons-math3-3.6.1.jar</string>
+            <string>lib\controlsfx-8.40.12.jar</string>
+            <string>lib\dex-javafx.jar</string>
+            <string>lib\dex-tmi.jar</string>
+            <string>lib\groovy-all-2.4.3.jar</string>
+            <string>lib\hsqldb.jar</string>
+            <string>lib\javax.json-1.0.4.jar</string>
+            <string>lib\jdom-2.0.5.jar</string>
+            <string>lib\jython-2.5.3.jar</string>
+            <string>lib\miglayout-core-5.1-20150924.220012-180.jar</string>
+            <string>lib\miglayout-javafx-5.1-20150924.220035-180.jar</string>
+            <string>lib\mongodb-driver-3.4.2.jar</string>
+            <string>lib\mongodb-driver-core-3.4.2.jar</string>
+            <string>lib\Monocle.jar</string>
+            <string>lib\mysql-connector-java-5.1.20-bin.jar</string>
+            <string>lib\neo4j-jdbc.jar</string>
+            <string>lib\ojdbc6.jar</string>
+            <string>lib\opencsv-4.1.jar</string>
+            <string>lib\plantuml.jar</string>
+            <string>lib\Prefuse.jar</string>
+            <string>lib\simple-xml-2.7.1.jar</string>
+            <string>lib\sqlite-jdbc-3.8.11.2.jar</string>
+            <string>lib\xdb.jar</string>
+            <string>lib\xstream-1.4.7.jar</string>
+            <string>lib\rserve\REngine.1.8.jar</string>
+            <string>lib\rserve\RserveEngine.1.8.jar</string>
+            <string>lib\selenium\client-combined-3.3.1-nodeps.jar</string>
+            <string>lib\selenium\commons-exec-1.3.jar</string>
+            <string>lib\selenium\gson-2.8.0.jar</string>
+            <string>lib\selenium\guava-21.0.jar</string>
+            <string>lib\selenium\httpclient-4.5.2.jar</string>
+            <string>lib\selenium\httpcore-4.4.4.jar</string>
+            <string>lib\selenium\jna-4.1.0.jar</string>
+            <string>lib\selenium\jna-platform-4.1.0.jar</string>
+            <string>lib\smile\org.slf4j.slf4j-api-1.7.25.jar</string>
+            <string>lib\smile\smile-1.5.1.jar</string>
+            <string>lib\smile\smile-core-1.5.1.jar</string>
+            <string>lib\smile\smile-data-1.5.1.jar</string>
+            <string>lib\smile\smile-math-1.5.1.jar</string>
+            <string>lib\smile\smile-nlp-1.5.1.jar</string>
+            <string>Dex.jar</string>
+         </task>
+      </task-item>
+      <task-item name="View Data" active="true">
+         <task class="com.dexvis.dex.task.utilities.ViewData">
+            <config-def>[ { &quot;type&quot; : &quot;label&quot;, &quot;initialValue&quot;: &quot;No configuration is available&quot; } ]</config-def>
+         </task>
+      </task-item>
+      <task-item name="Sankey Diagram" active="true">
+         <task class="com.dexvis.dex.task.vis.dexjs.Sankey">
+            <config-def>[ { &quot;type&quot; : &quot;label&quot;, &quot;initialValue&quot;: &quot;No configuration is available&quot; } ]</config-def>
+         </task>
+      </task-item>
+   </tasks>
+</dex-project>

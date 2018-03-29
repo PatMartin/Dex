@@ -49,7 +49,7 @@
             <kMax>10</kMax>
          </task>
       </task-item>
-      <task-item name="Create Relation Cluster" active="true">
+      <task-item name="Create Age Cluster" active="true">
          <task class="com.dexvis.dex.task.ml.clustering.KMeans">
             <config-def>[ { &quot;type&quot; : &quot;label&quot;, &quot;initialValue&quot;: &quot;No configuration is available&quot; } ]</config-def>
             <columnList>&lt;com.dexvis.simple.types.SimpleListSelectionView&gt;
@@ -83,7 +83,7 @@
   &lt;/entry&gt;
   &lt;entry&gt;
     &lt;string&gt;value&lt;/string&gt;
-    &lt;double&gt;7.0&lt;/double&gt;
+    &lt;double&gt;10.0&lt;/double&gt;
   &lt;/entry&gt;
 &lt;/map&gt;</numClusters>
          </task>
@@ -112,7 +112,7 @@
     &lt;string&gt;Embarked&lt;/string&gt;
   &lt;/sourceList&gt;
   &lt;targetList&gt;
-    &lt;string&gt;RELATION_CLUSTER&lt;/string&gt;
+    &lt;string&gt;AGE_CLUSTER&lt;/string&gt;
   &lt;/targetList&gt;
 &lt;/com.dexvis.simple.types.SimpleListSelectionView&gt;</columnList>
             <columnName>DTREE_PREDICTION</columnName>
@@ -133,7 +133,7 @@
       &lt;string&gt;Fare&lt;/string&gt;
       &lt;string&gt;Cabin&lt;/string&gt;
       &lt;string&gt;Embarked&lt;/string&gt;
-      &lt;string&gt;RELATION_CLUSTER&lt;/string&gt;
+      &lt;string&gt;AGE_CLUSTER&lt;/string&gt;
     &lt;/list&gt;
   &lt;/entry&gt;
   &lt;entry&gt;
