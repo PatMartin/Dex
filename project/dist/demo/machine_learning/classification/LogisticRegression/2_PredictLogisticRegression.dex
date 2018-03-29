@@ -1,0 +1,27 @@
+<dex-project version="0.8">
+   <tasks class="java.util.ArrayList">
+      <task-item name="Read CSV" active="true">
+         <task class="com.dexvis.dex.task.input.ReadCsv">
+            <config-def>[ { &quot;type&quot; : &quot;label&quot;, &quot;initialValue&quot;: &quot;No configuration is available&quot; } ]</config-def>
+            <fileText>data\iris_minus_species.csv</fileText>
+            <limitRows>false</limitRows>
+            <filterCB>false</filterCB>
+            <rowLimitText>0</rowLimitText>
+            <filter></filter>
+            <lastDir></lastDir>
+         </task>
+      </task-item>
+      <task-item name="Predict" active="true">
+         <task class="com.dexvis.dex.task.ml.Predict">
+            <config-def>[ { &quot;type&quot; : &quot;label&quot;, &quot;initialValue&quot;: &quot;No configuration is available&quot; } ]</config-def>
+            <columnName>PREDICTION</columnName>
+            <model>models\iris.logreg.mdl</model>
+         </task>
+      </task-item>
+      <task-item name="View Data" active="true">
+         <task class="com.dexvis.dex.task.utilities.ViewData">
+            <config-def>[ { &quot;type&quot; : &quot;label&quot;, &quot;initialValue&quot;: &quot;No configuration is available&quot; } ]</config-def>
+         </task>
+      </task-item>
+   </tasks>
+</dex-project>

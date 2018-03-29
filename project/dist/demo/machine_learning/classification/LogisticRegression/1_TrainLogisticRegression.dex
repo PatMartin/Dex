@@ -1,0 +1,69 @@
+<dex-project version="0.8">
+   <tasks class="java.util.ArrayList">
+      <task-item name="Read CSV" active="true">
+         <task class="com.dexvis.dex.task.input.ReadCsv">
+            <config-def>[ { &quot;type&quot; : &quot;label&quot;, &quot;initialValue&quot;: &quot;No configuration is available&quot; } ]</config-def>
+            <fileText>data\iris.csv</fileText>
+            <limitRows>false</limitRows>
+            <filterCB>false</filterCB>
+            <rowLimitText>0</rowLimitText>
+            <filter></filter>
+            <lastDir></lastDir>
+         </task>
+      </task-item>
+      <task-item name="Logistic Regression" active="true">
+         <task class="com.dexvis.dex.task.ml.classification.LogisticRegression">
+            <config-def>[ { &quot;type&quot; : &quot;label&quot;, &quot;initialValue&quot;: &quot;No configuration is available&quot; } ]</config-def>
+            <columnList>&lt;com.dexvis.simple.types.SimpleListSelectionView&gt;
+  &lt;sourceList&gt;
+    &lt;string&gt;Species&lt;/string&gt;
+  &lt;/sourceList&gt;
+  &lt;targetList&gt;
+    &lt;string&gt;Sepal Length&lt;/string&gt;
+    &lt;string&gt;Sepal Width&lt;/string&gt;
+    &lt;string&gt;Petal Length&lt;/string&gt;
+    &lt;string&gt;Petal Width&lt;/string&gt;
+  &lt;/targetList&gt;
+&lt;/com.dexvis.simple.types.SimpleListSelectionView&gt;</columnList>
+            <columnName>LOGREG_PREDICTION</columnName>
+            <autosave>true</autosave>
+            <resultColumn>&lt;map&gt;
+  &lt;entry&gt;
+    &lt;string&gt;items&lt;/string&gt;
+    &lt;list&gt;
+      &lt;string&gt;Sepal Length&lt;/string&gt;
+      &lt;string&gt;Sepal Width&lt;/string&gt;
+      &lt;string&gt;Petal Length&lt;/string&gt;
+      &lt;string&gt;Petal Width&lt;/string&gt;
+      &lt;string&gt;Species&lt;/string&gt;
+    &lt;/list&gt;
+  &lt;/entry&gt;
+  &lt;entry&gt;
+    &lt;string&gt;selected&lt;/string&gt;
+    &lt;string&gt;Species&lt;/string&gt;
+  &lt;/entry&gt;
+&lt;/map&gt;</resultColumn>
+            <fileText>models\iris.logreg.mdl</fileText>
+            <maxIterations>&lt;map&gt;
+  &lt;entry&gt;
+    &lt;string&gt;min&lt;/string&gt;
+    &lt;double&gt;1.0&lt;/double&gt;
+  &lt;/entry&gt;
+  &lt;entry&gt;
+    &lt;string&gt;max&lt;/string&gt;
+    &lt;double&gt;100.0&lt;/double&gt;
+  &lt;/entry&gt;
+  &lt;entry&gt;
+    &lt;string&gt;value&lt;/string&gt;
+    &lt;double&gt;100.0&lt;/double&gt;
+  &lt;/entry&gt;
+&lt;/map&gt;</maxIterations>
+         </task>
+      </task-item>
+      <task-item name="View Data" active="true">
+         <task class="com.dexvis.dex.task.utilities.ViewData">
+            <config-def>[ { &quot;type&quot; : &quot;label&quot;, &quot;initialValue&quot;: &quot;No configuration is available&quot; } ]</config-def>
+         </task>
+      </task-item>
+   </tasks>
+</dex-project>

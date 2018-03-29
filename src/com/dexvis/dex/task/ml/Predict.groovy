@@ -51,7 +51,7 @@ class Predict extends DexTask {
   private Button clearButton = new Button("Clear")
   
   private DexFileChooser modelChooser = new DexFileChooser("models",
-  "Load Model", "Save Model", "Decision Tree Model", "mdl")
+  "Load Model", "Save Model", "Model", "mdl")
   
   public DexTaskState execute(DexTaskState state) throws DexException {
     def dex = state.getDexData();
@@ -67,7 +67,8 @@ class Predict extends DexTask {
     
     // Load from model file from object stream.
     DexModel model = DexModel.read(filePath);
-    if (!(model.getType() in ["Decision Tree", "Ridge Regression", "Lasso Regression", "Linear Regression"]))
+    if (!(model.getType() in ["Decision Tree", "Logistic Regression", "Ridge Regression",
+      "Lasso Regression", "Linear Regression"]))
     {
       throw new DexException("Model of type: '${model.getType()}' is not currently supported.")
     }
@@ -94,6 +95,15 @@ class Predict extends DexTask {
       Map<String,String> classMap = (Map<String,String>) model.getProperties().get("classificationMap");
       ndata.eachWithIndex { row, ri ->
         String prediction = new String("${classMap[dtree.predict(row)]}")
+        dex.data[ri] << prediction
+      }
+      dex.header << columnNameText.getText()
+    }
+    else if (model.getType() == "Logistic Regression") {
+      smile.classification.LogisticRegression logReg = (smile.classification.LogisticRegression) model.getModel()
+      Map<String,String> classMap = (Map<String,String>) model.getProperties().get("classificationMap");
+      ndata.eachWithIndex { row, ri ->
+        String prediction = new String("${classMap[logReg.predict(row)]}")
         dex.data[ri] << prediction
       }
       dex.header << columnNameText.getText()
