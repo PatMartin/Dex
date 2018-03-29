@@ -64,7 +64,7 @@ class DecisionTree extends DexTask {
   
   @Element(name="splitRule", required=false)
   private ChoiceBox splitRuleCB = new ChoiceBox(FXCollections.observableArrayList(
-  "GINI", "Entropy", "Classification Error"))
+  "GINI", "Entropy"))
   
   @Element(required=false)
   private TextField fileText = new TextField()
