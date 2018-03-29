@@ -110,7 +110,8 @@ src="https://getfirebug.com/firebug-lite.js">
     }
   }
 
-  (1..maxValues).each { dd.header << "Value ${it}" }
+  //(1..maxValues).each { dd.header << "Value ${it}" }
+  clusterHeaders.each { dd.header << "${it}" }
 
   println dd.toCsvString()
 %>

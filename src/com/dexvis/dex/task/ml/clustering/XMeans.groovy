@@ -21,7 +21,7 @@ import com.dexvis.dex.wf.DexTaskState
 import com.dexvis.javafx.scene.control.NodeFactory
 import com.dexvis.util.WebViewUtil
 
-@Root(name="kmeans")
+@Root(name="xmeans")
 class XMeans extends DexTask {
   public XMeans() {
     super("Machine Learning: Clustering", "XMeans", "machine_learning/clustering/XMeans.html")
@@ -47,7 +47,6 @@ class XMeans extends DexTask {
   
   public DexTaskState execute(DexTaskState state) throws DexException {
     
-    def selected
     def dex = state.getDexData();
     
     // Only update if the list is empty.
@@ -63,7 +62,8 @@ class XMeans extends DexTask {
     
     // Define base attributes
     def columns = columnListView.getTargetItems()
-    def ndata= dex.getDoubles(columns)
+    def selected = dex.select(columns)
+    def ndata= selected.getDoubles(selected.header)
     
     smile.clustering.XMeans xmeans = new smile.clustering.XMeans(ndata,
         maxClustersValueLabel.getText() as Integer)
@@ -77,6 +77,7 @@ class XMeans extends DexTask {
       "centroids": xmeans.centroids(),
       "clusterLabels": xmeans.getClusterLabel(),
       "clusterValues": ndata,
+      "clusterHeaders": selected.header,
       "xmeans": xmeans.toString(),
       "distortion": xmeans.distortion()
     ])

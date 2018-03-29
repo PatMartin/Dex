@@ -47,7 +47,6 @@ class KMeans extends DexTask {
   
   public DexTaskState execute(DexTaskState state) throws DexException {
     
-    def selected
     def dex = state.getDexData();
     
     // Only update if the list is empty.
@@ -63,7 +62,8 @@ class KMeans extends DexTask {
     
     // Define base attributes
     def columns = columnListView.getTargetItems()
-    def ndata= dex.getDoubles(columns)
+    def selected = dex.select(columns)
+    def ndata= selected.getDoubles(selected.header)
     
     smile.clustering.KMeans kmeans = new smile.clustering.KMeans(ndata,
         numClustersValueLabel.getText() as Integer)
@@ -77,6 +77,7 @@ class KMeans extends DexTask {
       "centroids": kmeans.centroids(),
       "clusterLabels": kmeans.getClusterLabel(),
       "clusterValues": ndata,
+      "clusterHeaders": selected.header,
       "kmeans": kmeans.toString(),
       "distortion": kmeans.distortion()
     ])
