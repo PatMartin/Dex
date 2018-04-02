@@ -16,11 +16,7 @@ public class AggregateDistance implements
   public double d(double[] a, double[] b)
   {
     double distance = 0.0;
-    // if (a != null && b != null && a.length == b.length) {
-    // for (int i=0; i<a.length; i++) {
-    // distance += distanceFn.d(a[i], b[i]);
-    // }
-    // }
+
     distance = distanceFn.d(a, b);
     if (distance > maxDistance)
     {
@@ -32,7 +28,7 @@ public class AggregateDistance implements
       minDistance = distance;
     }
     
-    System.out.println("Aggregate Distance: " + distance);
+    //System.out.println("Aggregate Distance: " + distance);
     return distance;
   }
   
