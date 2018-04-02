@@ -96,7 +96,7 @@ class KMeans extends DexTask {
       configPane = new MigPane("", "[][grow]", "[][][][][][grow][]")
       configPane.setStyle("-fx-background-color: white;")
       
-      configPane.add(NodeFactory.createTitle("KMeans"), "grow,span")
+      configPane.add(NodeFactory.createTitle("K Means"), "grow,span")
       configPane.add(columnListView, "grow,span")
       
       configPane.add(numClustersValueLabel, "grow,span");
