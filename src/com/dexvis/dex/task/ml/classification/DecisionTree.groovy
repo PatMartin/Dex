@@ -152,11 +152,6 @@ class DecisionTree extends DexTask {
         (Attribute []) atts, (double [][]) ndata, (int[]) classification.classes,
         (int) maxNodesSlider.getValue(), SplitRule.ENTROPY)
         break;
-      case "Classification Error":
-        dtree = new smile.classification.DecisionTree(
-        (Attribute []) atts, (double [][]) ndata, (int[]) classification.classes,
-        (int) maxNodesSlider.getValue(), SplitRule.CLASSIFICATION_ERROR)
-        break;
       default:
         dtree = new smile.classification.DecisionTree(
         (Attribute []) atts, (double [][]) ndata, (int[]) classification.classes,
