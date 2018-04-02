@@ -96,7 +96,7 @@ class XMeans extends DexTask {
       configPane = new MigPane("", "[][][grow]", "[][][][][grow][]")
       configPane.setStyle("-fx-background-color: white;")
       
-      configPane.add(NodeFactory.createTitle("XMeans"), "grow,span")
+      configPane.add(NodeFactory.createTitle("X Means"), "grow,span")
       configPane.add(columnListView, "grow,span")
       
       configPane.add(maxClustersLabel);
