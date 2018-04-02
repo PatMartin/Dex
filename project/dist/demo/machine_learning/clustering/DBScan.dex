@@ -1,0 +1,142 @@
+<dex-project version="0.8">
+   <tasks class="java.util.ArrayList">
+      <task-item name="Read CSV" active="true">
+         <task class="com.dexvis.dex.task.input.ReadCsv">
+            <config-def>[ { &quot;type&quot; : &quot;label&quot;, &quot;initialValue&quot;: &quot;No configuration is available&quot; } ]</config-def>
+            <fileText>data\iris.csv</fileText>
+            <limitRows>false</limitRows>
+            <filterCB>false</filterCB>
+            <rowLimitText>0</rowLimitText>
+            <filter></filter>
+            <lastDir></lastDir>
+         </task>
+      </task-item>
+      <task-item name="View Data" active="true">
+         <task class="com.dexvis.dex.task.utilities.ViewData">
+            <config-def>[ { &quot;type&quot; : &quot;label&quot;, &quot;initialValue&quot;: &quot;No configuration is available&quot; } ]</config-def>
+         </task>
+      </task-item>
+      <task-item name="DB Scan" active="true">
+         <task class="com.dexvis.dex.task.ml.clustering.DBScan">
+            <config-def>[ { &quot;type&quot; : &quot;label&quot;, &quot;initialValue&quot;: &quot;No configuration is available&quot; } ]</config-def>
+            <columnList>&lt;com.dexvis.simple.types.SimpleListSelectionView&gt;
+  &lt;sourceList&gt;
+    &lt;string&gt;Species&lt;/string&gt;
+  &lt;/sourceList&gt;
+  &lt;targetList&gt;
+    &lt;string&gt;Sepal Length&lt;/string&gt;
+    &lt;string&gt;Sepal Width&lt;/string&gt;
+    &lt;string&gt;Petal Length&lt;/string&gt;
+    &lt;string&gt;Petal Width&lt;/string&gt;
+  &lt;/targetList&gt;
+&lt;/com.dexvis.simple.types.SimpleListSelectionView&gt;</columnList>
+            <columnName>DBSCAN_CLUSTER</columnName>
+            <distance>&lt;map&gt;
+  &lt;entry&gt;
+    &lt;string&gt;items&lt;/string&gt;
+    &lt;list&gt;
+      &lt;string&gt;Chebyshev&lt;/string&gt;
+      &lt;string&gt;Correlation&lt;/string&gt;
+      &lt;string&gt;Euclidean&lt;/string&gt;
+      &lt;string&gt;Manhattan&lt;/string&gt;
+    &lt;/list&gt;
+  &lt;/entry&gt;
+  &lt;entry&gt;
+    &lt;string&gt;selected&lt;/string&gt;
+    &lt;string&gt;Euclidean&lt;/string&gt;
+  &lt;/entry&gt;
+&lt;/map&gt;</distance>
+            <minPoints>&lt;map&gt;
+  &lt;entry&gt;
+    &lt;string&gt;min&lt;/string&gt;
+    &lt;double&gt;1.0&lt;/double&gt;
+  &lt;/entry&gt;
+  &lt;entry&gt;
+    &lt;string&gt;max&lt;/string&gt;
+    &lt;double&gt;100.0&lt;/double&gt;
+  &lt;/entry&gt;
+  &lt;entry&gt;
+    &lt;string&gt;value&lt;/string&gt;
+    &lt;double&gt;4.0&lt;/double&gt;
+  &lt;/entry&gt;
+&lt;/map&gt;</minPoints>
+            <radius>.5</radius>
+         </task>
+      </task-item>
+      <task-item name="View Data" active="true">
+         <task class="com.dexvis.dex.task.utilities.ViewData">
+            <config-def>[ { &quot;type&quot; : &quot;label&quot;, &quot;initialValue&quot;: &quot;No configuration is available&quot; } ]</config-def>
+         </task>
+      </task-item>
+      <task-item name="Groovy Script" active="true">
+         <task class="com.dexvis.dex.task.prg.GroovyScript">
+            <config-def>[ { &quot;type&quot; : &quot;label&quot;, &quot;initialValue&quot;: &quot;No configuration is available&quot; } ]</config-def>
+            <processbytable>&lt;map&gt;
+  &lt;entry&gt;
+    &lt;string&gt;text&lt;/string&gt;
+    &lt;string&gt;Table&lt;/string&gt;
+  &lt;/entry&gt;
+&lt;/map&gt;</processbytable>
+            <processbyrow>&lt;map&gt;
+  &lt;entry&gt;
+    &lt;string&gt;text&lt;/string&gt;
+    &lt;string&gt;Row&lt;/string&gt;
+  &lt;/entry&gt;
+  &lt;entry&gt;
+    &lt;string&gt;selected&lt;/string&gt;
+    &lt;boolean&gt;true&lt;/boolean&gt;
+  &lt;/entry&gt;
+&lt;/map&gt;</processbyrow>
+            <processbycolumn>&lt;map&gt;
+  &lt;entry&gt;
+    &lt;string&gt;text&lt;/string&gt;
+    &lt;string&gt;Column&lt;/string&gt;
+  &lt;/entry&gt;
+&lt;/map&gt;</processbycolumn>
+            <groovyCode class="javafx.beans.property.SimpleStringProperty">row.DBSCAN_CLUSTER = &quot;cluster-${row.DBSCAN_CLUSTER}&quot;</groovyCode>
+         </task>
+      </task-item>
+      <task-item name="View Data" active="true">
+         <task class="com.dexvis.dex.task.utilities.ViewData">
+            <config-def>[ { &quot;type&quot; : &quot;label&quot;, &quot;initialValue&quot;: &quot;No configuration is available&quot; } ]</config-def>
+         </task>
+      </task-item>
+      <task-item name="Group Columns" active="true">
+         <task class="com.dexvis.dex.task.tablemanipulation.GroupColumns">
+            <config-def>[ { &quot;type&quot; : &quot;label&quot;, &quot;initialValue&quot;: &quot;No configuration is available&quot; } ]</config-def>
+            <groupName>STAT</groupName>
+            <columnList>&lt;com.dexvis.simple.types.SimpleListSelectionView&gt;
+  &lt;sourceList&gt;
+    &lt;string&gt;Species&lt;/string&gt;
+    &lt;string&gt;DBSCAN_CLUSTER&lt;/string&gt;
+  &lt;/sourceList&gt;
+  &lt;targetList&gt;
+    &lt;string&gt;Sepal Length&lt;/string&gt;
+    &lt;string&gt;Sepal Width&lt;/string&gt;
+    &lt;string&gt;Petal Length&lt;/string&gt;
+    &lt;string&gt;Petal Width&lt;/string&gt;
+  &lt;/targetList&gt;
+&lt;/com.dexvis.simple.types.SimpleListSelectionView&gt;</columnList>
+         </task>
+      </task-item>
+      <task-item name="Select Columns" active="true">
+         <task class="com.dexvis.dex.task.tablemanipulation.SelectColumns">
+            <config-def>[ { &quot;type&quot; : &quot;label&quot;, &quot;initialValue&quot;: &quot;No configuration is available&quot; } ]</config-def>
+            <columnList>&lt;com.dexvis.simple.types.SimpleListSelectionView&gt;
+  &lt;sourceList/&gt;
+  &lt;targetList&gt;
+    &lt;string&gt;DBSCAN_CLUSTER&lt;/string&gt;
+    &lt;string&gt;Species&lt;/string&gt;
+    &lt;string&gt;STAT&lt;/string&gt;
+    &lt;string&gt;STAT_VALUE&lt;/string&gt;
+  &lt;/targetList&gt;
+&lt;/com.dexvis.simple.types.SimpleListSelectionView&gt;</columnList>
+         </task>
+      </task-item>
+      <task-item name="Taucharts ScatterPlot Multiples" active="true">
+         <task class="com.dexvis.dex.task.vis.dexjs.multiples.taucharts.ScatterPlotMultiples">
+            <config-def>{&quot;multiples&quot;:{&quot;type&quot;:&quot;group&quot;,&quot;name&quot;:&quot;Multiples Configuration&quot;,&quot;contents&quot;:[{&quot;type&quot;:&quot;group&quot;,&quot;name&quot;:&quot;Cell Dimensions&quot;,&quot;contents&quot;:[{&quot;name&quot;:&quot;Cell Height&quot;,&quot;description&quot;:&quot;Cell Height&quot;,&quot;type&quot;:&quot;int&quot;,&quot;minValue&quot;:50,&quot;maxValue&quot;:1600,&quot;step&quot;:10,&quot;initialValue&quot;:300,&quot;target&quot;:&quot;cell.height&quot;},{&quot;name&quot;:&quot;Cell Width&quot;,&quot;description&quot;:&quot;Cell Width&quot;,&quot;type&quot;:&quot;int&quot;,&quot;minValue&quot;:50,&quot;maxValue&quot;:2000,&quot;step&quot;:10,&quot;initialValue&quot;:300,&quot;target&quot;:&quot;cell.width&quot;}]},{&quot;name&quot;:&quot;Group By&quot;,&quot;description&quot;:&quot;Pick the columns on which to categorize or group the multiples by.&quot;,&quot;type&quot;:&quot;multiple-choice&quot;,&quot;choices&quot;:[&quot;DBSCAN_CLUSTER&quot;,&quot;Species&quot;,&quot;STAT&quot;,&quot;STAT_VALUE&quot;],&quot;initialValue&quot;:&quot;&quot;,&quot;target&quot;:&quot;groupBy&quot;},{&quot;type&quot;:&quot;group&quot;,&quot;name&quot;:&quot;TauChart Settings&quot;,&quot;contents&quot;:[{&quot;type&quot;:&quot;group&quot;,&quot;name&quot;:&quot;Plugins&quot;,&quot;contents&quot;:[{&quot;name&quot;:&quot;Enable Legend&quot;,&quot;description&quot;:&quot;Enable the legend.&quot;,&quot;type&quot;:&quot;boolean&quot;,&quot;target&quot;:&quot;model.attributes.plugins.legend&quot;,&quot;initialValue&quot;:true},{&quot;name&quot;:&quot;Enable Tooltips&quot;,&quot;description&quot;:&quot;Enable tooltips.&quot;,&quot;type&quot;:&quot;boolean&quot;,&quot;target&quot;:&quot;model.attributes.plugins.tooltips&quot;,&quot;initialValue&quot;:true},{&quot;name&quot;:&quot;Enable Quick Filters&quot;,&quot;description&quot;:&quot;Enable the quick filters.&quot;,&quot;type&quot;:&quot;boolean&quot;,&quot;target&quot;:&quot;model.attributes.plugins.quickfilters&quot;,&quot;initialValue&quot;:true},{&quot;name&quot;:&quot;Enable Trend Lines&quot;,&quot;description&quot;:&quot;Enable the trendlines plugin.&quot;,&quot;type&quot;:&quot;boolean&quot;,&quot;target&quot;:&quot;model.attributes.plugins.trendline&quot;,&quot;initialValue&quot;:false}]},{&quot;name&quot;:&quot;Chart Type&quot;,&quot;description&quot;:&quot;The type of chart.&quot;,&quot;type&quot;:&quot;choice&quot;,&quot;choices&quot;:[&quot;scatterplot&quot;,&quot;line&quot;,&quot;area&quot;,&quot;bar&quot;,&quot;horizontal-bar&quot;,&quot;stacked-bar&quot;,&quot;horizontal-stacked-bar&quot;],&quot;target&quot;:&quot;model.attributes.type&quot;,&quot;initialValue&quot;:&quot;scatterplot&quot;},{&quot;name&quot;:&quot;Colormap&quot;,&quot;description&quot;:&quot;Colormap.&quot;,&quot;type&quot;:&quot;choice&quot;,&quot;choices&quot;:[&quot;ECharts&quot;,&quot;category10&quot;,&quot;category20b&quot;,&quot;category20c&quot;,&quot;category20&quot;,&quot;c64Dark&quot;,&quot;c64Light&quot;,&quot;divergingDark12&quot;,&quot;divergingPastel12&quot;,&quot;hueSoft128&quot;,&quot;hueHard128&quot;,&quot;crayola8&quot;,&quot;crayola120&quot;,&quot;YlGn_9&quot;,&quot;YlGnBu_9&quot;,&quot;GnBu_9&quot;,&quot;BuGn_9&quot;,&quot;PuBuGn_9&quot;,&quot;PuBu_9&quot;,&quot;BuPu_9&quot;,&quot;RdPu_9&quot;,&quot;PuRd_9&quot;,&quot;OrRd_9&quot;,&quot;YlOrRd_9&quot;,&quot;YlOrBr_9&quot;,&quot;Purples_9&quot;,&quot;Blues_9&quot;,&quot;Greens_9&quot;,&quot;Oranges_9&quot;,&quot;Reds_9&quot;,&quot;Greys_9&quot;,&quot;PuOr_11&quot;,&quot;BrBG_11&quot;,&quot;PRGn_11&quot;,&quot;PiYG_11&quot;,&quot;RdBu_11&quot;,&quot;RdGy_11&quot;,&quot;RdYlBu_11&quot;,&quot;Spectral_4&quot;,&quot;Spectral_8&quot;,&quot;Spectral_11&quot;,&quot;RdYlGn_11&quot;,&quot;Accent_8&quot;,&quot;Dark2_8&quot;,&quot;Paired_12&quot;,&quot;Pastel1_9&quot;,&quot;Pastel2_8&quot;,&quot;Set1_9&quot;,&quot;Set2_8&quot;,&quot;Set3_12&quot;,&quot;Stop Light&quot;,&quot;White to Red&quot;,&quot;White to Blue&quot;,&quot;Red White and Blue&quot;],&quot;target&quot;:&quot;model.attributes.colormap&quot;,&quot;initialValue&quot;:&quot;category10&quot;},{&quot;name&quot;:&quot;Reverse Colormap&quot;,&quot;description&quot;:&quot;Reverse the colormap?&quot;,&quot;type&quot;:&quot;boolean&quot;,&quot;target&quot;:&quot;model.attributes.reverseColormap&quot;,&quot;initialValue&quot;:false},{&quot;name&quot;:&quot;Fit Model Settings&quot;,&quot;description&quot;:&quot;Fit settings.&quot;,&quot;type&quot;:&quot;choice&quot;,&quot;choices&quot;:[&quot;normal&quot;,&quot;minimal&quot;,&quot;entire-view&quot;,&quot;fit-width&quot;,&quot;fit-height&quot;],&quot;target&quot;:&quot;model.attributes.options.settings.fitModel&quot;,&quot;initialValue&quot;:&quot;normal&quot;},{&quot;name&quot;:&quot;Fit X-Axis to Data&quot;,&quot;description&quot;:&quot;Fit X-Axis to Data.&quot;,&quot;type&quot;:&quot;boolean&quot;,&quot;target&quot;:&quot;model.attributes.fitXAxis&quot;,&quot;initialValue&quot;:true},{&quot;name&quot;:&quot;Fit Y-Axis to Data&quot;,&quot;description&quot;:&quot;Fit Y-Axis to Data.&quot;,&quot;type&quot;:&quot;boolean&quot;,&quot;target&quot;:&quot;model.attributes.fitYAxis&quot;,&quot;initialValue&quot;:true},{&quot;name&quot;:&quot;X Density Padding&quot;,&quot;description&quot;:&quot;X Density Padding.&quot;,&quot;type&quot;:&quot;float&quot;,&quot;minValue&quot;:1,&quot;maxValue&quot;:50,&quot;target&quot;:&quot;model.attributes.options.settings.xDensityPadding&quot;,&quot;initialValue&quot;:&quot;0.25&quot;},{&quot;name&quot;:&quot;Y Density Padding&quot;,&quot;description&quot;:&quot;Y Density Padding.&quot;,&quot;type&quot;:&quot;float&quot;,&quot;minValue&quot;:1,&quot;maxValue&quot;:50,&quot;target&quot;:&quot;model.attributes.options.settings.yDensityPadding&quot;,&quot;initialValue&quot;:&quot;0.25&quot;},{&quot;name&quot;:&quot;Min Size&quot;,&quot;description&quot;:&quot;Minimum Size&quot;,&quot;type&quot;:&quot;int&quot;,&quot;minValue&quot;:0,&quot;maxValue&quot;:200,&quot;target&quot;:&quot;model.attributes.options.guide.size.minSize&quot;,&quot;initialValue&quot;:10},{&quot;name&quot;:&quot;Max Size&quot;,&quot;description&quot;:&quot;Maximum Size&quot;,&quot;type&quot;:&quot;int&quot;,&quot;minValue&quot;:0,&quot;maxValue&quot;:200,&quot;target&quot;:&quot;model.attributes.options.guide.size.maxSize&quot;,&quot;initialValue&quot;:10},{&quot;name&quot;:&quot;Animation Speed&quot;,&quot;description&quot;:&quot;Animation speed.&quot;,&quot;type&quot;:&quot;int&quot;,&quot;minValue&quot;:0,&quot;maxValue&quot;:2000,&quot;target&quot;:&quot;model.attributes.options.settings.animationSpeed&quot;,&quot;initialValue&quot;:&quot;750&quot;},{&quot;name&quot;:&quot;ASynchronous Rendering&quot;,&quot;description&quot;:&quot;Enable asyncrhonous rendering.&quot;,&quot;type&quot;:&quot;boolean&quot;,&quot;target&quot;:&quot;model.attributes.options.settings.asyncRendering&quot;,&quot;initialValue&quot;:true},{&quot;name&quot;:&quot;Fit Model Settings&quot;,&quot;description&quot;:&quot;Fit settings.&quot;,&quot;type&quot;:&quot;choice&quot;,&quot;choices&quot;:[&quot;normal&quot;,&quot;minimal&quot;,&quot;entire-view&quot;,&quot;fit-width&quot;,&quot;fit-height&quot;],&quot;target&quot;:&quot;model.attributes.options.settings.fitModel&quot;,&quot;initialValue&quot;:&quot;normal&quot;},{&quot;name&quot;:&quot;X-Axis&quot;,&quot;description&quot;:&quot;The X Axis&quot;,&quot;type&quot;:&quot;choice&quot;,&quot;choices&quot;:[],&quot;target&quot;:&quot;model.attributes.options.x&quot;},{&quot;name&quot;:&quot;Y-Axis&quot;,&quot;description&quot;:&quot;The Y Axis&quot;,&quot;type&quot;:&quot;choice&quot;,&quot;choices&quot;:[],&quot;target&quot;:&quot;model.attributes.options.y&quot;},{&quot;name&quot;:&quot;Color&quot;,&quot;description&quot;:&quot;The color&quot;,&quot;type&quot;:&quot;choice&quot;,&quot;choices&quot;:[&quot;none&quot;],&quot;target&quot;:&quot;model.attributes.options.color&quot;},{&quot;name&quot;:&quot;Size&quot;,&quot;description&quot;:&quot;Size by.&quot;,&quot;type&quot;:&quot;choice&quot;,&quot;choices&quot;:[&quot;none&quot;],&quot;target&quot;:&quot;model.attributes.options.size&quot;,&quot;initialValue&quot;:&quot;none&quot;},{&quot;name&quot;:&quot;Split&quot;,&quot;description&quot;:&quot;Split colors/series on.&quot;,&quot;type&quot;:&quot;choice&quot;,&quot;choices&quot;:[&quot;none&quot;],&quot;target&quot;:&quot;model.attributes.options.split&quot;}]}]}}</config-def>
+         </task>
+      </task-item>
+   </tasks>
+</dex-project>

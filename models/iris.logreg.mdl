@@ -1,0 +1,62 @@
+<object-stream>
+  <string>Logistic Regression</string>
+  <list>
+    <string>Sepal Length</string>
+    <string>Sepal Width</string>
+    <string>Petal Length</string>
+    <string>Petal Width</string>
+  </list>
+  <list>
+    <string>double</string>
+    <string>double</string>
+    <string>double</string>
+    <string>double</string>
+  </list>
+  <smile.classification.LogisticRegression>
+    <p>4</p>
+    <k>3</k>
+    <L>-5.949273396210297</L>
+    <W>
+      <double-array>
+        <double>5.85895835468771</double>
+        <double>15.722576661401366</double>
+        <double>-23.380034877110177</double>
+        <double>-10.779852307948955</double>
+        <double>3.1684503138657547</double>
+      </double-array>
+      <double-array>
+        <double>-1.696883395701148</double>
+        <double>-4.520816635490144</double>
+        <double>6.975305900677039</double>
+        <double>-3.7532496690103527</double>
+        <double>19.7349586247391</double>
+      </double-array>
+      <double-array>
+        <double>-4.162074958986834</double>
+        <double>-11.201760025912243</double>
+        <double>16.404728976432583</double>
+        <double>14.533101976961015</double>
+        <double>-22.90340893860506</double>
+      </double-array>
+    </W>
+  </smile.classification.LogisticRegression>
+  <linked-hash-map>
+    <entry>
+      <string>classificationMap</string>
+      <linked-hash-map>
+        <entry>
+          <int>0</int>
+          <string>setosa</string>
+        </entry>
+        <entry>
+          <int>1</int>
+          <string>versicolor</string>
+        </entry>
+        <entry>
+          <int>2</int>
+          <string>virginica</string>
+        </entry>
+      </linked-hash-map>
+    </entry>
+  </linked-hash-map>
+</object-stream>
