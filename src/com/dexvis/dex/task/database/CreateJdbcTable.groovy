@@ -27,7 +27,6 @@ import org.simpleframework.xml.Element
 import org.simpleframework.xml.Root
 import org.tbee.javafx.scene.layout.MigPane
 
-import com.dexvis.dex.Dex
 import com.dexvis.dex.exception.DexException
 import com.dexvis.dex.wf.DexEnvironment
 import com.dexvis.dex.wf.DexTask
@@ -178,7 +177,7 @@ class CreateJdbcTable extends DexTask {
     
     updateMessage("Dropping previous version")
     String dropSql = "DROP TABLE ${env.interpolate(tableText.getText())}"
-    println "DROP SQL: dropSql"
+    println "DROP SQL: ${dropSql}"
     
     try
     {
@@ -209,7 +208,7 @@ class CreateJdbcTable extends DexTask {
     
     def selectedDb = dbCB.getSelectionModel().getSelectedItem()
     println "SELECTED DB: '${selectedDb}'"
-    
+
     def dbTypeMaps = [
       "default" : [
         "integer" : "NUMBER(19,0)",
@@ -234,7 +233,6 @@ class CreateJdbcTable extends DexTask {
     println "DB TYPEMAP: '$dbTypeMap'"
     List<Integer> dataLengths = state.dexData.getMaxLengths()
     dataTypes.eachWithIndex { dataType, di ->
-      
       // Enough to store a long integer
       if (dataType == "integer")
       {
