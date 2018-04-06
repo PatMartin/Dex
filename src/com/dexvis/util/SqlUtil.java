@@ -18,6 +18,9 @@ import java.util.logging.Logger;
 
 import javax.sql.DataSource;
 
+import com.dexvis.dex.Dex;
+import com.dexvis.dex.DexData;
+
 /**
  * 
  * This class defines useful utilities for dealing with the jdbc.
@@ -29,7 +32,7 @@ import javax.sql.DataSource;
 public class SqlUtil
 {
   private static Logger logger = Logger.getLogger(SqlUtil.class.getName());
-
+  
   /**
    * 
    * Close a statement silently, handle all exceptions, should they occur.
@@ -59,7 +62,7 @@ public class SqlUtil
     }
     return null;
   }
-
+  
   /**
    * 
    * Close a statement silently, handle all exceptions, should they occur.
@@ -89,7 +92,7 @@ public class SqlUtil
     }
     return null;
   }
-
+  
   /**
    * 
    * Given an int datatype, return the java.sql.Types name for that datatype.
@@ -147,10 +150,10 @@ public class SqlUtil
       case Types.VARCHAR:
         return "VARCHAR";
     }
-
+    
     return "UNKNOWN";
   }
-
+  
   /**
    * 
    * Close a connection silently, handle all exceptions, should they occur.
@@ -178,10 +181,10 @@ public class SqlUtil
     {
       logger.log(Level.SEVERE, "Couldn't close connection.", ex);
     }
-
+    
     return null;
   }
-
+  
   /**
    * 
    * Close a ResultSet silently, handle all exceptions, should they occur.
@@ -209,10 +212,10 @@ public class SqlUtil
     {
       logger.log(Level.SEVERE, "Couldn't close result set.", ex);
     }
-
+    
     return null;
   }
-
+  
   /**
    * 
    * Print an exception, or series of exceptions to the designated output
@@ -237,7 +240,7 @@ public class SqlUtil
       sqlEx = sqlEx.getNextException();
     }
   }
-
+  
   public static List<Map<String, Object>> getResultSet(ResultSet rs)
       throws SQLException
   {
@@ -245,13 +248,13 @@ public class SqlUtil
     
     Map<String, Object> row = null;
     List<Map<String, Object>> resultList = new ArrayList<Map<String, Object>>();
-
+    
     // Process the data.
     if (rs != null)
     {
       ResultSetMetaData rsmd = rs.getMetaData();
       int numCols = rsmd.getColumnCount();
-
+      
       for (int r = 1; rs.next(); r++)
       {
         row = new HashMap<String, Object>();
@@ -273,23 +276,23 @@ public class SqlUtil
         resultList.add(row);
       }
     }
-
+    
     return resultList;
   }
-
+  
   public static List<Map<String, Object>> getResultSetNew(ResultSet rs)
       throws SQLException
   {
     int i = 0;
     Map<String, Object> row = null;
     List<Map<String, Object>> resultList = new ArrayList<Map<String, Object>>();
-
+    
     // Process the data.
     if (rs != null)
     {
       ResultSetMetaData rsmd = rs.getMetaData();
       int numCols = rsmd.getColumnCount();
-
+      
       while (rs.next())
       {
         row = new HashMap<String, Object>();
@@ -305,20 +308,20 @@ public class SqlUtil
                 "" + rs.getString(rsmd.getColumnLabel(i)));
           }
         }
-
+        
         logger.finest("ROW: " + row);
         resultList.add(row);
       }
     }
-
+    
     return resultList;
   }
-
+  
   public static Connection getConnection(DataSource ds, String username,
       String password, int numTries, long retryWait) throws SQLException
   {
     Connection con = null;
-
+    
     for (int i = 0; i < numTries; i++)
     {
       try
@@ -349,15 +352,15 @@ public class SqlUtil
         }
       }
     }
-
+    
     return con;
   }
-
+  
   public static Connection getConnection(DataSource ds, int numTries,
       long retryWait) throws SQLException
   {
     Connection con = null;
-
+    
     for (int i = 0; i < numTries; i++)
     {
       try
@@ -388,7 +391,7 @@ public class SqlUtil
         }
       }
     }
-
+    
     return con;
   }
 }

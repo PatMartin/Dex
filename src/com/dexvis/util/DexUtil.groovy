@@ -13,7 +13,7 @@ import com.dexvis.dex.wf.DexTask;
 
 /**
  * 
- * Useful routines for manipulating DexData.
+ * Useful routines when working with Dex.
  * 
  * @author Patrick Martin
  * 

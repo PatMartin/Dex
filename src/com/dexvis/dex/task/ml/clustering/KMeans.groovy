@@ -66,9 +66,9 @@ class KMeans extends DexTask {
     def ndata= selected.getDoubles(selected.header)
     
     smile.clustering.KMeans kmeans = new smile.clustering.KMeans(ndata,
-        numClustersValueLabel.getText() as Integer)
-    println "KMEANS: ${kmeans}"
-    
+        (int) numClustersValueLabel.getText())
+
+    //println "KMEANS: ${kmeans}"
     ndata.eachWithIndex { row, ri ->
       dex.data[ri] << new String("${kmeans.predict(row)}")
     }
