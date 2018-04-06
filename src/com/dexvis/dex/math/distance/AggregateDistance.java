@@ -22,7 +22,7 @@ public class AggregateDistance implements
     {
       maxDistance = distance;
     }
-    
+
     if (distance < minDistance)
     {
       minDistance = distance;
