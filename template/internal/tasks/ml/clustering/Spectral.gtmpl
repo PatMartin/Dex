@@ -63,21 +63,50 @@ src="https://getfirebug.com/firebug-lite.js">
 </div>
 <div class="ui-layout-east">
   <table border="1">
-    <tr><td>Dex Data Length:</td><td><%= dex.data.size() %></td></tr>
-    <tr><td>Membership Length:</td><td><%= membership.length %></td></tr>  </table>
+    <tr><td>Distortion:</td><td><%= distortion %></td></tr>
+    <tr><td>Num Clusters:</td><td><%= numClusters %></td></tr>
+    <tr><td>Spectral:</td><td><%= spectral %></td></tr>
+  </table>
 </div>
 <script>
 <%
-  def dd = dex.head(100)
+
+  def cmap = [:]
+  def clusterStr2Values = [:]
   
-  // Prepend row number, cluster number to data
-  membership.eachWithIndex {
+  clusterLabels.eachWithIndex {
     cluster, ri ->
-    if (ri < 100) {
-      dd.data[ri] = [ cluster, ri + 1 ].plus(data[ri])
+    cmap[cluster] = []
+  }
+
+  int maxValues = 0
+
+  clusterLabels.eachWithIndex {
+    cluster, ri ->
+    def clusterStr = "[ ${clusterValues[ri].join(', ')} ]"
+    if (clusterValues[ri].size() > maxValues) {
+      maxValues = clusterValues[ri].size()
+    }
+    clusterStr2Values[clusterStr] = clusterValues[ri]
+    cmap[cluster] << clusterStr
+  }
+  
+  def dd = new DexData(["Cluster", "Member Index" ])
+  cmap.keySet().sort().each {
+    cluster ->
+    cmap[cluster].eachWithIndex {
+      clusterStr, ci ->
+        def clusterVal = clusterLabels
+        //println "<tr><td>${cluster}</td><td>${clusterVal}</td></tr>"
+        def row =[ "${cluster}", "${ci}" ]
+        clusterStr2Values[clusterStr].each { row << "${it}" }
+        dd.data << row
     }
   }
-  dd.header = [ "Cluster", "Sample" ].plus(header)
+
+  //(1..maxValues).each { dd.header << "Value ${it}" }
+  clusterHeaders.each { dd.header << "${it}" }
+
   println dd.toCsvString()
 %>
 
