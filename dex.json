@@ -275,7 +275,8 @@
 	],
 
 	"databases": 
-	[
+	{
+		"HyperSQL": 
 		{
 			"name": "HyperSQL",
 			"driver": "org.hsqldb.jdbc.JDBCDriver",
@@ -291,6 +292,7 @@
 			}
 		},
 
+		"Oracle": 
 		{
 			"name": "Oracle",
 			"driver": "oracle.jdbc.OracleDriver",
@@ -306,6 +308,7 @@
 			}
 		},
 
+		"MySql": 
 		{
 			"name": "MySql",
 			"driver": "com.mysql.jdbc.Driver",
@@ -321,6 +324,7 @@
 			}
 		},
 
+		"Sqlite": 
 		{
 			"name": "Sqlite",
 			"driver": "org.sqlite.JDBC",
@@ -336,6 +340,7 @@
 			}
 		},
 
+		"Neo4J": 
 		{
 			"name": "Neo4J",
 			"driver": "org.neo4j.jdbc.Driver",
@@ -351,6 +356,7 @@
 			}
 		},
 
+		"Generic JDBC": 
 		{
 			"name": "Generic JDBC",
 			"driver": "jdbc.path.to.driver",
@@ -365,5 +371,5 @@
 				"string": "VARCHAR2"
 			}
 		}
-	]
+	}
 }
