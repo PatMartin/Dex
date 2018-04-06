@@ -4,10 +4,8 @@ import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.Modifier;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.concurrent.CompletionService;
 import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
@@ -57,9 +55,7 @@ import com.dexvis.javafx.scene.control.DexTaskTree;
 import com.dexvis.javafx.scene.control.ModalDialog;
 import com.dexvis.util.ClassPathUtil;
 import com.dexvis.util.DateUtil;
-import com.dexvis.util.JsonUtil;
 import com.dexvis.util.SortedList;
-import com.dexvis.util.StreamUtil;
 import com.dexvis.util.ThreadUtil;
 
 /**
@@ -73,7 +69,7 @@ public class Dex extends Application
 {
   public static Dex instance;
   
-  private static Object config = null;
+  private static DexConfig config = DexConfig.newInstance();
   
   // Thread factory for executing task serially.
   private final static BasicThreadFactory serialThreadFactory = new BasicThreadFactory.Builder()
@@ -107,15 +103,13 @@ public class Dex extends Application
     System.out.println("Available Processors: "
         + Runtime.getRuntime().availableProcessors());
     
-    String configPath = (System.getProperties().contains("dex.config")) ? System
-        .getProperties().getProperty("dex.config") : "dex.json";
-    
+    // Read in the portion of the config file which deals with dates.
+    // This allows the user to extend Dex's capabilities in the area
+    // of date-format recognition when encountering exotic time/date
+    // formats in the while.
     try
     {
-      config = JsonUtil.pathToObject(configPath);
-      
-      Map<String, Object> map = (Map<String, Object>) config;
-      List<Object> dateFormats = (List) map.get("dateFormats");
+      List<Object> dateFormats = config.getObjectList("dateFormats");
       
       for (Object obj : dateFormats)
       {
@@ -130,12 +124,11 @@ public class Dex extends Application
     }
     catch(Exception ex)
     {
-      System.err.println("Error Reading: '" + configPath + "'");
       ex.printStackTrace();
     }
     System.out.println("DEX-CONFIG: '" + config + "'");
   }
-  
+
   // GUI component housing our project name. Defaults to UnsavedProject.dex
   private StringProperty curProjectStringProp = new SimpleStringProperty(
       "UnsavedProject.dex");
