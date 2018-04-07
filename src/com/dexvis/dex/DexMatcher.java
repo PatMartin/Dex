@@ -1,6 +1,7 @@
 package com.dexvis.dex;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -32,6 +33,7 @@ import com.dexvis.simple.transform.PropertySheetTransform;
 import com.dexvis.simple.transform.RadioButtonTransform;
 import com.dexvis.simple.transform.SliderTransform;
 import com.dexvis.simple.transform.StringListTransform;
+import com.dexvis.simple.transform.StringMapTransform;
 import com.dexvis.simple.transform.StringPropertyTransform;
 import com.dexvis.simple.transform.TextAreaTransform;
 import com.dexvis.simple.transform.TextFieldTransform;
@@ -59,6 +61,10 @@ public class DexMatcher implements Matcher
     else if (type.equals(ArrayList.class))
     {
       return new StringListTransform();
+    }
+    else if (type.equals(HashMap.class))
+    {
+      return new StringMapTransform();
     }
     else if (type.equals(TextArea.class))
     {
