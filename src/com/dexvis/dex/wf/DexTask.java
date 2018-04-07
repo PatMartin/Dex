@@ -25,9 +25,6 @@ import com.thoughtworks.xstream.annotations.XStreamOmitField;
 public class DexTask extends Task<DexTask> implements Comparable<DexTask>,
     Serializable, Cloneable, DexConstants
 {
-  /**
-   * 
-   */
   private static final long serialVersionUID = -3296675819537504912L;
   // Base directory for all task help files.
   
@@ -73,7 +70,7 @@ public class DexTask extends Task<DexTask> implements Comparable<DexTask>,
   
   public DexTask(String category, String name, String helpFile)
   {
-    // System.out.println("CREATING(S, S, S) : " + getName());
+    System.out.println("Creating DexTask(" + category + ", " + name + ")");
     setCategory(category);
     setName(name);
     setHelpFile(helpFile);
