@@ -1,6 +1,9 @@
 package com.dexvis.dex.task.tablemanipulation
 
 import javafx.application.Platform
+import javafx.beans.value.ChangeListener
+import javafx.beans.value.ObservableValue
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler
 import javafx.scene.Node
 import javafx.scene.control.Button
@@ -62,10 +65,8 @@ class ReplaceAll extends DexTask {
     def selectedColumns = [:];
     
     if (columnMap.size() <= 0) {
-      state.dexData.header.each { columnMap[it] = true }
+      state.dexData.header.each { columnMap[it] = "true" }
       Platform.runLater({ renderColumns(columnMap) })
-    }
-    else {
     }
     
     int numRows = state.dexData.data?.size();
@@ -106,6 +107,10 @@ class ReplaceAll extends DexTask {
       columnMap.each { key, value ->
         CheckBox cb = new CheckBox(key)
         cb.setSelected(value == "true")
+        cb.setOnAction({ ActionEvent actionEvent ->
+          columnMap[key] = (((CheckBox) actionEvent.getSource()).isSelected()) ?
+            "true" : "false"
+        } as EventHandler);
         columnPane.add(cb, "span")
       }
     }
@@ -127,6 +132,7 @@ class ReplaceAll extends DexTask {
       // Figure out how to initialize at first given list of cb and no map.
       
       ScrollPane scrollPane = new ScrollPane()
+      renderColumns(columnMap);
       scrollPane.setContent(columnPane)
       
       configPane.add(scrollPane, "grow, span")
@@ -142,23 +148,23 @@ class ReplaceAll extends DexTask {
         columnMap.clear()
       } as EventHandler);
       
-    clearButton.setOnAction({ actionEvent ->
-      columnPane.getChildren().clear()
-      columnMap.clear()
-    } as EventHandler);
-  
+      clearButton.setOnAction({ actionEvent ->
+        columnPane.getChildren().clear()
+        columnMap.clear()
+      } as EventHandler);
+      
       selectAllButton.setOnAction({ actionEvent ->
         columnPane.getChildren().each { cb ->
           ((CheckBox)cb).setSelected(true)
         }
-        columnMap.each { key, value -> columnMap[key] = true }
+        columnMap.each { key, value -> columnMap[key] = "true" }
       } as EventHandler)
       
       unselectAllButton.setOnAction({ actionEvent ->
         columnPane.getChildren().each { cb ->
           ((CheckBox)cb).setSelected(false)
         }
-        columnMap.each { key, value -> columnMap[key] = false }
+        columnMap.each { key, value -> columnMap[key] = "false" }
       } as EventHandler)
     }
     
