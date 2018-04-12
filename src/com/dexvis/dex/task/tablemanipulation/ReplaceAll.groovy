@@ -91,9 +91,12 @@ class ReplaceAll extends DexTask {
   
   private void renderColumns(Map<String, Boolean> columnMap) {
     columnPane.getChildren().clear()
+    columnList.clear()
+    
     columnMap.keySet().sort().each { key ->
       CheckBox cb = new CheckBox(key)
       cb.setSelected(columnMap.get(key))
+      columnList.add(cb)
       columnPane.add(cb, "span")
     }
   }
