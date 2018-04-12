@@ -2,6 +2,7 @@ package com.dexvis.dex;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -27,6 +28,7 @@ import com.dexvis.simple.transform.CheckBoxTransform;
 import com.dexvis.simple.transform.ChoiceBoxTransform;
 import com.dexvis.simple.transform.HTMLEditorTransform;
 import com.dexvis.simple.transform.LabelTransform;
+import com.dexvis.simple.transform.LinkedMapTransform;
 import com.dexvis.simple.transform.ListSelectionViewTransform;
 import com.dexvis.simple.transform.ListViewTransform;
 import com.dexvis.simple.transform.PropertySheetTransform;
@@ -65,6 +67,10 @@ public class DexMatcher implements Matcher
     else if (type.equals(HashMap.class))
     {
       return new StringMapTransform();
+    }
+    else if (type.equals(LinkedHashMap.class))
+    {
+      return new LinkedMapTransform();
     }
     else if (type.equals(TextArea.class))
     {

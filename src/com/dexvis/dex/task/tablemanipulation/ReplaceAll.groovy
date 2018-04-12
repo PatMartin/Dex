@@ -18,6 +18,7 @@ import com.dexvis.dex.wf.DexEnvironment
 import com.dexvis.dex.wf.DexTask
 import com.dexvis.dex.wf.DexTaskState
 import com.dexvis.javafx.scene.control.NodeFactory
+import com.thoughtworks.xstream.annotations.XStreamOmitField
 
 /**
  * 
@@ -28,6 +29,7 @@ import com.dexvis.javafx.scene.control.NodeFactory
  */
 @Root
 class ReplaceAll extends DexTask {
+  @XStreamOmitField
   private MigPane configPane = null
   
   @Element(name="replace", required=false)
@@ -36,8 +38,12 @@ class ReplaceAll extends DexTask {
   @Element(name="with", required=false)
   private TextField withText = new TextField()
   
-  @Element(name="columnList", required=false)
-  private List<CheckBox> columnList = new ArrayList<CheckBox>()
+  @Element(name="sort", required=false)
+  private CheckBox sortCB = new CheckBox()
+  
+  @Element(name="columnMap", required=false)
+  private LinkedHashMap<String, String> columnMap = new LinkedHashMap<String, String>()
+  
   private MigPane columnPane = new MigPane("", "[][]")
   
   /**
@@ -55,14 +61,11 @@ class ReplaceAll extends DexTask {
     DexEnvironment env = DexEnvironment.getInstance()
     def selectedColumns = [:];
     
-    if (columnList.size() <= 0) {
-      state.dexData.header.each { selectedColumns[it] = true }
-      Platform.runLater({ renderColumns(selectedColumns) })
+    if (columnMap.size() <= 0) {
+      state.dexData.header.each { columnMap[it] = true }
+      Platform.runLater({ renderColumns(columnMap) })
     }
     else {
-      columnList.each { cb ->
-        selectedColumns[cb.getText()] = cb.isSelected()
-      }
     }
     
     int numRows = state.dexData.data?.size();
@@ -78,7 +81,7 @@ class ReplaceAll extends DexTask {
       }
       
       state.dexData.header.eachWithIndex { hdr, hi ->
-        if (selectedColumns.containsKey(hdr) && selectedColumns[hdr] == true) {
+        if (columnMap.containsKey(hdr) && columnMap[hdr] == "true") {
           state.dexData.data[ri][hi] = state.dexData.data[ri][hi].replaceAll(replaceStr, withStr)
         }
       }
@@ -91,20 +94,27 @@ class ReplaceAll extends DexTask {
   
   private void renderColumns(Map<String, Boolean> columnMap) {
     columnPane.getChildren().clear()
-    columnList.clear()
     
-    columnMap.keySet().sort().each { key ->
-      CheckBox cb = new CheckBox(key)
-      cb.setSelected(columnMap.get(key))
-      columnList.add(cb)
-      columnPane.add(cb, "span")
+    if (sortCB.isSelected()) {
+      columnMap.keySet().sort().each { key ->
+        CheckBox cb = new CheckBox(key)
+        cb.setSelected(columnMap.get(key) == "true")
+        columnPane.add(cb, "span")
+      }
+    }
+    else {
+      columnMap.each { key, value ->
+        CheckBox cb = new CheckBox(key)
+        cb.setSelected(value == "true")
+        columnPane.add(cb, "span")
+      }
     }
   }
   
   public Node getConfig() {
     
     if (configPane == null) {
-      configPane = new MigPane("", "[][grow]", "[][][][grow][]")
+      configPane = new MigPane("", "[][grow]", "[][][][][grow][]")
       configPane.setStyle("-fx-background-color: white;")
       
       configPane.add(NodeFactory.createTitle("Replace All"), "grow,span")
@@ -112,7 +122,8 @@ class ReplaceAll extends DexTask {
       configPane.add(replaceText, "grow, span")
       configPane.add(new Label("Replacement Text:"))
       configPane.add(withText, "grow, span")
-      
+      configPane.add(new Label("Sort"))
+      configPane.add(sortCB, "span")
       // Figure out how to initialize at first given list of cb and no map.
       
       ScrollPane scrollPane = new ScrollPane()
@@ -128,16 +139,27 @@ class ReplaceAll extends DexTask {
       
       clearButton.setOnAction({ actionEvent ->
         columnPane.getChildren().clear()
-        columnList.clear()
+        columnMap.clear()
       } as EventHandler);
       
+    clearButton.setOnAction({ actionEvent ->
+      columnPane.getChildren().clear()
+      columnMap.clear()
+    } as EventHandler);
+  
       selectAllButton.setOnAction({ actionEvent ->
-        columnList.each { it.setSelected(true) }
-      } as EventHandler);
+        columnPane.getChildren().each { cb ->
+          ((CheckBox)cb).setSelected(true)
+        }
+        columnMap.each { key, value -> columnMap[key] = true }
+      } as EventHandler)
       
       unselectAllButton.setOnAction({ actionEvent ->
-        columnList.each { it.setSelected(false) }
-      } as EventHandler);
+        columnPane.getChildren().each { cb ->
+          ((CheckBox)cb).setSelected(false)
+        }
+        columnMap.each { key, value -> columnMap[key] = false }
+      } as EventHandler)
     }
     
     return configPane
