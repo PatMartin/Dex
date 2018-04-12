@@ -83,7 +83,7 @@ class ReplaceAll extends DexTask {
       
       state.dexData.header.eachWithIndex { hdr, hi ->
         if (columnMap.containsKey(hdr) && columnMap[hdr] == "true") {
-          state.dexData.data[ri][hi] = state.dexData.data[ri][hi].replaceAll(replaceStr, withStr)
+          state.dexData.data[ri][hi] = state.dexData.data[ri][hi]?.replaceAll(replaceStr, withStr)
         }
       }
     }
