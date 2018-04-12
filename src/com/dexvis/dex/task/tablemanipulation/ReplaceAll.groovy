@@ -44,6 +44,12 @@ class ReplaceAll extends DexTask {
   @Element(name="sort", required=false)
   private CheckBox sortCB = new CheckBox()
   
+  @Element(name="replaceNull", required=false)
+  private CheckBox replaceNullCB = new CheckBox()
+  
+  @Element(name="replaceNullWith", required=false)
+  private TextField replaceNullWithText = new TextField()
+  
   @Element(name="columnMap", required=false)
   private LinkedHashMap<String, String> columnMap = new LinkedHashMap<String, String>()
   
@@ -83,7 +89,14 @@ class ReplaceAll extends DexTask {
       
       state.dexData.header.eachWithIndex { hdr, hi ->
         if (columnMap.containsKey(hdr) && columnMap[hdr] == "true") {
-          state.dexData.data[ri][hi] = state.dexData.data[ri][hi]?.replaceAll(replaceStr, withStr)
+          if (state.dexData.data[ri][hi] == null) {
+            if (replaceNullCB.isSelected()) {
+              state.dexData.data[ri][hi] = replaceNullWithText.getText()
+            }
+          }
+          else {
+            state.dexData.data[ri][hi] = state.dexData.data[ri][hi]?.replaceAll(replaceStr, withStr)
+          }
         }
       }
     }
@@ -109,7 +122,7 @@ class ReplaceAll extends DexTask {
         cb.setSelected(value == "true")
         cb.setOnAction({ ActionEvent actionEvent ->
           columnMap[key] = (((CheckBox) actionEvent.getSource()).isSelected()) ?
-            "true" : "false"
+              "true" : "false"
         } as EventHandler);
         columnPane.add(cb, "span")
       }
@@ -119,7 +132,7 @@ class ReplaceAll extends DexTask {
   public Node getConfig() {
     
     if (configPane == null) {
-      configPane = new MigPane("", "[][grow]", "[][][][][grow][]")
+      configPane = new MigPane("", "[][grow]", "[][][][][][grow][]")
       configPane.setStyle("-fx-background-color: white;")
       
       configPane.add(NodeFactory.createTitle("Replace All"), "grow,span")
@@ -127,6 +140,9 @@ class ReplaceAll extends DexTask {
       configPane.add(replaceText, "grow, span")
       configPane.add(new Label("Replacement Text:"))
       configPane.add(withText, "grow, span")
+      configPane.add(new Label("Replace Nulls"))
+      configPane.add(replaceNullWithText, "grow")
+      configPane.add(replaceNullCB, "span")
       configPane.add(new Label("Sort"))
       configPane.add(sortCB, "span")
       // Figure out how to initialize at first given list of cb and no map.
