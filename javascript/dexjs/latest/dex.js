@@ -26129,11 +26129,13 @@ var guipane = function (userConfig) {
         var attName = this.getAttribute("targetAttribute");
         var value = color.toHexString();
         if (cmp != undefined) {
-          cmp.attrSave(attName, value);
           if (!INITIALIZING) {
+            cmp.attrSave(attName, value);
             cmp.refreshAsync();
           }
-          ;
+          else {
+            cmp.attr(attName, value);
+          }
         }
       }
     });
@@ -26157,9 +26159,12 @@ var guipane = function (userConfig) {
           var cmp = componentMap[option[0].getAttribute("targetComponent")];
           var attName = option[0].getAttribute("targetAttribute");
           if (cmp != undefined) {
-            cmp.attrSave(attName, option[0].getAttribute("value"));
             if (!INITIALIZING) {
+              cmp.attrSave(attName, option[0].getAttribute("value"));
               cmp.refreshAsync();
+            }
+            else {
+              cmp.attr(attName, option[0].getAttribute("value"));
             }
           }
         }
@@ -26208,7 +26213,7 @@ var guipane = function (userConfig) {
               var attName = option.getAttribute("targetAttribute");
               if (cmp != undefined) {
                 cmp.attrSave(attName, vals);
-                  cmp.refreshAsync();
+                cmp.refreshAsync();
               }
             }
           }
@@ -26226,9 +26231,12 @@ var guipane = function (userConfig) {
         var cmp = componentMap[event.target.getAttribute("targetComponent")];
         var attName = event.target.getAttribute("targetAttribute");
         if (cmp != undefined) {
-          cmp.attrSave(attName, event.target.value);
           if (!INITIALIZING) {
+            cmp.attrSave(attName, event.target.value);
             cmp.refreshAsync();
+          }
+          else {
+            cmp.attr(attName, event.target.value);
           }
         }
       });
@@ -26256,9 +26264,12 @@ var guipane = function (userConfig) {
         slider.on("change", function (formattedValues, handle, values, tap, positions) {
           var cmp = componentMap[cmpName];
           if (cmp != undefined) {
-            cmp.attr(targetAttribute, values[0]);
             if (!INITIALIZING) {
+              cmp.attrSave(targetAttribute, values[0]);
               cmp.refreshAsync();
+            }
+            else {
+              cmp.attr(targetAttribute, values[0]);
             }
           }
         });
@@ -26298,9 +26309,12 @@ var guipane = function (userConfig) {
             values, tap, positions);
           var cmp = componentMap[cmpName];
           if (cmp != undefined) {
-            cmp.attr(targetAttribute, values[0]);
             if (!INITIALIZING) {
+              cmp.attrSave(targetAttribute, values[0]);
               cmp.refreshAsync();
+            }
+            else {
+              cmp.attr(targetAttribute, values[0]);
             }
           }
         });
@@ -27189,6 +27203,7 @@ module.exports = function (dex) {
   ui.Table = require("./Table");
   ui.ConfigurationPane = require("./ConfigurationPane");
   ui.DataFilterPane = require("./DataFilterPane");
+  //ui.ParameterPane = require("./ParameterPane");
   ui.GuiPane = require("./GuiPane");
   ui.ColumnSelector = require("./ColumnSelector");
   return ui;
