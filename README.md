@@ -2,7 +2,14 @@
 
 # Dex
 
-Dex : The data explorer is a data visualization tool written in Java/JavaFX capable of powerful ETL and data visualization.
+Dex : The data explorer is a powerful tool for data science.  It is written in Groovy and Java on top of JavaFX and offers the ability to:
+
+* Read in data from a variety of sources such files, programs and a variety of databases.
+* Transform the data in a powerful ways.
+* Apply powerful machine learning to the data via SMILE and R integration.
+* Visualize the data in over 50 distinct ways.
+* Output the data to a variety of databases and file formats.
+* Extend Dex from within via templates and internal scripting.  Save the extensions to reuse later.
 
 ## Other Resources
 
@@ -17,8 +24,10 @@ Dex : The data explorer is a data visualization tool written in Java/JavaFX capa
 
 There are 2 main ways to install Dex.
 
-1. [Download a stable release](http://dexvis.net/doku.php?id=Download)
-2. Install via Git by following the instructions below.
+1. Install via Git by following the instructions below.
+2. [Download a stable release](http://dexvis.net/doku.php?id=Download)
+
+The packaged release tends to lag significantly behind the Git version.
 
 ## Via Git
 
