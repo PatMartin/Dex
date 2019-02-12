@@ -1,0 +1,32 @@
+<%
+import static com.dexvis.util.GroovyUtil.renderTemplate as render;
+
+println render("web/include/dexjs_multiples.inc", [
+  "state"     : state,
+  "dexData"   : dexData,
+  "data"      : data,
+  "header"    : header,
+  "basedir"   : basedir,
+  "options"   : options,
+  "context"   : [
+    "chartConstructor" : "dex.charts.echarts.HeatMap",
+    "config" : [
+       "series" : [ "symbolSize": 5 ],
+       "cell": [ "height": 400, "width": 600 ],
+       "model" : [
+          "attributes": [
+            "options": [
+            legend: [show: false],
+            backgroundColor: "#FFFFFD",
+            axisLabel: [ margin: 8, rotate: 45 ],
+            "grid": [ left: 100, top: 10, right: 10, bottom: 10 ]
+          ]
+        ]
+      ]
+    ],
+    "title"   : "dex.js : ECharts Line Chart Multiples",
+    "styles"  : [ ],
+    "scripts" : [ "javascript/echarts/latest/echarts.min.js" ]
+  ]
+])
+%>

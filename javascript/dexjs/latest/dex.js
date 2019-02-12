@@ -11891,7 +11891,16 @@ var HeatMap = function (userConfig) {
       }
     },
     "options": {
-      tooltip: {},
+      tooltip: {
+        backgroundColor: "#FFFFFF",
+        borderColor: "#000000",
+        borderWidth: 2,
+        trigger: "item",
+        position: function (pos, params, dom, rect, size) {
+          return [pos[0] + 10, pos[1] - 0];
+        },
+        confine: true
+      },
       legend: {show: false},
       visualMap: {
         min: 1,
@@ -12023,14 +12032,27 @@ var HeatMap = function (userConfig) {
         dex.config.getFormatter(options.yAxis.axisLabel.formatter, yType);
     }
 
+    options.tooltip.formatter =  function (d) {
+      //dex.console.log("FORMATTER", d);
+      var str = "<table class='dex-tooltip-table'>";
+
+      csv.data[d.data[2]].forEach(function(col, ci) {
+        str += "<tr><td>" + csv.header[ci] + "</td><td>" + col + "</td></tr>";
+      });
+
+      str += "</table>";
+      return str;
+    };
+
     var series = dex.config.expandAndOverlay(chart.config.series, {
       name: chart.config.series.name,
       type: "heatmap",
-      data: csv.include([0, 1, 2]).data.map(function(row) {
+      data: csv.data.map(function(row, ri) {
         //dex.console.log("ROW", row, xData);
-        return [
+        var hdata = [
           xData.indexOf("" + row[0]),
-          yData.indexOf("" + row[1]), row[2]];
+          yData.indexOf("" + row[1]), ri, row[2]];
+        return hdata;
       })
     });
     options.series = series;
@@ -20843,7 +20865,7 @@ module.exports = function (dex) {
           "target": ns + "left",
           "type": "int",
           "minValue": 0,
-          "maxValue": 300,
+          "maxValue": 400,
           "initialValue": 0
         },
         {
@@ -20852,7 +20874,7 @@ module.exports = function (dex) {
           "target": ns + "right",
           "type": "int",
           "minValue": 0,
-          "maxValue": 300,
+          "maxValue": 400,
           "initialValue": 0
         },
         {
@@ -20861,7 +20883,7 @@ module.exports = function (dex) {
           "target": ns + "top",
           "type": "int",
           "minValue": 0,
-          "maxValue": 300,
+          "maxValue": 400,
           "initialValue": 0
         },
         {
@@ -20870,7 +20892,7 @@ module.exports = function (dex) {
           "target": ns + "bottom",
           "type": "int",
           "minValue": 0,
-          "maxValue": 300,
+          "maxValue": 400,
           "initialValue": 0
         },
         {
